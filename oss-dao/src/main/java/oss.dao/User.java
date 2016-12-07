@@ -12,10 +12,10 @@ import java.util.Set;
 @Entity
 @Table(name="Users")
 @NamedQueries({
-	@NamedQuery(name="User.findAll", query="SELECT u FROM User u")
-	@NamedQuery(name="User.findAllStudents", query="SELECT u FROM User u WHERE u.role = 'students' ")
-	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' ")
-	@NamedQuery(name="User.findUserByRole",  query="SELECT u FROM User u WHERE u.role = :role ")
+	@NamedQuery(name="User.findAll", query="SELECT u FROM User u"),
+	@NamedQuery(name="User.findAllStudents", query="SELECT u FROM User u WHERE u.role = 'students' "),
+	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' "),
+	@NamedQuery(name="User.findUserByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
 	@NamedQuery(name="User.findUserByUid",   query="SELECT u FROM User u WHERE u.uid = :uid ")
 })
 public class User implements Serializable {
