@@ -1,3 +1,4 @@
+/* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api;
 
 import de.openschoolserver.api.auth.OSSAuthorizer;
