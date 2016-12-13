@@ -11,14 +11,19 @@ import java.util.Set;
  */
 @Entity
 @Table(name="Rooms")
-@NamedQuery(name="Room.findAll", query="SELECT r FROM Room r")
+@NamedQueries ({
+  @NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
+  @NamedQuery(name="Room.getRoomByName", query="SELECT r FROM Room r WHERE r.name = :name"),
+  @NamedQuery(name="Room.getRoomByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
+  @NamedQuery(name="Room.getRoomByType", query="SELECT r FROM Room r WHERE r.type = :type")
+})
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	private int id;
 
-	private String cn;
+	private String name;
 
 	private int columns;
 
@@ -26,8 +31,10 @@ public class Room implements Serializable {
 
 	private int netMask;
 
-	private String roomtype;
+	private String startIP;
 
+	private String type;
+	
 	private int rows;
 
 	//bi-directional many-to-one association to AccessInRoom
@@ -83,12 +90,12 @@ public class Room implements Serializable {
 		this.id = id;
 	}
 
-	public String getCn() {
-		return this.cn;
+	public String getName() {
+		return this.name;
 	}
 
-	public void setCn(String cn) {
-		this.cn = cn;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public int getColumns() {
@@ -115,12 +122,20 @@ public class Room implements Serializable {
 		this.netMask = netMask;
 	}
 
-	public String getRoomtype() {
-		return this.roomtype;
+	public String getStartIP() {
+		return this.startIP;
 	}
 
-	public void setRoomtype(String roomtype) {
-		this.roomtype = roomtype;
+	public void setStartIP(String startIP) {
+		this.startIP = startIP;
+	}
+
+	public String getType() {
+		return this.type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public int getRows() {

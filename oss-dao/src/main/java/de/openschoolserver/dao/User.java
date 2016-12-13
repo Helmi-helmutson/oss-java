@@ -28,7 +28,7 @@ public class User implements Serializable {
 
 	private String role;
 
-	private String sn;
+	private String sureName;
 
 	private String uid;
 
@@ -105,12 +105,12 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-	public String getSn() {
-		return this.sn;
+	public String getSureName() {
+		return this.sureName;
 	}
 
-	public void setSn(String sn) {
-		this.sn = sn;
+	public void setSureName(String surename) {
+		this.sureName = surename;
 	}
 
 	public String getUid() {
