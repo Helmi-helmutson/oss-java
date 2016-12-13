@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
-import de.openschoolserver.api.auth.Session;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import de.openschoolserver.dao.Session;
 
 public class OSSTokenAuthenticator implements Authenticator<String, Session> {
 

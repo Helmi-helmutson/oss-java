@@ -10,7 +10,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import de.openschoolserver.api.auth.Session;
+import de.openschoolserver.dao.Session;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 

@@ -6,6 +6,8 @@ import io.dropwizard.auth.Authorizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import de.openschoolserver.dao.Session;
+
 import java.util.List;
 
 public class OSSAuthorizer implements Authorizer<Session> {

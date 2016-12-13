@@ -3,10 +3,10 @@ package de.openschoolserver.api;
 
 import de.openschoolserver.api.auth.OSSAuthorizer;
 import de.openschoolserver.api.auth.OSSTokenAuthenticator;
-import de.openschoolserver.api.auth.Session;
 import de.openschoolserver.api.health.TemplateHealthCheck;
 import de.openschoolserver.api.resourceimpl.*;
 import de.openschoolserver.api.resources.*;
+import de.openschoolserver.dao.Session;
 import io.dropwizard.Application;
 import io.dropwizard.auth.AuthDynamicFeature;
 import io.dropwizard.auth.AuthFilter;

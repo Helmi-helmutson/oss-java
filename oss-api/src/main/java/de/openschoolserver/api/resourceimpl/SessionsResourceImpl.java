@@ -1,8 +1,8 @@
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
-import de.openschoolserver.api.auth.Session;
 import de.openschoolserver.api.resources.SessionsResource;
+import de.openschoolserver.dao.Session;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

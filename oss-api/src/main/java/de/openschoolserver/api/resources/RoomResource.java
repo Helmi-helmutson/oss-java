@@ -8,8 +8,7 @@ import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 
 import de.openschoolserver.dao.Room;
-
-import de.openschoolserver.api.auth.Session;
+import de.openschoolserver.dao.Session;
 
 import java.util.List;
 

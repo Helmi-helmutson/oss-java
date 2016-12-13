@@ -1,7 +1,8 @@
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.Room;
-import de.openschoolserver.api.auth.Session;
+import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.api.resources.RoomResource;
 
 
@@ -12,9 +13,8 @@ public class RoomRescourceImpl implements RoomResource {
 
     @Override
     public Room getById(Session session, int roomId) {
-//        final RoomController roomController = new RoomController(session);
-//        final Room room = roomController.getById(roomId);
-    	Room room= new Room(); //TODO implement
+       final RoomController roomController = new RoomController(session);
+       final Room room = roomController.getById(roomId);
         if (room == null) {
             throw new WebApplicationException(404);
         }
@@ -23,10 +23,10 @@ public class RoomRescourceImpl implements RoomResource {
 
     @Override
     public List<Room> getByIds(Session session, List<Integer> roomIds) {
-//        final RoomController roomController = new RoomController(session);
-//        final List<Room> rooms = roomController.getByIds(roomIds);
-//        return rooms;
-    	return null; //TODO implement
+        final RoomController roomController = new RoomController(session);
+        final List<Room> rooms = roomController.getByIds(roomIds);
+        return rooms;
+    	
     }
 
 }
