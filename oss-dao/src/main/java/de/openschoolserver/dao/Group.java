@@ -2,7 +2,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -26,7 +26,7 @@ public class Group implements Serializable {
 
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups")
-	private Set<User> users;
+	private List<User> users;
 
 	public Group() {
 	}
@@ -63,11 +63,11 @@ public class Group implements Serializable {
 		this.type = type;
 	}
 
-	public Set<User> getUsers() {
+	public List<User> getUsers() {
 		return this.users;
 	}
 
-	public void setUsers(Set<User> users) {
+	public void setUsers(List<User> users) {
 		this.users = users;
 	}
 

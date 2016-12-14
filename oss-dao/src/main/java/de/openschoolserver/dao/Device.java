@@ -2,7 +2,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -43,11 +43,11 @@ public class Device implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
-	private Set<Device> availablePrinters;
+	private List<Device> availablePrinters;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="availablePrinters")
-	private Set<Device> availableForDevices;
+	private List<Device> availableForDevices;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
@@ -60,11 +60,11 @@ public class Device implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
-	private Set<Device> defaultPrinter;
+	private List<Device> defaultPrinter;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="defaultPrinter")
-	private Set<Device> defaultForDevices;
+	private List<Device> defaultForDevices;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
@@ -80,19 +80,19 @@ public class Device implements Serializable {
 
 	//bi-directional many-to-many association to Room
 	@ManyToMany(mappedBy="availablePrinters")
-	private Set<Room> availableInRooms;
+	private List<Room> availableInRooms;
 
 	//bi-directional many-to-many association to Room
 	@ManyToMany(mappedBy="defaultPrinter")
-	private Set<Room> defaultInRooms;
+	private List<Room> defaultInRooms;
 
 	//bi-directional many-to-one association to TestUser
 	@OneToMany(mappedBy="device")
-	private Set<TestUser> testUsers;
+	private List<TestUser> testUsers;
 
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="loggedOn")
-	private Set<User> loggedIn;
+	private List<User> loggedIn;
 
 	public Device() {
 	}
@@ -153,35 +153,35 @@ public class Device implements Serializable {
 		this.wstype = wstype;
 	}
 
-	public Set<Device> getAvailablePrinters() {
+	public List<Device> getAvailablePrinters() {
 		return this.availablePrinters;
 	}
 
-	public void setAvailablePrinters(Set<Device> availablePrinters) {
+	public void setAvailablePrinters(List<Device> availablePrinters) {
 		this.availablePrinters = availablePrinters;
 	}
 
-	public Set<Device> getAvailableForDevices() {
+	public List<Device> getAvailableForDevices() {
 		return this.availableForDevices;
 	}
 
-	public void setAvailableForDevices(Set<Device> availableForDevices) {
+	public void setAvailableForDevices(List<Device> availableForDevices) {
 		this.availableForDevices = availableForDevices;
 	}
 
-	public Set<Device> getDefaultPrinter() {
+	public List<Device> getDefaultPrinter() {
 		return this.defaultPrinter;
 	}
 
-	public void setDefaultPrinter(Set<Device> defaultPrinter) {
+	public void setDefaultPrinter(List<Device> defaultPrinter) {
 		this.defaultPrinter = defaultPrinter;
 	}
 
-	public Set<Device> getDefaultForDevices() {
+	public List<Device> getDefaultForDevices() {
 		return this.defaultForDevices;
 	}
 
-	public void setDefaultForDevices(Set<Device> defaultForDevices) {
+	public void setDefaultForDevices(List<Device> defaultForDevices) {
 		this.defaultForDevices = defaultForDevices;
 	}
 
@@ -209,27 +209,27 @@ public class Device implements Serializable {
 		this.owner = owner;
 	}
 
-	public Set<Room> getAvailableInRooms() {
+	public List<Room> getAvailableInRooms() {
 		return this.availableInRooms;
 	}
 
-	public void setAvailableInRooms(Set<Room> availableInRooms) {
+	public void setAvailableInRooms(List<Room> availableInRooms) {
 		this.availableInRooms = availableInRooms;
 	}
 
-	public Set<Room> getDefaultInRooms() {
+	public List<Room> getDefaultInRooms() {
 		return this.defaultInRooms;
 	}
 
-	public void setDefaultInRooms(Set<Room> defaultInRooms) {
+	public void setDefaultInRooms(List<Room> defaultInRooms) {
 		this.defaultInRooms = defaultInRooms;
 	}
 
-	public Set<TestUser> getTestUsers() {
+	public List<TestUser> getTestUsers() {
 		return this.testUsers;
 	}
 
-	public void setTestUsers(Set<TestUser> testUsers) {
+	public void setTestUsers(List<TestUser> testUsers) {
 		this.testUsers = testUsers;
 	}
 
@@ -247,11 +247,11 @@ public class Device implements Serializable {
 		return testUser;
 	}
 
-	public Set<User> getLoggedIn() {
+	public List<User> getLoggedIn() {
 		return this.loggedIn;
 	}
 
-	public void setLoggedIn(Set<User> loggedIn) {
+	public void setLoggedIn(List<User> loggedIn) {
 		this.loggedIn = loggedIn;
 	}
 

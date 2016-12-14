@@ -3,7 +3,7 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -40,11 +40,11 @@ public class Test implements Serializable {
 
 	//bi-directional many-to-one association to TestFile
 	@OneToMany(mappedBy="test")
-	private Set<TestFile> testFiles;
+	private List<TestFile> testFiles;
 
 	//bi-directional many-to-one association to TestUser
 	@OneToMany(mappedBy="test")
-	private Set<TestUser> testUsers;
+	private List<TestUser> testUsers;
 
 	//bi-directional many-to-one association to Room
 	@ManyToOne
@@ -130,11 +130,11 @@ public class Test implements Serializable {
 		this.windowsAccess = windowsAccess;
 	}
 
-	public Set<TestFile> getTestFiles() {
+	public List<TestFile> getTestFiles() {
 		return this.testFiles;
 	}
 
-	public void setTestFiles(Set<TestFile> testFiles) {
+	public void setTestFiles(List<TestFile> testFiles) {
 		this.testFiles = testFiles;
 	}
 
@@ -152,11 +152,11 @@ public class Test implements Serializable {
 		return testFile;
 	}
 
-	public Set<TestUser> getTestUsers() {
+	public List<TestUser> getTestUsers() {
 		return this.testUsers;
 	}
 
-	public void setTestUsers(Set<TestUser> testUsers) {
+	public void setTestUsers(List<TestUser> testUsers) {
 		this.testUsers = testUsers;
 	}
 
