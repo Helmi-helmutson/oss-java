@@ -33,16 +33,16 @@ public class IPv4 {
     int netmaskNumeric;
 
     /**
-* Specify IP address and netmask like: new
-* IPv4("10.1.0.25","255.255.255.16")
-*
-*@param symbolicIP
-*@param netmask
-*/
+     * Specify IP address and netmask like: new
+     * IPv4("10.1.0.25","255.255.255.16")
+     *
+     *@param symbolicIP
+     *@param netmask
+     */
     public IPv4(String symbolicIP, String netmask) throws NumberFormatException {
 
         /* IP */
-        String[] st = symbolicIP.split("\.");
+        String[] st = symbolicIP.split("\\.");
 
         if (st.length != 4)
             throw new NumberFormatException("Invalid IP address: " + symbolicIP);
@@ -64,7 +64,7 @@ public class IPv4 {
         }
 
         /* Netmask */
-        st = netmask.split("\.");
+        st = netmask.split("\\.");
 
         if (st.length != 4)
             throw new NumberFormatException("Invalid netmask address: "
@@ -122,7 +122,7 @@ public class IPv4 {
 */
     public IPv4(String IPinCIDRFormat) throws NumberFormatException {
 
-        String[] st = IPinCIDRFormat.split("\/");
+        String[] st = IPinCIDRFormat.split("\\/");
         if (st.length != 2)
 
             throw new NumberFormatException("Invalid CIDR format '"
@@ -137,7 +137,7 @@ public class IPv4 {
             throw new NumberFormatException("CIDR can not be greater than 32");
 
         /* IP */
-        st = symbolicIP.split("\.");
+        st = symbolicIP.split("\\.");
 
         if (st.length != 4)
             throw new NumberFormatException("Invalid IP address: " + symbolicIP);
@@ -256,6 +256,9 @@ public class IPv4 {
         }
 
         Integer baseIP = baseIPnumeric & netmaskNumeric;
+	if( numberofIPs == 0 ) {
+	    numberofIPs = numberOfIPs;
+	}
 
         for (int i = 1; i < (numberOfIPs) && i < numberofIPs; i++) {
 
@@ -266,6 +269,32 @@ public class IPv4 {
             result.add(ip);
         }
         return result;
+    }
+
+/**
+* Return the next network
+*
+*@return
+*/
+    public String getNext() {
+
+        int numberOfBits;
+        for (numberOfBits = 0; numberOfBits < 32; numberOfBits++) {
+
+            if ((netmaskNumeric << numberOfBits) == 0)
+                break;
+        }
+        Integer numberOfIPs = 0;
+        for (int n = 0; n < (32 - numberOfBits); n++) {
+
+            numberOfIPs = numberOfIPs << 1;
+            numberOfIPs = numberOfIPs | 0x01;
+
+        }
+
+        Integer baseIP = baseIPnumeric & netmaskNumeric;
+        String nextIP = convertNumericIpToSymbolic(baseIP + numberOfIPs + 1);
+        return nextIP;
     }
 
 /**
@@ -404,7 +433,7 @@ public class IPv4 {
     public boolean contains(String IPaddress) {
 
         Integer checkingIP = 0;
-        String[] st = IPaddress.split("\.");
+        String[] st = IPaddress.split("\\.");
 
         if (st.length != 4)
             throw new NumberFormatException("Invalid IP address: " + IPaddress);
@@ -464,7 +493,7 @@ public class IPv4 {
         }
 
         if (IPAddress
-                .matches("\A(25[0-5]|2[0-4]\d|[0-1]?\d?\d)(\.(25[0-5]|2[0-4]\d|[0-1]?\d?\d)){3}\z")) {
+                .matches("\\A(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}\\z")) {
 
             return true;
         }
@@ -476,54 +505,22 @@ public class IPv4 {
 */
     public static void main(String[] args) {
 
-        // ipv4.setIP("10.20.30.5", "255.255.255.200");
-        // System.out.println(ipv4.getIP());
-        // System.out.println(ipv4.getNetmask());
-        // System.out.println(ipv4.getCIDR());
+        IPv4 ipv4 = new IPv4("12.12.12.0/23");
 
-/*
-* IPv4 ipv4 = new IPv4("10.1.17.0/20");
-* System.out.println(ipv4.getIP());
-* System.out.println(ipv4.getNetmask());
-* System.out.println(ipv4.getCIDR());
-*
-* System.out.println("============= Available IPs ===============");
-* List<String> availableIPs = ipv4.getAvailableIPs(); int counter=0;
-* for (String ip : availableIPs) { System.out.print(ip);
-* System.out.print(" "); counter++; if((counter%10)==0)
-* System.out.print("n"); }
-*/
+        System.out.println(ipv4.getIP());
+        System.out.println(ipv4.getNetmask());
 
-        IPv4 ipv4 = new IPv4("12.12.12.0/16");
-
-        IPv4 ipv4Child = new IPv4("12.12.12.0/17");
-        // IPv4 ipv4 = new IPv4("192.168.20.0/16");
-        // System.out.println(ipv4.getIP());
-        // System.out.println(ipv4.getNetmask());
-
-        // System.out.println(ipv4.getCIDR());
-        // System.out.println("======= MATCHES =======");
-        // System.out.println(ipv4.getBinary(ipv4.baseIPnumeric));
-        // System.out.println(ipv4.getBinary(ipv4.netmaskNumeric));
-
-        System.out.println(ipv4.contains(ipv4Child));
-
+        System.out.println(ipv4.getAvailableIPs(0));
+        System.out.println(ipv4.getNext());
+        System.out.println(ipv4.getCIDR());
+	System.out.println(ipv4.contains("192.168.50.11"));
+        System.out.println("======= MATCHES =======");
         System.out.println(ipv4.getBinary(ipv4.baseIPnumeric));
         System.out.println(ipv4.getBinary(ipv4.netmaskNumeric));
-
-        System.out.println(ipv4Child.getBinary(ipv4Child.baseIPnumeric));
-
-        System.out.println(ipv4Child.getBinary(ipv4Child.netmaskNumeric));
-
+        System.out.println(ipv4.getBinary(ipv4.baseIPnumeric));
+        System.out.println(ipv4.getBinary(ipv4.netmaskNumeric));
         System.out.println("==============output================");
-        System.out.println(ipv4.contains(ipv4Child));
 
-        // ipv4.contains("192.168.50.11");
-        // System.out.println("======= DOES NOT MATCH =======");
-        // ipv4.contains("10.2.3.4");
-        // System.out.println(ipv4.validateIPAddress());
-        // System.out.println(ipv4.getBinary(ipv4.baseIPnumeric));
-        // System.out.println(ipv4.getBinary(ipv4.netmaskNumeric));
     }
 }
 
