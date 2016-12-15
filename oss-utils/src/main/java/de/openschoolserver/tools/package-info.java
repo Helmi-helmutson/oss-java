@@ -5,4 +5,4 @@
  * @author varkoly
  *
  */
-package oss.shell;
+package de.openschoolserver.tools;
