@@ -1,4 +1,4 @@
-package oss.shell;
+package de.openschoolserver.tools;
 
 import java.io.IOException;
 import java.io.InputStream;

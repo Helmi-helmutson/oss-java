@@ -1,1 +1,1 @@
-include 'oss-api', 'oss-dao'
+include 'oss-api', 'oss-dao', 'oss-utils'

@@ -22,11 +22,23 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
     @Override
-    public List<Room> getByIds(Session session, List<Integer> roomIds) {
+    public List<Room> getAll(Session session) {
         final RoomController roomController = new RoomController(session);
-        final List<Room> rooms = roomController.getByIds(roomIds);
+        final List<Room> rooms = roomController.getAll();
         return rooms;
     	
     }
+    
+	@Override
+	public boolean delete(Session session, int roomId) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean add(Session session, Room room) {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 }

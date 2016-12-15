@@ -2,7 +2,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -26,15 +26,15 @@ public class HWConf implements Serializable {
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="hwconf")
-	private Set<Device> devices;
+	private List<Device> devices;
 
 	//bi-directional many-to-one association to Partition
 	@OneToMany(mappedBy="hwconf")
-	private Set<Partition> partitions;
+	private List<Partition> partitions;
 
 	//bi-directional many-to-one association to Room
 	@OneToMany(mappedBy="hwconf")
-	private Set<Room> rooms;
+	private List<Room> rooms;
 
 	public HWConf() {
 	}
@@ -71,11 +71,11 @@ public class HWConf implements Serializable {
 		this.wstype = wstype;
 	}
 
-	public Set<Device> getDevices() {
+	public List<Device> getDevices() {
 		return this.devices;
 	}
 
-	public void setDevices(Set<Device> devices) {
+	public void setDevices(List<Device> devices) {
 		this.devices = devices;
 	}
 
@@ -93,11 +93,11 @@ public class HWConf implements Serializable {
 		return device;
 	}
 
-	public Set<Partition> getPartitions() {
+	public List<Partition> getPartitions() {
 		return this.partitions;
 	}
 
-	public void setPartitions(Set<Partition> partitions) {
+	public void setPartitions(List<Partition> partitions) {
 		this.partitions = partitions;
 	}
 
@@ -115,11 +115,11 @@ public class HWConf implements Serializable {
 		return partition;
 	}
 
-	public Set<Room> getRooms() {
+	public List<Room> getRooms() {
 		return this.rooms;
 	}
 
-	public void setRooms(Set<Room> rooms) {
+	public void setRooms(List<Room> rooms) {
 		this.rooms = rooms;
 	}
 

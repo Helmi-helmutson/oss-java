@@ -2,7 +2,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -28,29 +28,29 @@ public class User implements Serializable {
 
 	private String role;
 
-	private String sn;
+	private String sureName;
 
 	private String uid;
 
 	//bi-directional many-to-one association to Alias
 	@OneToMany(mappedBy="user")
-	private Set<Alias> aliases;
+	private List<Alias> aliases;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner")
-	private Set<Device> ownedDevices;
+	private List<Device> ownedDevices;
 
 	//bi-directional many-to-one association to TestFile
 	@OneToMany(mappedBy="user")
-	private Set<TestFile> testFiles;
+	private List<TestFile> testFiles;
 
 	//bi-directional many-to-one association to TestUser
 	@OneToMany(mappedBy="user")
-	private Set<TestUser> testUsers;
+	private List<TestUser> testUsers;
 
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="user")
-	private Set<Test> tests;
+	private List<Test> tests;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
@@ -63,7 +63,7 @@ public class User implements Serializable {
 			@JoinColumn(name="device_id")
 			}
 		)
-	private Set<Device> loggedOn;
+	private List<Device> loggedOn;
 
 	//bi-directional many-to-many association to Group
 	@ManyToMany
@@ -76,7 +76,7 @@ public class User implements Serializable {
 			@JoinColumn(name="group_id")
 			}
 		)
-	private Set<Group> groups;
+	private List<Group> groups;
 
 	public User() {
 	}
@@ -105,12 +105,12 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-	public String getSn() {
-		return this.sn;
+	public String getSureName() {
+		return this.sureName;
 	}
 
-	public void setSn(String sn) {
-		this.sn = sn;
+	public void setSureName(String surename) {
+		this.sureName = surename;
 	}
 
 	public String getUid() {
@@ -121,11 +121,11 @@ public class User implements Serializable {
 		this.uid = uid;
 	}
 
-	public Set<Alias> getAliases() {
+	public List<Alias> getAliases() {
 		return this.aliases;
 	}
 
-	public void setAliases(Set<Alias> aliases) {
+	public void setAliases(List<Alias> aliases) {
 		this.aliases = aliases;
 	}
 
@@ -143,11 +143,11 @@ public class User implements Serializable {
 		return alias;
 	}
 
-	public Set<Device> getOwnedDevices() {
+	public List<Device> getOwnedDevices() {
 		return this.ownedDevices;
 	}
 
-	public void setOwnedDevices(Set<Device> ownedDevices) {
+	public void setOwnedDevices(List<Device> ownedDevices) {
 		this.ownedDevices = ownedDevices;
 	}
 
@@ -165,11 +165,11 @@ public class User implements Serializable {
 		return ownedDevice;
 	}
 
-	public Set<TestFile> getTestFiles() {
+	public List<TestFile> getTestFiles() {
 		return this.testFiles;
 	}
 
-	public void setTestFiles(Set<TestFile> testFiles) {
+	public void setTestFiles(List<TestFile> testFiles) {
 		this.testFiles = testFiles;
 	}
 
@@ -187,11 +187,11 @@ public class User implements Serializable {
 		return testFile;
 	}
 
-	public Set<TestUser> getTestUsers() {
+	public List<TestUser> getTestUsers() {
 		return this.testUsers;
 	}
 
-	public void setTestUsers(Set<TestUser> testUsers) {
+	public void setTestUsers(List<TestUser> testUsers) {
 		this.testUsers = testUsers;
 	}
 
@@ -209,11 +209,11 @@ public class User implements Serializable {
 		return testUser;
 	}
 
-	public Set<Test> getTests() {
+	public List<Test> getTests() {
 		return this.tests;
 	}
 
-	public void setTests(Set<Test> tests) {
+	public void setTests(List<Test> tests) {
 		this.tests = tests;
 	}
 
@@ -231,19 +231,19 @@ public class User implements Serializable {
 		return test;
 	}
 
-	public Set<Device> getLoggedOn() {
+	public List<Device> getLoggedOn() {
 		return this.loggedOn;
 	}
 
-	public void setLoggedOn(Set<Device> loggedOn) {
+	public void setLoggedOn(List<Device> loggedOn) {
 		this.loggedOn = loggedOn;
 	}
 
-	public Set<Group> getGroups() {
+	public List<Group> getGroups() {
 		return this.groups;
 	}
 
-	public void setGroups(Set<Group> groups) {
+	public void setGroups(List<Group> groups) {
 		this.groups = groups;
 	}
 

@@ -1,0 +1,16 @@
+apply plugin: 'java'
+
+group = 'oss.java'
+version = '1.0-SNAPSHOT'
+description = "OSS Additional Tools"
+
+
+repositories {
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+
+dependencies {
+   testCompile 'junit:junit:4.12'
+}
+

@@ -2,7 +2,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 
 /**
@@ -11,14 +11,19 @@ import java.util.Set;
  */
 @Entity
 @Table(name="Rooms")
-@NamedQuery(name="Room.findAll", query="SELECT r FROM Room r")
+@NamedQueries ({
+  @NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
+  @NamedQuery(name="Room.getRoomByName", query="SELECT r FROM Room r WHERE r.name = :name"),
+  @NamedQuery(name="Room.getRoomByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
+  @NamedQuery(name="Room.getRoomByType", query="SELECT r FROM Room r WHERE r.type = :type")
+})
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	private int id;
 
-	private String cn;
+	private String name;
 
 	private int columns;
 
@@ -26,17 +31,19 @@ public class Room implements Serializable {
 
 	private int netMask;
 
-	private String roomtype;
+	private String startIP;
 
+	private String type;
+	
 	private int rows;
 
 	//bi-directional many-to-one association to AccessInRoom
 	@OneToMany(mappedBy="room")
-	private Set<AccessInRoom> accessInRooms;
+	private List<AccessInRoom> accessInRooms;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="room")
-	private Set<Device> devices;
+	private List<Device> devices;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
@@ -49,7 +56,7 @@ public class Room implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
-	private Set<Device> availablePrinters;
+	private List<Device> availablePrinters;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
@@ -62,7 +69,7 @@ public class Room implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
-	private Set<Device> defaultPrinter;
+	private List<Device> defaultPrinter;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
@@ -70,7 +77,7 @@ public class Room implements Serializable {
 
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="room")
-	private Set<Test> tests;
+	private List<Test> tests;
 
 	public Room() {
 	}
@@ -83,12 +90,12 @@ public class Room implements Serializable {
 		this.id = id;
 	}
 
-	public String getCn() {
-		return this.cn;
+	public String getName() {
+		return this.name;
 	}
 
-	public void setCn(String cn) {
-		this.cn = cn;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public int getColumns() {
@@ -115,12 +122,20 @@ public class Room implements Serializable {
 		this.netMask = netMask;
 	}
 
-	public String getRoomtype() {
-		return this.roomtype;
+	public String getStartIP() {
+		return this.startIP;
 	}
 
-	public void setRoomtype(String roomtype) {
-		this.roomtype = roomtype;
+	public void setStartIP(String startIP) {
+		this.startIP = startIP;
+	}
+
+	public String getType() {
+		return this.type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public int getRows() {
@@ -131,11 +146,11 @@ public class Room implements Serializable {
 		this.rows = rows;
 	}
 
-	public Set<AccessInRoom> getAccessInRooms() {
+	public List<AccessInRoom> getAccessInRooms() {
 		return this.accessInRooms;
 	}
 
-	public void setAccessInRooms(Set<AccessInRoom> accessInRooms) {
+	public void setAccessInRooms(List<AccessInRoom> accessInRooms) {
 		this.accessInRooms = accessInRooms;
 	}
 
@@ -153,11 +168,11 @@ public class Room implements Serializable {
 		return accessInRoom;
 	}
 
-	public Set<Device> getDevices() {
+	public List<Device> getDevices() {
 		return this.devices;
 	}
 
-	public void setDevices(Set<Device> devices) {
+	public void setDevices(List<Device> devices) {
 		this.devices = devices;
 	}
 
@@ -175,19 +190,19 @@ public class Room implements Serializable {
 		return device;
 	}
 
-	public Set<Device> getAvailablePrinters() {
+	public List<Device> getAvailablePrinters() {
 		return this.availablePrinters;
 	}
 
-	public void setAvailablePrinters(Set<Device> availablePrinters) {
+	public void setAvailablePrinters(List<Device> availablePrinters) {
 		this.availablePrinters = availablePrinters;
 	}
 
-	public Set<Device> getDefaultPrinter() {
+	public List<Device> getDefaultPrinter() {
 		return this.defaultPrinter;
 	}
 
-	public void setDefaultPrinter(Set<Device> defaultPrinter) {
+	public void setDefaultPrinter(List<Device> defaultPrinter) {
 		this.defaultPrinter = defaultPrinter;
 	}
 
@@ -199,11 +214,11 @@ public class Room implements Serializable {
 		this.hwconf = hwconf;
 	}
 
-	public Set<Test> getTests() {
+	public List<Test> getTests() {
 		return this.tests;
 	}
 
-	public void setTests(Set<Test> tests) {
+	public void setTests(List<Test> tests) {
 		this.tests = tests;
 	}
 
