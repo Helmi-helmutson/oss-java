@@ -10,7 +10,9 @@ repositories {
 
 dependencies {
 //    compile 'org.slf4j:slf4j-api:1.7.21'
-compile group: 'org.eclipse.persistence', name: 'eclipselink', version: '2.6.0'
+    compile group: 'org.eclipse.persistence', name: 'eclipselink', version: '2.6.0'
+    compile project(':de.openschoolserver.utils')
+    compile fileTree(dir: '../oss-utils/build/libs', include: 'oss-utils-1.0-SNAPSHOT.jar')
 
     testCompile 'junit:junit:4.12'
 }

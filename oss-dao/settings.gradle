@@ -16,4 +16,7 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'oss-dao'
+rootProject.name = 'de.openschoolserver.dao'
+include ':de.openschoolserver.tools'
+project(':de.openschoolserver.tools').projectDir = new File(settingsDir, '../oss-tools')
+

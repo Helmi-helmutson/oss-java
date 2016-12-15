@@ -16,4 +16,5 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'oss-utils'
+rootProject.name = 'de.openschoolserver.utils'
+
