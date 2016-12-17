@@ -23,7 +23,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package de.openschoolserver.tools;
+package de.openschoolserver.dao.tools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -502,7 +502,7 @@ public class IPv4 {
 
 /**
 *@param args
-*/
+
     public static void main(String[] args) {
 
         IPv4 ipv4 = new IPv4("12.12.12.0/23");
@@ -513,7 +513,7 @@ public class IPv4 {
         System.out.println(ipv4.getAvailableIPs(0));
         System.out.println(ipv4.getNext());
         System.out.println(ipv4.getCIDR());
-	System.out.println(ipv4.contains("192.168.50.11"));
+	    System.out.println(ipv4.contains("192.168.50.11"));
         System.out.println("======= MATCHES =======");
         System.out.println(ipv4.getBinary(ipv4.baseIPnumeric));
         System.out.println(ipv4.getBinary(ipv4.netmaskNumeric));
@@ -522,6 +522,7 @@ public class IPv4 {
         System.out.println("==============output================");
 
     }
+    */
 }
 
 

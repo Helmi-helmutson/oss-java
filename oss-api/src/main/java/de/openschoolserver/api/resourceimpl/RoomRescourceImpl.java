@@ -26,19 +26,29 @@ public class RoomRescourceImpl implements RoomResource {
         final RoomController roomController = new RoomController(session);
         final List<Room> rooms = roomController.getAll();
         return rooms;
-    	
     }
-    
-	@Override
-	public boolean delete(Session session, int roomId) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
-	@Override
-	public boolean add(Session session, Room room) {
-		// TODO Auto-generated method stub
-		return false;
-	}
+    @Override
+    public boolean delete(Session session, int roomId) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean add(Session session, Room room) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public List<String> getAvailableIPAddresses(Session session, int roomId) {
+        // TODO Auto-generated method stub
+        final RoomController roomController = new RoomController(session);
+        final List<String> ips = roomController.getAvailableIPAddresses(roomId);
+        if ( ips == null) {
+            throw new WebApplicationException(404);
+        }
+        return ips;
+    }
 
 }

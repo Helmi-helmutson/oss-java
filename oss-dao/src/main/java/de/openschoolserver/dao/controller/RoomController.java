@@ -8,9 +8,10 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.utils.*
+import de.openschoolserver.dao.tools.*;
 
 public class RoomController extends Controller {
 
@@ -101,7 +102,21 @@ public class RoomController extends Controller {
 
 	public boolean delete(int roomId){
 		EntityManager em = getEntityManager();
+		//TODO we have to implement it
 		return false;
+	}
+
+	public List<String> getAvailableIPAddresses(int roomId){
+		Room room = this.getById(roomId);
+		IPv4 net = new IPv4(room.getStartIP() + "/" + room.getNetMask());
+		List<String> allIPs  = net.getAvailableIPs(0);
+		List<String> usedIPs = new ArrayList<String>();
+		for( Device dev : room.getDevices() ){
+			usedIPs.add(dev.getIp());
+			//TODO handle WLAN Addresses
+		}
+		allIPs.removeAll(usedIPs);
+		return allIPs;
 	}
 
 }

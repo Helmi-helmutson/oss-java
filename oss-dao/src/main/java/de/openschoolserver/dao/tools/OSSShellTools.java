@@ -1,4 +1,4 @@
-package de.openschoolserver.tools;
+package de.openschoolserver.dao.tools;
 
 import java.io.IOException;
 import java.io.InputStream;
