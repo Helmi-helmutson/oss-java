@@ -28,6 +28,12 @@ public class Device implements Serializable {
 	@Column(name="MAC")
 	private String mac;
 
+	@Column(name="WLANIP")
+	private String wlanip;
+
+	@Column(name="WLANMAC")
+	private String wlanmac;
+
 	private int row;
 
 	private String wstype;
@@ -135,6 +141,22 @@ public class Device implements Serializable {
 
 	public void setMac(String mac) {
 		this.mac = mac;
+	}
+
+	public String getWlanIp() {
+		return this.wlanip;
+	}
+
+	public void setWlanIp(String wlanip) {
+		this.wlanip = wlanip;
+	}
+
+	public String getWlanMac() {
+		return this.wlanmac;
+	}
+
+	public void setWlanMac(String wlanmac) {
+		this.wlanmac = wlanmac;
 	}
 
 	public int getRow() {

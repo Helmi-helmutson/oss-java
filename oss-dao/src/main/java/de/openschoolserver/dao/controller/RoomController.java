@@ -113,7 +113,9 @@ public class RoomController extends Controller {
 		List<String> usedIPs = new ArrayList<String>();
 		for( Device dev : room.getDevices() ){
 			usedIPs.add(dev.getIp());
-			//TODO handle WLAN Addresses
+                        if( dev.getWlanIp() != "" ) {
+			   usedIPs.add(dev.getWlanIp());
+                        }
 		}
 		allIPs.removeAll(usedIPs);
 		return allIPs;
