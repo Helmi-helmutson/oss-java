@@ -1,25 +1,31 @@
-package de.openschoolserver.dao.controller;
-
+package oss.base;
+import java.util.*;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.file.*;
+
 
 public class Config {
 
-	static Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
+	private Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
 
-	private Map<String,String>  ossConfig;
-	private Map<String,Boolean> readOnly;
-	private List<String>        ossConfigFile;
+	private Map<String,String>   ossConfig;
+	private Map<String,String>   ossConfigPath;
+	private Map<String,Boolean>  readOnly;
+	private List<String>         ossConfigFile;
 	
 	public Config() {
-		ossConfig = new HashMap<>();
-		readOnly  = new HashMap<>();
+		this.InitConfig();
+	}
+	
+	public Config(String configPath) {
+		this.OSS_CONFIG = Paths.get(configPath);
+		this.InitConfig();
+	}
+	
+	public void InitConfig() {
+		ossConfig     = new HashMap<>();
+		readOnly      = new HashMap<>();
+		ossConfigPath = new HashMap<>();
 		try {
 			ossConfigFile = Files.readAllLines(OSS_CONFIG);
 		}
@@ -27,9 +33,15 @@ public class Config {
 			e.printStackTrace();
 		}
 		Boolean ro = false;
+		String  path = "Backup";
 		for ( String line : ossConfigFile ){
 			if( line.startsWith("#") && line.contains("readonly")) {
 				ro = true;
+			}
+			if( line.startsWith("## Path:")) {
+				String[] l = line.split("\\/");
+				if( l.length == 3 )
+				  path = l[2];
 			}
 			if( !line.startsWith("#") ) {
 				String[] sline = line.split("=", 2);
@@ -44,12 +56,15 @@ public class Config {
 					}
 					readOnly.put(sline[0], ro);
 					ossConfig.put(sline[0], value);
+					ossConfigPath.put(sline[0],path);
 					ro = false;
-					System.out.println(sline[0] + "=>" + value);
+					// System.out.println(sline[0] + "=>" + value);
 				}
 			}
 		}
 	}
+	
+	
 	
 	public Boolean IsReadOnly(String key){
 		return readOnly.get(key);
@@ -57,6 +72,32 @@ public class Config {
 	
 	public String Get(String key){
 		return ossConfig.get(key);
+	}
+	
+	public String GetPath(String key){
+		return ossConfigPath.get(key);
+	}
+	
+	public List<String> GetPaths() {
+ 		List<String> paths = new ArrayList<String>();
+		for ( String path : ossConfigPath.values() )
+		{
+		   if(!paths.contains(path))
+			   paths.add(path);
+		}
+		return paths;
+	}
+	
+	public List<String> GetKeysOfPath(String path) {
+		List<String> keys = new ArrayList<String>();
+		for ( String key : ossConfigPath.keySet() ) {
+			System.out.println(key + "=>" + ossConfigPath.get(key));
+			if( ossConfigPath.get(key).startsWith(path) )
+			  keys.add(key);
+		}
+		System.out.println(path);
+		Collections.sort(keys);
+		return keys;
 	}
 	
 	public void Set(String key, String value){
@@ -80,5 +121,18 @@ public class Config {
 		catch( IOException e ) { 
 			e.printStackTrace();
 		}
-	}	
+	}
+
+/*
+*
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Config c = new Config();
+		c.Set("SCHOOL_REG_CODE", "BLA_BALÖ");
+		System.out.println(c.GetPaths());
+		System.out.println(c.GetKeysOfPath("Backup"));
+	}
+*
+*/
 }
+
