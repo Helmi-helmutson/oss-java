@@ -1,8 +1,8 @@
 apply plugin: 'java'
 
-group = 'oss.java'
+group = 'oss.utils'
 version = '1.0-SNAPSHOT'
-description = "OSS Additional Tools"
+description = "OSS Additional Utilitis"
 
 
 repositories {
@@ -11,6 +11,7 @@ repositories {
 
 
 dependencies {
+   compile group: 'org.eclipse.persistence', name: 'eclipselink', version: '2.6.0'
    testCompile 'junit:junit:4.12'
 }
 
