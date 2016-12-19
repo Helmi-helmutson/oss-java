@@ -1,4 +1,4 @@
-package oss.base;
+package de.openschoolserver.dao.controller;
 import java.util.*;
 import java.io.IOException;
 import java.nio.file.*;
@@ -66,19 +66,19 @@ public class Config {
 	
 	
 	
-	public Boolean IsReadOnly(String key){
+	public Boolean isConfgiReadOnly(String key){
 		return readOnly.get(key);
 	}
 	
-	public String Get(String key){
+	public String getConfigValue(String key){
 		return ossConfig.get(key);
 	}
 	
-	public String GetPath(String key){
+	public String getConfigPath(String key){
 		return ossConfigPath.get(key);
 	}
 	
-	public List<String> GetPaths() {
+	public List<String> getConfigPaths() {
  		List<String> paths = new ArrayList<String>();
 		for ( String path : ossConfigPath.values() )
 		{
@@ -88,10 +88,9 @@ public class Config {
 		return paths;
 	}
 	
-	public List<String> GetKeysOfPath(String path) {
+	public List<String> getKeysOfPath(String path) {
 		List<String> keys = new ArrayList<String>();
 		for ( String key : ossConfigPath.keySet() ) {
-			System.out.println(key + "=>" + ossConfigPath.get(key));
 			if( ossConfigPath.get(key).startsWith(path) )
 			  keys.add(key);
 		}
@@ -100,7 +99,7 @@ public class Config {
 		return keys;
 	}
 	
-	public void Set(String key, String value){
+	public void setConfigValue(String key, String value){
 		if(readOnly.get(key)){
 			return;
 		}

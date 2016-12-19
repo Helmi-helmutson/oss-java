@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
 
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -18,7 +19,7 @@ public class RoomController extends Controller {
 	public RoomController(Session session) {
 		super(session);
 	}
-	
+
 	public boolean isNameUnique(String name)
 	{
 		EntityManager em = getEntityManager();
@@ -52,7 +53,7 @@ public class RoomController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	public Room getById(int roomId) {
 		EntityManager em = getEntityManager();
 		try {
@@ -89,6 +90,10 @@ public class RoomController extends Controller {
 		if( !this.isDescriptionUnique(room.getDescription())){
 			return false;
 		}
+		// If the starIp is not given we have to search the next room IP
+		if( room.getStartIP() == "" ) {
+			room.setStartIP( getNextRoomIP(room.getNetMask()) );
+		}
 		try {
 			em.getTransaction().begin();
 			em.persist(room);
@@ -107,18 +112,59 @@ public class RoomController extends Controller {
 	}
 
 	public List<String> getAvailableIPAddresses(int roomId){
-		Room room = this.getById(roomId);
-		IPv4 net = new IPv4(room.getStartIP() + "/" + room.getNetMask());
+		Room room   = this.getById(roomId);
+		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
 		List<String> allIPs  = net.getAvailableIPs(0);
 		List<String> usedIPs = new ArrayList<String>();
 		for( Device dev : room.getDevices() ){
 			usedIPs.add(dev.getIp());
-                        if( dev.getWlanIp() != "" ) {
-			   usedIPs.add(dev.getWlanIp());
-                        }
+			if( dev.getWlanIp() != "" ) {
+				usedIPs.add(dev.getWlanIp());
+			}
 		}
 		allIPs.removeAll(usedIPs);
 		return allIPs;
 	}
 
+	public String getNextRoomIP( int netMask ) {
+		List<String>  startIPAddresses   = new ArrayList<String>();
+		List<String>  sortedIPAddresses;
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Room.findAll");
+		for( Room room : (List<Room>) query.getResultList() ) {
+			startIPAddresses.add(room.getStartIP());
+		}
+		IPv4 ipv4 = new IPv4();
+		sortedIPAddresses = ipv4.sortIPAddresses(startIPAddresses);
+		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
+
+		// Find the net of the last room
+		query = em.createQuery("SELECT r.netMask FROM WHERE startIP = :startIP");
+		query.setParameter("startIP", lastNetworkIP);
+		Integer lastNetMask = (Integer) query.getSingleResult();
+
+		//Find the next free net with the netmask of the last room
+		IPv4Net net = new IPv4Net( lastNetworkIP + "/" + lastNetMask );
+		String nextNet = net.getNext();
+		
+		//Now set the last network ip to the las ip in the last network.
+		lastNetworkIP = net.getLast();
+		
+		//This could be our net
+		net = new IPv4Net(nextNet + "/" + netMask );
+		while ( net.contains(lastNetworkIP)) {
+			//If the end of the last network is in our net it is wrong.
+			nextNet = net.getNext();
+			net = new IPv4Net(nextNet + "/" + netMask );
+		}
+
+		// Check if the nextNet is in school net.
+		String lastIP = net.getNext();
+		net = new IPv4Net( this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK") );
+		if( ! net.contains(lastIP) )
+		{
+			return "";
+		}
+		return nextNet;
+	}
 }
