@@ -19,10 +19,10 @@ INSERT INTO Users VALUES(NULL,'tstudents','tstudents','TStudents',NULL);
 INSERT INTO Users VALUES(NULL,'tworkstations','sysadmins','TSysadmins',NULL);
 
 CREATE TABLE IF NOT EXISTS Groups (
-        id                INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
+        id          INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
         name        VARCHAR(32) NOT NULL,
-        description        VARCHAR(64) NOT NULL,
-        type                CHAR(1)     NOT NULL,
+        description VARCHAR(64) NOT NULL,
+        groupType   CHAR(1)     NOT NULL,
         PRIMARY KEY  (id)
 );
 
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS HWConfs (
         id            INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
         name          VARCHAR(32) NOT NULL,
         description   VARCHAR(32) NOT NULL,
-        wstype        VARCHAR(16) NOT NULL,
+        deviceType    VARCHAR(16) NOT NULL,
         PRIMARY KEY  (id)
 );
 
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
         hwconf_id    INTEGER UNSIGNED NOT NULL,
         name         VARCHAR(32) NOT NULL,
         description  VARCHAR(64) NOT NULL,
-        roomtype     VARCHAR(16) NOT NULL,
+        roomType     VARCHAR(16) NOT NULL,
         rows         INTEGER  DEFAULT 5,
         columns      INTEGER  DEFAULT 5,
         startIP      VARCHAR(16) NOT NULL,
@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS Devices (
         WLANIP       VARCHAR(16) DEFAULT '',
         MAC          VARCHAR(17) NOT NULL,
         WLANMAC      VARCHAR(17) DEFAULT '',
-        wstype       VARCHAR(16) NOT NULL,
+        deviceType   VARCHAR(16) NOT NULL,
         row          INTEGER  DEFAULT 0,
         column       INTEGER  DEFAULT 0,
         CONSTRAINTEGER fk_devices_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
@@ -106,7 +106,7 @@ CREATE TABLE IF NOT EXISTS Devices (
 CREATE TABLE IF NOT EXISTS AccessInRoom (
         id             INTEGER UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id        INTEGER UNSIGNED NOT NULL,
-        default_access BOOLEAN DEFAULT 0,
+        defaultAccess  BOOLEAN DEFAULT 0,
         moment         TIME    DEFAULT '06:00',
         all            BOOLEAN DEFAULT 0,
         logon          BOOLEAN DEFAULT 1,
@@ -200,20 +200,24 @@ CREATE TABLE IF NOT EXISTS Enumerates (
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Enumerates VALUES(NULL,'device_type','FatClient');
-INSERT INTO Enumerates VALUES(NULL,'device_type','ThinClient');
-INSERT INTO Enumerates VALUES(NULL,'device_type','Printer');
-INSERT INTO Enumerates VALUES(NULL,'device_type','Switch');
-INSERT INTO Enumerates VALUES(NULL,'device_type','Router');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','FatClient');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','ThinClient');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Printer');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Switch');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Router');
 INSERT INTO Enumerates VALUES(NULL,'role','students');
 INSERT INTO Enumerates VALUES(NULL,'role','teachers');
 INSERT INTO Enumerates VALUES(NULL,'role','sysadmins');
 INSERT INTO Enumerates VALUES(NULL,'role','administration');
 INSERT INTO Enumerates VALUES(NULL,'role','workstations');
-INSERT INTO Enumerates VALUES(NULL,'group_type','primary');
-INSERT INTO Enumerates VALUES(NULL,'group_type','class');
-INSERT INTO Enumerates VALUES(NULL,'group_type','workgroup');
-INSERT INTO Enumerates VALUES(NULL,'group_type','guest');
+INSERT INTO Enumerates VALUES(NULL,'groupType','primary');
+INSERT INTO Enumerates VALUES(NULL,'groupType','class');
+INSERT INTO Enumerates VALUES(NULL,'groupType','workgroup');
+INSERT INTO Enumerates VALUES(NULL,'groupType','guest');
+INSERT INTO Enumerates VALUES(NULL,'groupType,'ClassRoom');
+INSERT INTO Enumerates VALUES(NULL,'groupType,'ComputerRoom');
+INSERT INTO Enumerates VALUES(NULL,'groupType,'Library');
+INSERT INTO Enumerates VALUES(NULL,'groupType,'Laboratory');
 
 
 #Some additional config tables

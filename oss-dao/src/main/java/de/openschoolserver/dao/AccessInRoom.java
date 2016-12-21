@@ -19,7 +19,6 @@ public class AccessInRoom implements Serializable {
 
 	private Object all;
 
-	@Column(name="default_access")
 	private Object defaultAccess;
 
 	private Object logon;

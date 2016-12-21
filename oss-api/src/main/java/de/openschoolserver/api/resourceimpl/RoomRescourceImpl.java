@@ -52,7 +52,7 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
 	@Override
-	public String getNextRoomIP(Session session, Integer netMask) {
+	public String getNextRoomIP(Session session, int netMask) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		final String nextIP = roomController.getNextRoomIP(netMask);

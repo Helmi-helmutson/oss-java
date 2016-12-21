@@ -15,7 +15,7 @@ import java.util.List;
   @NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
   @NamedQuery(name="Room.getRoomByName", query="SELECT r FROM Room r WHERE r.name = :name"),
   @NamedQuery(name="Room.getRoomByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
-  @NamedQuery(name="Room.getRoomByType", query="SELECT r FROM Room r WHERE r.type = :type")
+  @NamedQuery(name="Room.getRoomByType", query="SELECT r FROM Room r WHERE r.roomType = :type")
 })
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -33,7 +33,7 @@ public class Room implements Serializable {
 
 	private String startIP;
 
-	private String type;
+	private String roomType;
 	
 	private int rows;
 
@@ -131,11 +131,11 @@ public class Room implements Serializable {
 	}
 
 	public String getType() {
-		return this.type;
+		return this.roomType;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setRoomType(String roomtype) {
+		this.roomType = roomtype;
 	}
 
 	public int getRows() {

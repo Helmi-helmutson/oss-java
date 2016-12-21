@@ -1,9 +1,6 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
-
-
-
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -26,7 +23,7 @@ public class RoomController extends Controller {
 		try {
 			Query query = em.createNamedQuery("Room.getRoomByName");
 			query.setParameter("name", name);
-			List<Room> rooms = query.getResultList();
+			List<Room> rooms = (List<Room>) query.getResultList();
 			return rooms.isEmpty();
 		} catch (Exception e) {
 			//logger.error(e.getMessage());
@@ -56,6 +53,7 @@ public class RoomController extends Controller {
 
 	public Room getById(int roomId) {
 		EntityManager em = getEntityManager();
+		
 		try {
 			return em.find(Room.class, roomId);
 		} catch (Exception e) {
@@ -107,7 +105,12 @@ public class RoomController extends Controller {
 
 	public boolean delete(int roomId){
 		EntityManager em = getEntityManager();
-		//TODO we have to implement it
+		DeviceController devController = new DeviceController(this.getSession());
+		Room room = this.getById(roomId);
+		for( Device dev : room.getDevices() ) {
+			devController.delete(dev.getId());
+		}
+		em.remove(room);
 		return false;
 	}
 

@@ -21,6 +21,10 @@ public class Controller extends Config {
         return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
     }
     
+    protected Session getSession() {
+    	return this.session;
+    }
+    
     public boolean isNameUnique(String name){
     	EntityManager em = this.getEntityManager();
     	return true;

@@ -22,7 +22,7 @@ public class Group implements Serializable {
 
 	private String description;
 
-	private String type;
+	private String groupType;
 
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups")
@@ -55,12 +55,12 @@ public class Group implements Serializable {
 		this.description = description;
 	}
 
-	public String getType() {
-		return this.type;
+	public String getGroupType() {
+		return this.groupType;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setGroupType(String grouptype) {
+		this.groupType = grouptype;
 	}
 
 	public List<User> getUsers() {
