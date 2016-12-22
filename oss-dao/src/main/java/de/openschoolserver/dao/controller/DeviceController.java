@@ -1,4 +1,5 @@
 package de.openschoolserver.dao.controller;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -117,4 +118,32 @@ public class DeviceController extends Controller {
 		}
 	}
 	
+	public Device getByName(String Name) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Device.getByName");
+			query.setParameter("Name", Name);
+			return (Device) query.getSingleResult();
+		} catch (Exception e) {
+			// logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+	
+	public String getDefaultPrinter(int deviceId) {
+		Device device = this.getById(deviceId);
+		return device.getDefaultPrinter().getName();
+	}
+	
+	public List<String> getAvailablePrinters(int deviceId) {
+		Device device = this.getById(deviceId);
+		List<String> printers   = new ArrayList<String>();
+ 		for( Device printer : device.getAvailablePrinters() ) {
+ 			printers.add(printer.getName());
+ 		}
+ 		return printers;
+	}
 }

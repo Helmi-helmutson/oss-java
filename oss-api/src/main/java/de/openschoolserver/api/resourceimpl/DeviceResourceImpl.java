@@ -91,4 +91,31 @@ public class DeviceResourceImpl implements DeviceResource {
 		return devices;
 	}
 
+
+	@Override
+	public Device getByName(Session session, String Name) {
+		// TODO Auto-generated method stub
+		final DeviceController deviceController = new DeviceController(session);
+		final Device device = deviceController.getByName(Name);
+		return device;
+	}
+
+
+	@Override
+	public String getDefaultPrinter(Session session, int deviceId) {
+		// TODO Auto-generated method stub
+		final DeviceController deviceController = new DeviceController(session);
+		final String printer = deviceController.getDefaultPrinter(deviceId);
+		return printer;
+	}
+
+
+	@Override
+	public List<String> getAvailablePrinters(Session session, int deviceId) {
+		// TODO Auto-generated method stub
+		final DeviceController deviceController = new DeviceController(session);
+		final List<String> printers = deviceController.getAvailablePrinters(deviceId);
+		return printers;
+	}
+
 }

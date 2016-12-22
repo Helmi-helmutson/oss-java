@@ -131,14 +131,13 @@ public class RoomController extends Controller {
 
 	public String getNextRoomIP( int netMask ) {
 		List<String>  startIPAddresses   = new ArrayList<String>();
-		List<String>  sortedIPAddresses;
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Room.findAll");
 		for( Room room : (List<Room>) query.getResultList() ) {
 			startIPAddresses.add(room.getStartIP());
 		}
 		IPv4 ipv4 = new IPv4();
-		sortedIPAddresses = ipv4.sortIPAddresses(startIPAddresses);
+		List<String> sortedIPAddresses = ipv4.sortIPAddresses(startIPAddresses);
 		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
 
 		// Find the net of the last room

@@ -16,7 +16,7 @@ import java.util.List;
 	@NamedQuery(name="Device.getDeviceByType", query="SELECT d FROM Device where deviceType = :type"),
 	@NamedQuery(name="Device.getByIP",   query="SELECT d FROM Device where ip = :IP OR wlanip = :IP"),
 	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device where mac = :MAC OR wlanmac = :MAC"),
-	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device where name = :name")
+	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device where name = :Name")
 })
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -62,7 +62,7 @@ public class Device implements Serializable {
 	private List<Device> availableForDevices;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany
+	@ManyToOne
 	@JoinTable(
 		name="DefaultPrinters"
 		, joinColumns={
@@ -72,7 +72,7 @@ public class Device implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
-	private List<Device> defaultPrinter;
+	private Device defaultPrinter;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="defaultPrinter")
@@ -197,11 +197,11 @@ public class Device implements Serializable {
 		this.availableForDevices = availableForDevices;
 	}
 
-	public List<Device> getDefaultPrinter() {
+	public Device getDefaultPrinter() {
 		return this.defaultPrinter;
 	}
 
-	public void setDefaultPrinter(List<Device> defaultPrinter) {
+	public void setDefaultPrinter(Device defaultPrinter) {
 		this.defaultPrinter = defaultPrinter;
 	}
 

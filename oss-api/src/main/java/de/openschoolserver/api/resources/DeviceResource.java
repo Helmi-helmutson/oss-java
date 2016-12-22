@@ -104,7 +104,7 @@ public interface DeviceResource {
      * GET devices/getbyIP/<IPAddress>
      */
     @GET
-    @Path("getbyIP/{IPAddress}")
+    @Path("getbyIP/{IP}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "get device by MAC address")
         @ApiResponses(value = {
@@ -120,7 +120,7 @@ public interface DeviceResource {
      * GET devices/getbyMAC/<MACAddress>
      */
     @GET
-    @Path("getbyMAC/{MACAddress}")
+    @Path("getbyMAC/{MAC}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "get device by MAC address")
         @ApiResponses(value = {
@@ -132,5 +132,51 @@ public interface DeviceResource {
             @PathParam("MAC") String MAC
     );
 
+    /*
+     * GET devices/getbyName/<Name>
+     */
+    @GET
+    @Path("getbyName/{Name}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "get device by Name")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Device getByName(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("Name") String Name
+    );
 
+    /*
+     * GET devices/{deviceId}/defaultPrinter
+     */
+    @GET
+    @Path("{deviceId}/defaultPrinter")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "get default printer Name")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    String getDefaultPrinter(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") int deviceId
+    );
+    
+    /*
+     * GET devices/{deviceId}/availablePrinters
+     */
+    @GET
+    @Path("{deviceId}/availablePrinters")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "get the list of name of the available printers")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<String> getAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") int deviceId
+    );    
 }
