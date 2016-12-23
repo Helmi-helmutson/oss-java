@@ -16,7 +16,8 @@ import java.util.List;
 	@NamedQuery(name="Device.getDeviceByType", query="SELECT d FROM Device where deviceType = :type"),
 	@NamedQuery(name="Device.getByIP",   query="SELECT d FROM Device where ip = :IP OR wlanip = :IP"),
 	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device where mac = :MAC OR wlanmac = :MAC"),
-	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device where name = :Name")
+	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device where name = :name"),
+	@NamedQuery(name="Device.search",    query="SELECT d FROM Device where name LIKE :name OR IP LIKE :name" )
 })
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;

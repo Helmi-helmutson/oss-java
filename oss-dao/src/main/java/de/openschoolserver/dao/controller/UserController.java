@@ -32,6 +32,36 @@ public class UserController extends Controller {
 		}
 	}
 	
+	public List<User> getByRole(String role) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("User.getByRole");
+			query.setParameter("role", role);
+			return query.getResultList();
+		} catch (Exception e) {
+			//logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return new ArrayList<>();
+		} finally {
+			em.close();
+		}
+	}
+
+	public List<User> search(String search) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("User.search");
+			query.setParameter("search", search);
+			return query.getResultList();
+		} catch (Exception e) {
+			//logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return new ArrayList<>();
+		} finally {
+			em.close();
+		}
+	}
+
 	public List<User> getAll() {
 		EntityManager em = getEntityManager();
 		try {
@@ -63,6 +93,25 @@ public class UserController extends Controller {
 		return true;
 	}
 
+	public boolean modify(User user){
+		User oldUser = this.getById(user.getId());
+		//TODO make some checks!!
+		EntityManager em = getEntityManager();
+		// First we check if the parameter are unique.
+		if( ! this.isNameUnique(user.getUid())){
+			return false;
+		}
+		try {
+			em.getTransaction().begin();
+			em.merge(user);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+	
 	public boolean delete(int userId){
 		EntityManager em = getEntityManager();
 		DeviceController devController = new DeviceController(this.getSession());

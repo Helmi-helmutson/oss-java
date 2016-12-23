@@ -35,6 +35,22 @@ public interface UserResource {
     );
 
     /*
+     * GET users/getByRole/<role>
+     */
+    @GET
+    @Path("users/getByRole/{role}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "get users from a rolle")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<User> getByRole(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("role") String role
+    );
+
+    /*
      * GET users/getall
      */
     @GET
@@ -48,6 +64,23 @@ public interface UserResource {
     @PermitAll
     List<User> getAll(
             @ApiParam(hidden = true) @Auth Session session
+    );
+
+    /*
+     * GET users/getall
+     */
+    @GET
+    @Path("search/{search}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Search for user by uid and name.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<User> search(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("search") String search
     );
 
     /*
@@ -68,6 +101,23 @@ public interface UserResource {
     );
     
     /*
+     * POST users/modify { hash }
+     */
+    @POST
+    @Path("modify")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "modify an existing user")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    boolean modify(
+            @ApiParam(hidden = true) @Auth Session session,
+            User user
+    );
+    
+    /*
      * DELETE users/<userId>
      */
     @DELETE
@@ -79,23 +129,6 @@ public interface UserResource {
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
     boolean delete(
-            @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("userId") int userId
-    );
-
-    
-    /*
-     * GET users/getall
-     */
-    @GET
-    @Path("{userId}/getAvailableIPAddresses")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "get all available ip-adresses of the user")
-        @ApiResponses(value = {
-        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @PermitAll
-    List<String> getAvailableIPAddresses(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") int userId
     );

@@ -118,11 +118,26 @@ public class DeviceController extends Controller {
 		}
 	}
 	
-	public Device getByName(String Name) {
+	public Device getByName(String name) {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.getByName");
-			query.setParameter("Name", Name);
+			query.setParameter("name", name);
+			return (Device) query.getSingleResult();
+		} catch (Exception e) {
+			// logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+	
+	public Device search(String name) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Device.search");
+			query.setParameter("name", name);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
 			// logger.error(e.getMessage());

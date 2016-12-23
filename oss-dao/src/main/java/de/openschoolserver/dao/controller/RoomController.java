@@ -141,9 +141,10 @@ public class RoomController extends Controller {
 		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
 
 		// Find the net of the last room
-		query = em.createQuery("SELECT r.netMask FROM WHERE startIP = :startIP");
+		query = em.createQuery("SELECT r FROM WHERE startIP = :startIP",Room.class);
 		query.setParameter("startIP", lastNetworkIP);
-		Integer lastNetMask = (Integer) query.getSingleResult();
+		Room lastRoom = (Room) query.getResultList().get(0);
+		int lastNetMask = lastRoom.getNetMask();
 
 		//Find the next free net with the netmask of the last room
 		IPv4Net net = new IPv4Net( lastNetworkIP + "/" + lastNetMask );
