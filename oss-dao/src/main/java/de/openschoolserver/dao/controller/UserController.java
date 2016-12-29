@@ -94,7 +94,6 @@ public class UserController extends Controller {
 	}
 
 	public boolean modify(User user){
-		User oldUser = this.getById(user.getId());
 		//TODO make some checks!!
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
@@ -114,10 +113,26 @@ public class UserController extends Controller {
 	
 	public boolean delete(int userId){
 		EntityManager em = getEntityManager();
-		DeviceController devController = new DeviceController(this.getSession());
+		em.getTransaction().begin();
 		User user = this.getById(userId);
+		List<Device> devices = user.getOwnedDevices();
+		// Remove user from logged on table
+		Query query = em.createQuery("DELETE FROM LoggedOn WHERE user_id = :userId");
+		query.setParameter("userId", userId);
+		query.executeUpdate();
+		// Remove user from GroupMember of table
+		query = em.createQuery("DELETE FROM GroupMember WHERE user_id = :userId");
+		query.setParameter("userId", userId);
+		query.executeUpdate();
+		// Let's remove the user
 		em.remove(user);
-		return false;
+		em.getTransaction().commit();
+		if( !devices.isEmpty() ) {
+			//TODO restart dhcp and dns
+			
+		}
+		//TODO find and remove files
+		return true;
 	}
 
 

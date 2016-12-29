@@ -35,19 +35,19 @@ public class User implements Serializable {
 	private String uid;
 
 	//bi-directional many-to-one association to Alias
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
 	private List<Alias> aliases;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="owner")
+	@OneToMany(mappedBy="owner",cascade=CascadeType.REMOVE)
 	private List<Device> ownedDevices;
 
 	//bi-directional many-to-one association to TestFile
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
 	private List<TestFile> testFiles;
 
 	//bi-directional many-to-one association to TestUser
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-one association to Test
