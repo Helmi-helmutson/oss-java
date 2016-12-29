@@ -8,8 +8,10 @@ import de.openschoolserver.api.resources.RoomResource;
 
 import javax.ws.rs.WebApplicationException;
 import java.util.List;
+import java.util.Map;
 
 public class RoomRescourceImpl implements RoomResource {
+	
 
     @Override
     public Room getById(Session session, int roomId) {
@@ -57,6 +59,17 @@ public class RoomRescourceImpl implements RoomResource {
 		final RoomController roomController = new RoomController(session);
 		final String nextIP = roomController.getNextRoomIP(netMask);
 		return nextIP;
+	}
+
+	@Override
+	public List<Map<String, String>> getLoggedInUsers(Session session, int roomId) {
+		// TODO Auto-generated method stub
+		final RoomController roomController = new RoomController(session);
+		final List<Map<String, String>> users = roomController.getLoggedInUsers(roomId);
+        if ( users == null) {
+            throw new WebApplicationException(404);
+        }
+        return users;
 	}
 
 }

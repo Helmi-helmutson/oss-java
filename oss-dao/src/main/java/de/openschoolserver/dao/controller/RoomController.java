@@ -1,13 +1,17 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Room;
+import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.tools.*;
 
@@ -107,13 +111,18 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		DeviceController devController = new DeviceController(this.getSession());
 		Room room = this.getById(roomId);
-		for( Device dev : room.getDevices() ) {
-			devController.delete(dev.getId());
+		List<Integer> deviceIds = new ArrayList<Integer>();
+ 		for( Device device : room.getDevices()) {
+			deviceIds.add(device.getId());
 		}
+		devController.delete(deviceIds);
 		em.remove(room);
 		return false;
 	}
 
+	/*
+	 * Return the list of the available adresses in the room
+	 */
 	public List<String> getAvailableIPAddresses(int roomId){
 		Room room   = this.getById(roomId);
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
@@ -169,5 +178,24 @@ public class RoomController extends Controller {
 			return "";
 		}
 		return nextNet;
+	}
+	
+	/*
+	 * Returns a list of the users logged in in the room
+	 */
+	public List<Map<String, String>> getLoggedInUsers(int roomID){
+		List<Map<String, String>> users = new ArrayList<>();
+		Room room = this.getById(roomID);
+		for(Device device : room.getDevices()){
+			for(User user: device.getLoggedIn()){
+				Map<String,String> userMap = new HashMap<>();
+				userMap.put("host", device.getName());
+				userMap.put("id", String.valueOf(user.getId()));
+				userMap.put("uid", user.getUid());
+				userMap.put("sureName", user.getSureName());
+				userMap.put("givenName", user.getGivenName());
+			}
+		}
+		return users;
 	}
 }

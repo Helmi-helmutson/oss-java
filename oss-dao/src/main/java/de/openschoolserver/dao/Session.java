@@ -2,10 +2,24 @@
 package de.openschoolserver.dao;
 
 import java.security.Principal;
+import javax.security.auth.Subject;
+
 
 public class Session implements Principal {
 	private String schoolId = "dummy";
-
+	private String userName = "dummy";
+	private String role     = "dummy";
+	private String password = "dummy";
+	private String deviceIP = "dummy";
+	
+	public String getUserName() {
+		return userName;
+	}
+	
+	public void setUserName(String username) {
+	     this.userName = username;
+	}
+	
 	public String getSchoolId() {
 		return schoolId;
 	}
@@ -15,9 +29,13 @@ public class Session implements Principal {
 	}
 
 	@Override
-	public String getName() {
-		
+	public String getName() {	
 		return "dummy";
+	}
+	
+	@Override
+	public boolean implies(Subject subject) {
+		return true;
 	}
 //TODO implement
 }

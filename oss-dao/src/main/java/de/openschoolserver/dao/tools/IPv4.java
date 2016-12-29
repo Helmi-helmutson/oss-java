@@ -10,7 +10,7 @@ public class IPv4 {
 	public IPv4() {
 	}
 
-	public String convertNumericIpToSymbolic(Integer ip) {
+	static public String convertNumericIpToSymbolic(Integer ip) {
 		StringBuffer sb = new StringBuffer(15);
 
 		for (int shift = 24; shift > 0; shift -= 8) {
@@ -30,8 +30,7 @@ public class IPv4 {
 	 *
 	 * @return
 	 */
-
-	public int convertSymbolicIPToNumeric(String symbolicIP)
+	static public int convertSymbolicIPToNumeric(String symbolicIP)
 	{
 		/* IP */
 		String[] st = symbolicIP.split("\\.");
@@ -58,7 +57,7 @@ public class IPv4 {
 	}
 
 
-	public String getBinary(Integer number) {
+	static public String getBinary(Integer number) {
 		String result = "";
 
 		Integer ourMaskBitPattern = 1;
@@ -80,7 +79,7 @@ public class IPv4 {
 		return result;
 	}
 
-	public boolean validateIPAddress(String IPAddress) {
+	static public boolean validateIPAddress(String IPAddress) {
 
 		if (IPAddress.startsWith("0")) {
 			return false;
@@ -98,19 +97,17 @@ public class IPv4 {
 		return false;
 	}
 
-	public List<String> sortIPAddresses(List<String> ipaddresses) {
-
-		List<Integer> numericIPAddresses = new ArrayList<Integer>();
+	static public List<String> sortIPAddresses(List<String> ipaddresses) {
+		
+		List<Long> numericIPAddresses = new ArrayList<Long>();
 		List<String>  sortedIPAddresses  = new ArrayList<String>();
 		for( String IP : ipaddresses ) {
-			numericIPAddresses.add(convertSymbolicIPToNumeric(IP));
+			numericIPAddresses.add( (long) convertSymbolicIPToNumeric(IP));
 		}
 		Collections.sort(numericIPAddresses);
-		for( Integer IP : numericIPAddresses ) {
-			sortedIPAddresses.add(convertNumericIpToSymbolic(IP));
+		for( long IP : numericIPAddresses ) {
+			sortedIPAddresses.add(convertNumericIpToSymbolic( (int) IP));
 		}
 		return sortedIPAddresses;
 	}
 }
-
-

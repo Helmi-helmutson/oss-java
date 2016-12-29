@@ -70,7 +70,7 @@ public interface DeviceResource {
      * POST devices/add { hash }
      */
     @POST
-    @Path("add")
+    @Path("ad")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "create new device")
     @ApiResponses(value = {
@@ -80,23 +80,23 @@ public interface DeviceResource {
     @PermitAll
     boolean add(
             @ApiParam(hidden = true) @Auth Session session,
-            Device device
+            List<Device> devices
     );
     
     /*
-     * DELETE devices/<deviceId>
+     * POST devices/delete [ deviceId, deviceId]
      */
-    @DELETE
-    @Path("{deviceId}")
+    @POST
+    @Path("delete")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "delete device by id")
+    @ApiOperation(value = "delete devices by id")
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
     boolean delete(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceIds") List<Integer> deviceIds
     );
 
     
@@ -178,5 +178,38 @@ public interface DeviceResource {
     List<String> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") int deviceId
-    );    
+    );
+    
+    /*
+     * GET devices/getloggedinusers/{IP-Address}
+     */
+    @GET
+    @Path("getloggedinusers/{IP}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the logged on users on a device by IP.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<String> getLoggedInUsers(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP
+    );
+    
+    /*
+     * GET devices/{deviceID}/getloggedinusers
+     */
+    @GET
+    @Path("{deviceID}/getloggedinusers")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the logged on users on a device by IP.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<String> getLoggedInUsers(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") int deviceId
+    );
+    
 }

@@ -58,10 +58,10 @@ public class Room implements Serializable {
 		)
 	private List<Device> availablePrinters;
 
-	//bi-directional many-to-many association to Device
-	@ManyToMany
+	//bi-directional many-to-one association to Device
+	@ManyToOne
 	@JoinTable(
-		name="DefaultPrinters"
+		name="DefaultPrinter"
 		, joinColumns={
 			@JoinColumn(name="room_id")
 			}
@@ -69,7 +69,7 @@ public class Room implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
-	private List<Device> defaultPrinter;
+	private Device defaultPrinter;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
@@ -198,11 +198,11 @@ public class Room implements Serializable {
 		this.availablePrinters = availablePrinters;
 	}
 
-	public List<Device> getDefaultPrinter() {
+	public Device getDefaultPrinter() {
 		return this.defaultPrinter;
 	}
 
-	public void setDefaultPrinter(List<Device> defaultPrinter) {
+	public void setDefaultPrinter(Device defaultPrinter) {
 		this.defaultPrinter = defaultPrinter;
 	}
 

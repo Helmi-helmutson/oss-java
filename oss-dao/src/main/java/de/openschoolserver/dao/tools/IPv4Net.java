@@ -31,7 +31,6 @@ import java.util.List;
 public class IPv4Net {
     int  baseIPnumeric;
     int  netmaskNumeric;
-    IPv4 ipv4 = new IPv4();
 
     /**
      * Specify IP address and netmask like: new
@@ -43,7 +42,7 @@ public class IPv4Net {
     public IPv4Net(String symbolicIP, String netmask) throws NumberFormatException {
 
         /* IP */
-        baseIPnumeric = ipv4.convertSymbolicIPToNumeric(symbolicIP);
+        baseIPnumeric = IPv4.convertSymbolicIPToNumeric(symbolicIP);
 
         /* Netmask */
         String[] st = netmask.split("\\.");
@@ -119,7 +118,7 @@ public class IPv4Net {
             throw new NumberFormatException("CIDR can not be greater than 32");
 
         /* IP */
-        baseIPnumeric = ipv4.convertSymbolicIPToNumeric(symbolicIP);
+        baseIPnumeric = IPv4.convertSymbolicIPToNumeric(symbolicIP);
 
         /* netmask from CIDR */
         if (numericCIDR < 8)
@@ -135,7 +134,7 @@ public class IPv4Net {
 *@return
 */
     public String getBase() {
-        return ipv4.convertNumericIpToSymbolic(baseIPnumeric);
+        return IPv4.convertNumericIpToSymbolic(baseIPnumeric);
     }
 
 /**
@@ -160,7 +159,7 @@ public class IPv4Net {
         }
 
         Integer baseIP = baseIPnumeric & netmaskNumeric;
-        return this.ipv4.convertNumericIpToSymbolic(baseIP + numberOfIPs );
+        return IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs );
     }
 
 /**
@@ -198,7 +197,7 @@ public class IPv4Net {
                 break;
 
         }
-        return this.ipv4.convertNumericIpToSymbolic(baseIPnumeric & netmaskNumeric) + "/" + i;
+        return IPv4.convertNumericIpToSymbolic(baseIPnumeric & netmaskNumeric) + "/" + i;
     }
 
 /**
@@ -235,7 +234,7 @@ public class IPv4Net {
 
             Integer ourIP = baseIP + i;
 
-            String ip = this.ipv4.convertNumericIpToSymbolic(ourIP);
+            String ip = IPv4.convertNumericIpToSymbolic(ourIP);
 
             result.add(ip);
         }
@@ -264,7 +263,7 @@ public class IPv4Net {
         }
 
         Integer baseIP = baseIPnumeric & netmaskNumeric;
-        String nextIP = this.ipv4.convertNumericIpToSymbolic(baseIP + numberOfIPs + 1);
+        String nextIP = IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs + 1);
         return nextIP;
     }
 
@@ -290,8 +289,8 @@ public class IPv4Net {
         }
 
         Integer baseIP = baseIPnumeric & netmaskNumeric;
-        String firstIP = this.ipv4.convertNumericIpToSymbolic(baseIP + 1);
-        String lastIP = this.ipv4.convertNumericIpToSymbolic(baseIP + numberOfIPs - 1);
+        String firstIP = IPv4.convertNumericIpToSymbolic(baseIP + 1);
+        String lastIP = IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs - 1);
         return firstIP + " - " + lastIP;
     }
 
@@ -363,14 +362,14 @@ public class IPv4Net {
         Integer baseIP = baseIPnumeric & netmaskNumeric;
         Integer ourIP = baseIP + numberOfIPs;
 
-        String ip = this.ipv4.convertNumericIpToSymbolic(ourIP);
+        String ip = IPv4.convertNumericIpToSymbolic(ourIP);
 
         return ip;
     }
 
     public String getNetmaskInBinary() {
 
-        return this.ipv4.getBinary(netmaskNumeric);
+        return IPv4.getBinary(netmaskNumeric);
     }
 
 /**

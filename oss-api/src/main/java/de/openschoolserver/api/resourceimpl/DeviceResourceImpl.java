@@ -35,10 +35,10 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public boolean add(Session session, Device device) {
+	public boolean add(Session session, List<Device> devices) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final boolean result = deviceController.add(device);
+		final boolean result = deviceController.add(devices);
 		if (! result) {
 	            throw new WebApplicationException(404);
 	    }
@@ -46,10 +46,10 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public boolean delete(Session session, int deviceId) {
+	public boolean delete(Session session, List<Integer> deviceIds) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final boolean result = deviceController.delete(deviceId);
+		final boolean result = deviceController.delete(deviceIds);
 		if (! result) {
 	            throw new WebApplicationException(404);
 	    }
@@ -77,7 +77,6 @@ public class DeviceResourceImpl implements DeviceResource {
 	    }
 		return device;
 	}
-
 
 
 	@Override
@@ -118,4 +117,20 @@ public class DeviceResourceImpl implements DeviceResource {
 		return printers;
 	}
 
+
+	@Override
+	public List<String> getLoggedInUsers(Session session, String IP) {
+		// TODO Auto-generated method stub
+		final DeviceController deviceController = new DeviceController(session);
+		final List<String> users = deviceController.getLoggedInUsers(IP);
+		return users;
+	}
+
+	@Override
+	public List<String> getLoggedInUsers(Session session, int deviceID) {
+		// TODO Auto-generated method stub
+		final DeviceController deviceController = new DeviceController(session);
+		final List<String> users = deviceController.getLoggedInUsers(deviceID);
+		return users;
+	}
 }
