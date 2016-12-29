@@ -2,12 +2,14 @@ package de.openschoolserver.api.resources;
 
 
 import io.dropwizard.auth.Auth;
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.*;
 
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 
 import java.util.List;
@@ -30,6 +32,22 @@ public interface UserResource {
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
     User getById(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("userId") int userId
+    );
+
+    /*
+	 * GET users/<userId>
+	 */
+    @GET
+    @Path("{userId}/availablegroups")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "get groups the user is not member in it.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+    List<Group> getAvailableGroups(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") int userId
     );
@@ -67,7 +85,7 @@ public interface UserResource {
     );
 
     /*
-     * GET users/getall
+     * GET search/{search}
      */
     @GET
     @Path("search/{search}")

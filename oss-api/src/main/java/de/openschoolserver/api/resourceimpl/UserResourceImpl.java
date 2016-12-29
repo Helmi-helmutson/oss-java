@@ -3,6 +3,7 @@ package de.openschoolserver.api.resourceimpl;
 import java.util.List;
 
 import de.openschoolserver.api.resources.UserResource;
+import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.UserController;
@@ -59,5 +60,13 @@ public class UserResourceImpl implements UserResource {
 		// TODO Auto-generated method stub
 		final UserController userController = new UserController(session);
 		return userController.search(search);
+	}
+
+	@Override
+	public List<Group> getAvailableGroups(Session session, int userId) {
+		// TODO Auto-generated method stub
+		final UserController userController = new UserController(session);
+		final List<Group> groups = userController.getAvailableGroups(userId);
+		return groups;
 	}
 }

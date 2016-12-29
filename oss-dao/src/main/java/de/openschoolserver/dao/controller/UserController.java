@@ -134,6 +134,13 @@ public class UserController extends Controller {
 		//TODO find and remove files
 		return true;
 	}
-
-
+	
+	public List<Group> getAvailableGroups(int userId){
+		EntityManager em = getEntityManager();
+		User user = this.getById(userId);
+		Query query = em.createNamedQuery("Group.findAll");
+		List<Group> allGroups = query.getResultList();
+		allGroups.removeAll(user.getGroups());
+		return allGroups;
+	}
 }
