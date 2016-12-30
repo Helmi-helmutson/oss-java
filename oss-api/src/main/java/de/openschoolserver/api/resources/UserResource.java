@@ -1,3 +1,4 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resources;
 
 

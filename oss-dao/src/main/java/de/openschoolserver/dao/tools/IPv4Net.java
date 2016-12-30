@@ -1,3 +1,4 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 /*
 Copyright (c) 2010, Saddam Abu Ghaida, Nicolai TufarAll rights reserved.
 Redistribution and use in source and binary forms, with or without

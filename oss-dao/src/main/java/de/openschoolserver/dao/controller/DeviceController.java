@@ -1,3 +1,4 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 import java.util.List;
