@@ -1,3 +1,4 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api;
 
@@ -54,12 +55,9 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final SessionsResource sessionsResource = new SessionsResourceImpl();
         environment.jersey().register(sessionsResource);
 
-      
-
         final RoomResource roomsResource = new RoomRescourceImpl();
         environment.jersey().register(roomsResource);
-
-       
+   
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
 

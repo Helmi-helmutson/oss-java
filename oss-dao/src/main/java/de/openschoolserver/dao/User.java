@@ -1,6 +1,8 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -15,14 +17,15 @@ import java.util.List;
 	@NamedQuery(name="User.findAll", query="SELECT u FROM User u"),
 	@NamedQuery(name="User.findAllStudents", query="SELECT u FROM User u WHERE u.role = 'students' "),
 	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' "),
-	@NamedQuery(name="User.findUserByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
-	@NamedQuery(name="User.findUserByUid",   query="SELECT u FROM User u WHERE u.uid = :uid ")
+	@NamedQuery(name="User.getByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
+	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
+	@NamedQuery(name="User.search", query="SELECT u FROM User WHERE uid LIKE :search OR givenName LIKE :search OR sureName LIKE :search")
 })
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-        int id;
+    int id;
 
 	private String givenName;
 
@@ -33,19 +36,19 @@ public class User implements Serializable {
 	private String uid;
 
 	//bi-directional many-to-one association to Alias
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
 	private List<Alias> aliases;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="owner")
+	@OneToMany(mappedBy="owner",cascade=CascadeType.REMOVE)
 	private List<Device> ownedDevices;
 
 	//bi-directional many-to-one association to TestFile
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
 	private List<TestFile> testFiles;
 
 	//bi-directional many-to-one association to TestUser
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-one association to Test
@@ -129,18 +132,14 @@ public class User implements Serializable {
 		this.aliases = aliases;
 	}
 
-	public Alias addAlias(Alias alias) {
+	public void addAlias(Alias alias) {
 		getAliases().add(alias);
-		alias.setUser(this);
-
-		return alias;
+		alias.setUser(this);	
 	}
 
-	public Alias removeAlias(Alias alias) {
+	public void removeAlias(Alias alias) {
 		getAliases().remove(alias);
 		alias.setUser(null);
-
-		return alias;
 	}
 
 	public List<Device> getOwnedDevices() {
@@ -154,14 +153,12 @@ public class User implements Serializable {
 	public Device addOwnedDevice(Device ownedDevice) {
 		getOwnedDevices().add(ownedDevice);
 		ownedDevice.setOwner(this);
-
 		return ownedDevice;
 	}
 
 	public Device removeOwnedDevice(Device ownedDevice) {
 		getOwnedDevices().remove(ownedDevice);
 		ownedDevice.setOwner(null);
-
 		return ownedDevice;
 	}
 
@@ -176,14 +173,12 @@ public class User implements Serializable {
 	public TestFile addTestFile(TestFile testFile) {
 		getTestFiles().add(testFile);
 		testFile.setUser(this);
-
 		return testFile;
 	}
 
 	public TestFile removeTestFile(TestFile testFile) {
 		getTestFiles().remove(testFile);
 		testFile.setUser(null);
-
 		return testFile;
 	}
 
@@ -198,14 +193,12 @@ public class User implements Serializable {
 	public TestUser addTestUser(TestUser testUser) {
 		getTestUsers().add(testUser);
 		testUser.setUser(this);
-
 		return testUser;
 	}
 
 	public TestUser removeTestUser(TestUser testUser) {
 		getTestUsers().remove(testUser);
 		testUser.setUser(null);
-
 		return testUser;
 	}
 
@@ -220,14 +213,12 @@ public class User implements Serializable {
 	public Test addTest(Test test) {
 		getTests().add(test);
 		test.setUser(this);
-
 		return test;
 	}
 
 	public Test removeTest(Test test) {
 		getTests().remove(test);
 		test.setUser(null);
-
 		return test;
 	}
 

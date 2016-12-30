@@ -1,3 +1,4 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 /*
 Copyright (c) 2010, Saddam Abu Ghaida, Nicolai TufarAll rights reserved.
 Redistribution and use in source and binary forms, with or without
@@ -23,55 +24,36 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-package de.openschoolserver.tools;
+package de.openschoolserver.dao.tools;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class IPv4 {
-    int baseIPnumeric;
-    int netmaskNumeric;
+public class IPv4Net {
+    int  baseIPnumeric;
+    int  netmaskNumeric;
 
     /**
      * Specify IP address and netmask like: new
-     * IPv4("10.1.0.25","255.255.255.16")
+     * IPv4Net("10.1.0.25","255.255.255.16")
      *
      *@param symbolicIP
      *@param netmask
      */
-    public IPv4(String symbolicIP, String netmask) throws NumberFormatException {
+    public IPv4Net(String symbolicIP, String netmask) throws NumberFormatException {
 
         /* IP */
-        String[] st = symbolicIP.split("\\.");
-
-        if (st.length != 4)
-            throw new NumberFormatException("Invalid IP address: " + symbolicIP);
-
-        int i = 24;
-        baseIPnumeric = 0;
-
-        for (int n = 0; n < st.length; n++) {
-
-            int value = Integer.parseInt(st[n]);
-
-            if (value != (value & 0xff)) {
-
-                throw new NumberFormatException("Invalid IP address: "+ symbolicIP);
-            }
-
-            baseIPnumeric += value << i;
-            i -= 8;
-        }
+        baseIPnumeric = IPv4.convertSymbolicIPToNumeric(symbolicIP);
 
         /* Netmask */
-        st = netmask.split("\\.");
+        String[] st = netmask.split("\\.");
 
         if (st.length != 4)
             throw new NumberFormatException("Invalid netmask address: "
 
                     + netmask);
 
-        i = 24;
+        int i = 24;
         netmaskNumeric = 0;
 
         if (Integer.parseInt(st[0]) < 255) {
@@ -116,11 +98,11 @@ public class IPv4 {
     }
 
 /**
-* Specify IP in CIDR format like: new IPv4("10.1.0.25/16");
+* Specify IP in CIDR format like: new IPv4Net("10.1.0.25/16");
 *
 *@param IPinCIDRFormat
 */
-    public IPv4(String IPinCIDRFormat) throws NumberFormatException {
+    public IPv4Net(String IPinCIDRFormat) throws NumberFormatException {
 
         String[] st = IPinCIDRFormat.split("\\/");
         if (st.length != 2)
@@ -137,27 +119,7 @@ public class IPv4 {
             throw new NumberFormatException("CIDR can not be greater than 32");
 
         /* IP */
-        st = symbolicIP.split("\\.");
-
-        if (st.length != 4)
-            throw new NumberFormatException("Invalid IP address: " + symbolicIP);
-
-        int i = 24;
-        baseIPnumeric = 0;
-
-        for (int n = 0; n < st.length; n++) {
-
-            int value = Integer.parseInt(st[n]);
-
-            if (value != (value & 0xff)) {
-
-                throw new NumberFormatException("Invalid IP address: " + symbolicIP);
-            }
-
-            baseIPnumeric += value << i;
-            i -= 8;
-
-        }
+        baseIPnumeric = IPv4.convertSymbolicIPToNumeric(symbolicIP);
 
         /* netmask from CIDR */
         if (numericCIDR < 8)
@@ -172,24 +134,33 @@ public class IPv4 {
 *
 *@return
 */
-    public String getIP() {
-        return convertNumericIpToSymbolic(baseIPnumeric);
-
+    public String getBase() {
+        return IPv4.convertNumericIpToSymbolic(baseIPnumeric);
     }
 
-    private String convertNumericIpToSymbolic(Integer ip) {
-        StringBuffer sb = new StringBuffer(15);
+/**
+* Return the next network
+*
+*@return
+*/
+    public String getLast() {
 
-        for (int shift = 24; shift > 0; shift -= 8) {
+        int numberOfBits;
+        for (numberOfBits = 0; numberOfBits < 32; numberOfBits++) {
 
-            // process 3 bytes, from high order byte down.
-            sb.append(Integer.toString((ip >>> shift) & 0xff));
-
-            sb.append('.');
+            if ((netmaskNumeric << numberOfBits) == 0)
+                break;
         }
-        sb.append(Integer.toString(ip & 0xff));
+        Integer numberOfIPs = 0;
+        for (int n = 0; n < (32 - numberOfBits); n++) {
 
-        return sb.toString();
+            numberOfIPs = numberOfIPs << 1;
+            numberOfIPs = numberOfIPs | 0x01;
+
+        }
+
+        Integer baseIP = baseIPnumeric & netmaskNumeric;
+        return IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs );
     }
 
 /**
@@ -227,7 +198,7 @@ public class IPv4 {
                 break;
 
         }
-        return convertNumericIpToSymbolic(baseIPnumeric & netmaskNumeric) + "/" + i;
+        return IPv4.convertNumericIpToSymbolic(baseIPnumeric & netmaskNumeric) + "/" + i;
     }
 
 /**
@@ -264,7 +235,7 @@ public class IPv4 {
 
             Integer ourIP = baseIP + i;
 
-            String ip = convertNumericIpToSymbolic(ourIP);
+            String ip = IPv4.convertNumericIpToSymbolic(ourIP);
 
             result.add(ip);
         }
@@ -293,7 +264,7 @@ public class IPv4 {
         }
 
         Integer baseIP = baseIPnumeric & netmaskNumeric;
-        String nextIP = convertNumericIpToSymbolic(baseIP + numberOfIPs + 1);
+        String nextIP = IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs + 1);
         return nextIP;
     }
 
@@ -319,8 +290,8 @@ public class IPv4 {
         }
 
         Integer baseIP = baseIPnumeric & netmaskNumeric;
-        String firstIP = convertNumericIpToSymbolic(baseIP + 1);
-        String lastIP = convertNumericIpToSymbolic(baseIP + numberOfIPs - 1);
+        String firstIP = IPv4.convertNumericIpToSymbolic(baseIP + 1);
+        String lastIP = IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs - 1);
         return firstIP + " - " + lastIP;
     }
 
@@ -392,36 +363,14 @@ public class IPv4 {
         Integer baseIP = baseIPnumeric & netmaskNumeric;
         Integer ourIP = baseIP + numberOfIPs;
 
-        String ip = convertNumericIpToSymbolic(ourIP);
+        String ip = IPv4.convertNumericIpToSymbolic(ourIP);
 
         return ip;
     }
 
-    private String getBinary(Integer number) {
-        String result = "";
-
-        Integer ourMaskBitPattern = 1;
-        for (int i = 1; i <= 32; i++) {
-
-            if ((number & ourMaskBitPattern) != 0) {
-
-                result = "1" + result; // the bit is 1
-            } else { // the bit is 0
-
-                result = "0" + result;
-            }
-            if ((i % 8) == 0 && i != 0 && i != 32)
-
-                result = "." + result;
-            ourMaskBitPattern = ourMaskBitPattern << 1;
-
-        }
-        return result;
-    }
-
     public String getNetmaskInBinary() {
 
-        return getBinary(netmaskNumeric);
+        return IPv4.getBinary(netmaskNumeric);
     }
 
 /**
@@ -460,7 +409,7 @@ public class IPv4 {
             return false;
     }
 
-    public boolean contains(IPv4 child) {
+    public boolean contains(IPv4Net child) {
 
         Integer subnetID = child.baseIPnumeric;
 
@@ -479,33 +428,12 @@ public class IPv4 {
 
     }
 
-    public boolean validateIPAddress() {
-        String IPAddress = getIP();
-
-        if (IPAddress.startsWith("0")) {
-            return false;
-
-        }
-
-        if (IPAddress.isEmpty()) {
-
-            return false;
-        }
-
-        if (IPAddress
-                .matches("\\A(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)(\\.(25[0-5]|2[0-4]\\d|[0-1]?\\d?\\d)){3}\\z")) {
-
-            return true;
-        }
-        return false;
-    }
-
 /**
 *@param args
-*/
+
     public static void main(String[] args) {
 
-        IPv4 ipv4 = new IPv4("12.12.12.0/23");
+        IPv4Net ipv4 = new IPv4Net("12.12.12.0/23");
 
         System.out.println(ipv4.getIP());
         System.out.println(ipv4.getNetmask());
@@ -513,7 +441,7 @@ public class IPv4 {
         System.out.println(ipv4.getAvailableIPs(0));
         System.out.println(ipv4.getNext());
         System.out.println(ipv4.getCIDR());
-	System.out.println(ipv4.contains("192.168.50.11"));
+	    System.out.println(ipv4.contains("192.168.50.11"));
         System.out.println("======= MATCHES =======");
         System.out.println(ipv4.getBinary(ipv4.baseIPnumeric));
         System.out.println(ipv4.getBinary(ipv4.netmaskNumeric));
@@ -522,6 +450,7 @@ public class IPv4 {
         System.out.println("==============output================");
 
     }
+    */
 }
 
 

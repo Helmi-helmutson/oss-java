@@ -17,6 +17,4 @@ include 'services:webservice'
 */
 
 rootProject.name = 'de.openschoolserver.dao'
-include ':de.openschoolserver.utils'
-project(':de.openschoolserver.utils').projectDir = new File(settingsDir, '../oss-utils')
 

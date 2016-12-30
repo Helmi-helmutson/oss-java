@@ -1,3 +1,4 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
@@ -11,14 +12,21 @@ import java.util.List;
  */
 @Entity
 @Table(name="Devices")
-@NamedQuery(name="Device.findAll", query="SELECT d FROM Device d")
+@NamedQueries( {
+	@NamedQuery(name="Device.findAll", query="SELECT d FROM Device d"),
+	@NamedQuery(name="Device.getDeviceByType", query="SELECT d FROM Device where deviceType = :type"),
+	@NamedQuery(name="Device.getByIP",   query="SELECT d FROM Device where ip = :IP OR wlanip = :IP"),
+	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device where mac = :MAC OR wlanmac = :MAC"),
+	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device where name = :name"),
+	@NamedQuery(name="Device.search",    query="SELECT d FROM Device where name LIKE :name OR IP LIKE :name" )
+})
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	private int id;
 
-	private String cn;
+	private String name;
 
 	private int column;
 
@@ -28,9 +36,15 @@ public class Device implements Serializable {
 	@Column(name="MAC")
 	private String mac;
 
+	@Column(name="WLANIP")
+	private String wlanip;
+
+	@Column(name="WLANMAC")
+	private String wlanmac;
+
 	private int row;
 
-	private String wstype;
+	private String deviceType;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
@@ -50,7 +64,7 @@ public class Device implements Serializable {
 	private List<Device> availableForDevices;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany
+	@ManyToOne
 	@JoinTable(
 		name="DefaultPrinters"
 		, joinColumns={
@@ -60,7 +74,7 @@ public class Device implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
-	private List<Device> defaultPrinter;
+	private Device defaultPrinter;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="defaultPrinter")
@@ -105,12 +119,12 @@ public class Device implements Serializable {
 		this.id = id;
 	}
 
-	public String getCn() {
-		return this.cn;
+	public String getName() {
+		return this.name;
 	}
 
-	public void setCn(String cn) {
-		this.cn = cn;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public int getColumn() {
@@ -137,6 +151,22 @@ public class Device implements Serializable {
 		this.mac = mac;
 	}
 
+	public String getWlanIp() {
+		return this.wlanip;
+	}
+
+	public void setWlanIp(String wlanip) {
+		this.wlanip = wlanip;
+	}
+
+	public String getWlanMac() {
+		return this.wlanmac;
+	}
+
+	public void setWlanMac(String wlanmac) {
+		this.wlanmac = wlanmac;
+	}
+
 	public int getRow() {
 		return this.row;
 	}
@@ -145,12 +175,12 @@ public class Device implements Serializable {
 		this.row = row;
 	}
 
-	public String getWstype() {
-		return this.wstype;
+	public String getDeviceType() {
+		return this.deviceType;
 	}
 
-	public void setWstype(String wstype) {
-		this.wstype = wstype;
+	public void setDeviceType(String devicetype) {
+		this.deviceType = devicetype;
 	}
 
 	public List<Device> getAvailablePrinters() {
@@ -169,11 +199,11 @@ public class Device implements Serializable {
 		this.availableForDevices = availableForDevices;
 	}
 
-	public List<Device> getDefaultPrinter() {
+	public Device getDefaultPrinter() {
 		return this.defaultPrinter;
 	}
 
-	public void setDefaultPrinter(List<Device> defaultPrinter) {
+	public void setDefaultPrinter(Device defaultPrinter) {
 		this.defaultPrinter = defaultPrinter;
 	}
 
