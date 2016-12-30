@@ -2,6 +2,7 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 import java.sql.Time;
 
@@ -11,24 +12,28 @@ import java.sql.Time;
  * 
  */
 @Entity
-@NamedQuery(name="AccessInRoom.findAll", query="SELECT a FROM AccessInRoom a")
+@NamedQueries( {
+	@NamedQuery(name="AccessInRoom.findAll", query="SELECT a FROM AccessInRoom a"),
+	@NamedQuery(name="AccessInRoom.findByRoom", query="SELECT a FROM AccessInRoom WHERE room = :room ORDER by pointOfTime"),
+	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom WHERE pointInTime = :time")
+})
 public class AccessInRoom implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	private int id;
 
-	private Object all;
+	private Boolean direct;
 
-	private Object defaultAccess;
+	private Boolean defaultAccess;
 
-	private Object logon;
+	private Boolean logon;
 
-	private Object mail;
+	private Boolean mail;
 
-	private Time moment;
+	private Time pointInTime;
 
-	private Object proxy;
+	private Boolean proxy;
 
 	//bi-directional many-to-one association to Room
 	@ManyToOne
@@ -45,51 +50,51 @@ public class AccessInRoom implements Serializable {
 		this.id = id;
 	}
 
-	public Object getAll() {
-		return this.all;
+	public Boolean getDirect() {
+		return this.direct;
 	}
 
-	public void setAll(Object all) {
-		this.all = all;
+	public void setDirect(Boolean direct) {
+		this.direct = direct;
 	}
 
-	public Object getDefaultAccess() {
+	public Boolean getDefaultAccess() {
 		return this.defaultAccess;
 	}
 
-	public void setDefaultAccess(Object defaultAccess) {
+	public void setDefaultAccess(Boolean defaultAccess) {
 		this.defaultAccess = defaultAccess;
 	}
 
-	public Object getLogon() {
+	public Boolean getLogon() {
 		return this.logon;
 	}
 
-	public void setLogon(Object logon) {
+	public void setLogon(Boolean logon) {
 		this.logon = logon;
 	}
 
-	public Object getMail() {
+	public Boolean getMail() {
 		return this.mail;
 	}
 
-	public void setMail(Object mail) {
+	public void setMail(Boolean mail) {
 		this.mail = mail;
 	}
 
-	public Time getMoment() {
-		return this.moment;
+	public Time getPointInTime() {
+		return this.pointInTime;
 	}
 
-	public void setMoment(Time moment) {
-		this.moment = moment;
+	public void setPointInTime(Time pointInTime) {
+		this.pointInTime = pointInTime;
 	}
 
-	public Object getProxy() {
+	public Boolean getProxy() {
 		return this.proxy;
 	}
 
-	public void setProxy(Object proxy) {
+	public void setProxy(Boolean proxy) {
 		this.proxy = proxy;
 	}
 

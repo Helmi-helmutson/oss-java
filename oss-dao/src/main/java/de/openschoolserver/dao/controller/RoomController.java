@@ -3,17 +3,21 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Calendar;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.sql.Time;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.tools.*;
 
 public class RoomController extends Controller {
@@ -199,4 +203,86 @@ public class RoomController extends Controller {
 		}
 		return users;
 	}
+	
+	/*
+	 * Returns the list of accesses in a room
+	 */
+	public List<AccessInRoom> getAccessList(int roomID){
+		Room room = this.getById(roomID);
+		return room.getAccessInRooms();
+	}
+	
+	/*
+	 * Sets the list of accesses in a room
+	 */
+	public void setAccessList(int roomID,List<AccessInRoom> AccessList){
+		Room room = this.getById(roomID);
+		room.setAccessInRooms(AccessList);
+	}
+	
+	/*
+	 * Sets the actual access status in a room
+	 */
+	public void setAccessStatus(Room room, AccessInRoom access) {
+		String network = room.getStartIP() + "/" + room.getNetMask();
+		if( access.getDirect() ){
+		}
+		if( access.getMail() ){
+		}
+		if( access.getProxy() ){
+		}
+		if( access.getLogon()) {
+		}
+	}
+	
+	/*
+	 * Sets the actual access status in a room 
+	 */
+	public void setAccessStatus(int roomID, AccessInRoom access) {
+		Room room = this.getById(roomID);
+		this.setAccessStatus(room, access);
+	}
+	
+	/*
+	 * Sets the scheduled access status in all rooms
+	 */
+	public void setScheduledAccess(){
+		EntityManager em = getEntityManager();
+		Calendar rightNow = Calendar.getInstance();
+		rightNow.set(Calendar.SECOND, 0);
+		rightNow.set(Calendar.MILLISECOND,0);
+		Query query = em.createNamedQuery("AccessInRoom.findActualAccesses");
+		query.setParameter("time", rightNow.getTime());
+		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
+			Room room = access.getRoom();
+			this.setAccessStatus(room, access);
+		}	
+	}
+	
+	/*
+	 * Sets the actual access status in a room
+	 */
+	public AccessInRoom getAccessStatus(Room room) {
+		String network = room.getStartIP() + "/" + room.getNetMask();
+		AccessInRoom access = new AccessInRoom();
+		access.setRoom(room);
+		if( access.getDirect() ){
+		}
+		if( access.getMail() ){
+		}
+		if( access.getProxy() ){
+		}
+		if( access.getLogon()) {
+		}
+		return access;
+	}
+	
+	/*
+	 * Sets the actual access status in a room 
+	 */
+	public AccessInRoom getAccessStatus(int roomID) {
+		Room room = this.getById(roomID);
+		return this.getAccessStatus(room);
+	}
+	
 }
