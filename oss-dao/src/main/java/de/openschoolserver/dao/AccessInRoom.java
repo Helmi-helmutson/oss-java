@@ -33,21 +33,37 @@ public class AccessInRoom implements Serializable {
 	
 	private Boolean printing;
 
-	private Time pointInTime;
+	private String pointInTime;
 
 	private Boolean proxy;
+
+	private Boolean mo;
+	private Boolean tu;
+	private Boolean we;
+	private Boolean th;
+	private Boolean fr;
+	private Boolean sa;
+	private Boolean su;
+	private Boolean holiday;
 
 	//bi-directional many-to-one association to Room
 	@ManyToOne
 	private Room room;
 
 	public AccessInRoom() {
-		this.direct = false;
-		this.login  = true;
-		this.portal = true;
+		this.direct   = false;
+		this.login    = true;
+		this.portal   = true;
 		this.printing = true;
-		this.proxy  = true;
-		
+		this.proxy    = true;
+		this.mo       = true;
+		this.tu       = true;
+		this.we       = true;
+		this.th       = true;
+		this.fr       = true;
+		this.sa       = false;
+		this.su       = false;
+		this.holiday  = false;
 	}
 
 	public long getId() {
@@ -114,6 +130,70 @@ public class AccessInRoom implements Serializable {
 		this.proxy = proxy;
 	}
 	
+	public Boolean getMo() {
+		return this.mo;
+	}
+
+	public void setMo(Boolean mo) {
+		this.mo = mo;
+	}
+	
+	public Boolean getTu() {
+		return this.tu;
+	}
+
+	public void setTu(Boolean tu) {
+		this.tu = tu;
+	}
+	
+	public Boolean getWe() {
+		return this.we;
+	}
+
+	public void setWe(Boolean we) {
+		this.we = we;
+	}
+	
+	public Boolean getTh() {
+		return this.th;
+	}
+
+	public void setTh(Boolean th) {
+		this.th = th;
+	}
+
+	public Boolean getFr() {
+		return this.fr;
+	}
+
+	public void setFr(Boolean fr) {
+		this.fr = fr;
+	}
+	
+	public Boolean getSa() {
+		return this.sa;
+	}
+
+	public void setSa(Boolean sa) {
+		this.sa = sa;
+	}
+
+	public Boolean getSu() {
+		return this.su;
+	}
+
+	public void setSu(Boolean su) {
+		this.su = su;
+	}
+	
+	public Boolean getHoliday() {
+		return this.holiday;
+	}
+
+	public void setHoliday(Boolean holiday) {
+		this.holiday = holiday;
+	}
+
 	public Room getRoom() {
 		return this.room;
 	}
