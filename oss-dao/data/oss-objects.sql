@@ -111,7 +111,8 @@ CREATE TABLE IF NOT EXISTS AccessInRoom (
         direct         BOOLEAN DEFAULT 0,
         logon          BOOLEAN DEFAULT 1,
         proxy          BOOLEAN DEFAULT 1,
-        mail           BOOLEAN DEFAULT 1,
+        pronting       BOOLEAN DEFAULT 1,
+        portal         BOOLEAN DEFAULT 1,
         CONSTRAINTEGER fk_accessinroom_rooms FOREIGN KEY(room_id) REFERENCES Rooms(id),
         PRIMARY KEY  (id)
 );

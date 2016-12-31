@@ -27,9 +27,11 @@ public class AccessInRoom implements Serializable {
 
 	private Boolean defaultAccess;
 
-	private Boolean logon;
+	private Boolean login;
 
-	private Boolean mail;
+	private Boolean portal;
+	
+	private Boolean printing;
 
 	private Time pointInTime;
 
@@ -40,6 +42,12 @@ public class AccessInRoom implements Serializable {
 	private Room room;
 
 	public AccessInRoom() {
+		this.direct = false;
+		this.login  = true;
+		this.portal = true;
+		this.printing = true;
+		this.proxy  = true;
+		
 	}
 
 	public int getId() {
@@ -66,20 +74,20 @@ public class AccessInRoom implements Serializable {
 		this.defaultAccess = defaultAccess;
 	}
 
-	public Boolean getLogon() {
-		return this.logon;
+	public Boolean getLogin() {
+		return this.login;
 	}
 
-	public void setLogon(Boolean logon) {
-		this.logon = logon;
+	public void setLogin(Boolean login) {
+		this.login = login;
 	}
 
-	public Boolean getMail() {
-		return this.mail;
+	public Boolean getPortal() {
+		return this.portal;
 	}
 
-	public void setMail(Boolean mail) {
-		this.mail = mail;
+	public void setPortal(Boolean portal) {
+		this.portal = portal;
 	}
 
 	public Time getPointInTime() {
@@ -90,6 +98,14 @@ public class AccessInRoom implements Serializable {
 		this.pointInTime = pointInTime;
 	}
 
+	public Boolean getPrinting() {
+		return this.printing;
+	}
+
+	public void setPrinting(Boolean printing) {
+		this.printing = printing;
+	}
+
 	public Boolean getProxy() {
 		return this.proxy;
 	}
@@ -97,7 +113,7 @@ public class AccessInRoom implements Serializable {
 	public void setProxy(Boolean proxy) {
 		this.proxy = proxy;
 	}
-
+	
 	public Room getRoom() {
 		return this.room;
 	}

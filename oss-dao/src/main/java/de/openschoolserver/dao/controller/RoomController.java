@@ -62,7 +62,7 @@ public class RoomController extends Controller {
 
 	public Room getById(int roomId) {
 		EntityManager em = getEntityManager();
-		
+
 		try {
 			return em.find(Room.class, roomId);
 		} catch (Exception e) {
@@ -117,7 +117,7 @@ public class RoomController extends Controller {
 		DeviceController devController = new DeviceController(this.getSession());
 		Room room = this.getById(roomId);
 		List<Integer> deviceIds = new ArrayList<Integer>();
- 		for( Device device : room.getDevices()) {
+		for( Device device : room.getDevices()) {
 			deviceIds.add(device.getId());
 		}
 		devController.delete(deviceIds);
@@ -155,22 +155,21 @@ public class RoomController extends Controller {
 		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
 
 		// Find the net of the last room
-		query = em.createQuery("SELECT r FROM WHERE startIP = :startIP",Room.class);
+		query = em.createQuery("SELECT r.netmask FROM WHERE startIP = :startIP",Room.class);
 		query.setParameter("startIP", lastNetworkIP);
-		Room lastRoom = (Room) query.getResultList().get(0);
-		int lastNetMask = lastRoom.getNetMask();
-
-		//Find the next free net with the netmask of the last room
+		int lastNetMask = (int) query.getSingleResult();
+		//Find the next free net with the network mask of the last room
 		IPv4Net net = new IPv4Net( lastNetworkIP + "/" + lastNetMask );
 		String nextNet = net.getNext();
-		
-		//Now set the last network ip to the las ip in the last network.
+
+		//Now set the last network IP to the last IP in the last network.
 		lastNetworkIP = net.getLast();
-		
+
 		//This could be our net
 		net = new IPv4Net(nextNet + "/" + netMask );
 		while ( net.contains(lastNetworkIP)) {
 			//If the end of the last network is in our net it is wrong.
+			//In this case get the next one net address
 			nextNet = net.getNext();
 			net = new IPv4Net(nextNet + "/" + netMask );
 		}
@@ -184,7 +183,7 @@ public class RoomController extends Controller {
 		}
 		return nextNet;
 	}
-	
+
 	/*
 	 * Returns a list of the users logged in in the room
 	 */
@@ -203,7 +202,7 @@ public class RoomController extends Controller {
 		}
 		return users;
 	}
-	
+
 	/*
 	 * Returns the list of accesses in a room
 	 */
@@ -211,7 +210,7 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomID);
 		return room.getAccessInRooms();
 	}
-	
+
 	/*
 	 * Sets the list of accesses in a room
 	 */
@@ -219,22 +218,59 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomID);
 		room.setAccessInRooms(AccessList);
 	}
-	
+
 	/*
 	 * Sets the actual access status in a room
 	 */
 	public void setAccessStatus(Room room, AccessInRoom access) {
-		String network = room.getStartIP() + "/" + room.getNetMask();
-		if( access.getDirect() ){
-		}
-		if( access.getMail() ){
-		}
-		if( access.getProxy() ){
-		}
-		if( access.getLogon()) {
-		}
+		String[] program = new String[4];
+		program[0] = "/usr/sbin/oss-set-access-state.sh";
+		program[2] = room.getStartIP() + "/" + room.getNetMask();
+		access.setRoom(room);
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+
+		// Direct internet
+		program[3] = "direct";
+		if( access.getDirect() )
+			program[1] = "1";
+		else
+			program[1] = "0";
+		OSSShellTools.exec(program, reply, error, null);
+
+		// Portal Access
+		program[3] = "portal";
+		if( access.getPortal() )
+			program[1] = "1";
+		else
+			program[1] = "0";
+		OSSShellTools.exec(program, reply, error, null);
+
+		// Proxy Access
+		program[3] = "proxy";
+		if( access.getProxy() )
+			program[1] = "1";
+		else
+			program[1] = "0";
+		OSSShellTools.exec(program, reply, error, null);
+
+		// Printing Access
+		program[3] = "printing";
+		if( access.getPrinting() )
+			program[1] = "1";
+		else
+			program[1] = "0";
+		OSSShellTools.exec(program, reply, error, null);
+
+		// Login
+		program[3] = "login";
+		if( access.getLogin()) 
+			program[1] = "1";
+		else
+			program[1] = "0";
+		OSSShellTools.exec(program, reply, error, null);
 	}
-	
+
 	/*
 	 * Sets the actual access status in a room 
 	 */
@@ -242,7 +278,7 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomID);
 		this.setAccessStatus(room, access);
 	}
-	
+
 	/*
 	 * Sets the scheduled access status in all rooms
 	 */
@@ -258,25 +294,53 @@ public class RoomController extends Controller {
 			this.setAccessStatus(room, access);
 		}	
 	}
-	
+
 	/*
 	 * Sets the actual access status in a room
 	 */
 	public AccessInRoom getAccessStatus(Room room) {
-		String network = room.getStartIP() + "/" + room.getNetMask();
+
 		AccessInRoom access = new AccessInRoom();
+		String[] program = new String[4];
+		program[0] = "/usr/sbin/oss-get-access-state.sh";
+		program[1] = room.getStartIP() + "/" + room.getNetMask();
 		access.setRoom(room);
-		if( access.getDirect() ){
-		}
-		if( access.getMail() ){
-		}
-		if( access.getProxy() ){
-		}
-		if( access.getLogon()) {
-		}
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+
+		// Direct internet
+		program[2] = "direct";
+		OSSShellTools.exec(program, reply, error, null);
+		if( reply.toString() == "1" )
+			access.setDirect(true);
+
+		// Portal Access
+		program[2] = "portal";
+		OSSShellTools.exec(program, reply, error, null);
+		if( reply.toString() == "0" )
+			access.setPortal(false);
+
+		// Proxy Access
+		program[2] = "proxy";
+		OSSShellTools.exec(program, reply, error, null);
+		if( reply.toString() == "0" )
+			access.setProxy(false);
+
+		// Printing Access
+		program[2] = "printing";
+		OSSShellTools.exec(program, reply, error, null);
+		if( reply.toString() == "0" )
+			access.setPrinting(false);
+
+		// Login
+		program[2] = "login";
+		OSSShellTools.exec(program, reply, error, null);
+		if( reply.toString() == "0" ) 
+			access.setLogin(false);
+
 		return access;
 	}
-	
+
 	/*
 	 * Sets the actual access status in a room 
 	 */
@@ -284,5 +348,5 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomID);
 		return this.getAccessStatus(room);
 	}
-	
+
 }
