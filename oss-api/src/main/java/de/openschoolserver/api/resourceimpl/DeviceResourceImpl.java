@@ -128,10 +128,10 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public List<String> getLoggedInUsers(Session session, long deviceID) {
+	public List<String> getLoggedInUsers(Session session, long deviceId) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final List<String> users = deviceController.getLoggedInUsers(deviceID);
+		final List<String> users = deviceController.getLoggedInUsers(deviceId);
 		return users;
 	}
 }

@@ -18,7 +18,7 @@ public class DeviceController extends Controller {
 	}
 
 	/*
-	 * Return a device found by the ID
+	 * Return a device found by the Id
 	 */
 	public Device getById(long deviceId) {
 		EntityManager em = getEntityManager();
@@ -229,8 +229,8 @@ public class DeviceController extends Controller {
 	/*
 	 * Return the list of users which are logged in on this device
 	 */
-	public List<String> getLoggedInUsers(Long deviceID) {
-		Device device = this.getById(deviceID);
+	public List<String> getLoggedInUsers(Long deviceId) {
+		Device device = this.getById(deviceId);
 		List<String> users = new ArrayList<String>();
 		for( User user : device.getLoggedIn() )
 			users.add(user.getUid());

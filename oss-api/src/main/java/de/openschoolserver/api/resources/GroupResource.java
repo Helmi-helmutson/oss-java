@@ -22,35 +22,35 @@ import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 public interface GroupResource {
 
 	/*
-	 * GET groups/<groupID>
+	 * GET groups/<groupId>
 	 */
     @GET
-    @Path("{groupID}")
+    @Path("{groupId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get group by id")
+    @ApiOperation(value = "Get group by id")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Group not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
-    Group getByID(
+    Group getById(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("groupID") long groupID
+            @PathParam("groupId") long groupId
     );
 
     /*
-	 * GET groups/<groupID>/availableMembers
+	 * GET groups/<groupId>/availableMembers
 	 */
     @GET
-    @Path("{groupID}/availableMembers")
+    @Path("{groupId}/availableMembers")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get users which are not member in this group.")
+    @ApiOperation(value = "Get users which are not member in this group.")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Group not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
     List<Group> getAvailableMembers(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("groupID") long groupID
+            @PathParam("groupId") long groupId
     );
 
     /*
@@ -59,7 +59,7 @@ public interface GroupResource {
     @GET
     @Path("groups/getByType/{type}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get groups from a type")
+    @ApiOperation(value = "Get groups from a type")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -70,12 +70,12 @@ public interface GroupResource {
     );
 
     /*
-     * GET groups/getall
+     * GET groups/getAll
      */
     @GET
-    @Path("getall")
+    @Path("getAll")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get all groups")
+    @ApiOperation(value = "Get all groups")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -137,10 +137,10 @@ public interface GroupResource {
     );
     
     /*
-     * GET groups/<groupID>/delete
+     * GET groups/<groupId>/delete
      */
     @GET
-    @Path("{groupID}/delete")
+    @Path("{groupId}/delete")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "delete group by id")
     @ApiResponses(value = {
@@ -149,7 +149,7 @@ public interface GroupResource {
     @PermitAll
     boolean delete(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("groupID") long groupID
+            @PathParam("groupId") long groupId
     );
 
 }

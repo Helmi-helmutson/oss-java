@@ -9,13 +9,13 @@ import de.openschoolserver.dao.Session;
 public class GroupResourceImpl implements GroupResource {
 
 	@Override
-	public Group getByID(Session session, long groupID) {
+	public Group getById(Session session, long groupId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Group> getAvailableMembers(Session session, long groupID) {
+	public List<Group> getAvailableMembers(Session session, long groupId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -51,7 +51,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public boolean delete(Session session, long groupID) {
+	public boolean delete(Session session, long groupId) {
 		// TODO Auto-generated method stub
 		return false;
 	}

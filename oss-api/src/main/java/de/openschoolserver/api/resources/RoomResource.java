@@ -43,7 +43,7 @@ public interface RoomResource {
      * GET rooms/getAll
      */
     @GET
-    @Path("getall")
+    @Path("getAll")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "get all rooms")
     @ApiResponses(value = {
@@ -123,10 +123,10 @@ public interface RoomResource {
     );
     
     /*
-     * GET rooms/{roomID}/getLoggedInUsers
+     * GET rooms/{roomId}/getLoggedInUsers
      */
     @GET
-    @Path("{roomID}/getLoggedInUsers")
+    @Path("{roomId}/getLoggedInUsers")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "create new room")
     @ApiResponses(value = {
@@ -136,14 +136,14 @@ public interface RoomResource {
     @PermitAll
     List<Map<String, String>> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") long roomID
+            @PathParam("roomId") long roomId
     );
     
     /*
-     * GET rooms/{roomID}/getAccessList
+     * GET rooms/{roomId}/getAccessList
      */
     @GET
-    @Path("{roomID}/getAccessList")
+    @Path("{roomId}/getAccessList")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Gets the access list in a room")
     @ApiResponses(value = {
@@ -153,14 +153,14 @@ public interface RoomResource {
     @PermitAll
     List<AccessInRoom> getAccessList(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") long roomID
+            @PathParam("roomId") long roomId
     );
     
     /*
-     * POST rooms/{roomID}/getAccessList { List<Hash> }
+     * POST rooms/{roomId}/getAccessList { List<Hash> }
      */
     @POST
-    @Path("{roomID}/setAccessList")
+    @Path("{roomId}/setAccessList")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Sets the access list in a room")
     @ApiResponses(value = {
@@ -170,7 +170,7 @@ public interface RoomResource {
     @PermitAll
     boolean setAccessList(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") long roomID,
+            @PathParam("roomId") long roomId,
             List<AccessInRoom>   accessList
     );
     
@@ -180,23 +180,23 @@ public interface RoomResource {
     @GET
     @Path("setScheduledAccess")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Sets access in all rooms corresponding to the Access Lists")
+    @ApiOperation(value = "Sets access in all rooms corresponding to the access lists and the actual time.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    void setScheduledAccess(
+    boolean setScheduledAccess(
     		@ApiParam(hidden = true) @Auth Session session
     );
     
     /*
-     * GET rooms/getActualAccess
+     * GET rooms/getAccessStatus
      */
     @GET
     @Path("getAccessStatus")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets access in all rooms corresponding to the Access Lists")
+    @ApiOperation(value = "Gets the actual access.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -207,10 +207,10 @@ public interface RoomResource {
     );
 
     /*
-     * GET rooms/{roomID}/getAccessStatus
+     * GET rooms/{roomId}/getAccessStatus
      */
     @GET
-    @Path("{roomID}/getAccessStatus")
+    @Path("{roomId}/getAccessStatus")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Gets the actual access in a room")
     @ApiResponses(value = {
@@ -220,14 +220,14 @@ public interface RoomResource {
     @PermitAll
     AccessInRoom getAccessStatus(
     		@ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") long roomID
+            @PathParam("roomId") long roomId
     );
     
     /*
-     * GET rooms/{roomID}/setAccessStatus
+     * POST rooms/{roomId}/setAccessStatus
      */
-    @GET
-    @Path("{roomID}/setAccessStatus")
+    @POST
+    @Path("{roomId}/setAccessStatus")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Sets the actual access in a room")
     @ApiResponses(value = {
@@ -235,9 +235,9 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    void setAccessStatus(
+    boolean setAccessStatus(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") long roomID,
+            @PathParam("roomId") long roomId,
             AccessInRoom access
     );
 }

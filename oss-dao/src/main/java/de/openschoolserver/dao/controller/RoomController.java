@@ -187,9 +187,9 @@ public class RoomController extends Controller {
 	/*
 	 * Returns a list of the users logged in in the room
 	 */
-	public List<Map<String, String>> getLoggedInUsers(long roomID){
+	public List<Map<String, String>> getLoggedInUsers(long roomId){
 		List<Map<String, String>> users = new ArrayList<>();
-		Room room = this.getById(roomID);
+		Room room = this.getById(roomId);
 		for(Device device : room.getDevices()){
 			for(User user: device.getLoggedIn()){
 				Map<String,String> userMap = new HashMap<>();
@@ -206,16 +206,16 @@ public class RoomController extends Controller {
 	/*
 	 * Returns the list of accesses in a room
 	 */
-	public List<AccessInRoom> getAccessList(long roomID){
-		Room room = this.getById(roomID);
+	public List<AccessInRoom> getAccessList(long roomId){
+		Room room = this.getById(roomId);
 		return room.getAccessInRooms();
 	}
 
 	/*
 	 * Sets the list of accesses in a room
 	 */
-	public void setAccessList(long roomID,List<AccessInRoom> AccessList){
-		Room room = this.getById(roomID);
+	public void setAccessList(long roomId,List<AccessInRoom> AccessList){
+		Room room = this.getById(roomId);
 		room.setAccessInRooms(AccessList);
 	}
 
@@ -274,8 +274,8 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the actual access status in a room 
 	 */
-	public void setAccessStatus(long roomID, AccessInRoom access) {
-		Room room = this.getById(roomID);
+	public void setAccessStatus(long roomId, AccessInRoom access) {
+		Room room = this.getById(roomId);
 		this.setAccessStatus(room, access);
 	}
 
@@ -344,8 +344,8 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the actual access status in a room 
 	 */
-	public AccessInRoom getAccessStatus(long roomID) {
-		Room room = this.getById(roomID);
+	public AccessInRoom getAccessStatus(long roomId) {
+		Room room = this.getById(roomId);
 		return this.getAccessStatus(room);
 	}
 

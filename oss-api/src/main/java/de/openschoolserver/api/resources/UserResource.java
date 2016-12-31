@@ -22,35 +22,35 @@ import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 public interface UserResource {
 
 	/*
-	 * GET users/<userID>
+	 * GET users/<userId>
 	 */
     @GET
-    @Path("{userID}")
+    @Path("{userId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get user by id")
+    @ApiOperation(value = "Get user by id")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
     User getById(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("userID") long userID
+            @PathParam("userId") long userId
     );
 
     /*
-	 * GET users/<userID>
+	 * GET users/<userId>
 	 */
     @GET
-    @Path("{userID}/availablegroups")
+    @Path("{userId}/availableGroups")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get groups the user is not member in it.")
+    @ApiOperation(value = "Get groups the user is not member in it.")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
     List<Group> getAvailableGroups(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("userID") long userID
+            @PathParam("userId") long userId
     );
 
     /*
@@ -59,7 +59,7 @@ public interface UserResource {
     @GET
     @Path("users/getByRole/{role}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get users from a rolle")
+    @ApiOperation(value = "Get users from a rolle")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -70,12 +70,12 @@ public interface UserResource {
     );
 
     /*
-     * GET users/getall
+     * GET users/getAll
      */
     @GET
-    @Path("getall")
+    @Path("getAll")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get all users")
+    @ApiOperation(value = "Get all users")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -137,10 +137,10 @@ public interface UserResource {
     );
     
     /*
-     * DELETE users/<userID>
+     * DELETE users/<userId>
      */
     @DELETE
-    @Path("{userID}")
+    @Path("{userId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "delete user by id")
     @ApiResponses(value = {
@@ -149,7 +149,7 @@ public interface UserResource {
     @PermitAll
     boolean delete(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("userID") long userID
+            @PathParam("userId") long userId
     );
 
 }
