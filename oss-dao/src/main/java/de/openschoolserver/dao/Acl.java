@@ -16,26 +16,26 @@ public class Acl implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	private long id;
 
 	private String acl;
 
 	@Column(name="object_id")
-	private int objectId;
+	private long objectId;
 
 	@Column(name="target_id")
-	private int targetId;
+	private long targetId;
 
 	private String targetType;
 
 	public Acl() {
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -47,19 +47,19 @@ public class Acl implements Serializable {
 		this.acl = acl;
 	}
 
-	public int getObjectId() {
+	public long getObjectId() {
 		return this.objectId;
 	}
 
-	public void setObjectId(int objectId) {
+	public void setObjectId(long objectId) {
 		this.objectId = objectId;
 	}
 
-	public int getTargetId() {
+	public long getTargetId() {
 		return this.targetId;
 	}
 
-	public void setTargetId(int targetId) {
+	public void setTargetId(long targetId) {
 		this.targetId = targetId;
 	}
 

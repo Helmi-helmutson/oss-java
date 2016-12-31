@@ -60,7 +60,7 @@ public class RoomController extends Controller {
 		}
 	}
 
-	public Room getById(int roomId) {
+	public Room getById(long roomId) {
 		EntityManager em = getEntityManager();
 
 		try {
@@ -112,11 +112,11 @@ public class RoomController extends Controller {
 		return true;
 	}
 
-	public boolean delete(int roomId){
+	public boolean delete(long roomId){
 		EntityManager em = getEntityManager();
 		DeviceController devController = new DeviceController(this.getSession());
 		Room room = this.getById(roomId);
-		List<Integer> deviceIds = new ArrayList<Integer>();
+		List<Long> deviceIds = new ArrayList<Long>();
 		for( Device device : room.getDevices()) {
 			deviceIds.add(device.getId());
 		}
@@ -128,7 +128,7 @@ public class RoomController extends Controller {
 	/*
 	 * Return the list of the available adresses in the room
 	 */
-	public List<String> getAvailableIPAddresses(int roomId){
+	public List<String> getAvailableIPAddresses(long roomId){
 		Room room   = this.getById(roomId);
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
 		List<String> allIPs  = net.getAvailableIPs(0);
@@ -187,7 +187,7 @@ public class RoomController extends Controller {
 	/*
 	 * Returns a list of the users logged in in the room
 	 */
-	public List<Map<String, String>> getLoggedInUsers(int roomID){
+	public List<Map<String, String>> getLoggedInUsers(long roomID){
 		List<Map<String, String>> users = new ArrayList<>();
 		Room room = this.getById(roomID);
 		for(Device device : room.getDevices()){
@@ -206,7 +206,7 @@ public class RoomController extends Controller {
 	/*
 	 * Returns the list of accesses in a room
 	 */
-	public List<AccessInRoom> getAccessList(int roomID){
+	public List<AccessInRoom> getAccessList(long roomID){
 		Room room = this.getById(roomID);
 		return room.getAccessInRooms();
 	}
@@ -214,7 +214,7 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the list of accesses in a room
 	 */
-	public void setAccessList(int roomID,List<AccessInRoom> AccessList){
+	public void setAccessList(long roomID,List<AccessInRoom> AccessList){
 		Room room = this.getById(roomID);
 		room.setAccessInRooms(AccessList);
 	}
@@ -274,7 +274,7 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the actual access status in a room 
 	 */
-	public void setAccessStatus(int roomID, AccessInRoom access) {
+	public void setAccessStatus(long roomID, AccessInRoom access) {
 		Room room = this.getById(roomID);
 		this.setAccessStatus(room, access);
 	}
@@ -344,7 +344,7 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the actual access status in a room 
 	 */
-	public AccessInRoom getAccessStatus(int roomID) {
+	public AccessInRoom getAccessStatus(long roomID) {
 		Room room = this.getById(roomID);
 		return this.getAccessStatus(room);
 	}

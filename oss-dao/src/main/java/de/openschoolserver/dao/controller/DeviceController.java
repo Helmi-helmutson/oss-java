@@ -20,7 +20,7 @@ public class DeviceController extends Controller {
 	/*
 	 * Return a device found by the ID
 	 */
-	public Device getById(int deviceId) {
+	public Device getById(long deviceId) {
 		EntityManager em = getEntityManager();
 
 		try {
@@ -72,10 +72,10 @@ public class DeviceController extends Controller {
 	/*
 	 * Deletes a list of device given by the device Ids.
 	 */
-	public boolean delete(List<Integer> deviceIds) {
+	public boolean delete(List<Long> deviceIds) {
 		EntityManager em = getEntityManager();
 		try {
-			for( Integer deviceId : deviceIds) {
+			for( Long deviceId : deviceIds) {
 				Device dev = em.find(Device.class, deviceId);
 				em.remove(dev);
 			}
@@ -185,7 +185,7 @@ public class DeviceController extends Controller {
 	 * Find the default printer for a device
 	 * If no printer was defined by the device find this from the room
 	 */
-	public String getDefaultPrinter(int deviceId) {
+	public String getDefaultPrinter(long deviceId) {
 		Device device = this.getById(deviceId);
 		Device printer = device.getDefaultPrinter();
 		if( printer != null)
@@ -200,7 +200,7 @@ public class DeviceController extends Controller {
 	 * Find the available printer for a device
 	 * If no printer was defined by the device find these from the room
 	 */
-	public List<String> getAvailablePrinters(int deviceId) {
+	public List<String> getAvailablePrinters(long deviceId) {
 		Device device = this.getById(deviceId);
 		List<String> printers   = new ArrayList<String>();
 		for( Device printer : device.getAvailablePrinters() ) {
@@ -229,7 +229,7 @@ public class DeviceController extends Controller {
 	/*
 	 * Return the list of users which are logged in on this device
 	 */
-	public List<String> getLoggedInUsers(Integer deviceID) {
+	public List<String> getLoggedInUsers(Long deviceID) {
 		Device device = this.getById(deviceID);
 		List<String> users = new ArrayList<String>();
 		for( User user : device.getLoggedIn() )

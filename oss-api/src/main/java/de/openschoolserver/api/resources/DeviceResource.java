@@ -32,7 +32,7 @@ public interface DeviceResource {
     @PermitAll
     Device getById(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceId") long deviceId
     );
 
     /*
@@ -97,7 +97,7 @@ public interface DeviceResource {
     @PermitAll
     boolean delete(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceIds") List<Integer> deviceIds
+            @PathParam("deviceIds") List<Long> deviceIds
     );
 
     
@@ -162,7 +162,7 @@ public interface DeviceResource {
     @PermitAll
     String getDefaultPrinter(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceId") long deviceId
     );
     
     /*
@@ -178,7 +178,7 @@ public interface DeviceResource {
     @PermitAll
     List<String> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceId") long deviceId
     );
     
     /*
@@ -210,7 +210,7 @@ public interface DeviceResource {
     @PermitAll
     List<String> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceId") long deviceId
     );
     
 }

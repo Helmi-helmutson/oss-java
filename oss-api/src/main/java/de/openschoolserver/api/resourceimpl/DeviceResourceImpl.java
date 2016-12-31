@@ -14,7 +14,7 @@ import de.openschoolserver.dao.controller.DeviceController;
 public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
-	public Device getById(Session session, int deviceId) {
+	public Device getById(Session session, long deviceId) {
 	    final DeviceController deviceController = new DeviceController(session);
 	    final Device device = deviceController.getById(deviceId);
 	    if (device == null) {
@@ -47,14 +47,14 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public boolean delete(Session session, List<Integer> deviceIds) {
+	public boolean delete(Session session, List<Long> deviceIds) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final boolean result = deviceController.delete(deviceIds);
 		if (! result) {
 	            throw new WebApplicationException(404);
 	    }
-		return false;
+		return true;
 	}
 
 	@Override
@@ -102,7 +102,7 @@ public class DeviceResourceImpl implements DeviceResource {
 
 
 	@Override
-	public String getDefaultPrinter(Session session, int deviceId) {
+	public String getDefaultPrinter(Session session, long deviceId) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final String printer = deviceController.getDefaultPrinter(deviceId);
@@ -111,7 +111,7 @@ public class DeviceResourceImpl implements DeviceResource {
 
 
 	@Override
-	public List<String> getAvailablePrinters(Session session, int deviceId) {
+	public List<String> getAvailablePrinters(Session session, long deviceId) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final List<String> printers = deviceController.getAvailablePrinters(deviceId);
@@ -128,7 +128,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public List<String> getLoggedInUsers(Session session, int deviceID) {
+	public List<String> getLoggedInUsers(Session session, long deviceID) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final List<String> users = deviceController.getLoggedInUsers(deviceID);

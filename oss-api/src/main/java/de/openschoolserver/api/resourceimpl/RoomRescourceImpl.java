@@ -16,7 +16,7 @@ public class RoomRescourceImpl implements RoomResource {
 	
 
     @Override
-    public Room getById(Session session, int roomID) {
+    public Room getById(Session session, long roomID) {
        final RoomController roomController = new RoomController(session);
        final Room room = roomController.getById(roomID);
         if (room == null) {
@@ -33,7 +33,7 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
     @Override
-    public boolean delete(Session session, int roomID) {
+    public boolean delete(Session session, long roomID) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -45,7 +45,7 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
     @Override
-    public List<String> getAvailableIPAddresses(Session session, int roomID) {
+    public List<String> getAvailableIPAddresses(Session session, long roomID) {
         // TODO Auto-generated method stub
         final RoomController roomController = new RoomController(session);
         final List<String> ips = roomController.getAvailableIPAddresses(roomID);
@@ -64,7 +64,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<Map<String, String>> getLoggedInUsers(Session session, int roomID) {
+	public List<Map<String, String>> getLoggedInUsers(Session session, long roomID) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		final List<Map<String, String>> users = roomController.getLoggedInUsers(roomID);
@@ -75,7 +75,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<AccessInRoom> getAccessList(Session session, int roomID) {
+	public List<AccessInRoom> getAccessList(Session session, long roomID) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		final List<AccessInRoom> users = roomController.getAccessList(roomID);
@@ -86,7 +86,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public boolean setAccessList(Session session, int roomID, List<AccessInRoom> accessList) {
+	public boolean setAccessList(Session session, long roomID, List<AccessInRoom> accessList) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		roomController.setAccessList(roomID, accessList);
@@ -107,14 +107,14 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public AccessInRoom getAccessStatus(Session session, int roomID) {
+	public AccessInRoom getAccessStatus(Session session, long roomID) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		return null;
 	}
 
 	@Override
-	public void setAccessStatus(Session session, int roomID, AccessInRoom access) {
+	public void setAccessStatus(Session session, long roomID, AccessInRoom access) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 	}

@@ -36,7 +36,7 @@ public interface RoomResource {
     @PermitAll
     Room getById(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomId") int roomId
+            @PathParam("roomId") long roomId
     );
 
     /*
@@ -73,10 +73,10 @@ public interface RoomResource {
     );
     
     /*
-     * GET rooms/delete/{roomId}
+     * GET rooms/{roomId}/delete
      */
     @GET
-    @Path("{roomId}")
+    @Path("{roomId}/delete")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "delete room by id")
     @ApiResponses(value = {
@@ -85,7 +85,7 @@ public interface RoomResource {
     @PermitAll
     boolean delete(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomId") int roomId
+            @PathParam("roomId") long roomId
     );
 
     
@@ -102,7 +102,7 @@ public interface RoomResource {
     @PermitAll
     List<String> getAvailableIPAddresses(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomId") int roomId
+            @PathParam("roomId") long roomId
     );
 
     /*
@@ -136,7 +136,7 @@ public interface RoomResource {
     @PermitAll
     List<Map<String, String>> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") int roomID
+            @PathParam("roomID") long roomID
     );
     
     /*
@@ -153,7 +153,7 @@ public interface RoomResource {
     @PermitAll
     List<AccessInRoom> getAccessList(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") int roomID
+            @PathParam("roomID") long roomID
     );
     
     /*
@@ -170,7 +170,7 @@ public interface RoomResource {
     @PermitAll
     boolean setAccessList(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") int roomID,
+            @PathParam("roomID") long roomID,
             List<AccessInRoom>   accessList
     );
     
@@ -220,7 +220,7 @@ public interface RoomResource {
     @PermitAll
     AccessInRoom getAccessStatus(
     		@ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") int roomID
+            @PathParam("roomID") long roomID
     );
     
     /*
@@ -237,7 +237,7 @@ public interface RoomResource {
     @PermitAll
     void setAccessStatus(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomID") int roomID,
+            @PathParam("roomID") long roomID,
             AccessInRoom access
     );
 }
