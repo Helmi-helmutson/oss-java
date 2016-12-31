@@ -3,6 +3,7 @@
 package de.openschoolserver.api;
 
 import de.openschoolserver.api.auth.OSSAuthorizer;
+
 import de.openschoolserver.api.auth.OSSTokenAuthenticator;
 import de.openschoolserver.api.health.TemplateHealthCheck;
 import de.openschoolserver.api.resourceimpl.*;
@@ -58,6 +59,15 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final RoomResource roomsResource = new RoomRescourceImpl();
         environment.jersey().register(roomsResource);
    
+        final UserResource usersResource = new UserResourceImpl();
+        environment.jersey().register(usersResource);
+        
+        final GroupResource groupsResource = new GroupResourceImpl();
+        environment.jersey().register(groupsResource);
+        
+        final DeviceResource devicesResource = new DeviceResourceImpl();
+        environment.jersey().register(devicesResource);
+        
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
 
