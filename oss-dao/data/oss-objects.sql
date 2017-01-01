@@ -106,22 +106,44 @@ CREATE TABLE IF NOT EXISTS Devices (
 CREATE TABLE IF NOT EXISTS AccessInRoom (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id        BIGINT UNSIGNED NOT NULL,
-        defaultAccess  BOOLEAN DEFAULT 0,
-        pointInTime    CHAR(5) DEFAULT '06:00',
-	mo             BOOLEAN DEFAULT 1,
-	tu             BOOLEAN DEFAULT 1,
-	we             BOOLEAN DEFAULT 1,
-	th             BOOLEAN DEFAULT 1,
-	fr             BOOLEAN DEFAULT 1,
-	sa             BOOLEAN DEFAULT 0,
-	su             BOOLEAN DEFAULT 0,
-	holiday        BOOLEAN DEFAULT 0,
-        direct         BOOLEAN DEFAULT 0,
-        logon          BOOLEAN DEFAULT 1,
-        proxy          BOOLEAN DEFAULT 1,
-        printing       BOOLEAN DEFAULT 1,
-        portal         BOOLEAN DEFAULT 1,
+        accessType     VARCHAR(8) DEFAULT,
         CONSTRAINT BIGINT fk_accessinroom_rooms FOREIGN KEY(room_id) REFERENCES Rooms(id),
+        PRIMARY KEY  (id)
+);
+
+CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
+        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        accessinroom_id BIGINT UNSIGNED NOT NULL,
+        pointInTime    CHAR(5) DEFAULT '06:00',
+	monday         BOOLEAN DEFAULT 1,
+	tusday         BOOLEAN DEFAULT 1,
+	wednesday      BOOLEAN DEFAULT 1,
+	thursady       BOOLEAN DEFAULT 1,
+	friday         BOOLEAN DEFAULT 1,
+	saturday       BOOLEAN DEFAULT 0,
+	sunday         BOOLEAN DEFAULT 0,
+	holiday        BOOLEAN DEFAULT 0,
+        CONSTRAINT BIGINT fk_accessinroompit_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
+        PRIMARY KEY  (id)
+);
+
+CREATE TABLE IF NOT EXISTS AccessInRoomFW (
+        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        accessinroom_id BIGINT UNSIGNED NOT NULL,
+        direct          BOOLEAN DEFAULT 0,
+        logon           BOOLEAN DEFAULT 1,
+        proxy           BOOLEAN DEFAULT 1,
+        printing        BOOLEAN DEFAULT 1,
+        portal          BOOLEAN DEFAULT 1,
+        CONSTRAINT BIGINT fk_accessinroomfw_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
+        PRIMARY KEY  (id)
+);
+
+CREATE TABLE IF NOT EXISTS AccessInRoomACT (
+        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        accessinroom_id BIGINT UNSIGNED NOT NULL,
+	action          VARCHAR(32) DEFAULT '',
+        CONSTRAINT BIGINT fk_accessinroomact_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
         PRIMARY KEY  (id)
 );
 
@@ -223,10 +245,13 @@ INSERT INTO Enumerates VALUES(NULL,'groupType','primary');
 INSERT INTO Enumerates VALUES(NULL,'groupType','class');
 INSERT INTO Enumerates VALUES(NULL,'groupType','workgroup');
 INSERT INTO Enumerates VALUES(NULL,'groupType','guest');
-INSERT INTO Enumerates VALUES(NULL,'groupType,'ClassRoom');
-INSERT INTO Enumerates VALUES(NULL,'groupType,'ComputerRoom');
-INSERT INTO Enumerates VALUES(NULL,'groupType,'Library');
-INSERT INTO Enumerates VALUES(NULL,'groupType,'Laboratory');
+INSERT INTO Enumerates VALUES(NULL,'roomType,'ClassRoom');
+INSERT INTO Enumerates VALUES(NULL,'roomType,'ComputerRoom');
+INSERT INTO Enumerates VALUES(NULL,'roomType,'Library');
+INSERT INTO Enumerates VALUES(NULL,'roomType,'Laboratory');
+INSERT INTO Enumerates VALUES(NULL,'accessType,'DEFAULT');
+INSERT INTO Enumerates VALUES(NULL,'accessType,'FW');
+INSERT INTO Enumerates VALUES(NULL,'accessType,'ACT');
 
 
 #Some additional config tables
