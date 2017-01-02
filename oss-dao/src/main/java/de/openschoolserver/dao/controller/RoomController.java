@@ -4,6 +4,7 @@ package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -18,6 +19,9 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.AccessInRoom;
+import de.openschoolserver.dao.AccessInRoomACT;
+import de.openschoolserver.dao.AccessInRoomFW;
+import de.openschoolserver.dao.AccessInRoomPIT;
 import de.openschoolserver.dao.tools.*;
 
 public class RoomController extends Controller {
@@ -207,8 +211,36 @@ public class RoomController extends Controller {
 	 * Returns the list of accesses in a room
 	 */
 	public List<AccessInRoom> getAccessList(long roomId){
+		List<AccessInRoom> accesses = new ArrayList<AccessInRoom>();
 		Room room = this.getById(roomId);
-		return room.getAccessInRooms();
+		for( AccessInRoom access : room.getAccessInRooms() ) {
+			HashMap accessMap = new HashMap<String, Object>();
+			if( access.getAccessType() == "DEFAULT" || access.getAccessType() =="FW") {
+				accessMap.put("direct",   access.getAccessInRoomFW().getDirect());
+				accessMap.put("login",    access.getAccessInRoomFW().getLogin());
+				accessMap.put("portal",   access.getAccessInRoomFW().getPortal());
+				accessMap.put("printing", access.getAccessInRoomFW().getPrinting());
+				accessMap.put("proxy",    access.getAccessInRoomFW().getProxy());
+			}
+			if( access.getAccessType() == "FW" || access.getAccessType() == "ACT" ) {
+				accessMap.put("Monday", access.getAccessInRoomPIT().getMonday());
+				accessMap.put("Tusday", access.getAccessInRoomPIT().getTusday());
+				accessMap.put("Wednesday", access.getAccessInRoomPIT().getWednesday());
+				accessMap.put("Thursday", access.getAccessInRoomPIT().getThursday());
+				accessMap.put("Friday", access.getAccessInRoomPIT().getFriday());
+				accessMap.put("Saturday", access.getAccessInRoomPIT().getSaturday());
+				accessMap.put("Sunday", access.getAccessInRoomPIT().getSunday());
+				accessMap.put("Holiday", access.getAccessInRoomPIT().getHoliday());
+			}
+			if( access.getAccessType() == "ACT" ) {
+				accessMap.put("action", access.getAccessInRoomACT().getAction());
+			}
+			AccessInRoom tmp = new AccessInRoom();
+			tmp.setAccessType(access.getAccessType());
+			tmp.setAccess(accessMap);
+			accesses.add(tmp);
+		}
+		return accesses;
 	}
 
 	/*
@@ -216,7 +248,52 @@ public class RoomController extends Controller {
 	 */
 	public void setAccessList(long roomId,List<AccessInRoom> AccessList){
 		Room room = this.getById(roomId);
-		room.setAccessInRooms(AccessList);
+		//Es ist nicht soo einfach. Als erstes werden die Vorhandene gelöscht und dann die Neue angelegt.
+		EntityManager em = getEntityManager();
+		for(AccessInRoom access : room.getAccessInRooms() ){
+			em.remove(access);
+		}
+		for(AccessInRoom access : AccessList ){
+			AccessInRoom    tmp    = new AccessInRoom();
+			tmp.setAccessType(access.getAccessType());
+			
+			AccessInRoomFW  tmpFW  = new AccessInRoomFW();
+			AccessInRoomPIT tmpPIT = new AccessInRoomPIT();
+			AccessInRoomACT tmpACT = new AccessInRoomACT();
+			if( access.getAccessType() == "DEFAULT" || access.getAccessType() =="FW") {
+				tmpFW.setDirect((Boolean)   access.getAccess().get("direct"));
+				tmpFW.setLogin((Boolean)    access.getAccess().get("login"));
+				tmpFW.setPortal((Boolean)   access.getAccess().get("portal"));
+				tmpFW.setPrinting((Boolean) access.getAccess().get("printing"));
+			}
+			if( access.getAccessType() == "FW" || access.getAccessType() == "ACT" ) {
+				tmpPIT.setMonday((Boolean) access.getAccess().get("Monday"));
+				tmpPIT.setMonday((Boolean) access.getAccess().get("Monday"));
+				tmpPIT.setMonday((Boolean) access.getAccess().get("Monday"));
+				tmpPIT.setMonday((Boolean) access.getAccess().get("Monday"));
+				tmpPIT.setMonday((Boolean) access.getAccess().get("Monday"));
+				tmpPIT.setMonday((Boolean) access.getAccess().get("Monday"));
+				tmpPIT.setMonday((Boolean) access.getAccess().get("Monday"));
+				tmpPIT.setMonday((Boolean) access.getAccess().get("Monday"));
+			}
+			if(access.getAccessType() == "ACT" ) {
+				tmpACT.setAction((String) access.getAccess().get("action"));
+			}
+			switch (access.getAccessType()) {
+			case "DEFAULT":
+				tmp.setAccessInRoomFW(tmpFW);
+				break;
+			case "FW":
+				tmp.setAccessInRoomFW(tmpFW);
+				tmp.setAccessInRoomPIT(tmpPIT);
+				break;
+			case "ACT":
+				tmp.setAccessInRoomACT(tmpACT);
+				tmp.setAccessInRoomPIT(tmpPIT);
+				break;
+			}
+			em.persist(tmp);
+		}
 	}
 
 	/*
@@ -230,45 +307,51 @@ public class RoomController extends Controller {
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 
-		// Direct internet
-		program[3] = "direct";
-		if( access.getDirect() )
-			program[1] = "1";
+		if(access.getAccessType() == "ACT" ) {
+			//TODO 	
+		}
 		else
-			program[1] = "0";
-		OSSShellTools.exec(program, reply, error, null);
+		{
+			// Direct internet
+			program[3] = "direct";
+			if( access.getAccessInRoomFW().getDirect() )
+				program[1] = "1";
+			else
+				program[1] = "0";
+			OSSShellTools.exec(program, reply, error, null);
 
-		// Portal Access
-		program[3] = "portal";
-		if( access.getPortal() )
-			program[1] = "1";
-		else
-			program[1] = "0";
-		OSSShellTools.exec(program, reply, error, null);
+			// Portal Access
+			program[3] = "portal";
+			if( access.getAccessInRoomFW().getPortal())
+				program[1] = "1";
+			else
+				program[1] = "0";
+			OSSShellTools.exec(program, reply, error, null);
 
-		// Proxy Access
-		program[3] = "proxy";
-		if( access.getProxy() )
-			program[1] = "1";
-		else
-			program[1] = "0";
-		OSSShellTools.exec(program, reply, error, null);
+			// Proxy Access
+			program[3] = "proxy";
+			if( access.getAccessInRoomFW().getProxy() )
+				program[1] = "1";
+			else
+				program[1] = "0";
+			OSSShellTools.exec(program, reply, error, null);
 
-		// Printing Access
-		program[3] = "printing";
-		if( access.getPrinting() )
-			program[1] = "1";
-		else
-			program[1] = "0";
-		OSSShellTools.exec(program, reply, error, null);
+			// Printing Access
+			program[3] = "printing";
+			if( access.getAccessInRoomFW().getPrinting() )
+				program[1] = "1";
+			else
+				program[1] = "0";
+			OSSShellTools.exec(program, reply, error, null);
 
-		// Login
-		program[3] = "login";
-		if( access.getLogin()) 
-			program[1] = "1";
-		else
-			program[1] = "0";
-		OSSShellTools.exec(program, reply, error, null);
+			// Login
+			program[3] = "login";
+			if( access.getAccessInRoomFW().getLogin() ) 
+				program[1] = "1";
+			else
+				program[1] = "0";
+			OSSShellTools.exec(program, reply, error, null);
+		}
 	}
 
 	/*
@@ -285,10 +368,9 @@ public class RoomController extends Controller {
 	public void setScheduledAccess(){
 		EntityManager em = getEntityManager();
 		Calendar rightNow = Calendar.getInstance();
-		rightNow.set(Calendar.SECOND, 0);
-		rightNow.set(Calendar.MILLISECOND,0);
+		String   actTime  = String.format("%02d:%02d", rightNow.get(Calendar.HOUR_OF_DAY),rightNow.get(Calendar.MINUTE));
 		Query query = em.createNamedQuery("AccessInRoom.findActualAccesses");
-		query.setParameter("time", rightNow.getTime());
+		query.setParameter("time", actTime);
 		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
 			Room room = access.getRoom();
 			this.setAccessStatus(room, access);
@@ -296,11 +378,13 @@ public class RoomController extends Controller {
 	}
 
 	/*
-	 * Sets the actual access status in a room
+	 * Gets the actual access status in a room
 	 */
 	public AccessInRoom getAccessStatus(Room room) {
 
 		AccessInRoom access = new AccessInRoom();
+		access.setAccessType("FW");
+		HashMap<String, Object> accessMap = new HashMap<String, Object>();
 		String[] program = new String[4];
 		program[0] = "/usr/sbin/oss-get-access-state.sh";
 		program[1] = room.getStartIP() + "/" + room.getNetMask();
@@ -312,37 +396,49 @@ public class RoomController extends Controller {
 		program[2] = "direct";
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString() == "1" )
-			access.setDirect(true);
+			accessMap.put("direct", true);
+		else
+			accessMap.put("direct", false);
 
 		// Portal Access
 		program[2] = "portal";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "0" )
-			access.setPortal(false);
+		if( reply.toString() == "1" )
+			accessMap.put("portal", true);
+		else
+			accessMap.put("portal", false);
 
 		// Proxy Access
 		program[2] = "proxy";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "0" )
-			access.setProxy(false);
+		if( reply.toString() == "1" )
+			accessMap.put("proxy", true);
+		else
+			accessMap.put("proxy", false);
 
 		// Printing Access
 		program[2] = "printing";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "0" )
-			access.setPrinting(false);
+		if( reply.toString() == "1" )
+			accessMap.put("printing", true);
+		else
+			accessMap.put("printing", false);
 
 		// Login
 		program[2] = "login";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "0" ) 
-			access.setLogin(false);
-
+		if( reply.toString() == "1" )
+			accessMap.put("login", true);
+		else
+			accessMap.put("login", false);
+		
+		access.setAccess(accessMap);
 		return access;
 	}
 
 	/*
-	 * Sets the actual access status in a room 
+	 * Sets the actual access status in a room.
+	 * Room is given by roomId
 	 */
 	public AccessInRoom getAccessStatus(long roomId) {
 		Room room = this.getById(roomId);

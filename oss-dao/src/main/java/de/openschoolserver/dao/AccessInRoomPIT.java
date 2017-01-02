@@ -65,11 +65,11 @@ public class AccessInRoomPIT implements Serializable {
 		this.monday = monday;
 	}
 	public Boolean getTusday() {
-		return this.thusday;
+		return this.tusday;
 	}
 
-	public void setTusday(Boolean thusday) {
-		this.thusday = thusday;
+	public void setTusday(Boolean tusday) {
+		this.tusday = tusday;
 	}
 	public Boolean getWednesday() {
 		return this.wednesday;
@@ -79,11 +79,11 @@ public class AccessInRoomPIT implements Serializable {
 		this.wednesday = wednesday;
 	}
 	public Boolean getThursday() {
-		return this.thursady;
+		return this.thursday;
 	}
 
-	public void setThursday(Boolean thursady) {
-		this.thursady = thursady;
+	public void setThursday(Boolean thursday) {
+		this.thursday = thursday;
 	}
 	public Boolean getFriday() {
 		return this.friday;

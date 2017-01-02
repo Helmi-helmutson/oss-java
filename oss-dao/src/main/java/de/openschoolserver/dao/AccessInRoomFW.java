@@ -68,14 +68,6 @@ public class AccessInRoomFW implements Serializable {
 		this.portal = portal;
 	}
 
-	public Time getPointInTime() {
-		return this.pointInTime;
-	}
-
-	public void setPointInTime(Time pointInTime) {
-		this.pointInTime = pointInTime;
-	}
-
 	public Boolean getPrinting() {
 		return this.printing;
 	}

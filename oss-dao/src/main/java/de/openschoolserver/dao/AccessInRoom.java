@@ -16,7 +16,7 @@ import java.util.HashMap;
 @NamedQueries( {
 	@NamedQuery(name="AccessInRoom.findAll",            query="SELECT a FROM AccessInRoom a"),
 	@NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom WHERE room = :room"),
-	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoomPIT WHERE pointInTime = :time")
+	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom WHERE a.accessPIT.pointInTime = :time")
 })
 public class AccessInRoom implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -24,30 +24,29 @@ public class AccessInRoom implements Serializable {
 	@Id
 	private long id;
 
-	private String accessType;
+	private String accesstype;
 
-	//bi-directional many-to-one association to Room
+	//uni-directional many-to-one association to Room
 	@ManyToOne
 	private Room room;
 
-	@OneToOne(mappedBy="accessinroom")
+	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
 	private AccessInRoomFW fwAccess;
 
-	@OneToOne(mappedBy="accessinroom")
+	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
 	private AccessInRoomACT actAccess;
 
-	@OneToOne(mappedBy="accessinroom")
+	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
 	private AccessInRoomPIT accessPIT;
 
 	@Transient
-	privat HashMap<String, Object> access = new HashMap<String, Object>();
+	private HashMap<String, Object> access = new HashMap<String, Object>();
 
 	public AccessInRoom() {
-		this.accessType = "DEFAULT";
-                this.defaultAccess = null;
-                this.fwAccess      = null;
-                this.actAccess     = null;
-                this.accessPIT     = null;
+		this.accesstype = "DEFAULT";
+		this.fwAccess   = null;
+		this.actAccess  = null;
+		this.accessPIT  = null;
 	}
 
 	public long getId() {
@@ -67,11 +66,11 @@ public class AccessInRoom implements Serializable {
 	}
 
 	public String getAccessType() {
-		return this.accessType;
+		return this.accesstype;
 	}
 
 	public void setAccessType(String accesstype) {
-		this.accessType = accesstype;
+		this.accesstype = accesstype;
 	}
 
 	public HashMap<String, Object> getAccess() {
@@ -82,28 +81,28 @@ public class AccessInRoom implements Serializable {
 		this.access = access;
 	}
 
-        public AccessInRoomFW getAccessInRoomFW() {
-                return this.fwAccess;
-        }
+	public AccessInRoomFW getAccessInRoomFW() {
+		return this.fwAccess;
+	}
 
-        public void setRoom(AccessInRoomFW fwAccess) {
-                this.fwAccess = fwAccess;
-        }
+	public void setAccessInRoomFW(AccessInRoomFW fwAccess) {
+		this.fwAccess = fwAccess;
+	}
 
-        public AccessInRoomACT getAccessInRoomACT() {
-                return this.actAccess;
-        }
+	public AccessInRoomACT getAccessInRoomACT() {
+		return this.actAccess;
+	}
 
-        public void setRoom(AccessInRoomACT actAccess) {
-                this.actAccess = actAccess;
-        }
+	public void setAccessInRoomACT(AccessInRoomACT actAccess) {
+		this.actAccess = actAccess;
+	}
 
-        public AccessInRoomPIT getAccessInRoomPIT() {
-                return this.accessPIT;
-        }
+	public AccessInRoomPIT getAccessInRoomPIT() {
+		return this.accessPIT;
+	}
 
-        public void setRoom(AccessInRoomPIT accessPIT) {
-                this.accessPIT = accessPIT;
-        }
+	public void setAccessInRoomPIT(AccessInRoomPIT accessPIT) {
+		this.accessPIT = accessPIT;
+	}
 
 }

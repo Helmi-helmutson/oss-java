@@ -151,24 +151,6 @@ public class Room implements Serializable {
 		return this.accessInRooms;
 	}
 
-	public void setAccessInRooms(List<AccessInRoom> accessInRooms) {
-		this.accessInRooms = accessInRooms;
-	}
-
-	public AccessInRoom addAccessInRoom(AccessInRoom accessInRoom) {
-		getAccessInRooms().add(accessInRoom);
-		accessInRoom.setRoom(this);
-
-		return accessInRoom;
-	}
-
-	public AccessInRoom removeAccessInRoom(AccessInRoom accessInRoom) {
-		getAccessInRooms().remove(accessInRoom);
-		accessInRoom.setRoom(null);
-
-		return accessInRoom;
-	}
-
 	public List<Device> getDevices() {
 		return this.devices;
 	}

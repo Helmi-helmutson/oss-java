@@ -118,7 +118,7 @@ CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
 	monday         BOOLEAN DEFAULT 1,
 	tusday         BOOLEAN DEFAULT 1,
 	wednesday      BOOLEAN DEFAULT 1,
-	thursady       BOOLEAN DEFAULT 1,
+	thursday       BOOLEAN DEFAULT 1,
 	friday         BOOLEAN DEFAULT 1,
 	saturday       BOOLEAN DEFAULT 0,
 	sunday         BOOLEAN DEFAULT 0,
