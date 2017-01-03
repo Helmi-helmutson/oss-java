@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 
 
+
+
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -101,9 +103,13 @@ public class RoomController extends Controller {
 		if( !this.isDescriptionUnique(room.getDescription())){
 			return false;
 		}
+		// If no network was configured we will use net school network.
+		if( room.getNetwork().equals(""))
+			room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
+		
 		// If the starIp is not given we have to search the next room IP
 		if( room.getStartIP() == "" ) {
-			room.setStartIP( getNextRoomIP(room.getNetMask()) );
+			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
 		}
 		try {
 			em.getTransaction().begin();
@@ -147,15 +153,32 @@ public class RoomController extends Controller {
 		return allIPs;
 	}
 
-	public String getNextRoomIP( int netMask ) {
+	/*
+	 * Delivers the next room IP address in a given subnet with the given netmask.
+	 * If the subnet is "" the default school network is meant.
+	 */
+	public String getNextRoomIP( String subnet, int roomNetMask ) throws NumberFormatException {
+		if( subnet.equals("") ){
+			subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
+		}
+		IPv4Net subNetwork = new IPv4Net( subnet );
+		if(roomNetMask < subNetwork.getNetmaskNumeric() ) {
+			throw new NumberFormatException("The network netmask must be less then the room netmask:" + roomNetMask + ">" + subNetwork.getNetmaskNumeric() );
+		}
+		
 		List<String>  startIPAddresses   = new ArrayList<String>();
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Room.findAll");
 		for( Room room : (List<Room>) query.getResultList() ) {
+			if( !subNetwork.contains(room.getStartIP()))
+				continue;
 			startIPAddresses.add(room.getStartIP());
 		}
-		IPv4 ipv4 = new IPv4();
-		List<String> sortedIPAddresses = ipv4.sortIPAddresses(startIPAddresses);
+		// When no room was found in this network we return the network address of the network.
+		if( startIPAddresses.isEmpty() )
+			return subNetwork.getBase();
+
+		List<String> sortedIPAddresses = IPv4.sortIPAddresses(startIPAddresses);
 		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
 
 		// Find the net of the last room
@@ -170,18 +193,17 @@ public class RoomController extends Controller {
 		lastNetworkIP = net.getLast();
 
 		//This could be our net
-		net = new IPv4Net(nextNet + "/" + netMask );
+		net = new IPv4Net(nextNet + "/" + roomNetMask );
 		while ( net.contains(lastNetworkIP)) {
 			//If the end of the last network is in our net it is wrong.
 			//In this case get the next one net address
 			nextNet = net.getNext();
-			net = new IPv4Net(nextNet + "/" + netMask );
+			net = new IPv4Net(nextNet + "/" + roomNetMask );
 		}
 
 		// Check if the nextNet is in school net.
 		String lastIP = net.getNext();
-		net = new IPv4Net( this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK") );
-		if( ! net.contains(lastIP) )
+		if( ! subNetwork.contains(lastIP) )
 		{
 			return "";
 		}
@@ -444,5 +466,9 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomId);
 		return this.getAccessStatus(room);
 	}
-
+	
+	/*
+	 * Create the dhcp configuration
+	 */
+	
 }

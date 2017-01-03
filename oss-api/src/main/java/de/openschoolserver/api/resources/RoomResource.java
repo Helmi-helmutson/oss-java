@@ -106,12 +106,12 @@ public interface RoomResource {
     );
 
     /*
-     * GET rooms/getNextRoomIP/{netMask}
+     * PUT rooms/getNextRoomIP/ { netMask : 26, netWork : "10.12.0.0/16" }
      */
-    @GET
-    @Path("getNextRoomIP/{netMask}")
+    @PUT
+    @Path("getNextRoomIP")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "create new room")
+    @ApiOperation(value = "Delivers the next free ip address for a room.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -119,7 +119,8 @@ public interface RoomResource {
     @PermitAll
     String getNextRoomIP(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("netMask") int netMask
+            String netWork,
+            int netMask
     );
     
     /*
@@ -128,7 +129,7 @@ public interface RoomResource {
     @GET
     @Path("{roomId}/getLoggedInUsers")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "create new room")
+    @ApiOperation(value = "Delivers the list of the users which are logged in in a room.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")

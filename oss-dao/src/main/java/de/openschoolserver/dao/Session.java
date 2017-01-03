@@ -3,6 +3,7 @@
 package de.openschoolserver.dao;
 
 import java.security.Principal;
+
 import javax.security.auth.Subject;
 
 

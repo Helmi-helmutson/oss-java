@@ -14,9 +14,10 @@ import java.util.List;
 @Table(name="Rooms")
 @NamedQueries ({
   @NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
-  @NamedQuery(name="Room.getRoomByName", query="SELECT r FROM Room r WHERE r.name = :name"),
-  @NamedQuery(name="Room.getRoomByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
-  @NamedQuery(name="Room.getRoomByType", query="SELECT r FROM Room r WHERE r.roomType = :type")
+  @NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
+  @NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
+  @NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
+  @NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room_id = :id")
 })
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -80,7 +81,11 @@ public class Room implements Serializable {
 	@OneToMany(mappedBy="room")
 	private List<Test> tests;
 
+	@Transient
+	private String network;
+	
 	public Room() {
+		this.network = "";
 	}
 
 	public long getId() {
@@ -218,5 +223,15 @@ public class Room implements Serializable {
 
 		return test;
 	}
+	
+	public String getNetwork() {
+		return this.network;
+	}
+
+	public void setNetwork(String network) {
+		this.network = network;
+	}
+
+
 
 }
