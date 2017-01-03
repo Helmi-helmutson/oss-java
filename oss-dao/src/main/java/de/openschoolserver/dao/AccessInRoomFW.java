@@ -18,14 +18,19 @@ public class AccessInRoomFW implements Serializable {
 	@Id
 	private long id;
 
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean direct;
 
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean login;
 
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean portal;
 	
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean printing;
 
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean proxy;
 
 	public AccessInRoomFW() {

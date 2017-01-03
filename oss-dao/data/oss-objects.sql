@@ -2,7 +2,7 @@
 DROP DATABASE OSS;
 
 CREATE DATABASE OSS;
-use OSS;
+USE OSS;
 
 CREATE TABLE IF NOT EXISTS Users (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -95,8 +95,8 @@ CREATE TABLE IF NOT EXISTS Devices (
         MAC          VARCHAR(17) NOT NULL,
         WLANMAC      VARCHAR(17) DEFAULT '',
         deviceType   VARCHAR(16) NOT NULL,
-        row          BIGINT  DEFAULT 0,
-        column       BIGINT  DEFAULT 0,
+        row          INTEGER  DEFAULT 0,
+        column       INTEGER  DEFAULT 0,
         CONSTRAINT BIGINT fk_devices_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
         CONSTRAINT BIGINT fk_devices_hwconfs FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         CONSTRAINT BIGINT fk_devices_users   FOREIGN KEY(owner_id)  REFERENCES Users(id),
@@ -115,14 +115,14 @@ CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         accessinroom_id BIGINT UNSIGNED NOT NULL,
         pointInTime    CHAR(5) DEFAULT '06:00',
-	monday         BOOLEAN DEFAULT 1,
-	tusday         BOOLEAN DEFAULT 1,
-	wednesday      BOOLEAN DEFAULT 1,
-	thursday       BOOLEAN DEFAULT 1,
-	friday         BOOLEAN DEFAULT 1,
-	saturday       BOOLEAN DEFAULT 0,
-	sunday         BOOLEAN DEFAULT 0,
-	holiday        BOOLEAN DEFAULT 0,
+	monday         CHAR(1) DEFAULT 'Y',
+	tusday         CHAR(1) DEFAULT 'Y',
+	wednesday      CHAR(1) DEFAULT 'Y',
+	thursday       CHAR(1) DEFAULT 'Y',
+	friday         CHAR(1) DEFAULT 'Y',
+	saturday       CHAR(1) DEFAULT 'N',
+	sunday         CHAR(1) DEFAULT 'N',
+	holiday        CHAR(1) DEFAULT 'N',
         CONSTRAINT BIGINT fk_accessinroompit_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
         PRIMARY KEY  (id)
 );
@@ -130,11 +130,11 @@ CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
 CREATE TABLE IF NOT EXISTS AccessInRoomFW (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         accessinroom_id BIGINT UNSIGNED NOT NULL,
-        direct          BOOLEAN DEFAULT 0,
-        logon           BOOLEAN DEFAULT 1,
-        proxy           BOOLEAN DEFAULT 1,
-        printing        BOOLEAN DEFAULT 1,
-        portal          BOOLEAN DEFAULT 1,
+        direct          CHAR(1) DEFAULT 'N',
+        logon           CHAR(1) DEFAULT 'Y',
+        proxy           CHAR(1) DEFAULT 'Y',
+        printing        CHAR(1) DEFAULT 'Y',
+        portal          CHAR(1) DEFAULT 'Y',
         CONSTRAINT BIGINT fk_accessinroomfw_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
         PRIMARY KEY  (id)
 );
@@ -194,9 +194,10 @@ CREATE TABLE IF NOT EXISTS  Tests (
         currentStep   VARCHAR(128) NOT NULL,
         startTime     DATETIME NOT NULL,
         endTime       DATETIME NOT NULL,
-        windowsAccess BOOLEAN NOT NULL,
-        proxyAccess   BOOLEAN NOT NULL,
-        DirectInternetAccess BOOLEAN NOT NULL,
+        login         CHAR(1) NOT NULL DEFAULT 'Y',
+        proxy         CHAR(1) NOT NULL DEFAULT 'N',
+        direct        CHAR(1) NOT NULL DEFAULT 'N',
+        portal        CHAR(1) NOT NULL DEFAULT 'N',
         CONSTRAINT BIGINT fk_tests_users FOREIGN KEY(teacher_id) REFERENCES Users(id),
         CONSTRAINT BIGINT fk_tests_rooms FOREIGN KEY(room_id)    REFERENCES Rooms(id),
         PRIMARY KEY  (id)
@@ -233,6 +234,8 @@ CREATE TABLE IF NOT EXISTS Enumerates (
 
 INSERT INTO Enumerates VALUES(NULL,'deviceType','FatClient');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','ThinClient');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','ManagedMobileDevice');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','MobileDevice');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Printer');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Switch');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Router');
@@ -245,13 +248,13 @@ INSERT INTO Enumerates VALUES(NULL,'groupType','primary');
 INSERT INTO Enumerates VALUES(NULL,'groupType','class');
 INSERT INTO Enumerates VALUES(NULL,'groupType','workgroup');
 INSERT INTO Enumerates VALUES(NULL,'groupType','guest');
-INSERT INTO Enumerates VALUES(NULL,'roomType,'ClassRoom');
-INSERT INTO Enumerates VALUES(NULL,'roomType,'ComputerRoom');
-INSERT INTO Enumerates VALUES(NULL,'roomType,'Library');
-INSERT INTO Enumerates VALUES(NULL,'roomType,'Laboratory');
-INSERT INTO Enumerates VALUES(NULL,'accessType,'DEFAULT');
-INSERT INTO Enumerates VALUES(NULL,'accessType,'FW');
-INSERT INTO Enumerates VALUES(NULL,'accessType,'ACT');
+INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom');
+INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom');
+INSERT INTO Enumerates VALUES(NULL,'roomType','Library');
+INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory');
+INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT');
+INSERT INTO Enumerates VALUES(NULL,'accessType','FW');
+INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
 
 
 #Some additional config tables

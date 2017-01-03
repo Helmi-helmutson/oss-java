@@ -4,8 +4,6 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import javax.persistence.*;
-import java.sql.Time;
-
 
 /**
  * The persistent class for the AccessInRoom database table.
@@ -39,5 +37,4 @@ public class AccessInRoomACT implements Serializable {
 	public void setAction(String action) {
 		this.action = action;
 	}
-
 }

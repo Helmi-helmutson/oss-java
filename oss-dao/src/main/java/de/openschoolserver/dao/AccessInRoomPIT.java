@@ -20,13 +20,28 @@ public class AccessInRoomPIT implements Serializable {
 
 	private String  pointintime;
 
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean monday;
+	
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean tusday;
+	
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean wednesday;
+	
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean thursday;
+	
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean friday;
+	
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean saturday;
+	
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean sunday;
+	
+	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean holiday;
 
 	public AccessInRoomPIT() {
