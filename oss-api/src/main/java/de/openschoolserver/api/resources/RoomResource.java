@@ -109,7 +109,7 @@ public interface RoomResource {
      * PUT rooms/getNextRoomIP/ { netMask : 26, netWork : "10.12.0.0/16" }
      */
     @PUT
-    @Path("getNextRoomIP")
+    @Path("getNextRoomIP/{netWork}/{netMask}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Delivers the next free ip address for a room.")
     @ApiResponses(value = {
