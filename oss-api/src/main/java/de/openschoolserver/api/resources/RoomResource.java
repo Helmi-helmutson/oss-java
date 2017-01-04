@@ -109,7 +109,7 @@ public interface RoomResource {
      * PUT rooms/getNextRoomIP/ { netMask : 26, netWork : "10.12.0.0/16" }
      */
     @PUT
-    @Path("getNextRoomIP/{netWork}/{netMask}")
+    @Path("getNextRoomIP")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Delivers the next free ip address for a room.")
     @ApiResponses(value = {
@@ -119,8 +119,8 @@ public interface RoomResource {
     @PermitAll
     String getNextRoomIP(
             @ApiParam(hidden = true) @Auth Session session,
-            String netWork,
-            int netMask
+            @FormParam("netWork") String netWork,
+            @FormParam("netMask") int netMask
     );
     
     /*
