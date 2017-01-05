@@ -18,6 +18,7 @@ public class OSSAuthorizer implements Authorizer<Session> {
     @Override
     public boolean authorize(Session session, String requiredRole) {
 
+    	session.getUser().getRole().equals(requiredRole);
 //        logger.info("authorize() Person: " + session.getPerson() + ", required role category: " + requiredRole);
 //
 //        List<Role> rolesList = session.getPerson().getRoleItems();

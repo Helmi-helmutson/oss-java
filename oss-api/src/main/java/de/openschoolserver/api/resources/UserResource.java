@@ -7,6 +7,8 @@ import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
+
 import javax.ws.rs.*;
 
 import de.openschoolserver.dao.User;
@@ -113,7 +115,8 @@ public interface UserResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    //@PermitAll
+    @RolesAllowed("SYSADMINS")
     boolean add(
             @ApiParam(hidden = true) @Auth Session session,
             User user
