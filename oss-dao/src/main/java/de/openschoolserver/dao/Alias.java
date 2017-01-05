@@ -16,7 +16,7 @@ public class Alias implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	private long id;
 
 	private String alias;
 
@@ -27,11 +27,11 @@ public class Alias implements Serializable {
 	public Alias() {
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

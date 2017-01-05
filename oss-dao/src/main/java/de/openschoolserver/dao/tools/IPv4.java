@@ -3,6 +3,7 @@ package de.openschoolserver.dao.tools;
 
 import java.util.ArrayList;
 
+
 import java.util.List;
 import java.util.Collections;
 
@@ -31,7 +32,7 @@ public class IPv4 {
 	 *
 	 * @return
 	 */
-	static public int convertSymbolicIPToNumeric(String symbolicIP)
+	static public int convertSymbolicIPToNumeric (String symbolicIP) throws NumberFormatException 
 	{
 		/* IP */
 		String[] st = symbolicIP.split("\\.");

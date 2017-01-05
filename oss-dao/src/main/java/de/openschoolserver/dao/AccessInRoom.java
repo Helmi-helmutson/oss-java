@@ -4,7 +4,8 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import javax.persistence.*;
-import java.sql.Time;
+
+import java.util.HashMap;
 
 
 /**
@@ -13,89 +14,47 @@ import java.sql.Time;
  */
 @Entity
 @NamedQueries( {
-	@NamedQuery(name="AccessInRoom.findAll", query="SELECT a FROM AccessInRoom a"),
-	@NamedQuery(name="AccessInRoom.findByRoom", query="SELECT a FROM AccessInRoom WHERE room = :room ORDER by pointOfTime"),
-	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom WHERE pointInTime = :time")
+	@NamedQuery(name="AccessInRoom.findAll",            query="SELECT a FROM AccessInRoom a"),
+	@NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom WHERE room = :room"),
+	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom WHERE a.accessPIT.pointInTime = :time")
 })
 public class AccessInRoom implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	private long id;
 
-	private Boolean direct;
+	private String accesstype;
 
-	private Boolean defaultAccess;
-
-	private Boolean logon;
-
-	private Boolean mail;
-
-	private Time pointInTime;
-
-	private Boolean proxy;
-
-	//bi-directional many-to-one association to Room
+	//uni-directional many-to-one association to Room
 	@ManyToOne
 	private Room room;
 
+	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
+	private AccessInRoomFW fwAccess;
+
+	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
+	private AccessInRoomACT actAccess;
+
+	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
+	private AccessInRoomPIT accessPIT;
+
+	@Transient
+	private HashMap<String, Object> access = new HashMap<String, Object>();
+
 	public AccessInRoom() {
+		this.accesstype = "DEFAULT";
+		this.fwAccess   = null;
+		this.actAccess  = null;
+		this.accessPIT  = null;
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
-	}
-
-	public Boolean getDirect() {
-		return this.direct;
-	}
-
-	public void setDirect(Boolean direct) {
-		this.direct = direct;
-	}
-
-	public Boolean getDefaultAccess() {
-		return this.defaultAccess;
-	}
-
-	public void setDefaultAccess(Boolean defaultAccess) {
-		this.defaultAccess = defaultAccess;
-	}
-
-	public Boolean getLogon() {
-		return this.logon;
-	}
-
-	public void setLogon(Boolean logon) {
-		this.logon = logon;
-	}
-
-	public Boolean getMail() {
-		return this.mail;
-	}
-
-	public void setMail(Boolean mail) {
-		this.mail = mail;
-	}
-
-	public Time getPointInTime() {
-		return this.pointInTime;
-	}
-
-	public void setPointInTime(Time pointInTime) {
-		this.pointInTime = pointInTime;
-	}
-
-	public Boolean getProxy() {
-		return this.proxy;
-	}
-
-	public void setProxy(Boolean proxy) {
-		this.proxy = proxy;
 	}
 
 	public Room getRoom() {
@@ -104,6 +63,46 @@ public class AccessInRoom implements Serializable {
 
 	public void setRoom(Room room) {
 		this.room = room;
+	}
+
+	public String getAccessType() {
+		return this.accesstype;
+	}
+
+	public void setAccessType(String accesstype) {
+		this.accesstype = accesstype;
+	}
+
+	public HashMap<String, Object> getAccess() {
+		return this.access;
+	}
+
+	public void setAccess(HashMap<String, Object> access) {
+		this.access = access;
+	}
+
+	public AccessInRoomFW getAccessInRoomFW() {
+		return this.fwAccess;
+	}
+
+	public void setAccessInRoomFW(AccessInRoomFW fwAccess) {
+		this.fwAccess = fwAccess;
+	}
+
+	public AccessInRoomACT getAccessInRoomACT() {
+		return this.actAccess;
+	}
+
+	public void setAccessInRoomACT(AccessInRoomACT actAccess) {
+		this.actAccess = actAccess;
+	}
+
+	public AccessInRoomPIT getAccessInRoomPIT() {
+		return this.accessPIT;
+	}
+
+	public void setAccessInRoomPIT(AccessInRoomPIT accessPIT) {
+		this.accessPIT = accessPIT;
 	}
 
 }

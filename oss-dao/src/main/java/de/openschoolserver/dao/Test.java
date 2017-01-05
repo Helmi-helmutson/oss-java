@@ -18,17 +18,24 @@ public class Test implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	private long id;
 
 	private String currentStep;
 
-	@Column(name="DirectInternetAccess")
-	private Object directInternetAccess;
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean direct;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean proxy;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean portal;
+	
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean login;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date endTime;
-
-	private Object proxyAccess;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date startTime;
@@ -36,8 +43,6 @@ public class Test implements Serializable {
 	private String testDir;
 
 	private String testName;
-
-	private Object windowsAccess;
 
 	//bi-directional many-to-one association to TestFile
 	@OneToMany(mappedBy="test")
@@ -59,11 +64,11 @@ public class Test implements Serializable {
 	public Test() {
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -75,12 +80,12 @@ public class Test implements Serializable {
 		this.currentStep = currentStep;
 	}
 
-	public Object getDirectInternetAccess() {
-		return this.directInternetAccess;
+	public Boolean getDirect() {
+		return this.direct;
 	}
 
-	public void setDirectInternetAccess(Object directInternetAccess) {
-		this.directInternetAccess = directInternetAccess;
+	public void setDirect(Boolean direct) {
+		this.direct = direct;
 	}
 
 	public Date getEndTime() {
@@ -91,14 +96,22 @@ public class Test implements Serializable {
 		this.endTime = endTime;
 	}
 
-	public Object getProxyAccess() {
-		return this.proxyAccess;
+	public Boolean getProxy() {
+		return this.proxy;
 	}
 
-	public void setProxyAccess(Object proxyAccess) {
-		this.proxyAccess = proxyAccess;
+	public void setProxy(Boolean proxy) {
+		this.proxy = proxy;
 	}
 
+	public Boolean getPortal() {
+		return this.portal;
+	}
+
+	public void setPortal(Boolean portal) {
+		this.portal = portal;
+	}
+	
 	public Date getStartTime() {
 		return this.startTime;
 	}
@@ -123,12 +136,12 @@ public class Test implements Serializable {
 		this.testName = testName;
 	}
 
-	public Object getWindowsAccess() {
-		return this.windowsAccess;
+	public Boolean getLogin() {
+		return this.login;
 	}
 
-	public void setWindowsAccess(Object windowsAccess) {
-		this.windowsAccess = windowsAccess;
+	public void setLogin(Boolean login) {
+		this.login = login;
 	}
 
 	public List<TestFile> getTestFiles() {

@@ -2,6 +2,7 @@
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.AccessInRoom;
+
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.RoomController;
@@ -16,9 +17,9 @@ public class RoomRescourceImpl implements RoomResource {
 	
 
     @Override
-    public Room getById(Session session, int roomID) {
+    public Room getById(Session session, long roomId) {
        final RoomController roomController = new RoomController(session);
-       final Room room = roomController.getById(roomID);
+       final Room room = roomController.getById(roomId);
         if (room == null) {
             throw new WebApplicationException(404);
         }
@@ -33,22 +34,26 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
     @Override
-    public boolean delete(Session session, int roomID) {
+    public boolean delete(Session session, long roomId) {
         // TODO Auto-generated method stub
-        return false;
+    	final RoomController roomController = new RoomController(session);
+    	roomController.delete(roomId);
+    	return true;
     }
 
     @Override
     public boolean add(Session session, Room room) {
         // TODO Auto-generated method stub
+    	final RoomController roomController = new RoomController(session);
+    	roomController.add(room);
         return false;
     }
 
     @Override
-    public List<String> getAvailableIPAddresses(Session session, int roomID) {
+    public List<String> getAvailableIPAddresses(Session session, long roomId) {
         // TODO Auto-generated method stub
         final RoomController roomController = new RoomController(session);
-        final List<String> ips = roomController.getAvailableIPAddresses(roomID);
+        final List<String> ips = roomController.getAvailableIPAddresses(roomId);
         if ( ips == null) {
             throw new WebApplicationException(404);
         }
@@ -56,18 +61,18 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
 	@Override
-	public String getNextRoomIP(Session session, int netMask) {
+	public String getNextRoomIP(Session session, String network, int netMask) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		final String nextIP = roomController.getNextRoomIP(netMask);
+		final String nextIP = roomController.getNextRoomIP(network, netMask);
 		return nextIP;
 	}
 
 	@Override
-	public List<Map<String, String>> getLoggedInUsers(Session session, int roomID) {
+	public List<Map<String, String>> getLoggedInUsers(Session session, long roomId) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		final List<Map<String, String>> users = roomController.getLoggedInUsers(roomID);
+		final List<Map<String, String>> users = roomController.getLoggedInUsers(roomId);
         if ( users == null) {
             throw new WebApplicationException(404);
         }
@@ -75,48 +80,54 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<AccessInRoom> getAccessList(Session session, int roomID) {
+	public List<AccessInRoom> getAccessList(Session session, long roomId) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		final List<AccessInRoom> users = roomController.getAccessList(roomID);
-        if ( users == null) {
+		final List<AccessInRoom> accesses = roomController.getAccessList(roomId);
+        if ( accesses == null) {
             throw new WebApplicationException(404);
         }
-        return users;
+        return accesses;
 	}
 
 	@Override
-	public boolean setAccessList(Session session, int roomID, List<AccessInRoom> accessList) {
+	public boolean setAccessList(Session session, long roomId, List<AccessInRoom> accessList) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		roomController.setAccessList(roomID, accessList);
-		return false;
+		roomController.setAccessList(roomId, accessList);
+		return true;
 	}
 
 	@Override
-	public void setScheduledAccess(Session session) {
+	public boolean setScheduledAccess(Session session) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
+		roomController.setScheduledAccess();
+		return true;
 	}
 
 	@Override
 	public List<AccessInRoom> getAccessStatus(Session session) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		return null;
+		final List<AccessInRoom> accesses = roomController.getAccessStatus();
+		return accesses;
 	}
 
 	@Override
-	public AccessInRoom getAccessStatus(Session session, int roomID) {
+	public AccessInRoom getAccessStatus(Session session, long roomId) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		return null;
+		final AccessInRoom access = roomController.getAccessStatus(roomId);
+		return access;
 	}
 
 	@Override
-	public void setAccessStatus(Session session, int roomID, AccessInRoom access) {
+	public boolean setAccessStatus(Session session, long roomId, AccessInRoom access) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
+		roomController.setAccessStatus(roomId, access);
+		return true;
 	}
 
 }

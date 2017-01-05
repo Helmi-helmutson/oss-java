@@ -3,37 +3,56 @@
 package de.openschoolserver.dao;
 
 import java.security.Principal;
+import java.util.List;
+
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.security.auth.Subject;
 
 
 public class Session implements Principal {
-	private String schoolId = "dummy";
-	private String userName = "dummy";
-	private String role     = "dummy";
+	
 	private String password = "dummy";
-	private String deviceIP = "dummy";
 	
-	public String getUserName() {
-		return userName;
-	}
+	@OneToOne
+	private Device device;
+		
+	@OneToOne
+	private User user;
 	
-	public void setUserName(String username) {
-	     this.userName = username;
-	}
+	@OneToOne
+	private Room room;
 	
-	public String getSchoolId() {
-		return schoolId;
-	}
-
-	public void setSchoolId(String schoolId) {
-		this.schoolId = schoolId;
-	}
-
 	@Override
 	public String getName() {	
 		return "dummy";
 	}
 	
+	public Room getRoom() {
+		return this.room;
+	}
+
+	public void setRoom(Room room) {
+		this.room = room;
+	}
+	
+	public User getUser() {
+		return this.user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
+	public Device getDevice() {
+		return this.device;
+	}
+
+	public void setDevice(Device device) {
+		this.device = device;
+	}
+
 	@Override
 	public boolean implies(Subject subject) {
 		return true;

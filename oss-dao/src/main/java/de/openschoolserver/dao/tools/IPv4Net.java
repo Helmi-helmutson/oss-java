@@ -31,7 +31,7 @@ import java.util.List;
 
 public class IPv4Net {
     int  baseIPnumeric;
-    int  netmaskNumeric;
+    private int  netmaskNumeric;
 
     /**
      * Specify IP address and netmask like: new
@@ -54,7 +54,7 @@ public class IPv4Net {
                     + netmask);
 
         int i = 24;
-        netmaskNumeric = 0;
+        setNetmaskNumeric(0);
 
         if (Integer.parseInt(st[0]) < 255) {
 
@@ -70,7 +70,7 @@ public class IPv4Net {
                 throw new NumberFormatException("Invalid netmask address: "  + netmask);
             }
 
-            netmaskNumeric += value << i;
+            setNetmaskNumeric(getNetmaskNumeric() + (value << i));
             i -= 8;
 
         }
@@ -84,7 +84,7 @@ public class IPv4Net {
 
         for (i = 0; i < 32; i++) {
 
-            if ((netmaskNumeric & ourMaskBitPattern) != 0) {
+            if ((getNetmaskNumeric() & ourMaskBitPattern) != 0) {
 
                 encounteredOne = true; // the bit is 1
             } else { // the bit is 0
@@ -124,12 +124,20 @@ public class IPv4Net {
         /* netmask from CIDR */
         if (numericCIDR < 8)
             throw new NumberFormatException("Netmask CIDR can not be less than 8");
-        netmaskNumeric = 0xffffffff;
-        netmaskNumeric = netmaskNumeric << (32 - numericCIDR);
+        setNetmaskNumeric(0xffffffff);
+        setNetmaskNumeric(getNetmaskNumeric() << (32 - numericCIDR));
 
     }
 
-    /**
+    public int getNetmaskNumeric() {
+	return netmaskNumeric;
+}
+
+public void setNetmaskNumeric(int netmaskNumeric) {
+	this.netmaskNumeric = netmaskNumeric;
+}
+
+	/**
 * Get the IP in symbolic form, i.e. xxx.xxx.xxx.xxx
 *
 *@return
@@ -148,7 +156,7 @@ public class IPv4Net {
         int numberOfBits;
         for (numberOfBits = 0; numberOfBits < 32; numberOfBits++) {
 
-            if ((netmaskNumeric << numberOfBits) == 0)
+            if ((getNetmaskNumeric() << numberOfBits) == 0)
                 break;
         }
         Integer numberOfIPs = 0;
@@ -159,7 +167,7 @@ public class IPv4Net {
 
         }
 
-        Integer baseIP = baseIPnumeric & netmaskNumeric;
+        Integer baseIP = baseIPnumeric & getNetmaskNumeric();
         return IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs );
     }
 
@@ -175,11 +183,11 @@ public class IPv4Net {
         for (int shift = 24; shift > 0; shift -= 8) {
 
             // process 3 bytes, from high order byte down.
-            sb.append(Integer.toString((netmaskNumeric >>> shift) & 0xff));
+            sb.append(Integer.toString((getNetmaskNumeric() >>> shift) & 0xff));
 
             sb.append('.');
         }
-        sb.append(Integer.toString(netmaskNumeric & 0xff));
+        sb.append(Integer.toString(getNetmaskNumeric() & 0xff));
 
         return sb.toString();
     }
@@ -194,11 +202,11 @@ public class IPv4Net {
         int i;
         for (i = 0; i < 32; i++) {
 
-            if ((netmaskNumeric << i) == 0)
+            if ((getNetmaskNumeric() << i) == 0)
                 break;
 
         }
-        return IPv4.convertNumericIpToSymbolic(baseIPnumeric & netmaskNumeric) + "/" + i;
+        return IPv4.convertNumericIpToSymbolic(baseIPnumeric & getNetmaskNumeric()) + "/" + i;
     }
 
 /**
@@ -214,7 +222,7 @@ public class IPv4Net {
 
         for (numberOfBits = 0; numberOfBits < 32; numberOfBits++) {
 
-            if ((netmaskNumeric << numberOfBits) == 0)
+            if ((getNetmaskNumeric() << numberOfBits) == 0)
                 break;
 
         }
@@ -226,7 +234,7 @@ public class IPv4Net {
 
         }
 
-        Integer baseIP = baseIPnumeric & netmaskNumeric;
+        Integer baseIP = baseIPnumeric & getNetmaskNumeric();
 	if( numberofIPs == 0 ) {
 	    numberofIPs = numberOfIPs;
 	}
@@ -252,7 +260,7 @@ public class IPv4Net {
         int numberOfBits;
         for (numberOfBits = 0; numberOfBits < 32; numberOfBits++) {
 
-            if ((netmaskNumeric << numberOfBits) == 0)
+            if ((getNetmaskNumeric() << numberOfBits) == 0)
                 break;
         }
         Integer numberOfIPs = 0;
@@ -263,7 +271,7 @@ public class IPv4Net {
 
         }
 
-        Integer baseIP = baseIPnumeric & netmaskNumeric;
+        Integer baseIP = baseIPnumeric & getNetmaskNumeric();
         String nextIP = IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs + 1);
         return nextIP;
     }
@@ -278,7 +286,7 @@ public class IPv4Net {
         int numberOfBits;
         for (numberOfBits = 0; numberOfBits < 32; numberOfBits++) {
 
-            if ((netmaskNumeric << numberOfBits) == 0)
+            if ((getNetmaskNumeric() << numberOfBits) == 0)
                 break;
         }
         Integer numberOfIPs = 0;
@@ -289,7 +297,7 @@ public class IPv4Net {
 
         }
 
-        Integer baseIP = baseIPnumeric & netmaskNumeric;
+        Integer baseIP = baseIPnumeric & getNetmaskNumeric();
         String firstIP = IPv4.convertNumericIpToSymbolic(baseIP + 1);
         String lastIP = IPv4.convertNumericIpToSymbolic(baseIP + numberOfIPs - 1);
         return firstIP + " - " + lastIP;
@@ -305,7 +313,7 @@ public class IPv4Net {
 
         for (numberOfBits = 0; numberOfBits < 32; numberOfBits++) {
 
-            if ((netmaskNumeric << numberOfBits) == 0)
+            if ((getNetmaskNumeric() << numberOfBits) == 0)
                 break;
 
         }
@@ -325,7 +333,7 @@ public class IPv4Net {
 */
 
     public String getWildcardMask() {
-        Integer wildcardMask = netmaskNumeric ^ 0xffffffff;
+        Integer wildcardMask = getNetmaskNumeric() ^ 0xffffffff;
 
         StringBuffer sb = new StringBuffer(15);
         for (int shift = 24; shift > 0; shift -= 8) {
@@ -343,13 +351,13 @@ public class IPv4Net {
 
     public String getBroadcastAddress() {
 
-        if (netmaskNumeric == 0xffffffff)
+        if (getNetmaskNumeric() == 0xffffffff)
             return "0.0.0.0";
 
         int numberOfBits;
         for (numberOfBits = 0; numberOfBits < 32; numberOfBits++) {
 
-            if ((netmaskNumeric << numberOfBits) == 0)
+            if ((getNetmaskNumeric() << numberOfBits) == 0)
                 break;
 
         }
@@ -360,7 +368,7 @@ public class IPv4Net {
             numberOfIPs = numberOfIPs | 0x01;
         }
 
-        Integer baseIP = baseIPnumeric & netmaskNumeric;
+        Integer baseIP = baseIPnumeric & getNetmaskNumeric();
         Integer ourIP = baseIP + numberOfIPs;
 
         String ip = IPv4.convertNumericIpToSymbolic(ourIP);
@@ -370,7 +378,7 @@ public class IPv4Net {
 
     public String getNetmaskInBinary() {
 
-        return IPv4.getBinary(netmaskNumeric);
+        return IPv4.getBinary(getNetmaskNumeric());
     }
 
 /**
@@ -402,7 +410,7 @@ public class IPv4Net {
             i -= 8;
         }
 
-        if ((baseIPnumeric & netmaskNumeric) == (checkingIP & netmaskNumeric))
+        if ((baseIPnumeric & getNetmaskNumeric()) == (checkingIP & getNetmaskNumeric()))
 
             return true;
         else
@@ -413,11 +421,11 @@ public class IPv4Net {
 
         Integer subnetID = child.baseIPnumeric;
 
-        Integer subnetMask = child.netmaskNumeric;
+        Integer subnetMask = child.getNetmaskNumeric();
 
-        if ((subnetID & this.netmaskNumeric) == (this.baseIPnumeric & this.netmaskNumeric)) {
+        if ((subnetID & this.getNetmaskNumeric()) == (this.baseIPnumeric & this.getNetmaskNumeric())) {
 
-            if ((this.netmaskNumeric < subnetMask) == true
+            if ((this.getNetmaskNumeric() < subnetMask) == true
                     && this.baseIPnumeric <= subnetID) {
 
                 return true;

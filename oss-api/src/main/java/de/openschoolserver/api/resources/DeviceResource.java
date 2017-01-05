@@ -3,6 +3,7 @@ package de.openschoolserver.api.resources;
 
 
 import io.dropwizard.auth.Auth;
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -25,14 +26,14 @@ public interface DeviceResource {
     @GET
     @Path("{deviceId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get device by id")
+    @ApiOperation(value = "Get device by id")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Device not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
     Device getById(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceId") long deviceId
     );
 
     /*
@@ -41,7 +42,7 @@ public interface DeviceResource {
     @GET
     @Path("byType/{deviceType}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get device by type, this can be printer, mobileDvice, ...")
+    @ApiOperation(value = "Get device by type, this can be printer, mobileDvice, ...")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Device not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -52,12 +53,12 @@ public interface DeviceResource {
     );
     
     /*
-     * GET devices/getall
+     * GET devices/getAll
      */
     @GET
-    @Path("getall")
+    @Path("getAll")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get all devices")
+    @ApiOperation(value = "Get all devices")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -71,9 +72,9 @@ public interface DeviceResource {
      * POST devices/add { hash }
      */
     @POST
-    @Path("ad")
+    @Path("add")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "create new device")
+    @ApiOperation(value = "Create new devices")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -97,7 +98,7 @@ public interface DeviceResource {
     @PermitAll
     boolean delete(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceIds") List<Integer> deviceIds
+            @PathParam("deviceId") List<Long> deviceId
     );
 
     
@@ -107,7 +108,7 @@ public interface DeviceResource {
     @GET
     @Path("getbyIP/{IP}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get device by MAC address")
+    @ApiOperation(value = "Get device by MAC address")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -123,7 +124,7 @@ public interface DeviceResource {
     @GET
     @Path("getbyMAC/{MAC}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get device by MAC address")
+    @ApiOperation(value = "Get device by MAC address")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -139,7 +140,7 @@ public interface DeviceResource {
     @GET
     @Path("getbyName/{Name}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get device by Name")
+    @ApiOperation(value = "Get device by Name")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -155,14 +156,14 @@ public interface DeviceResource {
     @GET
     @Path("{deviceId}/defaultPrinter")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get default printer Name")
+    @ApiOperation(value = "Get default printer Name")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
     String getDefaultPrinter(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceId") long deviceId
     );
     
     /*
@@ -171,21 +172,21 @@ public interface DeviceResource {
     @GET
     @Path("{deviceId}/availablePrinters")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get the list of name of the available printers")
+    @ApiOperation(value = "Get the list of name of the available printers")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
     List<String> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceId") long deviceId
     );
     
     /*
-     * GET devices/getloggedinusers/{IP-Address}
+     * GET devices/getLoggedInUsers/{IP-Address}
      */
     @GET
-    @Path("getloggedinusers/{IP}")
+    @Path("getLoggedInUsers/{IP}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the logged on users on a device by IP.")
         @ApiResponses(value = {
@@ -198,10 +199,10 @@ public interface DeviceResource {
     );
     
     /*
-     * GET devices/{deviceID}/getloggedinusers
+     * GET devices/{deviceId}/getLoggedInUsers
      */
     @GET
-    @Path("{deviceID}/getloggedinusers")
+    @Path("{deviceId}/getLoggedInUsers")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the logged on users on a device by IP.")
         @ApiResponses(value = {
@@ -210,7 +211,7 @@ public interface DeviceResource {
     @PermitAll
     List<String> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") int deviceId
+            @PathParam("deviceId") long deviceId
     );
     
 }

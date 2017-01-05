@@ -3,6 +3,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 
+
 import javax.persistence.*;
 import java.util.List;
 
@@ -19,13 +20,15 @@ import java.util.List;
 	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' "),
 	@NamedQuery(name="User.getByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
 	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
-	@NamedQuery(name="User.search", query="SELECT u FROM User WHERE uid LIKE :search OR givenName LIKE :search OR sureName LIKE :search")
+	@NamedQuery(name="User.search", query="SELECT u FROM User WHERE uid LIKE :search OR givenName LIKE :search OR sureName LIKE :search"),
+	@NamedQuery(name="User.getConfig",  query="SELECT c.value FROM UserConfig  WHERE user_id = :user_id AND key = :key" ),
+	@NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig WHERE user_id = :user_id AND key = :key" )
 })
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    int id;
+    long id;
 
 	private String givenName;
 
@@ -42,6 +45,14 @@ public class User implements Serializable {
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.REMOVE)
 	private List<Device> ownedDevices;
+
+	//bi-directional many-to-one association to TestFile
+	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+	private List<UserMConfig> UserMConfig;
+
+	//bi-directional many-to-one association to TestFile
+	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+	private List<UserConfig> UserConfig;
 
 	//bi-directional many-to-one association to TestFile
 	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
@@ -84,11 +95,11 @@ public class User implements Serializable {
 	public User() {
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

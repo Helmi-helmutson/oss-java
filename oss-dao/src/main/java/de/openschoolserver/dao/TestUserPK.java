@@ -14,23 +14,23 @@ public class TestUserPK implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Column(name="test_id", insertable=false, updatable=false)
-	private int testId;
+	private long testId;
 
 	@Column(name="user_id", insertable=false, updatable=false)
-	private int userId;
+	private long userId;
 
 	public TestUserPK() {
 	}
-	public int getTestId() {
+	public long getTestId() {
 		return this.testId;
 	}
-	public void setTestId(int testId) {
+	public void setTestId(long testId) {
 		this.testId = testId;
 	}
-	public int getUserId() {
+	public long getUserId() {
 		return this.userId;
 	}
-	public void setUserId(int userId) {
+	public void setUserId(long userId) {
 		this.userId = userId;
 	}
 
@@ -50,8 +50,8 @@ public class TestUserPK implements Serializable {
 	public int hashCode() {
 		final int prime = 31;
 		int hash = 17;
-		hash = hash * prime + this.testId;
-		hash = hash * prime + this.userId;
+		hash = hash * prime + (int) this.testId;
+		hash = hash * prime + (int) this.userId;
 		
 		return hash;
 	}

@@ -14,15 +14,18 @@ import java.util.List;
 @Table(name="Rooms")
 @NamedQueries ({
   @NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
-  @NamedQuery(name="Room.getRoomByName", query="SELECT r FROM Room r WHERE r.name = :name"),
-  @NamedQuery(name="Room.getRoomByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
-  @NamedQuery(name="Room.getRoomByType", query="SELECT r FROM Room r WHERE r.roomType = :type")
+  @NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
+  @NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
+  @NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
+  @NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room_id = :id"),
+  @NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig  WHERE user_id = :user_id AND key = :key" ),
+  @NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig WHERE user_id = :user_id AND key = :key" )
 })
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	private long id;
 
 	private String name;
 
@@ -37,6 +40,14 @@ public class Room implements Serializable {
 	private String roomType;
 	
 	private int rows;
+
+        //bi-directional many-to-one association to RoomMConfig
+        @OneToMany(mappedBy="room", cascade=CascadeType.REMOVE)
+        private List<RoomMConfig> RoomMConfig;
+
+        //bi-directional many-to-one association to RoomConfig
+        @OneToMany(mappedBy="room", cascade=CascadeType.REMOVE)
+        private List<RoomConfig> RoomConfig;
 
 	//bi-directional many-to-one association to AccessInRoom
 	@OneToMany(mappedBy="room")
@@ -80,14 +91,18 @@ public class Room implements Serializable {
 	@OneToMany(mappedBy="room")
 	private List<Test> tests;
 
+	@Transient
+	private String network;
+	
 	public Room() {
+		this.network = "";
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
@@ -149,24 +164,6 @@ public class Room implements Serializable {
 
 	public List<AccessInRoom> getAccessInRooms() {
 		return this.accessInRooms;
-	}
-
-	public void setAccessInRooms(List<AccessInRoom> accessInRooms) {
-		this.accessInRooms = accessInRooms;
-	}
-
-	public AccessInRoom addAccessInRoom(AccessInRoom accessInRoom) {
-		getAccessInRooms().add(accessInRoom);
-		accessInRoom.setRoom(this);
-
-		return accessInRoom;
-	}
-
-	public AccessInRoom removeAccessInRoom(AccessInRoom accessInRoom) {
-		getAccessInRooms().remove(accessInRoom);
-		accessInRoom.setRoom(null);
-
-		return accessInRoom;
 	}
 
 	public List<Device> getDevices() {
@@ -236,5 +233,15 @@ public class Room implements Serializable {
 
 		return test;
 	}
+	
+	public String getNetwork() {
+		return this.network;
+	}
+
+	public void setNetwork(String network) {
+		this.network = network;
+	}
+
+
 
 }

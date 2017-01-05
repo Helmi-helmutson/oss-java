@@ -18,13 +18,15 @@ import java.util.List;
 	@NamedQuery(name="Device.getByIP",   query="SELECT d FROM Device where ip = :IP OR wlanip = :IP"),
 	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device where mac = :MAC OR wlanmac = :MAC"),
 	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device where name = :name"),
-	@NamedQuery(name="Device.search",    query="SELECT d FROM Device where name LIKE :name OR IP LIKE :name" )
+	@NamedQuery(name="Device.search",    query="SELECT d FROM Device where name LIKE :name OR IP LIKE :name" ),
+	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig  WHERE user_id = :user_id AND key = :key" ),
+        @NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig WHERE user_id = :user_id AND key = :key" )
 })
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	private long id;
 
 	private String name;
 
@@ -45,6 +47,14 @@ public class Device implements Serializable {
 	private int row;
 
 	private String deviceType;
+
+        //bi-directional many-to-one association to DeviceMConfig
+        @OneToMany(mappedBy="device", cascade=CascadeType.REMOVE)
+        private List<DeviceMConfig> DeviceMConfig;
+
+        //bi-directional many-to-one association to DeviceConfig
+        @OneToMany(mappedBy="device", cascade=CascadeType.REMOVE)
+        private List<DeviceConfig> DeviceConfig;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
@@ -111,11 +121,11 @@ public class Device implements Serializable {
 	public Device() {
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

@@ -17,9 +17,9 @@ public class Group implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	private long id;
 
-	private String cn;
+	private String name;
 
 	private String description;
 
@@ -32,20 +32,20 @@ public class Group implements Serializable {
 	public Group() {
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
-	public String getCn() {
-		return this.cn;
+	public String getName() {
+		return this.name;
 	}
 
-	public void setCn(String cn) {
-		this.cn = cn;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getDescription() {

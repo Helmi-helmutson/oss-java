@@ -12,7 +12,7 @@ import de.openschoolserver.dao.controller.UserController;
 public class UserResourceImpl implements UserResource {
 
 	@Override
-	public User getById(Session session, int userId) {
+	public User getById(Session session, long userId) {
 		// TODO Auto-generated method stub
 		final UserController userController = new UserController(session);
 		final User user = userController.getById(userId);
@@ -43,7 +43,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public boolean delete(Session session, int userId) {
+	public boolean delete(Session session, long userId) {
 		// TODO Auto-generated method stub
 		final UserController userController = new UserController(session);
 		return userController.delete(userId);
@@ -64,7 +64,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public List<Group> getAvailableGroups(Session session, int userId) {
+	public List<Group> getAvailableGroups(Session session, long userId) {
 		// TODO Auto-generated method stub
 		final UserController userController = new UserController(session);
 		final List<Group> groups = userController.getAvailableGroups(userId);

@@ -2,6 +2,7 @@
 package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
+
 import javax.persistence.Query;
 import java.util.List;
 import de.openschoolserver.dao.Session;

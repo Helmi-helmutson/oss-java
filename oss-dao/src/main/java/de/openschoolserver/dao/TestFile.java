@@ -17,7 +17,7 @@ public class TestFile implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	private int id;
+	private long id;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateTime;
@@ -37,11 +37,11 @@ public class TestFile implements Serializable {
 	public TestFile() {
 	}
 
-	public int getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(int id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 

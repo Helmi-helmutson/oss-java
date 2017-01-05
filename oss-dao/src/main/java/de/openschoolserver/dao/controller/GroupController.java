@@ -14,16 +14,16 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.tools.*;
 
-public class UserController extends Controller {
+public class GroupController extends Controller {
 	
-	public UserController(Session session) {
+	public GroupController(Session session) {
 		super(session);
 	}
 	
-	public User getById(long userId) {
+	public Group getById(long groupId) {
 		EntityManager em = getEntityManager();	
 		try {
-			return em.find(User.class, userId);
+			return em.find(Group.class, groupId);
 		} catch (Exception e) {
 			// logger.error(e.getMessage());
 			System.err.println(e.getMessage()); //TODO
@@ -33,10 +33,10 @@ public class UserController extends Controller {
 		}
 	}
 	
-	public List<User> getByRole(String role) {
+	public List<Group> getByRole(String role) {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("User.getByRole");
+			Query query = em.createNamedQuery("Group.getByRole");
 			query.setParameter("role", role);
 			return query.getResultList();
 		} catch (Exception e) {
@@ -48,10 +48,10 @@ public class UserController extends Controller {
 		}
 	}
 
-	public List<User> search(String search) {
+	public List<Group> search(String search) {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("User.search");
+			Query query = em.createNamedQuery("Group.search");
 			query.setParameter("search", search);
 			return query.getResultList();
 		} catch (Exception e) {
@@ -63,10 +63,10 @@ public class UserController extends Controller {
 		}
 	}
 
-	public List<User> getAll() {
+	public List<Group> getAll() {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("User.findAll"); 
+			Query query = em.createNamedQuery("Group.findAll"); 
 			return query.getResultList();
 		} catch (Exception e) {
 			//logger.error(e.getMessage());
@@ -77,15 +77,15 @@ public class UserController extends Controller {
 		}
 	}
 
-	public boolean add(User user){
+	public boolean add(Group group){
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(user.getUid())){
+		if( ! this.isNameUnique(group.getName())){
 			return false;
 		}
 		try {
 			em.getTransaction().begin();
-			em.persist(user);
+			em.persist(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
@@ -94,16 +94,12 @@ public class UserController extends Controller {
 		return true;
 	}
 
-	public boolean modify(User user){
+	public boolean modify(Group group){
 		//TODO make some checks!!
 		EntityManager em = getEntityManager();
-		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(user.getUid())){
-			return false;
-		}
 		try {
 			em.getTransaction().begin();
-			em.merge(user);
+			em.merge(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
@@ -112,36 +108,31 @@ public class UserController extends Controller {
 		return true;
 	}
 	
-	public boolean delete(long userId){
+	public boolean delete(long groupId){
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
-		User user = this.getById(userId);
-		List<Device> devices = user.getOwnedDevices();
-		// Remove user from logged on table
-		Query query = em.createQuery("DELETE FROM LoggedOn WHERE user_id = :userId");
-		query.setParameter("userId", userId);
+		Group group = this.getById(groupId);
+		String groupName = group.getName();
+
+		// Remove group from GroupMember of table
+		Query query = em.createQuery("DELETE FROM GroupMember WHERE group_id = :groupId");
+		query.setParameter("groupId", groupId);
 		query.executeUpdate();
-		// Remove user from GroupMember of table
-		query = em.createQuery("DELETE FROM GroupMember WHERE user_id = :userId");
-		query.setParameter("userId", userId);
-		query.executeUpdate();
-		// Let's remove the user
-		em.remove(user);
+		// Let's remove the group
+		em.remove(group);
 		em.getTransaction().commit();
-		if( !devices.isEmpty() ) {
-			//TODO restart dhcp and dns
-			
-		}
+		
 		//TODO find and remove files
+		//TODO remove group from AD
 		return true;
 	}
 	
-	public List<Group> getAvailableGroups(long userId){
+	public List<User> getAvailableMember(long groupId){
 		EntityManager em = getEntityManager();
-		User user = this.getById(userId);
-		Query query = em.createNamedQuery("Group.findAll");
-		List<Group> allGroups = query.getResultList();
-		allGroups.removeAll(user.getGroups());
-		return allGroups;
+		Group group = this.getById(groupId);
+		Query query = em.createNamedQuery("User.findAll");
+		List<User> allUsers = query.getResultList();
+		allUsers.removeAll(group.getUsers());
+		return allUsers;
 	}
 }
