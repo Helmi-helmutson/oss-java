@@ -42,11 +42,11 @@ public class Room implements Serializable {
 	private int rows;
 
         //bi-directional many-to-one association to RoomMConfig
-        @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+        @OneToMany(mappedBy="room", cascade=CascadeType.REMOVE)
         private List<RoomMConfig> RoomMConfig;
 
         //bi-directional many-to-one association to RoomConfig
-        @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+        @OneToMany(mappedBy="room", cascade=CascadeType.REMOVE)
         private List<RoomConfig> RoomConfig;
 
 	//bi-directional many-to-one association to AccessInRoom

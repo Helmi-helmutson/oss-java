@@ -49,11 +49,11 @@ public class Device implements Serializable {
 	private String deviceType;
 
         //bi-directional many-to-one association to DeviceMConfig
-        @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+        @OneToMany(mappedBy="device", cascade=CascadeType.REMOVE)
         private List<DeviceMConfig> DeviceMConfig;
 
         //bi-directional many-to-one association to DeviceConfig
-        @OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+        @OneToMany(mappedBy="device", cascade=CascadeType.REMOVE)
         private List<DeviceConfig> DeviceConfig;
 
 	//bi-directional many-to-many association to Device

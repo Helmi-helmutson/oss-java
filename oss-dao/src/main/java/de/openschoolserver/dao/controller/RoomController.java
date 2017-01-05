@@ -468,7 +468,14 @@ public class RoomController extends Controller {
 	}
 	
 	/*
-	 * Create the dhcp configuration
+	 * Sets the actual access status in all rooms.
+	 * Room is given by roomId
 	 */
-	
+	public List<AccessInRoom> getAccessStatus() {
+		List<AccessInRoom> accesses = new ArrayList<AccessInRoom>();
+		for(Room room : this.getAll()) {
+			accesses.add(this.getAccessStatus(room));
+		}
+		return accesses;
+	}
 }
