@@ -40,23 +40,23 @@ public interface CloneToolResource {
 	);
        
 	/*
-	 * Get clonetool/{hwconf}
+	 * Get clonetool/{hwconfId}
 	 */
 	@GET
-	@Path("{hwconf}")
+	@Path("{hwconfId}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets the configuration of a partition to a given hardware configuration.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	HWConf getConfiguration(
+	HWConf getById(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf
+	        @PathParam("hwconfId") Long hwconfId
 	);
        
        /*
-        * GET clonetool/{hwconf}/partitions
+        * GET clonetool/{hwconfId}/partitions
         */
 	@GET
 	@Path("partitions")
@@ -68,15 +68,15 @@ public interface CloneToolResource {
 	@PermitAll
 	String getPartitions(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf,
+	        @PathParam("hwconfId") Long hwconfId,
 	        @PathParam("partition") String partition
 	);
     
 	/*
-	 * Get clonetool/{hwconf}/{partition}
+	 * Get clonetool/{hwconfId}/{partition}
 	 */
 	@GET
-	@Path("{hwconf}/{partition}")
+	@Path("{hwconfId}/{partition}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets the configuration of a partition to a given hardware configuration.")
 	@ApiResponses(value = {
@@ -89,88 +89,22 @@ public interface CloneToolResource {
 	);
 
 	/*
-	 * GET clonetool/{hwconf}/{partition}/os
+	 * GET clonetool/{hwconfId}/{partition}/{key}
 	 */
 	@GET
-	@Path("{hwconf}/{partition}/os")
+	@Path("{hwconfId}/{partition}/{key}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the OS to a given partition.")
+	@ApiOperation(value = "Gets the value of a key to a given partition.")
+			      "The key may be: OS, Description, Join, Format, Itool" )
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	String getOS(
+	String getConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition
-	);
-    
-	/*
-        * GET clonetool/{hwconf}/{partition}/join
-        */
-	@GET
-	@Path("{howconf}/{partition}/join")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the join type to a given partition.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	String getJoin(
-	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition
-	);
-    
-	/*
-	 * GET clonetool/{hwconf}/{partition}/description
-	 */
-	@GET
-	@Path("{hwconf}/{partition}/description")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the description to a given partition.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	String getDescription(
-	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition
-	);
-    
-	/*
-	 * GET clonetool/{hwconf}/{partition}/format
-	 */
-	@GET
-	@Path("{hwconf}/{partition}/format")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the filesystem format to a given partition.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	String getFormat(
-	        @ApiParam(hidden = true) @Auth Session session,
-		@PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition
-	);
-    
-	/*
-	 * GET clonetool/{hwconf}/{partition}/itool
-	 */
-	@GET
-	@Path("{hwconf}/{partition}/itool")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the used imaging tool to a given partition.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	String getItool(
-	        @ApiParam(hidden = true) @Auth Session session,
-		@PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition
+	        @PathParam("hwconfId") Long hwconfId,
+	        @PathParam("partition") String partition,
+	        @PathParam("key") String key
 	);
 
 	// POST and PUSH methodes.
@@ -181,21 +115,21 @@ public interface CloneToolResource {
 	@POST
 	@Path("hwconf")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Creates a new hardware configuration.")
+	@ApiOperation(value = "Creates a new hardware configuration. And returns the hwoconfId")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	Boolean createHWConf(
+	Long createHWConf(
 	        @ApiParam(hidden = true) @Auth Session session,
 		HWConf hwconf
 	);
        
 	/*
-	 * Get clonetool/{hwconf}
+	 * Post clonetool/{hwconfId}
 	 */
 	@POST
-	@Path("{hwconf}")
+	@Path("{hwconfId}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Updates a hardware configuration.")
 	@ApiResponses(value = {
@@ -204,17 +138,17 @@ public interface CloneToolResource {
 	@PermitAll
 	Boolean setConfiguration(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf,
+	        @PathParam("hwconfId") Long hwconfId,
 		HWConf hwconf
 	);
        
 	/*
-	 * POST clonetool/{hwconf}/{partition}
+	 * POST clonetool/{hwconfIf}/{partition}
 	 */
 	@POST
-	@Path("{hwconf}/{partition}")
+	@Path("{hwconfIf}/{partition}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the configuration of a partition to a given hardware configuration.")
+	@ApiOperation(value = "Puts the configuration of a partition to a given hardware configuration.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -226,95 +160,24 @@ public interface CloneToolResource {
 	);
 
 	/*
-	 * PUT clonetool/{hwconf}/{partition}/os/{os}
+	 * PUT clonetool/{hwconfIf}/{partition}/{key}/{value}
 	 */
 	@PUT
-	@Path("{hwconf}/{partition}/os/{os}")
+	@Path("{hwconfIf}/{partition}/{key}/{value}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the OS to a given partition.")
+	@ApiOperation(value = "Sets the value of a key to a given partition." +
+			      "The keys may be: OS, Description, Join, Format, Itool" )
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	Boolean getOS(
+	Boolean setConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf,
+	        @PathParam("hwconfIf") Long hwconfIf,
 	        @PathParam("partition") String partition,
-	        @PathParam("os") String os
+	        @PathParam("key") String key,
+	        @PathParam("value") String value
 	);
     
-	/*
-        * GET clonetool/{hwconf}/{partition}/join/{join}
-        */
-	@GET
-	@Path("{howconf}/{partition}/join/{join}")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the join type to a given partition.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	Boolean getJoin(
-	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition.
-	        @PathParam("os") String os
-	);
-    
-	/*
-	 * GET clonetool/{hwconf}/{partition}/description
-	 */
-	@GET
-	@Path("{hwconf}/{partition}/description/{description}")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the description to a given partition.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	Boolean getDescription(
-	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition,
-	        @PathParam("join") String join
-	);
-    
-	/*
-	 * GET clonetool/{hwconf}/{partition}/format/{format}
-	 */
-	@GET
-	@Path("{hwconf}/{partition}/format/{format}")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the filesystem format to a given partition.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	Boolean getFormat(
-	        @ApiParam(hidden = true) @Auth Session session,
-		@PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition,
-	        @PathParam("format") String format
-	);
-    
-	/*
-	 * GET clonetool/{hwconf}/{partition}/itool/{itool}
-	 */
-	@GET
-	@Path("{hwconf}/{partition}/itool/{itool}")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the used imaging tool to a given partition.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	Boolean getItool(
-	        @ApiParam(hidden = true) @Auth Session session,
-		@PathParam("hwconf") String hwconf,
-	        @PathParam("partition") String partition,
-	        @PathParam("format") String itool
-	);
-    
-
 }
 

@@ -11,7 +11,10 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="Partitions")
-@NamedQuery(name="Partition.findAll", query="SELECT p FROM Partition p")
+@NamedQueries({
+	@NamedQuery(name="Partition.findAll", query="SELECT p FROM Partition p"),
+	@NamedQuery(name="Partition.getPartitionByName", query="SELECT p FROM Partition p WHERE hwconf_id = :hwconfId AND name = :name")
+});
 public class Partition implements Serializable {
 	private static final long serialVersionUID = 1L;
 
