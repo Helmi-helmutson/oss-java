@@ -8,6 +8,7 @@ import de.openschoolserver.dao.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
@@ -17,7 +18,7 @@ public class SessionsResourceImpl implements SessionsResource {
     Logger logger = LoggerFactory.getLogger(SessionsResourceImpl.class);
 
     @Override
-    public Session createSession(UriInfo ui, String username, String password, String device) {
+    public Session createSession(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
 
         if (username == null || password == null || device == null) {
             throw new WebApplicationException(400);

@@ -5,14 +5,13 @@ package de.openschoolserver.dao;
 import java.security.Principal;
 import java.util.List;
 
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import javax.security.auth.Subject;
 
 
 public class Session implements Principal {
-	
+
+	@Transient
 	private String password = "dummy";
 	
 	@OneToOne
@@ -53,9 +52,5 @@ public class Session implements Principal {
 		this.device = device;
 	}
 
-	@Override
-	public boolean implies(Subject subject) {
-		return true;
-	}
 //TODO implement
 }

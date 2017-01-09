@@ -6,6 +6,7 @@ import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -31,7 +32,8 @@ public interface SessionsResource {
             @Context UriInfo ui,
             @FormParam("username") String username,
             @FormParam("password") String password,
-            @FormParam("device") String device
+            @FormParam("device") String device,
+            @Context HttpServletRequest req
     );
 
     @GET
