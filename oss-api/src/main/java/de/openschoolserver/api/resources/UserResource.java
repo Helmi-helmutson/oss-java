@@ -33,7 +33,7 @@ public interface UserResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("user.search")
     User getById(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId
@@ -49,7 +49,7 @@ public interface UserResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("user.search")
     List<Group> getAvailableGroups(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId
@@ -65,7 +65,7 @@ public interface UserResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("user.search")
     List<User> getByRole(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("role") String role
@@ -82,7 +82,7 @@ public interface UserResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("user.search")
     List<User> getAll(
             @ApiParam(hidden = true) @Auth Session session
     );
@@ -98,7 +98,8 @@ public interface UserResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    //@PermitAll
+    @RolesAllowed("user.search")
     List<User> search(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("search") String search
@@ -116,7 +117,7 @@ public interface UserResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     //@PermitAll
-    @RolesAllowed("SYSADMINS")
+    @RolesAllowed("user.add")
     boolean add(
             @ApiParam(hidden = true) @Auth Session session,
             User user
@@ -133,7 +134,8 @@ public interface UserResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    //@PermitAll
+    @RolesAllowed("user.add")
     boolean modify(
             @ApiParam(hidden = true) @Auth Session session,
             User user
