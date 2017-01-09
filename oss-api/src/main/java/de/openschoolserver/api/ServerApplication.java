@@ -4,6 +4,7 @@ package de.openschoolserver.api;
 
 import de.openschoolserver.api.auth.OSSAuthorizer;
 
+
 import de.openschoolserver.api.auth.OSSTokenAuthenticator;
 import de.openschoolserver.api.health.TemplateHealthCheck;
 import de.openschoolserver.api.resourceimpl.*;
@@ -69,7 +70,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final DeviceResource devicesResource = new DeviceResourceImpl();
         environment.jersey().register(devicesResource);
         
-        final CloneToolResource cloneToolResource = new CloneToolResourceImpl();
+        final CloneToolResource cloneToolResource = new CloneToolRescourceImpl();
         environment.jersey().register(cloneToolResource);
         
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());

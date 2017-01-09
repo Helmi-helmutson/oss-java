@@ -14,6 +14,9 @@ public class Session implements Principal {
 	@Transient
 	private String password = "dummy";
 	
+	@Transient
+	private String schoolId = "dummy";
+	
 	@OneToOne
 	private Device device;
 		
@@ -23,11 +26,29 @@ public class Session implements Principal {
 	@OneToOne
 	private Room room;
 	
+	private String IP;
+	
 	@Override
 	public String getName() {	
 		return "dummy";
 	}
 	
+	public String getSchoolId() {
+		return this.schoolId;
+	}
+
+	public void setSchoolId(String schoolId) {
+		this.schoolId = schoolId;
+	}
+
+	public String getIP() {
+		return this.IP;
+	}
+
+	public void setIP(String IP) {
+		this.IP = IP;
+	}
+
 	public Room getRoom() {
 		return this.room;
 	}
