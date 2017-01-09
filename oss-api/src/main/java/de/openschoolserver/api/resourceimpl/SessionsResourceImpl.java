@@ -3,7 +3,9 @@
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.api.resources.SessionsResource;
+
 import de.openschoolserver.dao.Session;
+
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,9 +16,9 @@ import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 
 public class SessionsResourceImpl implements SessionsResource {
-
+	
     Logger logger = LoggerFactory.getLogger(SessionsResourceImpl.class);
-
+    
     @Override
     public Session createSession(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
 
@@ -35,7 +37,10 @@ public class SessionsResourceImpl implements SessionsResource {
 //            logger.debug("Person authenticated: " + session.getPerson());
 //            return session;
 //        }
-        return new Session(); //TODO implement
+        Session session =  new Session();
+        session.setIP(req.getRemoteAddr());
+        //TODO Implement setting user room etc.
+        return session;
     }
 
     @Override
@@ -60,5 +65,4 @@ public class SessionsResourceImpl implements SessionsResource {
     	
     	//TODO implement
     }
-
 }

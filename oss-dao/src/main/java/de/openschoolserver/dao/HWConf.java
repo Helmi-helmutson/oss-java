@@ -12,7 +12,10 @@ import java.util.List;
  */
 @Entity
 @Table(name="HWConfs")
-@NamedQuery(name="HWConf.findAll", query="SELECT h FROM HWConf h")
+@NamedQueries({
+	@NamedQuery(name="HWConf.findAll", query="SELECT h FROM HWConf h"),
+	@NamedQuery(name="HWConf.getByName", query="SELECT h FROM HWConf h WHERE name = :name")
+})
 public class HWConf implements Serializable {
 	private static final long serialVersionUID = 1L;
 

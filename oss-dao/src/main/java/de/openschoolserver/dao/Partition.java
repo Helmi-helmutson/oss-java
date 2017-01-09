@@ -14,7 +14,7 @@ import javax.persistence.*;
 @NamedQueries({
 	@NamedQuery(name="Partition.findAll", query="SELECT p FROM Partition p"),
 	@NamedQuery(name="Partition.getPartitionByName", query="SELECT p FROM Partition p WHERE hwconf_id = :hwconfId AND name = :name")
-});
+})
 public class Partition implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -39,6 +39,10 @@ public class Partition implements Serializable {
 	private HWConf hwconf;
 
 	public Partition() {
+	}
+
+	public Partition(String name) {
+		this.name = name;
 	}
 
 	public long getId() {
