@@ -59,7 +59,7 @@ public interface UserResource {
      * GET users/getByRole/<role>
      */
     @GET
-    @Path("users/getByRole/{role}")
+    @Path("getByRole/{role}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get users from a rolle")
         @ApiResponses(value = {

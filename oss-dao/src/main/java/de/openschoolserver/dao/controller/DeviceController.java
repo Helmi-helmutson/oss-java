@@ -91,6 +91,24 @@ public class DeviceController extends Controller {
 	}
 
 	/*
+	 * Deletes a list of device given by the device Ids.
+	 */
+	public boolean delete(Long deviceId) {
+		EntityManager em = getEntityManager();
+		try {
+				Device dev = em.find(Device.class, deviceId);
+				em.remove(dev);
+			return true;
+		} catch (Exception e) {
+			// logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return false;
+		} finally {
+			em.close();
+		}
+	}
+
+	/*
 	 * Creates devices
 	 */
 	public boolean add(List<Device> devices) {

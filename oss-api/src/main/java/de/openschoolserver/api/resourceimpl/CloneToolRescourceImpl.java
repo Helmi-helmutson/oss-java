@@ -87,6 +87,10 @@ public class CloneToolRescourceImpl implements CloneToolResource {
 		return cloneToolController.setConfigurationValue(hwconfId,partition,key,value);
 	}
 
-	
-
+	@Override
+	public boolean delete(Session session, Long hwconfId) {
+		// TODO Auto-generated method stub
+		final CloneToolController cloneToolController = new CloneToolController(session);
+		return cloneToolController.delete(hwconfId);
+	}
 }

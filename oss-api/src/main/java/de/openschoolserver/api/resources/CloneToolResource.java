@@ -3,10 +3,12 @@ package de.openschoolserver.api.resources;
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
 
+
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -111,7 +113,7 @@ public interface CloneToolResource {
 	// POST and PUSH methodes.
 
 	/*
-	 * POST clonetool/hwconf
+	 * POST clonetool/ { hwconf hash }
 	 */
 	@POST
 	@Path("hwconf")
@@ -123,7 +125,7 @@ public interface CloneToolResource {
 	@PermitAll
 	boolean addHWConf(
 	        @ApiParam(hidden = true) @Auth Session session,
-		HWConf hwconf
+	        HWConf hwconf
 	);
        
 	/*
@@ -199,4 +201,19 @@ public interface CloneToolResource {
 	        @PathParam("value") String value
 	);
     
+	/*
+	 * DELETE clonetool/{hwconfId}
+	 */
+	@DELETE
+	@Path("{hwconfId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Updates a hardware configuration.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	boolean delete(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("hwconfId") Long hwconfId
+	);
 }

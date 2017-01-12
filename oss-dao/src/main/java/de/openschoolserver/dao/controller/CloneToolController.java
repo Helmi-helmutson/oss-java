@@ -170,4 +170,13 @@ public class CloneToolController extends Controller {
 		em.getTransaction().commit();
 		return false;
 	}
+	
+	public boolean delete(Long hwconfId){
+		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
+		HWConf hwconf = this.getById(hwconfId);
+		em.remove(hwconf);
+		em.getTransaction().commit();
+		return true;
+	}
 }
