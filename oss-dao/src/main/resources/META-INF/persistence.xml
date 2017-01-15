@@ -15,6 +15,7 @@
 		<class>oss.dao.TestUserPK</class>
 		<class>oss.dao.Test</class>
 		<class>oss.dao.User</class>
+		<class>oss.dao.Session</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/OSS1"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>

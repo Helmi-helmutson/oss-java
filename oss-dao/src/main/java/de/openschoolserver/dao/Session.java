@@ -138,6 +138,7 @@ public class Session implements Principal {
 	        this.userId = userid;
 	        this.password = password;
 	        this.token = token;
+	        this.schoolId="dummy";
 	       
 	    }
 

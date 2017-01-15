@@ -56,6 +56,7 @@ public class SessionController extends Controller {
             final String token = SessionToken.createSessionToken("dummy");
             Session session = new Session(token, user.getId(), password, ip);
             sessions.put(token, session);
+            super.session=session; //note: controller was instanciated without a session
             save(session);
             return session;
         } else {

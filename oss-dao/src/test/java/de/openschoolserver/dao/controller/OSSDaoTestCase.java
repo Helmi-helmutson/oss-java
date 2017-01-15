@@ -5,6 +5,7 @@ package de.openschoolserver.dao.controller;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import junit.framework.TestCase;
+import java.nio.file.Paths;
 
 public class OSSDaoTestCase extends TestCase {
 
@@ -24,6 +25,8 @@ public class OSSDaoTestCase extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
+       
+        Config.OSS_CONFIG=Paths.get("src/test/resources/schoolserver");
         c = new SessionController();
        
      
