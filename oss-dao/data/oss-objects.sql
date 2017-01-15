@@ -314,4 +314,17 @@ CREATE TABLE IF NOT EXISTS RoomMConfig (
         CONSTRAINT BIGINT pk_roommconfig PRIMARY KEY  (room_id,key)
 );
 
+CREATE TABLE IF NOT EXISTS Session (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id int(20) unsigned NOT NULL,
+  room_id      BIGINT UNSIGNED  NULL,
+  cratedate timestamp not null,
+  ip varchar(30),
+  token varchar(60),
+  CONSTRAINT BIGINT fk_session_user FOREIGN KEY(user_id) REFERENCES Users(id),
+   CONSTRAINT BIGINT fk_session_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
+ PRIMARY KEY (`id`)
+       
+        
+ );
 

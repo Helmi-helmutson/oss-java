@@ -10,9 +10,7 @@ import javax.persistence.Query;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.tools.*;
 
 public class UserController extends Controller {
 	

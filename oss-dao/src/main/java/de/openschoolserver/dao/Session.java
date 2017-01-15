@@ -3,14 +3,29 @@
 package de.openschoolserver.dao;
 
 import java.security.Principal;
-import java.util.List;
+import java.util.Date;
 
 import javax.persistence.*;
-import javax.security.auth.Subject;
 
 
+import static javax.persistence.GenerationType.IDENTITY;
+
+@Entity
+@Table(name = "Session")
+@NamedQueries({ @NamedQuery(name = "Session.getByToken", query = "SELECT s FROM Session s WHERE s.token=:token") })
 public class Session implements Principal {
 
+	 @Id
+	    @Column(name = "id")
+	    @GeneratedValue(strategy = IDENTITY)
+	    private int id;
+	 
+	 @Temporal(TemporalType.TIMESTAMP)
+	    @Column(name = "createdate")
+	    private Date createDate;
+
+	 
+	 
 	@Transient
 	private String password = "dummy";
 	
@@ -20,13 +35,21 @@ public class Session implements Principal {
 	@OneToOne
 	private Device device;
 		
-	@OneToOne
-	private User user;
+	@Column(name = "user_id")
+	private long userId;
+	   
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    private User user;
 	
 	@OneToOne
 	private Room room;
 	
+	@Column(name = "IP")
 	private String IP;
+	
+    @Column(name = "Token")
+	private String token;
 	
 	@Override
 	public String getName() {	
@@ -65,6 +88,26 @@ public class Session implements Principal {
 		this.user = user;
 	}
 	
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(long userId) {
+		this.userId = userId;
+	}
+
+	public Date getCreateDate() {
+		return createDate;
+	}
+
 	public Device getDevice() {
 		return this.device;
 	}
@@ -72,6 +115,45 @@ public class Session implements Principal {
 	public void setDevice(Device device) {
 		this.device = device;
 	}
+	
+	
+	    public int getId() {
+	        return id;
+	    }
 
-//TODO implement
+	    public void setId(int id) {
+	        this.id = id;
+	    }
+
+	 
+	    public String getToken() {
+	        return token;
+	    }
+
+	    public void setToken(String token) {
+	        this.token = token;
+	    }
+
+	    public Session(String token, long userid, String password, String ip) {
+	        this.userId = userid;
+	        this.password = password;
+	        this.token = token;
+	       
+	    }
+
+	    public Session() {
+	        // empty constructor
+	    }
+	    
+	    @Override
+	    public int hashCode() {
+	        return token != null ? token.hashCode() : id;
+	    }
+
+	    @Override
+	    public boolean equals(Object obj) {
+
+	        return token != null && obj != null && ((Session) obj).getToken() != null
+	                && token.equals(((Session) obj).getToken());
+	    }
 }
