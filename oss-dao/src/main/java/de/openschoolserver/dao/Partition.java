@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(name="Partitions")
 @NamedQueries({
 	@NamedQuery(name="Partition.findAll", query="SELECT p FROM Partition p"),
-	@NamedQuery(name="Partition.getPartitionByName", query="SELECT p FROM Partition p WHERE hwconf_id = :hwconfId AND name = :name")
+	@NamedQuery(name="Partition.getPartitionByName", query="SELECT p FROM Partition p WHERE p.hwconf.id = :hwconfId AND p.name = :name")
 })
 public class Partition implements Serializable {
 	private static final long serialVersionUID = 1L;

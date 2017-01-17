@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name="HWConfs")
 @NamedQueries({
 	@NamedQuery(name="HWConf.findAll", query="SELECT h FROM HWConf h"),
-	@NamedQuery(name="HWConf.getByName", query="SELECT h FROM HWConf h WHERE name = :name")
+	@NamedQuery(name="HWConf.getByName", query="SELECT h FROM HWConf h WHERE h.name = :name")
 })
 public class HWConf implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -26,7 +26,7 @@ public class HWConf implements Serializable {
 
 	private String name;
 
-	private String wstype;
+	private String deviceType;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="hwconf")
@@ -67,12 +67,14 @@ public class HWConf implements Serializable {
 		this.name = name;
 	}
 
-	public String getWstype() {
-		return this.wstype;
+	
+
+	public String getDeviceType() {
+		return deviceType;
 	}
 
-	public void setWstype(String wstype) {
-		this.wstype = wstype;
+	public void setDeviceType(String deviceType) {
+		this.deviceType = deviceType;
 	}
 
 	public List<Device> getDevices() {

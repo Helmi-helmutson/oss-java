@@ -14,13 +14,14 @@ import java.util.List;
 @Table(name="Devices")
 @NamedQueries( {
 	@NamedQuery(name="Device.findAll", query="SELECT d FROM Device d"),
-	@NamedQuery(name="Device.getDeviceByType", query="SELECT d FROM Device where deviceType = :type"),
-	@NamedQuery(name="Device.getByIP",   query="SELECT d FROM Device where ip = :IP OR wlanip = :IP"),
-	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device where mac = :MAC OR wlanmac = :MAC"),
-	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device where name = :name"),
-	@NamedQuery(name="Device.search",    query="SELECT d FROM Device where name LIKE :name OR IP LIKE :name" ),
-	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig  WHERE user_id = :user_id AND key = :key" ),
-        @NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig WHERE user_id = :user_id AND key = :key" )
+	@NamedQuery(name="Device.getDeviceByType", query="SELECT d FROM Device d where d.deviceType = :type"),
+	@NamedQuery(name="Device.getByIP",   query="SELECT d FROM Device d where d.ip = :IP OR d.wlanip = :IP"),
+	
+	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
+	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device d where d.name = :name"),
+	@NamedQuery(name="Device.search",    query="SELECT d FROM Device d where d.name LIKE :name OR d.ip LIKE :name" ),
+	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :user_id AND c.key = :key" ),
+	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :user_id AND c.key = :key" )
 })
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -29,7 +30,7 @@ public class Device implements Serializable {
 	private long id;
 
 	private String name;
-
+    @Column(name="col")
 	private int column;
 
 	@Column(name="IP")
@@ -87,7 +88,7 @@ public class Device implements Serializable {
 	private Device defaultPrinter;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany(mappedBy="defaultPrinter")
+	@OneToMany(mappedBy="defaultPrinter")
 	private List<Device> defaultForDevices;
 
 	//bi-directional many-to-one association to HWConf
@@ -107,7 +108,7 @@ public class Device implements Serializable {
 	private List<Room> availableInRooms;
 
 	//bi-directional many-to-many association to Room
-	@ManyToMany(mappedBy="defaultPrinter")
+	@OneToMany(mappedBy="defaultPrinter")
 	private List<Room> defaultInRooms;
 
 	//bi-directional many-to-one association to TestUser

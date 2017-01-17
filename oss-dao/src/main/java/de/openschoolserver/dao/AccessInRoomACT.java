@@ -17,6 +17,18 @@ public class AccessInRoomACT implements Serializable {
 	private long id;
 
 	private String action;
+	
+private AccessInRoom accessinroom;
+
+	
+
+	public AccessInRoom getAccessinroom() {
+	return accessinroom;
+}
+
+public void setAccessinroom(AccessInRoom accessinroom) {
+	this.accessinroom = accessinroom;
+}
 
 	public AccessInRoomACT() {
 		this.action  = "";

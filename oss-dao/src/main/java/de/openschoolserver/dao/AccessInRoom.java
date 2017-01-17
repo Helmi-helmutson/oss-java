@@ -15,8 +15,8 @@ import java.util.HashMap;
 @Entity
 @NamedQueries( {
 	@NamedQuery(name="AccessInRoom.findAll",            query="SELECT a FROM AccessInRoom a"),
-	@NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom WHERE room = :room"),
-	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom WHERE a.accessPIT.pointInTime = :time")
+	@NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom a WHERE a.room = :room"),
+	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom a WHERE a.accessPIT.pointintime = :time")
 })
 public class AccessInRoom implements Serializable {
 	private static final long serialVersionUID = 1L;

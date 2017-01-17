@@ -16,7 +16,7 @@ import de.openschoolserver.dao.Device;
 
 public class Controller extends Config {
 	
-	private Session session ;
+	protected Session session ;
 	
 	public Controller(Session session) {
 		super();

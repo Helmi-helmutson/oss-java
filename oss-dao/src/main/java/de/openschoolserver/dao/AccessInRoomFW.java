@@ -17,6 +17,14 @@ public class AccessInRoomFW implements Serializable {
 
 	@Id
 	private long id;
+	private AccessInRoom accessinroom;
+	public AccessInRoom getAccessinroom() {
+		return accessinroom;
+	}
+
+	public void setAccessinroom(AccessInRoom accessinroom) {
+		this.accessinroom = accessinroom;
+	}
 
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean direct;
