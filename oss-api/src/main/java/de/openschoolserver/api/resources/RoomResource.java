@@ -73,10 +73,10 @@ public interface RoomResource {
     );
     
     /*
-     * GET rooms/{roomId}/delete
+     * DELETE rooms/{roomId}
      */
-    @GET
-    @Path("{roomId}/delete")
+    @DELETE
+    @Path("{roomId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "delete room by id")
     @ApiResponses(value = {
