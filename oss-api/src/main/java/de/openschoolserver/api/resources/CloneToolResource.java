@@ -48,7 +48,7 @@ public interface CloneToolResource {
 	@GET
 	@Path("{hwconfId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the configuration of a hardware configuration.")
+	@ApiOperation(value = "Gets a hardware configuration.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -75,10 +75,10 @@ public interface CloneToolResource {
 	);
     
 	/*
-	 * Get clonetool/{hwconfId}/{partition}
+	 * Get clonetool/{hwconfId}/{partitionName}
 	 */
 	@GET
-	@Path("{hwconfId}/{partition}")
+	@Path("{hwconfId}/{partitionName}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets the configuration of a partition to a given hardware configuration.")
 	@ApiResponses(value = {
@@ -88,14 +88,14 @@ public interface CloneToolResource {
 	Partition getPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
-	        @PathParam("partition") String partition
+	        @PathParam("partitionName") String partitionName
 	);
 
 	/*
-	 * GET clonetool/{hwconfId}/{partition}/{key}
+	 * GET clonetool/{hwconfId}/{partitionName}/{key}
 	 */
 	@GET
-	@Path("{hwconfId}/{partition}/{key}")
+	@Path("{hwconfId}/{partitionName}/{key}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets the value of a key to a given partition." +
 			      "The key may be: OS, Description, Join, Format, Itool" )
@@ -106,7 +106,7 @@ public interface CloneToolResource {
 	String getConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
-	        @PathParam("partition") String partition,
+	        @PathParam("partitionName") String partitionName,
 	        @PathParam("key") String key
 	);
 
@@ -160,11 +160,11 @@ public interface CloneToolResource {
 	boolean addPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
-	        @PathParam("partition") String partitionName
+	        @PathParam("partitionName") String partitionName
 	);
 
 	/*
-	 * POST clonetool/{hwconfId}/{partition}
+	 * POST clonetool/{hwconfId}/{partitionName}
 	 */
 	@POST
 	@Path("{hwconfId}/{partitionName}")
@@ -177,15 +177,15 @@ public interface CloneToolResource {
 	boolean addPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
-	        @PathParam("partition") String partitionName,
+	        @PathParam("partitionName") String partitionName,
 	        Partition partition
 	);
 
 	/*
-	 * PUT clonetool/{hwconfId}/{partition}/{key}/{value}
+	 * PUT clonetool/{hwconfId}/{partitionName}/{key}/{value}
 	 */
 	@PUT
-	@Path("{hwconfId}/{partition}/{key}/{value}")
+	@Path("{hwconfId}/{partitionName}/{key}/{value}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Sets the value of a key to a given partition." +
 			      "The keys may be: OS, Description, Join, Format, Itool" )
@@ -196,7 +196,7 @@ public interface CloneToolResource {
 	boolean setConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
-	        @PathParam("partition") String partition,
+	        @PathParam("partitionName") String partitionName,
 	        @PathParam("key") String key,
 	        @PathParam("value") String value
 	);
@@ -216,4 +216,41 @@ public interface CloneToolResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
 	);
+
+	/*
+	 * DELETE clonetool/{hwconfId}/{partitionName}
+	 */
+	@DELETE
+	@Path("{hwconfId}/{partitionName}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Delets a partition to a given hardware configuration.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	boolean getPartition(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("hwconfId") Long hwconfId,
+	        @PathParam("partitionName") String partitionName
+	);
+
+	/*
+	 * DELETE clonetool/{hwconfId}/{partitionName}/{key}
+	 */
+	@DELETE
+	@Path("{hwconfId}/{partitionName}/{key}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Delets a key an the correspondig value from a partition." +
+			      "The key may be: OS, Description, Join, Format, Itool" )
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	boolean deleteConfigurationValue(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("hwconfId") Long hwconfId,
+	        @PathParam("partitionName") String partitionName,
+	        @PathParam("key") String key
+	);
+
 }
