@@ -48,7 +48,7 @@ public interface CloneToolResource {
 	@GET
 	@Path("{hwconfId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the configuration of a partition to a given hardware configuration.")
+	@ApiOperation(value = "Gets the configuration of a hardware configuration.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
