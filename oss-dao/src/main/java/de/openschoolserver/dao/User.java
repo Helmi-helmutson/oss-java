@@ -20,9 +20,9 @@ import java.util.List;
 	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' "),
 	@NamedQuery(name="User.getByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
 	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
-	@NamedQuery(name="User.search", query="SELECT u FROM User WHERE uid LIKE :search OR givenName LIKE :search OR sureName LIKE :search"),
-	@NamedQuery(name="User.getConfig",  query="SELECT c.value FROM UserConfig  WHERE user_id = :user_id AND key = :key" ),
-	@NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig WHERE user_id = :user_id AND key = :key" )
+	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.sureName LIKE :search"),
+	@NamedQuery(name="User.getConfig",  query="SELECT c.value FROM UserConfig c WHERE c.user.id = :user_id AND c.key = :key" ),
+    @NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :user_id AND c.key = :key" )
 })
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;

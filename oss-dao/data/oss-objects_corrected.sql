@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS Users (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         uid          VARCHAR(32) NOT NULL,
         role         VARCHAR(16) NOT NULL,
-        surName      VARCHAR(64) NOT NULL,
+        sureName      VARCHAR(64) NOT NULL,
         givenName    VARCHAR(64),
         PRIMARY KEY  (id)
 );
@@ -321,11 +321,13 @@ CREATE TABLE IF NOT EXISTS Session (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id BIGINT unsigned NOT NULL,
   room_id      BIGINT UNSIGNED  NULL,
-  cratedate timestamp not null,
+  device_id BIGINT UNSIGNED NULL,
+  createdate timestamp not null,
   ip varchar(30),
   token varchar(60),
    FOREIGN KEY(user_id) REFERENCES Users(id),
    FOREIGN KEY(room_id)   REFERENCES Rooms(id),
+   FOREIGN KEY(device_id) REFERENCES DEVICES(id),
  PRIMARY KEY (`id`)
  );
 

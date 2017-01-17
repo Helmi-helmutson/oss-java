@@ -32,23 +32,33 @@ public class Session implements Principal {
 	@Transient
 	private String schoolId = "dummy";
 	
-	@OneToOne
+	@Column(name="device_id")
+	private long deviceId;
+	
+	//@OneToOne
+	 @JoinColumn(name = "device_id", insertable = false, updatable = false)
 	private Device device;
 		
 	@Column(name = "user_id")
 	private long userId;
+	
+	@Column(name = "room_id")
+	private long roomId;
 	   
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 	
+ 
+    
 	@OneToOne
+	@JoinColumn(name = "room_id", insertable = false, updatable = false)
 	private Room room;
 	
-	@Column(name = "IP")
+	@Column(name = "ip")
 	private String IP;
 	
-    @Column(name = "Token")
+    @Column(name = "token")
 	private String token;
 	
 	@Override

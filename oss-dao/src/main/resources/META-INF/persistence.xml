@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
 	<persistence-unit name="OSS1" transaction-type="RESOURCE_LOCAL">
-		<class>oss.dao.AccessInRoom</class>
-		<class>oss.dao.Acl</class>
-		<class>oss.dao.Alias</class>
-		<class>oss.dao.Device</class>
-		<class>oss.dao.Enumerate</class>
-		<class>oss.dao.Group</class>
-		<class>oss.dao.HWConf</class>
-		<class>oss.dao.Partition</class>
-		<class>oss.dao.Room</class>
-		<class>oss.dao.TestFile</class>
-		<class>oss.dao.TestUser</class>
-		<class>oss.dao.TestUserPK</class>
-		<class>oss.dao.Test</class>
-		<class>oss.dao.User</class>
-		<class>oss.dao.Session</class>
+		<class>de.openschoolserver.dao.AccessInRoom</class>
+		<class>de.openschoolserver.dao.AccessInRoomACT</class>
+		
+		<class>de.openschoolserver.dao.AccessInRoomFW</class>
+		<class>de.openschoolserver.dao.AccessInRoomPIT</class>
+		<class>de.openschoolserver.dao.Acl</class>
+		<class>de.openschoolserver.dao.Alias</class>
+		<class>de.openschoolserver.dao.Device</class>
+		
+		<class>de.openschoolserver.dao.DeviceConfig</class>
+		<class>de.openschoolserver.dao.DeviceMConfig</class>
+		<class>de.openschoolserver.dao.Enumerate</class>
+		<class>de.openschoolserver.dao.Group</class>
+		<class>de.openschoolserver.dao.HWConf</class>
+		<class>de.openschoolserver.dao.Partition</class>
+		<class>de.openschoolserver.dao.Room</class>
+		<class>de.openschoolserver.dao.RoomMConfig</class>
+		<class>de.openschoolserver.dao.RoomConfig</class>
+		<class>de.openschoolserver.dao.TestFile</class>
+	 	<class>de.openschoolserver.dao.TestUser</class>
+		<class>de.openschoolserver.dao.TestUserPK</class> 
+	    <class>de.openschoolserver.dao.Test</class>
+		<class>de.openschoolserver.dao.User</class>
+		<class>de.openschoolserver.dao.UserConfig</class>
+		<class>de.openschoolserver.dao.UserMConfig</class>
+		<class>de.openschoolserver.dao.Session</class>
+		<class>de.openschoolserver.dao.BooleanToStringConverter</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/OSS1"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>

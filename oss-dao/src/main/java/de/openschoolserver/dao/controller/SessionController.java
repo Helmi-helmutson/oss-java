@@ -79,6 +79,7 @@ public class SessionController extends Controller {
                 em.getTransaction().commit();
             } catch (Exception e) {
                 //TODO PGR LOG.error("create failed: " + e.getMessage());
+            	System.err.println(e.getMessage());
             } finally {
                 em.close();
             }

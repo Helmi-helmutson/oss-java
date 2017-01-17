@@ -23,7 +23,7 @@ public class SessionControllerTestCase extends OSSDaoTestCase {
         assertEquals(true, true);  
     }
 
-    public void testLoginWithUsernameNoSuccess() {
+    public void testLoginWithUserSuccess() {
         assertNotNull(c);
         User user = new User();
         user.setId(1);
@@ -31,7 +31,7 @@ public class SessionControllerTestCase extends OSSDaoTestCase {
         assertNotNull(session);
     }
 
-    public void testLoginWithPersonIdNoSuccess() {
+    public void testLoginWithUserNoSuccess() {
         assertNotNull(c);
         Session session = c.createSessionWithUser(null, "test", "testdevice");
         assertNull(session);

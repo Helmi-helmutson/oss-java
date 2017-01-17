@@ -96,7 +96,7 @@ CREATE TABLE IF NOT EXISTS Devices (
         WLANMAC      VARCHAR(17) DEFAULT '',
         deviceType   VARCHAR(16) NOT NULL,
         row          INTEGER  DEFAULT 0,
-        column       INTEGER  DEFAULT 0,
+        col          INTEGER  DEFAULT 0,
         CONSTRAINT BIGINT fk_devices_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
         CONSTRAINT BIGINT fk_devices_hwconfs FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         CONSTRAINT BIGINT fk_devices_users   FOREIGN KEY(owner_id)  REFERENCES Users(id),
@@ -318,13 +318,11 @@ CREATE TABLE IF NOT EXISTS Session (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id int(20) unsigned NOT NULL,
   room_id      BIGINT UNSIGNED  NULL,
-  cratedate timestamp not null,
+  device_id    BIGINT UNSIGNED NULL,
+  createdate timestamp not null,
   ip varchar(30),
   token varchar(60),
   CONSTRAINT BIGINT fk_session_user FOREIGN KEY(user_id) REFERENCES Users(id),
    CONSTRAINT BIGINT fk_session_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
  PRIMARY KEY (`id`)
-       
-        
  );
-

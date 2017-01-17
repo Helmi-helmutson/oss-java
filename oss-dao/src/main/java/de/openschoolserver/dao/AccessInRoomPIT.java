@@ -19,6 +19,15 @@ public class AccessInRoomPIT implements Serializable {
 	private long id;
 
 	private String  pointintime;
+	private AccessInRoom accessinroom;
+
+	public AccessInRoom getAccessinroom() {
+		return accessinroom;
+	}
+
+	public void setAccessinroom(AccessInRoom accessinroom) {
+		this.accessinroom = accessinroom;
+	}
 
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean monday;

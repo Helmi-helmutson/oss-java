@@ -17,9 +17,9 @@ import java.util.List;
   @NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
   @NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
   @NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
-  @NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room_id = :id"),
-  @NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig  WHERE user_id = :user_id AND key = :key" ),
-  @NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig WHERE user_id = :user_id AND key = :key" )
+  @NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id"),
+  @NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :user_id AND c.key = :key" ),
+  @NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :user_id AND c.key = :key" )
 })
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
