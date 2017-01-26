@@ -4,6 +4,7 @@ package de.openschoolserver.api.auth;
 
 import java.util.Optional;
 
+
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 
