@@ -91,8 +91,15 @@ public class User implements Serializable {
 			}
 		)
 	private List<Group> groups;
+	
+	@Transient
+	private String password ="";
 
 	public User() {
+		this.uid = "";
+		this.sureName = "";
+		this.givenName = "";
+		this.password = "";
 	}
 
 	public long getId() {
@@ -247,6 +254,27 @@ public class User implements Serializable {
 
 	public void setGroups(List<Group> groups) {
 		this.groups = groups;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public String getPassword() {
+		return this.password;
+	}
+	
+	public String diff(User newUser){
+		StringBuilder diff = new StringBuilder();
+		if( givenName != newUser.getGivenName() )
+			diff.append(String.format("givenName: %s%n", newUser.getGivenName()));
+		if( sureName != newUser.getSureName() )
+			diff.append(String.format("sureName: %s%n",  newUser.getSureName()));
+		if( newUser.getPassword() != "" ) {
+			diff.append(String.format("password: %s%n",  newUser.getPassword()));
+		}
+
+		 return diff.toString();
 	}
 
 }
