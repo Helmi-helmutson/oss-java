@@ -10,6 +10,6 @@ public class TestUtil {
 		System.out.println("Random Password 8 digits with given chars: " + UserUtil.createRandomPassword(8,"ABCabc897.!"));
 	
 		String userid = UserUtil.createUserId("Péter","Varkoly",new Date(), true, true, "G4N2Y2");
-		System.out.println("CreateUserId:");
+		System.out.println("CreateUserId:"+userid);
 	}
 }
