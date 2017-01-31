@@ -1,15 +1,19 @@
 apply plugin: 'java'
+//apply plugin: 'application'
 
 group = 'oss.java'
 version = '1.0-SNAPSHOT'
 description = "OSS Java Data Access"
 
 repositories {
-    maven { url "http://repo.maven.apache.org/maven2" } 
+//    maven { url "http://repo.maven.apache.org/maven2" } 
+maven { url "http://nexus.extis.de:18081/repository/maven-public/" }
+
 }
 
 dependencies {
 //    compile 'org.slf4j:slf4j-api:1.7.21'
+compile "de.claxss:ClaXssCoreLib:1.0.1-SNAPSHOT"
     compile group: 'org.eclipse.persistence', name: 'eclipselink', version: '2.6.4'
     testCompile 'junit:junit:4.12'
     testCompile group: 'mysql', name: 'mysql-connector-java', version: '5.1.40'
