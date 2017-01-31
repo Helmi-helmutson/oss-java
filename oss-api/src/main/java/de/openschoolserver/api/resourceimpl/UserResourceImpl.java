@@ -36,10 +36,17 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public boolean add(Session session, User user) {
+	public String add(Session session, User user) {
 		// TODO Auto-generated method stub
 		final UserController userController = new UserController(session);
 		return userController.add(user);
+	}
+
+	@Override
+	public List<String> add(Session session, List<User> users) {
+		// TODO Auto-generated method stub
+		final UserController userController = new UserController(session);
+		return userController.add(users);
 	}
 
 	@Override

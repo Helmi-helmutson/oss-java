@@ -2,6 +2,7 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -75,11 +76,14 @@ public class UserController extends Controller {
 		}
 	}
 
-	public boolean add(User user){
+	public String add(User user){
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(user.getUid())){
-			return false;
+			return "ERROR User name is not unique.";
+		}
+		if( user.getUid() == "") {
+			//TODO Create uid
 		}
 		try {
 			em.getTransaction().begin();
@@ -87,11 +91,19 @@ public class UserController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return "ERROR " + e.getMessage();
 		}
-		return true;
+		return "OK " + user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.";
 	}
 
+	public List<String> add(List<User> users){
+		List<String> results = new ArrayList<String>();
+		for( User user : users ) {
+			results.add(this.add(user));
+		}
+		return results;
+	}
+	
 	public boolean modify(User user){
 		//TODO make some checks!!
 		EntityManager em = getEntityManager();

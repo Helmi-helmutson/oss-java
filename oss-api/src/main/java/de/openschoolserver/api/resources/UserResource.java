@@ -118,9 +118,27 @@ public interface UserResource {
     })
     //@PermitAll
     @RolesAllowed("user.add")
-    boolean add(
+    String add(
             @ApiParam(hidden = true) @Auth Session session,
             User user
+    );
+    
+    /*
+     * POST users/add [ { hash }, { user } ]
+     */
+    @POST
+    @Path("add")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new users")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    //@PermitAll
+    @RolesAllowed("user.add")
+    List<String> add(
+            @ApiParam(hidden = true) @Auth Session session,
+            List<User> users
     );
     
     /*
