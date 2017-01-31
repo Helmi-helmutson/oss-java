@@ -82,9 +82,9 @@ public class CloneToolRescourceImpl implements CloneToolResource {
 	}
 	
 	@Override
-	public boolean setConfigurationValue(Session session, Long hwconfId, String partition, String key, String value) {
+	public boolean setConfigurationValue(Session session, Long hwconfId, String partitionName, String key, String value) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.setConfigurationValue(hwconfId,partition,key,value);
+		return cloneToolController.setConfigurationValue(hwconfId,partitionName,key,value);
 	}
 
 	@Override
@@ -92,5 +92,17 @@ public class CloneToolRescourceImpl implements CloneToolResource {
 		// TODO Auto-generated method stub
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.delete(hwconfId);
+	}
+
+	@Override
+	public boolean deletePartition(Session session, Long hwconfId, String partitionName) {
+		final CloneToolController cloneToolController = new CloneToolController(session);
+		return cloneToolController.deletePartition(hwconfId,partitionName);
+	}
+
+	@Override
+	public boolean deleteConfigurationValue(Session session, Long hwconfId, String partitionName, String key) {
+		final CloneToolController cloneToolController = new CloneToolController(session);
+		return cloneToolController.deleteConfigurationValue(hwconfId,partitionName,key);
 	}
 }
