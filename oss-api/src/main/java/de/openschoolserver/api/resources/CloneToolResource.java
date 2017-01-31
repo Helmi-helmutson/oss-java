@@ -228,7 +228,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	boolean getPartition(
+	boolean deletePartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
 	        @PathParam("partitionName") String partitionName
