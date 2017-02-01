@@ -2,10 +2,10 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
-import java.util.List;
 
 
 /**
@@ -37,6 +37,8 @@ public class User implements Serializable {
 	private String sureName;
 
 	private String uid;
+	
+	private Date birthDay;
 
 	//bi-directional many-to-one association to Alias
 	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
@@ -100,6 +102,7 @@ public class User implements Serializable {
 		this.sureName = "";
 		this.givenName = "";
 		this.password = "";
+		this.birthDay = new Date();
 	}
 
 	public long getId() {
@@ -140,6 +143,14 @@ public class User implements Serializable {
 
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+	
+	public Date getBirthDay() {
+		return this.birthDay;
+	}
+	
+	public void setBirthDay(Date birthday) {
+		this.birthDay = birthday;
 	}
 
 	public List<Alias> getAliases() {
@@ -270,11 +281,12 @@ public class User implements Serializable {
 			diff.append(String.format("givenName: %s%n", newUser.getGivenName()));
 		if( sureName != newUser.getSureName() )
 			diff.append(String.format("sureName: %s%n",  newUser.getSureName()));
+		if( birthDay != newUser.birthDay() )
+			diff.append(String.format("birthDay: %s%n",  newUser.getBirthDay()));
 		if( newUser.getPassword() != "" ) {
 			diff.append(String.format("password: %s%n",  newUser.getPassword()));
 		}
-
-		 return diff.toString();
+		return diff.toString();
 	}
 
 }
