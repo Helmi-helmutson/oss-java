@@ -62,20 +62,21 @@ public class Controller extends Config {
     	return true;
     }
     
-    protected void startPlugin(String pluginName, Object object, Object oldObject){
+    protected void startPlugin(String pluginName, Object object){
     	StringBuilder data = new StringBuilder();
     	String[] program   = new String[4];
         StringBuffer reply = new StringBuffer();
         StringBuffer error = new StringBuffer();
     	program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
+    	program[1] = pluginName;
     	switch(object.getClass().getName()) {
     	case "User":
     		User user = (User)object;
     		switch(pluginName) {
-    		case "add_user":
-    		    program[1] = "add_user";
+    		case "add_user", "modify_user":
     		    data.append(String.format("givenName: %s%n", user.getGivenName()));
     		    data.append(String.format("sureName: %s%n", user.getSureName()));
+    		    data.append(String.format("birthDay: %s%n", user.getBirthDay()));
     		    data.append(String.format("password: %s%n", user.getPassword()));
     		    data.append(String.format("uid: %s%n", user.getUid()));
     		    data.append(String.format("role: %s%n", user.getRole()));
@@ -84,11 +85,6 @@ public class Controller extends Config {
     			program[1] = "delete_user";
     			data.append(String.format("uid: %s%n", user.getUid()));
     			break;
-    		case "modify_user":
-    			program[1] = "modify_user";
-    			User oldUser = (User)oldObject;
-    			data.append(oldUser.diff(user));
-    			break;
     		}
     		break;
     	case "Group":
@@ -96,13 +92,10 @@ public class Controller extends Config {
     		Group group = (Group)object;
     		switch(pluginName){
     		case "add_group":
-    			program[1] = "add_group";
     			break;
     		case "delete_group":
-    			program[1] = "delete_group";
     			break;
     		case "modify_group":
-    			program[1] = "modify_group";
     			break;
     		}
     		break;

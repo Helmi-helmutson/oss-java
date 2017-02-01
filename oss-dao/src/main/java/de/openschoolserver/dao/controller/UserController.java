@@ -2,16 +2,19 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
-
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import de.extis.core.util.UserUtil;
+
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
+
 
 public class UserController extends Controller {
 	
@@ -82,8 +85,40 @@ public class UserController extends Controller {
 		if( ! this.isNameUnique(user.getUid())){
 			return "ERROR User name is not unique.";
 		}
+		// Check if uid is not OK
+		if( ) {
+			return "ERROR Uid contains not allowed characters.";
+		}
+		// Create uid if not given
 		if( user.getUid() == "") {
-			//TODO Create uid
+			String userid = UserUtil.createUserId( user.getGivenName(),
+												   user.getSureName(),
+												   user.getBirthDay(),
+												   true,
+												   this.getConfigValue("SCHOOL_STRING_CONVERT_TYPE") == "telex", 
+												   this.getConfigValue("SCHOOL_LOGIN_SCHEME")
+												   );
+			user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId );
+			Integer i = 1;
+			while( !this.isNameUnique(user.getUid()) ) {
+				user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId + i );
+			}
+		}
+		// Check the user password
+		if( user.getPassword() == "" ) {
+			user.setPassword(UserUtil.createRandomPassword(8));
+		}
+		else
+		{
+			if( user.getPassword().size < (Integer)this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH") ) {
+				
+			}
+			if( user.getPassword().size > (Integer)this.getConfigValue("SCHOOL_MAXIMAL_PASSWORD_LENGTH") ) {
+				
+			}
+			if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY" == "yes" ) {
+				
+			}
 		}
 		try {
 			em.getTransaction().begin();
@@ -93,6 +128,7 @@ public class UserController extends Controller {
 			System.err.println(e.getMessage());
 			return "ERROR " + e.getMessage();
 		}
+		this.startPlugin("add_user",user);
 		return "OK " + user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.";
 	}
 
@@ -107,10 +143,8 @@ public class UserController extends Controller {
 	public boolean modify(User user){
 		//TODO make some checks!!
 		EntityManager em = getEntityManager();
-		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(user.getUid())){
-			return false;
-		}
+
+		// First we have to check some parameter
 		try {
 			em.getTransaction().begin();
 			em.merge(user);
@@ -119,13 +153,18 @@ public class UserController extends Controller {
 			System.err.println(e.getMessage());
 			return false;
 		}
+		this.startPlugin("modify_user",user);
 		return true;
 	}
 	
 	public boolean delete(long userId){
+		
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
 		User user = this.getById(userId);
+
+		this.startPlugin("delete_user",user);
+
 		List<Device> devices = user.getOwnedDevices();
 		// Remove user from logged on table
 		Query query = em.createQuery("DELETE FROM LoggedOn WHERE user_id = :userId");
