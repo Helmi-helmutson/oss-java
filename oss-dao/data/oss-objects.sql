@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS Users (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         uid          VARCHAR(32) NOT NULL,
         role         VARCHAR(16) NOT NULL,
-        surName      VARCHAR(64) NOT NULL,
+        sureName     VARCHAR(64) NOT NULL,
         givenName    VARCHAR(64),
         birthDay     DATE NOT NULL,
         PRIMARY KEY  (id)
@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS Users (
 
 INSERT INTO Users VALUES(NULL,'admin','sysadmins','Administrator',NULL,NOW());
 INSERT INTO Users VALUES(NULL,'tteachers','teachers','TTeachers',NULL,NOW());
-INSERT INTO Users VALUES(NULL,'tstudents','tstudents','TStudents',NULL,NOW());
-INSERT INTO Users VALUES(NULL,'tworkstations','sysadmins','TSysadmins',NULL,NOW());
+INSERT INTO Users VALUES(NULL,'tstudents','students','TStudents',NULL,NOW());
+INSERT INTO Users VALUES(NULL,'tworkstations','workstations','TWorkstations',NULL,NOW());
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -316,7 +316,7 @@ CREATE TABLE IF NOT EXISTS RoomMConfig (
 );
 
 CREATE TABLE IF NOT EXISTS Session (
-        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id      BIGINT UNSIGNED NOT NULL,
         room_id      BIGINT UNSIGNED NULL,
         device_id    BIGINT UNSIGNED NULL,
@@ -327,3 +327,12 @@ CREATE TABLE IF NOT EXISTS Session (
         CONSTRAINT fk_session_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
         PRIMARY KEY (`id`)
  );
+
+CREATE TABLE IF NOT EXISTS Responses (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	session_id   BIGINT UNSIGNED NOT NULL,
+	code	VARCHAR(64) NOT NULL,
+	value   VARCHAR(1024) NOT NULL,
+	CONSTRAINT fk_responses_session FOREIGN KEY(session_id) REFERENCES Session(id),
+	PRIMARY KEY (`id`)
+);

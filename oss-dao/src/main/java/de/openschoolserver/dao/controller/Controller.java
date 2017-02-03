@@ -3,10 +3,9 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
-
-
 import javax.persistence.Query;
 import java.util.List;
+import java.util.regex.*;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.controller.Config;
@@ -62,9 +61,13 @@ public class Controller extends Config {
     	return true;
     }
     
+    protected boolean checkNonASCII(String name) {
+    	return Pattern.matches("[^a-zA-Z0-9\\.\\-_]",name);
+    }
+    
     protected void startPlugin(String pluginName, Object object){
     	StringBuilder data = new StringBuilder();
-    	String[] program   = new String[4];
+    	String[] program   = new String[2];
         StringBuffer reply = new StringBuffer();
         StringBuffer error = new StringBuffer();
     	program[0] = "/usr/share/oss/plugins/plugin_handler.sh";

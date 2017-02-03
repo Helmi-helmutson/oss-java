@@ -4,6 +4,7 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -13,6 +14,7 @@ import javax.ws.rs.*;
 
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
 import java.util.List;
@@ -118,7 +120,7 @@ public interface UserResource {
     })
     //@PermitAll
     @RolesAllowed("user.add")
-    String add(
+    Response add(
             @ApiParam(hidden = true) @Auth Session session,
             User user
     );
@@ -136,7 +138,7 @@ public interface UserResource {
     })
     //@PermitAll
     @RolesAllowed("user.add")
-    List<String> add(
+    List<Response> add(
             @ApiParam(hidden = true) @Auth Session session,
             List<User> users
     );

@@ -16,6 +16,7 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Response;
 
 
 public class UserController extends Controller {
@@ -81,7 +82,7 @@ public class UserController extends Controller {
 		}
 	}
 
-	public String add(User user){
+	public Response add(User user){
 		EntityManager em = getEntityManager();
 		// Create uid if not given
 		if( user.getUid() == "") {
@@ -102,11 +103,11 @@ public class UserController extends Controller {
 		{
 		// First we check if the parameter are unique.
 				if( ! this.isNameUnique(user.getUid())){
-					return "ERROR User name is not unique.";
+					return new Response(this.getSession(),"ERROR", "User name is not unique.");
 				}
-				// Check if uid is not OK TODO
-				if( false ) {
-					return "ERROR Uid contains not allowed characters.";
+				// Check if uid contains non allowed characters
+				if( this.checkNonASCII(user.getUid()) ) {
+					return new Response(this.getSession(),"ERROR", "Uid contains not allowed characters.");
 				}
 		}
 		// Check the user password
@@ -116,13 +117,13 @@ public class UserController extends Controller {
 		else
 		{
 			if( user.getPassword().length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
-				
+				return new Response(this.getSession(),"ERROR", "User password is to short.");
 			}
 			if( user.getPassword().length() > Integer.parseInt(this.getConfigValue("SCHOOL_MAXIMAL_PASSWORD_LENGTH")) ) {
-				
+				return new Response(this.getSession(),"ERROR", "User password is to long.");
 			}
 			if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY") == "yes" ) {
-				
+				//return new Response(this.getSession(),"ERROR", "User password is to simple.");
 			}
 		}
 		try {
@@ -131,14 +132,14 @@ public class UserController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return "ERROR " + e.getMessage();
+			return new Response(this.getSession(),"ERROR ", e.getMessage());
 		}
 		this.startPlugin("add_user",user);
-		return "OK " + user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.";
+		return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.");
 	}
 
-	public List<String> add(List<User> users){
-		List<String> results = new ArrayList<String>();
+	public List<Response> add(List<User> users){
+		List<Response> results = new ArrayList<Response>();
 		for( User user : users ) {
 			results.add(this.add(user));
 		}

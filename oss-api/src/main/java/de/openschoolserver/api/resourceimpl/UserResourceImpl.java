@@ -3,10 +3,12 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
 
+
 import de.openschoolserver.api.resources.UserResource;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.controller.UserController;
 
 public class UserResourceImpl implements UserResource {
@@ -36,14 +38,14 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public String add(Session session, User user) {
+	public Response add(Session session, User user) {
 		// TODO Auto-generated method stub
 		final UserController userController = new UserController(session);
 		return userController.add(user);
 	}
 
 	@Override
-	public List<String> add(Session session, List<User> users) {
+	public List<Response> add(Session session, List<User> users) {
 		// TODO Auto-generated method stub
 		final UserController userController = new UserController(session);
 		return userController.add(users);
