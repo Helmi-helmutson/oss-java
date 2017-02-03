@@ -3,6 +3,7 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.ws.rs.WebApplicationException;
 
 import de.openschoolserver.api.resources.DeviceResource;
