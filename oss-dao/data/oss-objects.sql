@@ -10,19 +10,20 @@ CREATE TABLE IF NOT EXISTS Users (
         role         VARCHAR(16) NOT NULL,
         surName      VARCHAR(64) NOT NULL,
         givenName    VARCHAR(64),
+        birthDay     DATE NOT NULL,
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Users VALUES(NULL,'admin','sysadmins','Administrator',NULL);
-INSERT INTO Users VALUES(NULL,'tteachers','teachers','TTeachers',NULL);
-INSERT INTO Users VALUES(NULL,'tstudents','tstudents','TStudents',NULL);
-INSERT INTO Users VALUES(NULL,'tworkstations','sysadmins','TSysadmins',NULL);
+INSERT INTO Users VALUES(NULL,'admin','sysadmins','Administrator',NULL,NOW());
+INSERT INTO Users VALUES(NULL,'tteachers','teachers','TTeachers',NULL,NOW());
+INSERT INTO Users VALUES(NULL,'tstudents','tstudents','TStudents',NULL,NOW());
+INSERT INTO Users VALUES(NULL,'tworkstations','sysadmins','TSysadmins',NULL,NOW());
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name        VARCHAR(32) NOT NULL,
         description VARCHAR(64) NOT NULL,
-        groupType   CHAR(1)     NOT NULL,
+        groupType   VARCHAR(16) NOT NULL,
         PRIMARY KEY  (id)
 );
 
@@ -36,16 +37,16 @@ INSERT INTO Groups VALUES(NULL,'templates','Templates','primary');
 CREATE TABLE IF NOT EXISTS GroupMember (
         user_id        BIGINT UNSIGNED NOT NULL,
         group_id       BIGINT UNSIGNED NOT NULL,
-        CONSTRAINT BIGINT fk_groupmember_user  FOREIGN KEY(user_id)  REFERENCES Users(id),
-        CONSTRAINT BIGINT fk_groupmember_group FOREIGN KEY(group_id) REFERENCES Groups(id),
-        CONSTRAINT BIGINT pk_groupmember PRIMARY KEY  (user_id,group_id)
+	CONSTRAINT fk_groupmember_user  FOREIGN KEY(user_id)  REFERENCES Users(id),
+	CONSTRAINT fk_groupmember_group FOREIGN KEY(group_id) REFERENCES Groups(id),
+	CONSTRAINT pk_groupmember PRIMARY KEY  (user_id,group_id)
 );
 
 CREATE TABLE IF NOT EXISTS Aliases (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id         BIGINT UNSIGNED NOT NULL,
         alias           VARCHAR(64) NOT NULL,
-        CONSTRAINT BIGINT fk_aliases_user  FOREIGN KEY(user_id)  REFERENCES Users(id),
+        CONSTRAINT fk_aliases_user  FOREIGN KEY(user_id)  REFERENCES Users(id),
         PRIMARY KEY  (id)
 );
 
@@ -63,10 +64,10 @@ CREATE TABLE IF NOT EXISTS Partitions (
         name         VARCHAR(32) NOT NULL,
         description  VARCHAR(32) NOT NULL,
         OS           VARCHAR(16) NOT NULL,
-        join         VARCHAR(16) NOT NULL,
+        joinType     VARCHAR(16) NOT NULL,
         tool         VARCHAR(16) NOT NULL,
         format       VARCHAR(16) NOT NULL,
-        CONSTRAINT BIGINT fk_partitions_hwconfs FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
+        CONSTRAINT fk_partitions_hwconfs FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         PRIMARY KEY  (id)
 );
 
@@ -80,7 +81,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
         columns      INTEGER  DEFAULT 5,
         startIP      VARCHAR(16) NOT NULL,
         netMask      INTEGER  NOT NULL,
-        CONSTRAINT BIGINT fk_rooms_hwconfs FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
+        CONSTRAINT fk_rooms_hwconfs FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         PRIMARY KEY  (id)
 );
 
@@ -97,17 +98,17 @@ CREATE TABLE IF NOT EXISTS Devices (
         deviceType   VARCHAR(16) NOT NULL,
         row          INTEGER  DEFAULT 0,
         col          INTEGER  DEFAULT 0,
-        CONSTRAINT BIGINT fk_devices_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
-        CONSTRAINT BIGINT fk_devices_hwconfs FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
-        CONSTRAINT BIGINT fk_devices_users   FOREIGN KEY(owner_id)  REFERENCES Users(id),
+        CONSTRAINT fk_devices_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
+        CONSTRAINT fk_devices_hwconfs FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
+        CONSTRAINT fk_devices_users   FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY  (id)
 );
 
 CREATE TABLE IF NOT EXISTS AccessInRoom (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id        BIGINT UNSIGNED NOT NULL,
-        accessType     VARCHAR(8) DEFAULT,
-        CONSTRAINT BIGINT fk_accessinroom_rooms FOREIGN KEY(room_id) REFERENCES Rooms(id),
+        accessType     VARCHAR(8) NOT NULL,
+        CONSTRAINT fk_accessinroom_rooms FOREIGN KEY(room_id) REFERENCES Rooms(id),
         PRIMARY KEY  (id)
 );
 
@@ -123,7 +124,7 @@ CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
 	saturday       CHAR(1) DEFAULT 'N',
 	sunday         CHAR(1) DEFAULT 'N',
 	holiday        CHAR(1) DEFAULT 'N',
-        CONSTRAINT BIGINT fk_accessinroompit_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
+        CONSTRAINT fk_accessinroompit_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
         PRIMARY KEY  (id)
 );
 
@@ -135,7 +136,7 @@ CREATE TABLE IF NOT EXISTS AccessInRoomFW (
         proxy           CHAR(1) DEFAULT 'Y',
         printing        CHAR(1) DEFAULT 'Y',
         portal          CHAR(1) DEFAULT 'Y',
-        CONSTRAINT BIGINT fk_accessinroomfw_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
+        CONSTRAINT fk_accessinroomfw_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
         PRIMARY KEY  (id)
 );
 
@@ -143,26 +144,26 @@ CREATE TABLE IF NOT EXISTS AccessInRoomACT (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         accessinroom_id BIGINT UNSIGNED NOT NULL,
 	action          VARCHAR(32) DEFAULT '',
-        CONSTRAINT BIGINT fk_accessinroomact_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
+        CONSTRAINT fk_accessinroomact_accessinroom FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
         PRIMARY KEY  (id)
 );
 
 CREATE TABLE IF NOT EXISTS LoggedOn (
         user_id      BIGINT UNSIGNED NOT NULL,
         device_id    BIGINT UNSIGNED NOT NULL,
-        CONSTRAINT BIGINT fk_loggedon_users    FOREIGN KEY(user_id)   REFERENCES Users(id),
-        CONSTRAINT BIGINT fk_loggedon_devices  FOREIGN KEY(device_id) REFERENCES Devices(id),
-        CONSTRAINT BIGINT pk_LoggedOn PRIMARY KEY  (device_id, user_id)
+        CONSTRAINT fk_loggedon_users    FOREIGN KEY(user_id)   REFERENCES Users(id),
+        CONSTRAINT fk_loggedon_devices  FOREIGN KEY(device_id) REFERENCES Devices(id),
+        CONSTRAINT pk_LoggedOn PRIMARY KEY  (device_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS DefaultPrinters (
         room_id      BIGINT UNSIGNED DEFAULT NULL,
         device_id    BIGINT UNSIGNED DEFAULT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
-        CONSTRAINT BIGINT fk_defaultprinters_rooms     FOREIGN KEY(room_id)    REFERENCES Rooms(id),
-        CONSTRAINT BIGINT fk_defaultprinters_devices1  FOREIGN KEY(device_id)  REFERENCES Devices(id),
-        CONSTRAINT BIGINT fk_defaultprinters_devices2  FOREIGN KEY(printer_id) REFERENCES Devices(id),
-        CONSTRAINT BIGINT pk_DefaultPrinters PRIMARY KEY  (device_id, room_id)
+        CONSTRAINT fk_defaultprinters_rooms     FOREIGN KEY(room_id)    REFERENCES Rooms(id),
+        CONSTRAINT fk_defaultprinters_devices1  FOREIGN KEY(device_id)  REFERENCES Devices(id),
+        CONSTRAINT fk_defaultprinters_devices2  FOREIGN KEY(printer_id) REFERENCES Devices(id),
+        CONSTRAINT pk_DefaultPrinters PRIMARY KEY  (device_id, room_id)
 );
 
 CREATE TABLE IF NOT EXISTS AvailablePrinters (
@@ -170,9 +171,9 @@ CREATE TABLE IF NOT EXISTS AvailablePrinters (
         room_id      BIGINT UNSIGNED DEFAULT NULL,
         device_id    BIGINT UNSIGNED DEFAULT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
-        CONSTRAINT BIGINT fk_availableprinters_rooms    FOREIGN KEY(room_id)    REFERENCES Rooms(id),
-        CONSTRAINT BIGINT fk_availableprinters_devices1 FOREIGN KEY(device_id)  REFERENCES Devices(id),
-        CONSTRAINT BIGINT fk_availableprinters_devices2 FOREIGN KEY(printer_id) REFERENCES Devices(id),
+        CONSTRAINT fk_availableprinters_rooms    FOREIGN KEY(room_id)    REFERENCES Rooms(id),
+        CONSTRAINT fk_availableprinters_devices1 FOREIGN KEY(device_id)  REFERENCES Devices(id),
+        CONSTRAINT fk_availableprinters_devices2 FOREIGN KEY(printer_id) REFERENCES Devices(id),
         PRIMARY KEY  (id)
 );
 
@@ -198,8 +199,8 @@ CREATE TABLE IF NOT EXISTS  Tests (
         proxy         CHAR(1) NOT NULL DEFAULT 'N',
         direct        CHAR(1) NOT NULL DEFAULT 'N',
         portal        CHAR(1) NOT NULL DEFAULT 'N',
-        CONSTRAINT BIGINT fk_tests_users FOREIGN KEY(teacher_id) REFERENCES Users(id),
-        CONSTRAINT BIGINT fk_tests_rooms FOREIGN KEY(room_id)    REFERENCES Rooms(id),
+        CONSTRAINT fk_tests_users FOREIGN KEY(teacher_id) REFERENCES Users(id),
+        CONSTRAINT fk_tests_rooms FOREIGN KEY(room_id)    REFERENCES Rooms(id),
         PRIMARY KEY  (id)
 );
 
@@ -210,8 +211,8 @@ CREATE TABLE IF NOT EXISTS TestFiles (
         getOrPost    VARCHAR(128) NOT NULL,
         fileName     VARCHAR(256) NOT NULL,
         dateTime     DATETIME NOT NULL,
-        CONSTRAINT BIGINT fk_testfiles_tests FOREIGN KEY(test_id) REFERENCES Tests(id),
-        CONSTRAINT BIGINT fk_testfiles_users FOREIGN KEY(user_id) REFERENCES Users(id),
+        CONSTRAINT fk_testfiles_tests FOREIGN KEY(test_id) REFERENCES Tests(id),
+        CONSTRAINT fk_testfiles_users FOREIGN KEY(user_id) REFERENCES Users(id),
         PRIMARY KEY  (id)
 );
 
@@ -219,10 +220,10 @@ CREATE TABLE IF NOT EXISTS TestUsers (
         test_id      BIGINT UNSIGNED NOT NULL,
         user_id      BIGINT UNSIGNED NOT NULL,
         device_id    BIGINT UNSIGNED,
-        CONSTRAINT BIGINT fk_testusers_tests FOREIGN KEY(test_id) REFERENCES Tests(id),
-        CONSTRAINT BIGINT fk_testusers_users FOREIGN KEY(user_id) REFERENCES Users(id),
-        CONSTRAINT BIGINT fk_testusers_devices FOREIGN KEY(device_id) REFERENCES Devices(id),
-        CONSTRAINT BIGINT pk_TestUser PRIMARY KEY (test_id,user_id)
+        CONSTRAINT fk_testusers_tests FOREIGN KEY(test_id) REFERENCES Tests(id),
+        CONSTRAINT fk_testusers_users FOREIGN KEY(user_id) REFERENCES Users(id),
+        CONSTRAINT fk_testusers_devices FOREIGN KEY(device_id) REFERENCES Devices(id),
+        CONSTRAINT pk_TestUser PRIMARY KEY (test_id,user_id)
 );
 
 CREATE TABLE IF NOT EXISTS Enumerates (
@@ -260,69 +261,69 @@ INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
 #Some additional config tables
 CREATE TABLE IF NOT EXISTS UserConfig (
         user_id      BIGINT UNSIGNED NOT NULL,
-        key          VARCHAR(256) NOT NULL,
-        value        VARCHAR(256) NOT NULL,
-        CONSTRAINT BIGINT pk_userconfig PRIMARY KEY  (user_id,key,value)
+        keyword      VARCHAR(64) NOT NULL,
+        value        VARCHAR(128) NOT NULL,
+        CONSTRAINT pk_userconfig PRIMARY KEY  (user_id,keyword,value)
 );
 
 CREATE TABLE IF NOT EXISTS UserMConfig (
         user_id      BIGINT UNSIGNED NOT NULL,
-        key          VARCHAR(256) NOT NULL,
-        value        VARCHAR(256) NOT NULL,
-        CONSTRAINT BIGINT pk_usermconfig PRIMARY KEY  (user_id,key)
+        keyword      VARCHAR(64) NOT NULL,
+        value        VARCHAR(128) NOT NULL,
+        CONSTRAINT pk_usermconfig PRIMARY KEY  (user_id,keyword)
 );
 
 CREATE TABLE IF NOT EXISTS GroupConfig (
         group_id     BIGINT UNSIGNED NOT NULL,
-        key          VARCHAR(256) NOT NULL,
-        value        VARCHAR(256) NOT NULL,
-        CONSTRAINT BIGINT pk_groupconfig PRIMARY KEY  (group_id,key,value)
+        keyword      VARCHAR(64) NOT NULL,
+        value        VARCHAR(128) NOT NULL,
+        CONSTRAINT pk_groupconfig PRIMARY KEY  (group_id,keyword,value)
 );
 
 CREATE TABLE IF NOT EXISTS GroupMConfig (
         group_id     BIGINT UNSIGNED NOT NULL,
-        key          VARCHAR(256) NOT NULL,
-        value        VARCHAR(256) NOT NULL,
-        CONSTRAINT BIGINT pk_groupmconfig PRIMARY KEY  (group_id,key)
+        keyword      VARCHAR(64) NOT NULL,
+        value        VARCHAR(128) NOT NULL,
+        CONSTRAINT pk_groupmconfig PRIMARY KEY  (group_id,keyword)
 );
 
 CREATE TABLE IF NOT EXISTS DeviceConfig (
         device_id    BIGINT UNSIGNED NOT NULL,
-        key          VARCHAR(256) NOT NULL,
-        value        VARCHAR(256) NOT NULL,
-        CONSTRAINT BIGINT pk_deviceconfig PRIMARY KEY  (device_id,key,value)
+        keyword      VARCHAR(64) NOT NULL,
+        value        VARCHAR(128) NOT NULL,
+        CONSTRAINT pk_deviceconfig PRIMARY KEY  (device_id,keyword,value)
 );
 
 CREATE TABLE IF NOT EXISTS DeviceMConfig (
         device_id    BIGINT UNSIGNED NOT NULL,
-        key          VARCHAR(256) NOT NULL,
-        value        VARCHAR(256) NOT NULL,
-        CONSTRAINT BIGINT pk_devicemconfig PRIMARY KEY  (workstation_id,key)
+        keyword      VARCHAR(64) NOT NULL,
+        value        VARCHAR(128) NOT NULL,
+        CONSTRAINT pk_devicemconfig PRIMARY KEY  (device_id,keyword)
 );
 
 CREATE TABLE IF NOT EXISTS RoomConfig (
         room_id      BIGINT UNSIGNED NOT NULL,
-        key          VARCHAR(256) NOT NULL,
-        value        VARCHAR(256) NOT NULL,
-        CONSTRAINT BIGINT pk_roomconfig PRIMARY KEY  (room_id,key,value)
+        keyword      VARCHAR(64) NOT NULL,
+        value        VARCHAR(128) NOT NULL,
+        CONSTRAINT pk_roomconfig PRIMARY KEY  (room_id,keyword,value)
 );
 
 CREATE TABLE IF NOT EXISTS RoomMConfig (
         room_id      BIGINT UNSIGNED NOT NULL,
-        key          VARCHAR(256) NOT NULL,
-        value        VARCHAR(256) NOT NULL,
-        CONSTRAINT BIGINT pk_roommconfig PRIMARY KEY  (room_id,key)
+        keyword      VARCHAR(64) NOT NULL,
+        value        VARCHAR(128) NOT NULL,
+        CONSTRAINT pk_roommconfig PRIMARY KEY  (room_id,keyword)
 );
 
 CREATE TABLE IF NOT EXISTS Session (
-  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  user_id int(20) unsigned NOT NULL,
-  room_id      BIGINT UNSIGNED  NULL,
-  device_id    BIGINT UNSIGNED NULL,
-  createdate timestamp not null,
-  ip varchar(30),
-  token varchar(60),
-  CONSTRAINT BIGINT fk_session_user FOREIGN KEY(user_id) REFERENCES Users(id),
-   CONSTRAINT BIGINT fk_session_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
- PRIMARY KEY (`id`)
+        id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id      BIGINT UNSIGNED NOT NULL,
+        room_id      BIGINT UNSIGNED NULL,
+        device_id    BIGINT UNSIGNED NULL,
+        createdate   timestamp not null,
+        ip varchar(30),
+        token varchar(60),
+        CONSTRAINT fk_session_user FOREIGN KEY(user_id) REFERENCES Users(id),
+        CONSTRAINT fk_session_rooms   FOREIGN KEY(room_id)   REFERENCES Rooms(id),
+        PRIMARY KEY (`id`)
  );
