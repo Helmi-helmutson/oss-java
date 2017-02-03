@@ -127,7 +127,7 @@ public interface UserResource {
      * POST users/add [ { hash }, { user } ]
      */
     @POST
-    @Path("add")
+    @Path("addList")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Create new users")
     @ApiResponses(value = {
