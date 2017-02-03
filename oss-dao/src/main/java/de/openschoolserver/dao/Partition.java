@@ -25,7 +25,7 @@ public class Partition implements Serializable {
 
 	private String format;
 
-	private String join;
+	private String joinType;
 
 	private String name;
 
@@ -69,12 +69,12 @@ public class Partition implements Serializable {
 		this.format = format;
 	}
 
-	public String getJoin() {
-		return this.join;
+	public String getJoinType() {
+		return this.joinType;
 	}
 
-	public void setJoin(String join) {
-		this.join = join;
+	public void setJoinType(String joinType) {
+		this.joinType = joinType;
 	}
 
 	public String getName() {
