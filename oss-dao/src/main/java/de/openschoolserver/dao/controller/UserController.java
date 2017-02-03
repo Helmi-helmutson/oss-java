@@ -2,8 +2,10 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
+import java.lang.Integer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -81,17 +83,9 @@ public class UserController extends Controller {
 
 	public String add(User user){
 		EntityManager em = getEntityManager();
-		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(user.getUid())){
-			return "ERROR User name is not unique.";
-		}
-		// Check if uid is not OK
-		if( ) {
-			return "ERROR Uid contains not allowed characters.";
-		}
 		// Create uid if not given
 		if( user.getUid() == "") {
-			String userid = UserUtil.createUserId( user.getGivenName(),
+			String userId = UserUtil.createUserId( user.getGivenName(),
 												   user.getSureName(),
 												   user.getBirthDay(),
 												   true,
@@ -104,19 +98,30 @@ public class UserController extends Controller {
 				user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId + i );
 			}
 		}
+		else
+		{
+		// First we check if the parameter are unique.
+				if( ! this.isNameUnique(user.getUid())){
+					return "ERROR User name is not unique.";
+				}
+				// Check if uid is not OK TODO
+				if( false ) {
+					return "ERROR Uid contains not allowed characters.";
+				}
+		}
 		// Check the user password
 		if( user.getPassword() == "" ) {
 			user.setPassword(UserUtil.createRandomPassword(8));
 		}
 		else
 		{
-			if( user.getPassword().size < (Integer)this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH") ) {
+			if( user.getPassword().length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
 				
 			}
-			if( user.getPassword().size > (Integer)this.getConfigValue("SCHOOL_MAXIMAL_PASSWORD_LENGTH") ) {
+			if( user.getPassword().length() > Integer.parseInt(this.getConfigValue("SCHOOL_MAXIMAL_PASSWORD_LENGTH")) ) {
 				
 			}
-			if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY" == "yes" ) {
+			if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY") == "yes" ) {
 				
 			}
 		}

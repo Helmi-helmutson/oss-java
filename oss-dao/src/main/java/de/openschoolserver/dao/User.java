@@ -281,7 +281,7 @@ public class User implements Serializable {
 			diff.append(String.format("givenName: %s%n", newUser.getGivenName()));
 		if( sureName != newUser.getSureName() )
 			diff.append(String.format("sureName: %s%n",  newUser.getSureName()));
-		if( birthDay != newUser.birthDay() )
+		if( birthDay != newUser.getBirthDay() )
 			diff.append(String.format("birthDay: %s%n",  newUser.getBirthDay()));
 		if( newUser.getPassword() != "" ) {
 			diff.append(String.format("password: %s%n",  newUser.getPassword()));

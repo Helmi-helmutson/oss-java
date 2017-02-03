@@ -73,7 +73,8 @@ public class Controller extends Config {
     	case "User":
     		User user = (User)object;
     		switch(pluginName) {
-    		case "add_user", "modify_user":
+    		case "add_user":
+    		case "modify_user":
     		    data.append(String.format("givenName: %s%n", user.getGivenName()));
     		    data.append(String.format("sureName: %s%n", user.getSureName()));
     		    data.append(String.format("birthDay: %s%n", user.getBirthDay()));
@@ -92,21 +93,35 @@ public class Controller extends Config {
     		Group group = (Group)object;
     		switch(pluginName){
     		case "add_group":
-    			break;
+        	case "modify_group":
+        		break;
     		case "delete_group":
-    			break;
-    		case "modify_group":
     			break;
     		}
     		break;
     	case "Device":
     		//TODO
+    		Device device = (Device)object;
+    		switch(pluginName){
+    		case "add_device":
+        	case "modify_device":
+        		break;
+    		case "delete_device":
+    			break;
+    		}
     		break;
     	case "Room":
     		//TODO
+    		Room room = (Room)object;
+    		switch(pluginName){
+    		case "add_doom":
+        	case "modify_room":
+        		break;
+    		case "delete_room":
+    			break;
+    		}
     		break;
     	}
     	OSSShellTools.exec(program, reply, error, data.toString());
     }
- 
 }
