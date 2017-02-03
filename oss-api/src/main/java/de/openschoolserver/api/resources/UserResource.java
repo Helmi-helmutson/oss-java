@@ -5,10 +5,12 @@ package de.openschoolserver.api.resources;
 import io.dropwizard.auth.Auth;
 
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.ws.rs.*;
 
@@ -25,6 +27,7 @@ import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 @Api(value = "users")
 public interface UserResource {
 
+	
 	/*
 	 * GET users/<userId>
 	 */
@@ -85,6 +88,7 @@ public interface UserResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("user.search")
+    @JsonIgnoreProperties({"groups"})
     List<User> getAll(
             @ApiParam(hidden = true) @Auth Session session
     );

@@ -15,6 +15,7 @@ import java.util.List;
 @NamedQueries({
 	@NamedQuery(name="Group.findAll", query="SELECT g FROM Group g"),
 	@NamedQuery(name="Group.getByName",  query="SELECT g FROM Group g WHERE g.name = :name OR g.description = :name"),
+	@NamedQuery(name="Group.getByType",  query="SELECT g FROM Group g WHERE g.groupType = :groupType"),
 	@NamedQuery(name="Group.search", query="SELECT g FROM Group g WHERE g.name LIKE :search OR g.description LIKE :search"),
 })
 public class Group implements Serializable {
@@ -64,8 +65,8 @@ public class Group implements Serializable {
 		return this.groupType;
 	}
 
-	public void setGroupType(String grouptype) {
-		this.groupType = grouptype;
+	public void setGroupType(String groupType) {
+		this.groupType = groupType;
 	}
 
 	public List<User> getUsers() {

@@ -14,10 +14,11 @@ CREATE TABLE IF NOT EXISTS Users (
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Users VALUES(NULL,'admin','sysadmins','Administrator',NULL,NOW());
-INSERT INTO Users VALUES(NULL,'tteachers','teachers','TTeachers',NULL,NOW());
-INSERT INTO Users VALUES(NULL,'tstudents','students','TStudents',NULL,NOW());
-INSERT INTO Users VALUES(NULL,'tworkstations','workstations','TWorkstations',NULL,NOW());
+INSERT INTO Users VALUES(1,'admin','sysadmins','Administrator',NULL,NOW());
+INSERT INTO Users VALUES(2,'tteachers','teachers','TTeachers',NULL,NOW());
+INSERT INTO Users VALUES(3,'tstudents','students','TStudents',NULL,NOW());
+INSERT INTO Users VALUES(4,'tadministration','administrations','TAdinistration',NULL,NOW());
+INSERT INTO Users VALUES(5,'tworkstations','workstations','TWorkstations',NULL,NOW());
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -27,12 +28,12 @@ CREATE TABLE IF NOT EXISTS Groups (
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Groups VALUES(NULL,'sysadmins','Sysadmins','primary');
-INSERT INTO Groups VALUES(NULL,'teachers','Teachers','primary');
-INSERT INTO Groups VALUES(NULL,'students','Students','primary');
-INSERT INTO Groups VALUES(NULL,'administration','Administration','primary');
-INSERT INTO Groups VALUES(NULL,'workstations','Workstations','primary');
-INSERT INTO Groups VALUES(NULL,'templates','Templates','primary');
+INSERT INTO Groups VALUES(1,'sysadmins','Sysadmins','primary');
+INSERT INTO Groups VALUES(2,'teachers','Teachers','primary');
+INSERT INTO Groups VALUES(3,'students','Students','primary');
+INSERT INTO Groups VALUES(4,'administration','Administration','primary');
+INSERT INTO Groups VALUES(5,'workstations','Workstations','primary');
+INSERT INTO Groups VALUES(6,'templates','Templates','primary');
 
 CREATE TABLE IF NOT EXISTS GroupMember (
         user_id        BIGINT UNSIGNED NOT NULL,
@@ -41,6 +42,16 @@ CREATE TABLE IF NOT EXISTS GroupMember (
 	CONSTRAINT fk_groupmember_group FOREIGN KEY(group_id) REFERENCES Groups(id),
 	CONSTRAINT pk_groupmember PRIMARY KEY  (user_id,group_id)
 );
+
+INSERT INTO GroupMember VALUES(1,1);
+INSERT INTO GroupMember VALUES(2,6);
+INSERT INTO GroupMember VALUES(3,6);
+INSERT INTO GroupMember VALUES(4,6);
+INSERT INTO GroupMember VALUES(5,6);
+INSERT INTO GroupMember VALUES(2,2);
+INSERT INTO GroupMember VALUES(3,3);
+INSERT INTO GroupMember VALUES(4,4);
+INSERT INTO GroupMember VALUES(5,5);
 
 CREATE TABLE IF NOT EXISTS Aliases (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

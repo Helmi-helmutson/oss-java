@@ -2,6 +2,7 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -12,6 +13,7 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.tools.*;
 
 public class GroupController extends Controller {
@@ -33,11 +35,11 @@ public class GroupController extends Controller {
 		}
 	}
 	
-	public List<Group> getByRole(String role) {
+	public List<Group> getByType(String groupType) {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Group.getByRole");
-			query.setParameter("role", role);
+			Query query = em.createNamedQuery("Group.getByType");
+			query.setParameter("groupType", groupType);
 			return query.getResultList();
 		} catch (Exception e) {
 			//logger.error(e.getMessage());
@@ -77,11 +79,11 @@ public class GroupController extends Controller {
 		}
 	}
 
-	public boolean add(Group group){
+	public Response add(Group group){
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(group.getName())){
-			return false;
+			return new Response(this.getSession(),"ERROR","Group name is not unique.");
 		}
 		try {
 			em.getTransaction().begin();
@@ -89,12 +91,12 @@ public class GroupController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
-		return true;
+		return new Response(this.getSession(),"OK","Group was created");
 	}
 
-	public boolean modify(Group group){
+	public Response modify(Group group){
 		//TODO make some checks!!
 		EntityManager em = getEntityManager();
 		try {
@@ -103,12 +105,12 @@ public class GroupController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
-		return true;
+		return new Response(this.getSession(),"OK","Group was modified");
 	}
 	
-	public boolean delete(long groupId){
+	public Response delete(long groupId){
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
 		Group group = this.getById(groupId);
@@ -124,7 +126,7 @@ public class GroupController extends Controller {
 		
 		//TODO find and remove files
 		//TODO remove group from AD
-		return true;
+		return new Response(this.getSession(),"OK","Group was deleted");
 	}
 	
 	public List<User> getAvailableMember(long groupId){

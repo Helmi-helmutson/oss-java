@@ -4,6 +4,7 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -12,6 +13,7 @@ import javax.ws.rs.*;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Response;
 
 import java.util.List;
 
@@ -48,7 +50,7 @@ public interface GroupResource {
             @ApiResponse(code = 404, message = "Group not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
-    List<Group> getAvailableMembers(
+    List<User> getAvailableMembers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId
     );
@@ -114,7 +116,7 @@ public interface GroupResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    boolean add(
+    Response add(
             @ApiParam(hidden = true) @Auth Session session,
             Group group
     );
@@ -131,7 +133,7 @@ public interface GroupResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    boolean modify(
+    Response modify(
             @ApiParam(hidden = true) @Auth Session session,
             Group group
     );
@@ -147,7 +149,7 @@ public interface GroupResource {
         @ApiResponse(code = 404, message = "Group not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
-    boolean delete(
+    Response delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId
     );
