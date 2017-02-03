@@ -18,7 +18,6 @@ public class OSSShellTools {
 			OutputStream requestStrm = proc.getOutputStream();
 
 			if (request != null) {
-
 				requestStrm.write(request.getBytes("UTF-8"));
 			}
 			requestStrm.close();

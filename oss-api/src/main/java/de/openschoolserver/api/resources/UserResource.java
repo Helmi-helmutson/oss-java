@@ -4,6 +4,7 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -13,6 +14,7 @@ import javax.ws.rs.*;
 
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
 import java.util.List;
@@ -59,7 +61,7 @@ public interface UserResource {
      * GET users/getByRole/<role>
      */
     @GET
-    @Path("users/getByRole/{role}")
+    @Path("getByRole/{role}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get users from a rolle")
         @ApiResponses(value = {
@@ -118,9 +120,27 @@ public interface UserResource {
     })
     //@PermitAll
     @RolesAllowed("user.add")
-    boolean add(
+    Response add(
             @ApiParam(hidden = true) @Auth Session session,
             User user
+    );
+    
+    /*
+     * POST users/add [ { hash }, { user } ]
+     */
+    @POST
+    @Path("addList")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new users")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    //@PermitAll
+    @RolesAllowed("user.add")
+    List<Response> add(
+            @ApiParam(hidden = true) @Auth Session session,
+            List<User> users
     );
     
     /*

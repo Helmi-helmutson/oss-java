@@ -134,4 +134,13 @@ public class DeviceResourceImpl implements DeviceResource {
 		final List<String> users = deviceController.getLoggedInUsers(deviceId);
 		return users;
 	}
+
+
+	@Override
+	public boolean delete(Session session, Long deviceId) {
+		// TODO Auto-generated method stub
+		final DeviceController deviceController = new DeviceController(session);
+		deviceController.delete(deviceId);
+		return false;
+	}
 }

@@ -147,27 +147,72 @@ public class CloneToolController extends Controller {
 	}
 
 
-	public boolean setConfigurationValue(Long hwconfId, String partition, String key, String value) {
+	public boolean setConfigurationValue(Long hwconfId, String partitionName, String key, String value) {
 		// TODO Auto-generated method stub
-		Partition part = this.getPartition(hwconfId, partition);
+		Partition partition = this.getPartition(hwconfId, partitionName);
 		switch (key) {
 		case "Description" :
-			part.setDescription(value);
+			partition.setDescription(value);
 		case "Format" :
-			part.setFormat(value);
+			partition.setFormat(value);
 		case "ITool" :
-			part.setOs(value);
+			partition.setOs(value);
 		case "Join" :
-			part.setFormat(value);
+			partition.setFormat(value);
 		case "Name" :
-			part.setFormat(value);
+			partition.setFormat(value);
 		case "OS" :
-			part.setOs(value);
+			partition.setOs(value);
 		}
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
 		em.merge(partition);
 		em.getTransaction().commit();
-		return false;
+		return true;
 	}
+	
+	public boolean delete(Long hwconfId){
+		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
+		HWConf hwconf = this.getById(hwconfId);
+		em.remove(hwconf);
+		em.getTransaction().commit();
+		return true;
+	}
+
+	public boolean deletePartition(Long hwconfId, String partitionName) {
+		// TODO Auto-generated method stub
+		Partition partition = this.getPartition(hwconfId, partitionName);
+		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
+		em.remove(partition);
+		em.getTransaction().commit();
+		return true;
+	}
+
+	public boolean deleteConfigurationValue(Long hwconfId, String partitionName, String key) {
+		// TODO Auto-generated method stub
+		Partition partition = this.getPartition(hwconfId, partitionName);
+		switch (key) {
+		case "Description" :
+			partition.setDescription("");
+		case "Format" :
+			partition.setFormat("");
+		case "ITool" :
+			partition.setOs("");
+		case "Join" :
+			partition.setFormat("");
+		case "Name" :
+			partition.setFormat("");
+		case "OS" :
+			partition.setOs("");
+		}
+		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
+		em.merge(partition);
+		em.getTransaction().commit();
+		return true;
+	}
+	
+	
 }

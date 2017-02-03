@@ -2,10 +2,10 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.*;
-import java.util.List;
 
 
 /**
@@ -21,8 +21,8 @@ import java.util.List;
 	@NamedQuery(name="User.getByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
 	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
 	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.sureName LIKE :search"),
-	@NamedQuery(name="User.getConfig",  query="SELECT c.value FROM UserConfig c WHERE c.user.id = :user_id AND c.key = :key" ),
-    @NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :user_id AND c.key = :key" )
+	@NamedQuery(name="User.getConfig",  query="SELECT c.value FROM UserConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" ),
+    @NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" )
 })
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -37,6 +37,8 @@ public class User implements Serializable {
 	private String sureName;
 
 	private String uid;
+	
+	private Date birthDay;
 
 	//bi-directional many-to-one association to Alias
 	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
@@ -91,8 +93,16 @@ public class User implements Serializable {
 			}
 		)
 	private List<Group> groups;
+	
+	@Transient
+	private String password ="";
 
 	public User() {
+		this.uid = "";
+		this.sureName = "";
+		this.givenName = "";
+		this.password = "";
+		this.birthDay = new Date();
 	}
 
 	public long getId() {
@@ -133,6 +143,14 @@ public class User implements Serializable {
 
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+	
+	public Date getBirthDay() {
+		return this.birthDay;
+	}
+	
+	public void setBirthDay(Date birthday) {
+		this.birthDay = birthday;
 	}
 
 	public List<Alias> getAliases() {
@@ -247,6 +265,28 @@ public class User implements Serializable {
 
 	public void setGroups(List<Group> groups) {
 		this.groups = groups;
+	}
+	
+	public void setPassword(String password) {
+		this.password = password;
+	}
+	
+	public String getPassword() {
+		return this.password;
+	}
+	
+	public String diff(User newUser){
+		StringBuilder diff = new StringBuilder();
+		if( givenName != newUser.getGivenName() )
+			diff.append(String.format("givenName: %s%n", newUser.getGivenName()));
+		if( sureName != newUser.getSureName() )
+			diff.append(String.format("sureName: %s%n",  newUser.getSureName()));
+		if( birthDay != newUser.getBirthDay() )
+			diff.append(String.format("birthDay: %s%n",  newUser.getBirthDay()));
+		if( newUser.getPassword() != "" ) {
+			diff.append(String.format("password: %s%n",  newUser.getPassword()));
+		}
+		return diff.toString();
 	}
 
 }

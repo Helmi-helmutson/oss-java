@@ -40,7 +40,7 @@ public interface DeviceResource {
 	 * GET devices/byType/<deviceTyp>
 	 */
     @GET
-    @Path("byType/{deviceType}")
+    @Path("getByType/{deviceType}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get device by type, this can be printer, mobileDvice, ...")
     @ApiResponses(value = {
@@ -98,7 +98,24 @@ public interface DeviceResource {
     @PermitAll
     boolean delete(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") List<Long> deviceId
+            List<Long> deviceId
+           // @PathParam("deviceId") List<Long> deviceId
+    );
+    
+    /*
+     * DELETE devices/{deviceId}
+     */
+    @DELETE
+    @Path("{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delete a device defined by deviceId")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+    boolean delete(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") Long deviceId
     );
 
     
@@ -106,7 +123,7 @@ public interface DeviceResource {
      * GET devices/getbyIP/<IPAddress>
      */
     @GET
-    @Path("getbyIP/{IP}")
+    @Path("getByIP/{IP}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get device by MAC address")
         @ApiResponses(value = {
@@ -122,7 +139,7 @@ public interface DeviceResource {
      * GET devices/getbyMAC/<MACAddress>
      */
     @GET
-    @Path("getbyMAC/{MAC}")
+    @Path("getByMAC/{MAC}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get device by MAC address")
         @ApiResponses(value = {
@@ -138,7 +155,7 @@ public interface DeviceResource {
      * GET devices/getbyName/<Name>
      */
     @GET
-    @Path("getbyName/{Name}")
+    @Path("getByName/{Name}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get device by Name")
         @ApiResponses(value = {
@@ -188,7 +205,7 @@ public interface DeviceResource {
     @GET
     @Path("getLoggedInUsers/{IP}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Get the logged on users on a device by IP.")
+    @ApiOperation(value = "Get the logged on users on a device defined by IP.")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -204,7 +221,7 @@ public interface DeviceResource {
     @GET
     @Path("{deviceId}/getLoggedInUsers")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Get the logged on users on a device by IP.")
+    @ApiOperation(value = "Get the logged on users on a device defined by the deviceId.")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })

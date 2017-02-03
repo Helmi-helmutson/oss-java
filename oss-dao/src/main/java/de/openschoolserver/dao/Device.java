@@ -20,8 +20,8 @@ import java.util.List;
 	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
 	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device d where d.name = :name"),
 	@NamedQuery(name="Device.search",    query="SELECT d FROM Device d where d.name LIKE :name OR d.ip LIKE :name" ),
-	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :user_id AND c.key = :key" ),
-	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :user_id AND c.key = :key" )
+	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :user_id AND c.keyword = :keyword" ),
+	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :user_id AND c.keyword = :keyword" )
 })
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;

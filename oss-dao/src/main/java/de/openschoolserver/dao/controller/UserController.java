@@ -2,15 +2,22 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+
+import java.util.Date;
 import java.util.List;
+import java.lang.Integer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import de.extis.core.util.UserUtil;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Response;
+
 
 public class UserController extends Controller {
 	
@@ -75,11 +82,49 @@ public class UserController extends Controller {
 		}
 	}
 
-	public boolean add(User user){
+	public Response add(User user){
 		EntityManager em = getEntityManager();
+		// Create uid if not given
+		if( user.getUid() == "") {
+			String userId = UserUtil.createUserId( user.getGivenName(),
+												   user.getSureName(),
+												   user.getBirthDay(),
+												   true,
+												   this.getConfigValue("SCHOOL_STRING_CONVERT_TYPE") == "telex", 
+												   this.getConfigValue("SCHOOL_LOGIN_SCHEME")
+												   );
+			user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId );
+			Integer i = 1;
+			while( !this.isNameUnique(user.getUid()) ) {
+				user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId + i );
+			}
+		}
+		else
+		{
 		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(user.getUid())){
-			return false;
+				if( ! this.isNameUnique(user.getUid())){
+					return new Response(this.getSession(),"ERROR", "User name is not unique.");
+				}
+				// Check if uid contains non allowed characters
+				if( this.checkNonASCII(user.getUid()) ) {
+					return new Response(this.getSession(),"ERROR", "Uid contains not allowed characters.");
+				}
+		}
+		// Check the user password
+		if( user.getPassword() == "" ) {
+			user.setPassword(UserUtil.createRandomPassword(8));
+		}
+		else
+		{
+			if( user.getPassword().length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
+				return new Response(this.getSession(),"ERROR", "User password is to short.");
+			}
+			if( user.getPassword().length() > Integer.parseInt(this.getConfigValue("SCHOOL_MAXIMAL_PASSWORD_LENGTH")) ) {
+				return new Response(this.getSession(),"ERROR", "User password is to long.");
+			}
+			if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY") == "yes" ) {
+				//return new Response(this.getSession(),"ERROR", "User password is to simple.");
+			}
 		}
 		try {
 			em.getTransaction().begin();
@@ -87,18 +132,25 @@ public class UserController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR ", e.getMessage());
 		}
-		return true;
+		this.startPlugin("add_user",user);
+		return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.");
 	}
 
+	public List<Response> add(List<User> users){
+		List<Response> results = new ArrayList<Response>();
+		for( User user : users ) {
+			results.add(this.add(user));
+		}
+		return results;
+	}
+	
 	public boolean modify(User user){
 		//TODO make some checks!!
 		EntityManager em = getEntityManager();
-		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(user.getUid())){
-			return false;
-		}
+
+		// First we have to check some parameter
 		try {
 			em.getTransaction().begin();
 			em.merge(user);
@@ -107,13 +159,18 @@ public class UserController extends Controller {
 			System.err.println(e.getMessage());
 			return false;
 		}
+		this.startPlugin("modify_user",user);
 		return true;
 	}
 	
 	public boolean delete(long userId){
+		
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
 		User user = this.getById(userId);
+
+		this.startPlugin("delete_user",user);
+
 		List<Device> devices = user.getOwnedDevices();
 		// Remove user from logged on table
 		Query query = em.createQuery("DELETE FROM LoggedOn WHERE user_id = :userId");

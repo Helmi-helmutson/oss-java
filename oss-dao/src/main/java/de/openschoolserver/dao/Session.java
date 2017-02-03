@@ -49,7 +49,6 @@ public class Session implements Principal {
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 	
- 
     
 	@OneToOne
 	@JoinColumn(name = "room_id", insertable = false, updatable = false)

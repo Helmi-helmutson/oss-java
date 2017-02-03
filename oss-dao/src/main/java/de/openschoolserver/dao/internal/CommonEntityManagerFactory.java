@@ -80,7 +80,7 @@ public class CommonEntityManagerFactory {
             Map<String, Object> props = getProperties();
             //logger.debug("getEntityManagerFactory : JDBC_URL : " + props.get(PersistenceUnitProperties.JDBC_URL));
 
-            emf = Persistence.createEntityManagerFactory("OSS1", props);//TODO !!!!!!!!!!! new PersistenceProvider().createEntityManagerFactory(Activator.PLUGIN_ID, props);
+            emf = Persistence.createEntityManagerFactory("OSS", props);//TODO !!!!!!!!!!! new PersistenceProvider().createEntityManagerFactory(Activator.PLUGIN_ID, props);
 
             if (emf == null) {
            //     logger.error("getEntityManagerFactory : EntityManagerFactory still null.");

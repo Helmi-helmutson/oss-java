@@ -91,7 +91,7 @@ public interface GroupResource {
     @GET
     @Path("search/{search}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Search for group by uid and name.")
+    @ApiOperation(value = "Search for group by name and description.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -108,7 +108,7 @@ public interface GroupResource {
     @POST
     @Path("add")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "create new group")
+    @ApiOperation(value = "Create new group")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -125,7 +125,7 @@ public interface GroupResource {
     @POST
     @Path("modify")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "modify an existing group")
+    @ApiOperation(value = "Modify an existing group")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -137,12 +137,12 @@ public interface GroupResource {
     );
     
     /*
-     * GET groups/<groupId>/delete
+     * DELETE groups/<groupId>
      */
-    @GET
-    @Path("{groupId}/delete")
+    @DELETE
+    @Path("{groupId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "delete group by id")
+    @ApiOperation(value = "Deletes group by id")
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Group not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})

@@ -16,7 +16,7 @@ public class UserConfig implements Serializable {
         @Id
         private long id;
 
-        private String key;
+        private String keyword;
 
         private String value;
 
@@ -32,12 +32,12 @@ public class UserConfig implements Serializable {
                 this.id = id;
         }
 
-        public String getKey() {
-                return this.key;
+        public String getKeyword() {
+                return this.keyword;
         }
 
-        public void setKey(String key) {
-                this.key = key;
+        public void setKeyword(String keyword) {
+                this.keyword = keyword;
         }
 
         public String getValue() {
