@@ -12,8 +12,9 @@ targetCompatibility = 1.8
 
 
 repositories {
-    mavenLocal()
-    mavenCentral()
+//    mavenLocal()
+//   mavenCentral()
+    maven { url "http://nexus.extis.de:18081/repository/maven-public/" }
 }
 
 dependencies {
