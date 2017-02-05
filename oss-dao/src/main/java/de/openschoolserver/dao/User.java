@@ -3,6 +3,8 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import java.util.Date;
 import java.util.List;
 
@@ -93,6 +95,7 @@ public class User implements Serializable {
 			@JoinColumn(name="group_id")
 			}
 		)
+	@JsonManagedReference
 	private List<Group> groups;
 	
 	@Transient
