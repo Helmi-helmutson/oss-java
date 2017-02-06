@@ -2,6 +2,9 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.List;
 
@@ -30,7 +33,7 @@ public class Device implements Serializable {
 	private long id;
 
 	private String name;
-    @Column(name="col")
+        @Column(name="col")
 	private int column;
 
 	@Column(name="IP")
@@ -97,10 +100,12 @@ public class Device implements Serializable {
 
 	//bi-directional many-to-one association to Room
 	@ManyToOne
+	@JsonIgnore
 	private Room room;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
+	@JsonIgnore
 	private User owner;
 
 	//bi-directional many-to-many association to Room
@@ -113,10 +118,12 @@ public class Device implements Serializable {
 
 	//bi-directional many-to-one association to TestUser
 	@OneToMany(mappedBy="device")
+	@JsonIgnore
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="loggedOn")
+	@JsonIgnore
 	private List<User> loggedIn;
 
 	public Device() {

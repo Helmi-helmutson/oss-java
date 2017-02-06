@@ -6,6 +6,8 @@ import java.io.Serializable;
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 
@@ -35,7 +37,8 @@ public class Group implements Serializable {
 
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups")
-	@JsonBackReference
+	@JsonIgnore
+	//@JsonBackReference
 	private List<User> users;
 
 	public Group() {
