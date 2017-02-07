@@ -124,6 +124,13 @@ public class User implements Serializable {
 		this.id = id;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof User && obj !=null) {
+			return getId() == ((User)obj).getId();
+		}
+		return super.equals(obj);
+	}
 	public String getGivenName() {
 		return this.givenName;
 	}

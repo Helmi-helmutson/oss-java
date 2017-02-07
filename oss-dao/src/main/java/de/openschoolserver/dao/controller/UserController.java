@@ -200,4 +200,10 @@ public class UserController extends Controller {
 		allGroups.removeAll(user.getGroups());
 		return allGroups;
 	}
+
+	public List<Group> getGroups(long userId) {
+		// TODO Auto-generated method stub
+		User user = this.getById(userId);
+		return user.getGroups();
+	}
 }

@@ -106,6 +106,14 @@ public class Room implements Serializable {
 		this.id = id;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Room && obj !=null) {
+			return getId() == ((Room)obj).getId();
+		}
+		return super.equals(obj);
+	}
+	
 	public String getName() {
 		return this.name;
 	}

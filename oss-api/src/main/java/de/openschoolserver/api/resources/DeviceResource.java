@@ -40,7 +40,7 @@ public interface DeviceResource {
 	 * GET devices/byType/<deviceTyp>
 	 */
     @GET
-    @Path("getByType/{deviceType}")
+    @Path("byType/{deviceType}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get device by type, this can be printer, mobileDvice, ...")
     @ApiResponses(value = {
@@ -56,7 +56,7 @@ public interface DeviceResource {
      * GET devices/getAll
      */
     @GET
-    @Path("getAll")
+    @Path("all")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get all devices")
     @ApiResponses(value = {
@@ -120,10 +120,10 @@ public interface DeviceResource {
 
     
     /*
-     * GET devices/getbyIP/<IPAddress>
+     * GET devices/byIP/<IPAddress>
      */
     @GET
-    @Path("getByIP/{IP}")
+    @Path("byIP/{IP}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get device by MAC address")
         @ApiResponses(value = {
@@ -136,10 +136,10 @@ public interface DeviceResource {
     );
 
     /*
-     * GET devices/getbyMAC/<MACAddress>
+     * GET devices/byMAC/<MACAddress>
      */
     @GET
-    @Path("getByMAC/{MAC}")
+    @Path("byMAC/{MAC}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get device by MAC address")
         @ApiResponses(value = {
@@ -152,10 +152,10 @@ public interface DeviceResource {
     );
 
     /*
-     * GET devices/getbyName/<Name>
+     * GET devices/byName/<Name>
      */
     @GET
-    @Path("getByName/{Name}")
+    @Path("byName/{Name}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get device by Name")
         @ApiResponses(value = {
@@ -200,10 +200,10 @@ public interface DeviceResource {
     );
     
     /*
-     * GET devices/getLoggedInUsers/{IP-Address}
+     * GET devices/loggedInUsers/{IP-Address}
      */
     @GET
-    @Path("getLoggedInUsers/{IP}")
+    @Path("loggedInUsers/{IP}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the logged on users on a device defined by IP.")
         @ApiResponses(value = {
@@ -216,10 +216,10 @@ public interface DeviceResource {
     );
     
     /*
-     * GET devices/{deviceId}/getLoggedInUsers
+     * GET devices/{deviceId}/loggedInUsers
      */
     @GET
-    @Path("{deviceId}/getLoggedInUsers")
+    @Path("{deviceId}/loggedInUsers")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the logged on users on a device defined by the deviceId.")
         @ApiResponses(value = {

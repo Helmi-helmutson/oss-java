@@ -40,6 +40,22 @@ public interface GroupResource {
     );
 
     /*
+   	 * GET groups/<groupId>/members
+   	 */
+       @GET
+       @Path("{groupId}/members")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Get users which are member in this group.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 404, message = "Group not found"),
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @PermitAll
+       List<User> getMembers(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("groupId") long groupId
+       );
+
+       /*
 	 * GET groups/<groupId>/availableMembers
 	 */
     @GET
@@ -56,10 +72,10 @@ public interface GroupResource {
     );
 
     /*
-     * GET groups/getByType/{type}
+     * GET groups/byType/{type}
      */
     @GET
-    @Path("groups/getByType/{type}")
+    @Path("byType/{type}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get groups from a type")
         @ApiResponses(value = {
@@ -72,10 +88,10 @@ public interface GroupResource {
     );
 
     /*
-     * GET groups/getAll
+     * GET groups/all
      */
     @GET
-    @Path("getAll")
+    @Path("all")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get all groups")
     @ApiResponses(value = {

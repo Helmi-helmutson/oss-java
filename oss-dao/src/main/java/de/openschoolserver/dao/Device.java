@@ -136,7 +136,15 @@ public class Device implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Device && obj !=null) {
+			return getId() == ((Device)obj).getId();
+		}
+		return super.equals(obj);
+	}
+	
 	public String getName() {
 		return this.name;
 	}

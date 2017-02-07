@@ -55,6 +55,14 @@ public class Group implements Serializable {
 		this.id = id;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Group && obj !=null) {
+			return getId() == ((Group)obj).getId();
+		}
+		return super.equals(obj);
+	}
+
 	public String getName() {
 		return this.name;
 	}
