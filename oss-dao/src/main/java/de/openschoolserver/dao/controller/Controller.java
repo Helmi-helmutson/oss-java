@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
+
 import javax.persistence.Query;
 import java.util.List;
 import java.util.regex.*;
@@ -72,8 +73,9 @@ public class Controller extends Config {
         StringBuffer error = new StringBuffer();
     	program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
     	program[1] = pluginName;
+   System.err.println("startPlugin: " + object.getClass().getName());
     	switch(object.getClass().getName()) {
-    	case "User":
+    	case "de.openschoolserver.dao.User":
     		User user = (User)object;
     		switch(pluginName) {
     		case "add_user":
@@ -86,12 +88,11 @@ public class Controller extends Config {
     		    data.append(String.format("role: %s%n", user.getRole()));
     		    break;
     		case "delete_user":
-    			program[1] = "delete_user";
     			data.append(String.format("uid: %s%n", user.getUid()));
     			break;
     		}
     		break;
-    	case "Group":
+    	case "de.openschoolserver.dao.Group":
     		//TODO 
     		Group group = (Group)object;
     		switch(pluginName){
@@ -102,7 +103,7 @@ public class Controller extends Config {
     			break;
     		}
     		break;
-    	case "Device":
+    	case "de.openschoolserver.dao.Device":
     		//TODO
     		Device device = (Device)object;
     		switch(pluginName){
@@ -113,7 +114,7 @@ public class Controller extends Config {
     			break;
     		}
     		break;
-    	case "Room":
+    	case "de.openschoolserver.dao.Room":
     		//TODO
     		Room room = (Room)object;
     		switch(pluginName){
@@ -126,5 +127,6 @@ public class Controller extends Config {
     		break;
     	}
     	OSSShellTools.exec(program, reply, error, data.toString());
+    	System.err.println(pluginName + " : " + data.toString() + " : " + error);
     }
 }

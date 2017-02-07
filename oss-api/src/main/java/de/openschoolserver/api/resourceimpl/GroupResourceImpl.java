@@ -27,6 +27,12 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
+	public List<User> getMembers(Session session, long groupId) {
+		final GroupController groupController = new GroupController(session);
+		return groupController.getMember(groupId);
+	}
+	
+	@Override
 	public List<Group> getByType(Session session, String type) {
 		// TODO Auto-generated method stub
 		final GroupController groupController = new GroupController(session);
@@ -67,5 +73,7 @@ public class GroupResourceImpl implements GroupResource {
 		final GroupController groupController = new GroupController(session);
 		return groupController.delete(groupId);
 	}
+
+	
 
 }

@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
+
 import java.util.Date;
 import java.util.List;
 import java.lang.Integer;
@@ -198,5 +199,11 @@ public class UserController extends Controller {
 		List<Group> allGroups = query.getResultList();
 		allGroups.removeAll(user.getGroups());
 		return allGroups;
+	}
+
+	public List<Group> getGroups(long userId) {
+		// TODO Auto-generated method stub
+		User user = this.getById(userId);
+		return user.getGroups();
 	}
 }

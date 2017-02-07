@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
+
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -88,11 +89,24 @@ public class GroupController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.persist(group);
+	    	String[] program   = new String[4];
+	        StringBuffer reply = new StringBuffer();
+	        StringBuffer error = new StringBuffer();
+	    	program[0] = "/usr/sbin/oss-add-group.sh";
+	    	program[1] = String.format("--name='%s'",group.getName());
+	    	program[2] = String.format("--description='%s'",group.getDescription());
+	    	program[3] = String.format("--type='%s'",group.getGroupType());
+	    	OSSShellTools.exec(program, reply, error, null);
+	    	if( error.toString() != "") {
+	    		em.getTransaction().rollback();
+	    		return new Response(this.getSession(),"ERROR",error.toString());
+	    	}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
+		this.startPlugin("add_group", group);
 		return new Response(this.getSession(),"OK","Group was created");
 	}
 
@@ -107,25 +121,36 @@ public class GroupController extends Controller {
 			System.err.println(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
+		this.startPlugin("modify_group", group);
 		return new Response(this.getSession(),"OK","Group was modified");
 	}
 	
 	public Response delete(long groupId){
-		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
 		Group group = this.getById(groupId);
-		String groupName = group.getName();
-
+		this.startPlugin("delete_group", group);
+		
+		//REMOVE THE GROUP FROM SAMBA
+		String[] program   = new String[2];
+        StringBuffer reply = new StringBuffer();
+        StringBuffer error = new StringBuffer();
+    	program[0] = "/usr/sbin/oss-delete-group.sh";
+    	program[1] = String.format("--name='%s'",group.getName());
+    	OSSShellTools.exec(program, reply, error, null);
+    	
 		// Remove group from GroupMember of table
+		EntityManager em = getEntityManager();
+		try {
+		em.getTransaction().begin();
 		Query query = em.createQuery("DELETE FROM GroupMember WHERE group_id = :groupId");
 		query.setParameter("groupId", groupId);
 		query.executeUpdate();
 		// Let's remove the group
 		em.remove(group);
 		em.getTransaction().commit();
-		
-		//TODO find and remove files
-		//TODO remove group from AD
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		}
 		return new Response(this.getSession(),"OK","Group was deleted");
 	}
 	
@@ -136,5 +161,10 @@ public class GroupController extends Controller {
 		List<User> allUsers = query.getResultList();
 		allUsers.removeAll(group.getUsers());
 		return allUsers;
+	}
+
+	public List<User> getMember(long groupId) {
+		Group group = this.getById(groupId);
+		return group.getUsers();
 	}
 }

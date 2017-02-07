@@ -76,7 +76,13 @@ public class UserResourceImpl implements UserResource {
 	public List<Group> getAvailableGroups(Session session, long userId) {
 		// TODO Auto-generated method stub
 		final UserController userController = new UserController(session);
-		final List<Group> groups = userController.getAvailableGroups(userId);
-		return groups;
+		return userController.getAvailableGroups(userId);
+	}
+
+	@Override
+	public List<Group> groups(Session session, long userId) {
+		// TODO Auto-generated method stub
+		final UserController userController = new UserController(session);
+		return userController.getGroups(userId);
 	}
 }

@@ -52,6 +52,15 @@ public class Partition implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Partition && obj !=null) {
+			return getId() == ((Partition)obj).getId();
+		}
+		return super.equals(obj);
+	}
+	
 
 	public String getDescription() {
 		return this.description;

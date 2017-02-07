@@ -71,7 +71,14 @@ public class Test implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Test && obj !=null) {
+			return getId() == ((Test)obj).getId();
+		}
+		return super.equals(obj);
+	}
 	public String getCurrentStep() {
 		return this.currentStep;
 	}

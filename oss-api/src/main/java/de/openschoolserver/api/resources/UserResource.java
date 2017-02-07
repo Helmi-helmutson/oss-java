@@ -49,6 +49,22 @@ public interface UserResource {
 	 * GET users/<userId>
 	 */
     @GET
+    @Path("{userId}/groups")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get groups the user is member in it.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.search")
+    List<Group> groups(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("userId") long userId
+    );
+
+    /*
+	 * GET users/<userId>
+	 */
+    @GET
     @Path("{userId}/availableGroups")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get groups the user is not member in it.")
@@ -62,10 +78,10 @@ public interface UserResource {
     );
 
     /*
-     * GET users/getByRole/<role>
+     * GET users/byRole/<role>
      */
     @GET
-    @Path("getByRole/{role}")
+    @Path("byRole/{role}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get users from a rolle")
         @ApiResponses(value = {
@@ -81,7 +97,7 @@ public interface UserResource {
      * GET users/getAll
      */
     @GET
-    @Path("getAll")
+    @Path("all")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get all users")
     @ApiResponses(value = {

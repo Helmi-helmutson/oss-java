@@ -56,7 +56,14 @@ public class AccessInRoom implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof AccessInRoom && obj !=null) {
+			return getId() == ((AccessInRoom)obj).getId();
+		}
+		return super.equals(obj);
+	}
 	public Room getRoom() {
 		return this.room;
 	}

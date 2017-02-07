@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.List;
 
@@ -61,14 +63,17 @@ public class User implements Serializable {
 
 	//bi-directional many-to-one association to TestFile
 	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+	@JsonIgnore
 	private List<TestFile> testFiles;
 
 	//bi-directional many-to-one association to TestUser
 	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+	@JsonIgnore
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="user")
+	@JsonIgnore
 	private List<Test> tests;
 
 	//bi-directional many-to-many association to Device
@@ -82,6 +87,7 @@ public class User implements Serializable {
 			@JoinColumn(name="device_id")
 			}
 		)
+	@JsonIgnore
 	private List<Device> loggedOn;
 
 	//bi-directional many-to-many association to Group
@@ -95,9 +101,10 @@ public class User implements Serializable {
 			@JoinColumn(name="group_id")
 			}
 		)
-	@JsonManagedReference
+	//@JsonManagedReference
+	@JsonIgnore
 	private List<Group> groups;
-	
+
 	@Transient
 	private String password ="";
 
@@ -117,6 +124,13 @@ public class User implements Serializable {
 		this.id = id;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof User && obj !=null) {
+			return getId() == ((User)obj).getId();
+		}
+		return super.equals(obj);
+	}
 	public String getGivenName() {
 		return this.givenName;
 	}
