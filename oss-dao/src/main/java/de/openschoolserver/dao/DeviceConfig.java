@@ -3,8 +3,9 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
 
+import javax.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * The persistent class for the DeviceConfig database table.
  *
@@ -22,6 +23,7 @@ public class DeviceConfig implements Serializable {
 
         //bi-directional many-to-one association to Device
         @ManyToOne
+        @JsonIgnore
         private Device device;
 
         public long getId() {

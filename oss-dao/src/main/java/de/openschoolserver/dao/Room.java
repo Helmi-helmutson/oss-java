@@ -259,13 +259,13 @@ public class Room implements Serializable {
         }
 
         public RoomConfig addRoomConfig(RoomConfig roomConfig) {
-                getRoomConfig().add(roomConfig);
+                getRoomConfigs().add(roomConfig);
                 roomConfig.setRoom(this);
                 return roomConfig;
         }
 
         public RoomConfig removeRoomConfig(RoomConfig roomConfig) {
-                getRoomConfig().remove(roomConfig);
+                getRoomConfigs().remove(roomConfig);
                 roomConfig.setRoom(null);
                 return roomConfig;
         }
@@ -279,13 +279,13 @@ public class Room implements Serializable {
         }
 
         public RoomMConfig addRoomMConfig(RoomMConfig roomMConfig) {
-                getRoomMConfig().add(roomMConfig);
+                getRoomMConfigs().add(roomMConfig);
                 roomMConfig.setRoom(this);
                 return roomMConfig;
         }
 
         public RoomMConfig removeRoomMConfig(RoomMConfig roomMConfig) {
-                getRoomMConfig().remove(roomMConfig);
+                getRoomMConfigs().remove(roomMConfig);
                 roomMConfig.setRoom(null);
                 return roomMConfig;
         }

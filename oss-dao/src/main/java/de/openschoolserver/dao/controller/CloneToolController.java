@@ -1,8 +1,6 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
-
-
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -71,11 +69,11 @@ public class CloneToolController extends Controller {
 		case "Format" :
 			return part.getFormat();
 		case "ITool" :
-			return part.getOs();
+			return part.getTool();
 		case "Join" :
-			return part.getFormat();
+			return part.getJoinType();
 		case "Name" :
-			return part.getFormat();
+			return part.getName();
 		case "OS" :
 			return part.getOs();
 		}
@@ -155,14 +153,19 @@ public class CloneToolController extends Controller {
 		switch (key) {
 		case "Description" :
 			partition.setDescription(value);
+			break;
 		case "Format" :
 			partition.setFormat(value);
+			break;
 		case "ITool" :
-			partition.setOs(value);
+			partition.setTool(value);
+			break;
 		case "Join" :
-			partition.setFormat(value);
+			partition.setJoinType(value);
+			break;
 		case "Name" :
-			partition.setFormat(value);
+			partition.setName(value);
+			break;
 		case "OS" :
 			partition.setOs(value);
 		}
@@ -184,10 +187,12 @@ public class CloneToolController extends Controller {
 
 	public boolean deletePartition(Long hwconfId, String partitionName) {
 		// TODO Auto-generated method stub
+		HWConf hwconf = this.getById(hwconfId);
 		Partition partition = this.getPartition(hwconfId, partitionName);
+		hwconf.removePartition(partition);
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
-		em.remove(partition);
+		em.merge(hwconf);
 		em.getTransaction().commit();
 		return true;
 	}
@@ -198,16 +203,22 @@ public class CloneToolController extends Controller {
 		switch (key) {
 		case "Description" :
 			partition.setDescription("");
+			break;
 		case "Format" :
 			partition.setFormat("");
+			break;
 		case "ITool" :
-			partition.setOs("");
+			partition.setTool("");
+			break;
 		case "Join" :
-			partition.setFormat("");
+			partition.setJoinType("");
+			break;
 		case "Name" :
-			partition.setFormat("");
+			partition.setName("");
+			break;
 		case "OS" :
 			partition.setOs("");
+			break;
 		}
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
@@ -215,6 +226,18 @@ public class CloneToolController extends Controller {
 		em.getTransaction().commit();
 		return true;
 	}
-	
-	
+
+	public List<HWConf> getAllHWConf() {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("HWConf.findAll");
+			return (List<HWConf>) query.getResultList();
+		} catch (Exception e) {
+			//logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
 }

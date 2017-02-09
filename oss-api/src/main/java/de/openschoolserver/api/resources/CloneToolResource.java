@@ -2,8 +2,6 @@ package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
-
-
 import javax.annotation.security.PermitAll;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -22,23 +20,39 @@ import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.Session;
+import java.util.List;
 
 @Path("clonetool")
 @Api(value = "clonetool")
 public interface CloneToolResource {
-       
+  
 	/*
 	 * Get clonetool/hwconf
 	 */
 	@GET
 	@Path("hwconf")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the id of the hardwareconfiguration based on the IP-address of the session.")
+	@ApiOperation(value = "Gets the id of the hardware configuration based on the IP-address of the session.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
 	Long getHWConf(
+	        @ApiParam(hidden = true) @Auth Session session
+	);
+  
+	/*
+	 * Get clonetool/all
+	 */
+	@GET
+	@Path("all")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets all hardware configuration.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	List<HWConf> getAllHWConf(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
        
@@ -164,10 +178,10 @@ public interface CloneToolResource {
 	);
 
 	/*
-	 * POST clonetool/{hwconfId}/{partitionName}
+	 * POST clonetool/{hwconfId}/addPartition
 	 */
 	@POST
-	@Path("{hwconfId}/{partitionName}")
+	@Path("{hwconfId}/addPartition")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Create a new partition to a given hardware configuration.")
 	@ApiResponses(value = {
@@ -177,7 +191,6 @@ public interface CloneToolResource {
 	boolean addPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
-	        @PathParam("partitionName") String partitionName,
 	        Partition partition
 	);
 

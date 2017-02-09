@@ -90,15 +90,16 @@ public class HWConf implements Serializable {
 	}
 
 	public Device addDevice(Device device) {
-		this.devices.add(device);
+		getDevices().add(device);
 		device.setHwconf(this);
 
 		return device;
 	}
 
 	public Device removeDevice(Device device) {
-		this.devices.remove(device);
+		getDevices().remove(device);
 		device.setHwconf(null);
+
 		return device;
 	}
 
@@ -111,14 +112,16 @@ public class HWConf implements Serializable {
 	}
 
 	public Partition addPartition(Partition partition) {
+		getPartitions().add(partition);
 		partition.setHwconf(this);
-		this.partitions.add(partition);
+
 		return partition;
 	}
 
 	public Partition removePartition(Partition partition) {
-		this.devices.remove(partition);
+		getPartitions().remove(partition);
 		partition.setHwconf(null);
+
 		return partition;
 	}
 

@@ -2,6 +2,7 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import javax.persistence.*;
 
@@ -22,6 +23,7 @@ public class RoomConfig implements Serializable {
 
         //bi-directional many-to-one association to Room
         @ManyToOne
+        @JsonIgnore
         private Room room;
 
         public long getId() {

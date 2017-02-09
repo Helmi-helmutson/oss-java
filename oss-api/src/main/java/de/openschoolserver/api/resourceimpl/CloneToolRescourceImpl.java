@@ -3,6 +3,7 @@ package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.HWConf;
 
+
 import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.CloneToolController;
@@ -11,7 +12,6 @@ import de.openschoolserver.api.resources.CloneToolResource;
 
 import javax.ws.rs.WebApplicationException;
 import java.util.List;
-import java.util.Map;
 
 public class CloneToolRescourceImpl implements CloneToolResource {
 
@@ -67,10 +67,9 @@ public class CloneToolRescourceImpl implements CloneToolResource {
 	}
 
 	@Override
-	public boolean addPartition(Session session, Long hwconfId, String partitionName, Partition partition) {
+	public boolean addPartition(Session session, Long hwconfId, Partition partition) {
 		// TODO Auto-generated method stub
 		final CloneToolController cloneToolController = new CloneToolController(session);
-		partition.setName(partitionName);
 		return cloneToolController.addPartitionToHWConf(hwconfId, partition);
 	}
 
@@ -104,5 +103,12 @@ public class CloneToolRescourceImpl implements CloneToolResource {
 	public boolean deleteConfigurationValue(Session session, Long hwconfId, String partitionName, String key) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.deleteConfigurationValue(hwconfId,partitionName,key);
+	}
+
+	@Override
+	public List<HWConf> getAllHWConf(Session session) {
+		// TODO Auto-generated method stub
+		final CloneToolController cloneToolController = new CloneToolController(session);
+		return cloneToolController.getAllHWConf();
 	}
 }

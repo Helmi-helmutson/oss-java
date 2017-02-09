@@ -4,9 +4,6 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.List;
@@ -287,18 +284,6 @@ public class User implements Serializable {
 		this.groups = groups;
 	}
 	
-	public Group addGroup(Group group) {
-		getGroup().add(group);
-		group.setUser(this);
-		return group;
-	}
-
-	public Group removeGroup(Group group) {
-		getGroup().remove(group);
-		group.setUser(null);
-		return group;
-	}
-
 	public List<UserConfig> getUserConfigs() {
 		return this.userConfigs;
 	}
@@ -308,13 +293,13 @@ public class User implements Serializable {
 	}
 	
 	public UserConfig addUserConfig(UserConfig userConfig) {
-		getUserConfig().add(userConfig);
+		getUserConfigs().add(userConfig);
 		userConfig.setUser(this);
 		return userConfig;
 	}
 
 	public UserConfig removeUserConfig(UserConfig userConfig) {
-		getUserConfig().remove(userConfig);
+		getUserConfigs().remove(userConfig);
 		userConfig.setUser(null);
 		return userConfig;
 	}
@@ -328,13 +313,13 @@ public class User implements Serializable {
 	}
 	
 	public UserMConfig addUserMConfig(UserMConfig userMConfig) {
-		getUserMConfig().add(userMConfig);
+		getUserMConfigs().add(userMConfig);
 		userMConfig.setUser(this);
 		return userMConfig;
 	}
 
 	public UserMConfig removeUserMConfig(UserMConfig userMConfig) {
-		getUserMConfig().remove(userMConfig);
+		getUserMConfigs().remove(userMConfig);
 		userMConfig.setUser(null);
 		return userMConfig;
 	}

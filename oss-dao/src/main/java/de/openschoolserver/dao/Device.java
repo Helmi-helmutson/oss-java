@@ -318,15 +318,15 @@ public class Device implements Serializable {
         public void setDeviceConfigs(List<DeviceConfig> deviceConfigs) {
                 this.deviceConfigs = deviceConfigs;
         }
-
+        
         public DeviceConfig addDeviceConfig(DeviceConfig deviceConfig) {
-                getDeviceConfig().add(deviceConfig);
+                getDeviceConfigs().add(deviceConfig);
                 deviceConfig.setDevice(this);
                 return deviceConfig;
         }
 
         public DeviceConfig removeDeviceConfig(DeviceConfig deviceConfig) {
-                getDeviceConfig().remove(deviceConfig);
+                getDeviceConfigs().remove(deviceConfig);
                 deviceConfig.setDevice(null);
                 return deviceConfig;
         }
@@ -340,13 +340,13 @@ public class Device implements Serializable {
         }
 
         public DeviceMConfig addDeviceMConfig(DeviceMConfig deviceMConfig) {
-                getDeviceMConfig().add(deviceMConfig);
+                getDeviceMConfigs().add(deviceMConfig);
                 deviceMConfig.setDevice(this);
                 return deviceMConfig;
         }
 
         public DeviceMConfig removeDeviceMConfig(DeviceMConfig deviceMConfig) {
-                getDeviceMConfig().remove(deviceMConfig);
+                getDeviceMConfigs().remove(deviceMConfig);
                 deviceMConfig.setDevice(null);
                 return deviceMConfig;
         }
