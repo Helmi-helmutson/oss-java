@@ -28,13 +28,13 @@ import javax.persistence.*;
 	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
 	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.sureName LIKE :search"),
 	@NamedQuery(name="User.getConfig",  query="SELECT c.value FROM UserConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" ),
-    @NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" )
+	@NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" )
 })
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-    long id;
+	long id;
 
 	private String givenName;
 
@@ -43,37 +43,38 @@ public class User implements Serializable {
 	private String sureName;
 
 	private String uid;
-	
+
+	@Temporal(TemporalType.DATE)	
 	private Date birthDay;
 
 	//bi-directional many-to-one association to Alias
-	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Alias> aliases;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="owner",cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Device> ownedDevices;
 
 	//bi-directional many-to-one association to TestFile
-	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
-	private List<UserMConfig> UserMConfig;
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<UserMConfig> userMConfigs;
 
 	//bi-directional many-to-one association to TestFile
-	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
-	private List<UserConfig> UserConfig;
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<UserConfig> userConfigs;
 
 	//bi-directional many-to-one association to TestFile
-	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<TestFile> testFiles;
 
 	//bi-directional many-to-one association to TestUser
-	@OneToMany(mappedBy="user", cascade=CascadeType.REMOVE)
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-one association to Test
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<Test> tests;
 
@@ -286,26 +287,64 @@ public class User implements Serializable {
 		this.groups = groups;
 	}
 	
+	public Group addGroup(Group group) {
+		getGroup().add(group);
+		group.setUser(this);
+		return group;
+	}
+
+	public Group removeGroup(Group group) {
+		getGroup().remove(group);
+		group.setUser(null);
+		return group;
+	}
+
+	public List<UserConfig> getUserConfigs() {
+		return this.userConfigs;
+	}
+
+	public void setUserConfigs(List<UserConfig> userConfigs) {
+		this.userConfigs = userConfigs;
+	}
+	
+	public UserConfig addUserConfig(UserConfig userConfig) {
+		getUserConfig().add(userConfig);
+		userConfig.setUser(this);
+		return userConfig;
+	}
+
+	public UserConfig removeUserConfig(UserConfig userConfig) {
+		getUserConfig().remove(userConfig);
+		userConfig.setUser(null);
+		return userConfig;
+	}
+
+	public List<UserMConfig> getUserMConfigs() {
+		return this.userMConfigs;
+	}
+
+	public void setUserMConfigs(List<UserMConfig> userMConfigs) {
+		this.userMConfigs = userMConfigs;
+	}
+	
+	public UserMConfig addUserMConfig(UserMConfig userMConfig) {
+		getUserMConfig().add(userMConfig);
+		userMConfig.setUser(this);
+		return userMConfig;
+	}
+
+	public UserMConfig removeUserMConfig(UserMConfig userMConfig) {
+		getUserMConfig().remove(userMConfig);
+		userMConfig.setUser(null);
+		return userMConfig;
+	}
+
 	public void setPassword(String password) {
 		this.password = password;
 	}
 	
 	public String getPassword() {
 		return this.password;
-	}
-	
-	public String diff(User newUser){
-		StringBuilder diff = new StringBuilder();
-		if( givenName != newUser.getGivenName() )
-			diff.append(String.format("givenName: %s%n", newUser.getGivenName()));
-		if( sureName != newUser.getSureName() )
-			diff.append(String.format("sureName: %s%n",  newUser.getSureName()));
-		if( birthDay != newUser.getBirthDay() )
-			diff.append(String.format("birthDay: %s%n",  newUser.getBirthDay()));
-		if( newUser.getPassword() != "" ) {
-			diff.append(String.format("password: %s%n",  newUser.getPassword()));
-		}
-		return diff.toString();
 	}
 
 }

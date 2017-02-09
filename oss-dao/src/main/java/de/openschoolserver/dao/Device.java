@@ -23,8 +23,8 @@ import java.util.List;
 	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
 	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device d where d.name = :name"),
 	@NamedQuery(name="Device.search",    query="SELECT d FROM Device d where d.name LIKE :name OR d.ip LIKE :name" ),
-	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :user_id AND c.keyword = :keyword" ),
-	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :user_id AND c.keyword = :keyword" )
+	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" ),
+	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" )
 })
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -53,12 +53,12 @@ public class Device implements Serializable {
 	private String deviceType;
 
     //bi-directional many-to-one association to DeviceMConfig
-    @OneToMany(mappedBy="device", cascade=CascadeType.REMOVE)
-    private List<DeviceMConfig> DeviceMConfig;
+    @OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
+    private List<DeviceMConfig> deviceMConfigs;
 
     //bi-directional many-to-one association to DeviceConfig
-    @OneToMany(mappedBy="device", cascade=CascadeType.REMOVE)
-    private List<DeviceConfig> DeviceConfig;
+    @OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
+    private List<DeviceConfig> deviceConfigs;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
@@ -310,5 +310,45 @@ public class Device implements Serializable {
 	public void setLoggedIn(List<User> loggedIn) {
 		this.loggedIn = loggedIn;
 	}
+
+        public List<DeviceConfig> getDeviceConfigs() {
+                return this.deviceConfigs;
+        }
+
+        public void setDeviceConfigs(List<DeviceConfig> deviceConfigs) {
+                this.deviceConfigs = deviceConfigs;
+        }
+
+        public DeviceConfig addDeviceConfig(DeviceConfig deviceConfig) {
+                getDeviceConfig().add(deviceConfig);
+                deviceConfig.setDevice(this);
+                return deviceConfig;
+        }
+
+        public DeviceConfig removeDeviceConfig(DeviceConfig deviceConfig) {
+                getDeviceConfig().remove(deviceConfig);
+                deviceConfig.setDevice(null);
+                return deviceConfig;
+        }
+
+        public List<DeviceMConfig> getDeviceMConfigs() {
+                return this.deviceMConfigs;
+        }
+
+        public void setDeviceMConfigs(List<DeviceMConfig> deviceMConfigs) {
+                this.deviceMConfigs = deviceMConfigs;
+        }
+
+        public DeviceMConfig addDeviceMConfig(DeviceMConfig deviceMConfig) {
+                getDeviceMConfig().add(deviceMConfig);
+                deviceMConfig.setDevice(this);
+                return deviceMConfig;
+        }
+
+        public DeviceMConfig removeDeviceMConfig(DeviceMConfig deviceMConfig) {
+                getDeviceMConfig().remove(deviceMConfig);
+                deviceMConfig.setDevice(null);
+                return deviceMConfig;
+        }
 
 }

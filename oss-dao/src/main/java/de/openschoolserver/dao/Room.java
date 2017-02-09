@@ -18,8 +18,8 @@ import java.util.List;
   @NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
   @NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
   @NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id"),
-  @NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :user_id AND c.keyword = :keyword" ),
-  @NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :user_id AND c.keyword = :keyword" )
+  @NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" ),
+  @NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" )
 })
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -42,12 +42,12 @@ public class Room implements Serializable {
 	private int rows;
 
         //bi-directional many-to-one association to RoomMConfig
-        @OneToMany(mappedBy="room", cascade=CascadeType.REMOVE)
-        private List<RoomMConfig> RoomMConfig;
+        @OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+        private List<RoomMConfig> roomMConfigs;
 
         //bi-directional many-to-one association to RoomConfig
-        @OneToMany(mappedBy="room", cascade=CascadeType.REMOVE)
-        private List<RoomConfig> RoomConfig;
+        @OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+        private List<RoomConfig> roomConfigs;
 
 	//bi-directional many-to-one association to AccessInRoom
 	@OneToMany(mappedBy="room")
@@ -250,6 +250,45 @@ public class Room implements Serializable {
 		this.network = network;
 	}
 
+        public List<RoomConfig> getRoomConfigs() {
+                return this.roomConfigs;
+        }
+
+        public void setRoomConfigs(List<RoomConfig> roomConfigs) {
+                this.roomConfigs = roomConfigs;
+        }
+
+        public RoomConfig addRoomConfig(RoomConfig roomConfig) {
+                getRoomConfig().add(roomConfig);
+                roomConfig.setRoom(this);
+                return roomConfig;
+        }
+
+        public RoomConfig removeRoomConfig(RoomConfig roomConfig) {
+                getRoomConfig().remove(roomConfig);
+                roomConfig.setRoom(null);
+                return roomConfig;
+        }
+
+        public List<RoomMConfig> getRoomMConfigs() {
+                return this.roomMConfigs;
+        }
+
+        public void setRoomMConfigs(List<RoomMConfig> roomMConfigs) {
+                this.roomMConfigs = roomMConfigs;
+        }
+
+        public RoomMConfig addRoomMConfig(RoomMConfig roomMConfig) {
+                getRoomMConfig().add(roomMConfig);
+                roomMConfig.setRoom(this);
+                return roomMConfig;
+        }
+
+        public RoomMConfig removeRoomMConfig(RoomMConfig roomMConfig) {
+                getRoomMConfig().remove(roomMConfig);
+                roomMConfig.setRoom(null);
+                return roomMConfig;
+        }
 
 
 }
