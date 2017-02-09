@@ -116,14 +116,15 @@ public class CloneToolController extends Controller {
 	}
 
 	public boolean addPartitionToHWConf(Long hwconfId, String name ) {
-		Partition partition = new Partition(name);
-		partition.setHwconf(this.getById(hwconfId));
 		EntityManager em = getEntityManager();
-		// First we check if the parameter are unique.
+		HWConf hwconf = this.getById(hwconfId);
+		Partition partition = new Partition();
+		partition.setName(name);
+		hwconf.addPartition(partition);
 		try {
 			em.getTransaction().begin();
-			em.persist(partition);
-			em.getTransaction().commit();
+			em.merge(hwconf);
+			em.getTransaction().commit();			
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return false;
@@ -132,13 +133,14 @@ public class CloneToolController extends Controller {
 	}
 	
 	public boolean addPartitionToHWConf(Long hwconfId, Partition partition ) {
-		partition.setHwconf(this.getById(hwconfId));
 		EntityManager em = getEntityManager();
+		HWConf hwconf = this.getById(hwconfId);
+		hwconf.addPartition(partition);
 		// First we check if the parameter are unique.
 		try {
 			em.getTransaction().begin();
-			em.persist(partition);
-			em.getTransaction().commit();
+			em.merge(hwconf);
+			em.getTransaction().commit();			
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return false;

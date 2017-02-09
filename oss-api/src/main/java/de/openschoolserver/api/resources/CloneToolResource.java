@@ -142,7 +142,7 @@ public interface CloneToolResource {
 	boolean modifyHWConf(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
-		HWConf hwconf
+		    HWConf hwconf
 	);
     
 	/*
