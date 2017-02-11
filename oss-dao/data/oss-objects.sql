@@ -64,10 +64,12 @@ CREATE TABLE IF NOT EXISTS Aliases (
 CREATE TABLE IF NOT EXISTS HWConfs (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name          VARCHAR(32) NOT NULL,
-        description   VARCHAR(32) NOT NULL,
+        description   VARCHAR(32) DEFAULT "",
         deviceType    VARCHAR(16) NOT NULL,
         PRIMARY KEY  (id)
 );
+INSERT INTO HWConfs VALUES(0,"Server","","Server");
+INSERT INTO HWConfs VALUES(1,"Printer","","Printer");
 
 CREATE TABLE IF NOT EXISTS Partitions (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -81,22 +83,21 @@ CREATE TABLE IF NOT EXISTS Partitions (
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         PRIMARY KEY  (id)
 );
-
 CREATE TABLE IF NOT EXISTS Rooms (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         hwconf_id    BIGINT UNSIGNED DEFAULT NULL,
         name         VARCHAR(32) NOT NULL,
-        description  VARCHAR(64) NOT NULL,
+        description  VARCHAR(64) DEFAULT "",
         roomType     VARCHAR(16) NOT NULL,
         rows         INTEGER  DEFAULT 5,
-        columns      INTEGER  DEFAULT 5,
+        places       INTEGER  DEFAULT 5,
         startIP      VARCHAR(16) NOT NULL,
         netMask      INTEGER  NOT NULL,
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Rooms VALUES(NULL,NULL,"SERVER_NET","Logical room for servers","LogicalRoom",10,10,#SERVER_NETWORK#,#SERVER_NETMASK#);
+INSERT INTO Rooms VALUES(NULL,0,"SERVER_NET","Logical room for servers","LogicalRoom",10,10,#SERVER_NETWORK#,#SERVER_NETMASK#);
 INSERT INTO Rooms VALUES(NULL,NULL,"ANON_DHCP","Logical room for unknown devices","LogicalRoom",10,10,#ANON_NETWORK#,#ANON_NETMASK#);
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -110,7 +111,7 @@ CREATE TABLE IF NOT EXISTS Devices (
         WLANMAC      VARCHAR(17) DEFAULT '',
         deviceType   VARCHAR(16) NOT NULL,
         row          INTEGER  DEFAULT 0,
-        column       INTEGER  DEFAULT 0,
+        place        INTEGER  DEFAULT 0,
         FOREIGN KEY(room_id)   REFERENCES Rooms(id),
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         FOREIGN KEY(owner_id)  REFERENCES Users(id),
@@ -247,12 +248,13 @@ CREATE TABLE IF NOT EXISTS Enumerates (
 );
 
 INSERT INTO Enumerates VALUES(NULL,'deviceType','FatClient');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','ThinClient');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','ManagedMobileDevice');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','MobileDevice');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Printer');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','Switch');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Router');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Server');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Switch');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','ThinClient');
 INSERT INTO Enumerates VALUES(NULL,'role','students');
 INSERT INTO Enumerates VALUES(NULL,'role','teachers');
 INSERT INTO Enumerates VALUES(NULL,'role','sysadmins');

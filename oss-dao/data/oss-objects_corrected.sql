@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
         name         VARCHAR(32) NOT NULL,
         description  VARCHAR(32) NOT NULL,
         OS           VARCHAR(16) NOT NULL,
-        `join`         VARCHAR(16) NOT NULL,
+        joinType     VARCHAR(16) NOT NULL,
         tool         VARCHAR(16) NOT NULL,
         format       VARCHAR(16) NOT NULL,
          FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
@@ -75,7 +75,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
         description  VARCHAR(64) NOT NULL,
         roomType     VARCHAR(16) NOT NULL,
         rows         INTEGER  DEFAULT 5,
-        columns      INTEGER  DEFAULT 5,
+        places       INTEGER  DEFAULT 5,
         startIP      VARCHAR(16) NOT NULL,
         netMask      INTEGER  NOT NULL,
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
@@ -94,10 +94,10 @@ CREATE TABLE IF NOT EXISTS Devices (
         WLANMAC      VARCHAR(17) DEFAULT '',
         deviceType   VARCHAR(16) NOT NULL,
         row          INTEGER  DEFAULT 0,
-        `column`       INTEGER  DEFAULT 0,
-         FOREIGN KEY(room_id)   REFERENCES Rooms(id),
-         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
-          FOREIGN KEY(owner_id)  REFERENCES Users(id),
+        place        INTEGER  DEFAULT 0,
+        FOREIGN KEY(room_id)   REFERENCES Rooms(id),
+        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
+         FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY  (id)
 );
 

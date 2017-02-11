@@ -31,8 +31,10 @@ public class Device implements Serializable {
 	private long id;
 
 	private String name;
-        @Column(name="col")
-	private int column;
+  
+	private int place;
+	
+	private int row;
 
 	@Column(name="IP")
 	private String ip;
@@ -45,8 +47,6 @@ public class Device implements Serializable {
 
 	@Column(name="WLANMAC")
 	private String wlanmac;
-
-	private int row;
 
 	private String deviceType;
 
@@ -159,12 +159,12 @@ public class Device implements Serializable {
 		this.name = name;
 	}
 
-	public int getColumn() {
-		return this.column;
+	public int getPlace() {
+		return this.place;
 	}
 
-	public void setColumn(int column) {
-		this.column = column;
+	public void setPlace(int place) {
+		this.place = place;
 	}
 
 	public String getIp() {

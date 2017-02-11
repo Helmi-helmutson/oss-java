@@ -30,7 +30,7 @@ public class Room implements Serializable {
 
 	private String name;
 
-	private int columns;
+	private int places;
 	
 	private int rows;
 
@@ -101,8 +101,12 @@ public class Room implements Serializable {
 	@Transient
 	private String network;
 	
+	@Transient
+	private long hwconfId;
+	
 	public Room() {
-		this.network = "";
+		this.network  = "";
+		this.hwconfId = 0;
 	}
 
 	public long getId() {
@@ -121,6 +125,14 @@ public class Room implements Serializable {
 		return super.equals(obj);
 	}
 	
+	public long getHwconfId() {
+		return this.id;
+	}
+
+	public void setHwconfId(long id) {
+		this.id = id;
+	}
+
 	public String getName() {
 		return this.name;
 	}
@@ -129,12 +141,12 @@ public class Room implements Serializable {
 		this.name = name;
 	}
 
-	public int getColumns() {
-		return this.columns;
+	public int getPlaces() {
+		return this.places;
 	}
 
-	public void setColumns(int columns) {
-		this.columns = columns;
+	public void setPlaces(int places) {
+		this.places = places;
 	}
 
 	public String getDescription() {
