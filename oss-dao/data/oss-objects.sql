@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS AccessInRoomACT (
         accessinroom_id BIGINT UNSIGNED NOT NULL,
 	action          VARCHAR(32) DEFAULT '',
         FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS LoggedOn (
@@ -166,7 +166,7 @@ CREATE TABLE IF NOT EXISTS LoggedOn (
         device_id    BIGINT UNSIGNED NOT NULL,
         FOREIGN KEY(user_id)   REFERENCES Users(id),
         FOREIGN KEY(device_id) REFERENCES Devices(id),
-        PRIMARY KEY  (device_id, user_id)
+        PRIMARY KEY(device_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS DefaultPrinters (
@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS DefaultPrinters (
         FOREIGN KEY(room_id)    REFERENCES Rooms(id),
         FOREIGN KEY(device_id)  REFERENCES Devices(id),
         FOREIGN KEY(printer_id) REFERENCES Devices(id),
-        PRIMARY KEY  (device_id, room_id)
+        PRIMARY KEY(device_id, room_id)
 );
 
 CREATE TABLE IF NOT EXISTS AvailablePrinters (
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS AvailablePrinters (
         FOREIGN KEY(room_id)    REFERENCES Rooms(id),
         FOREIGN KEY(device_id)  REFERENCES Devices(id),
         FOREIGN KEY(printer_id) REFERENCES Devices(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS Acls (
