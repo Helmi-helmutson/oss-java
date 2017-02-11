@@ -69,57 +69,6 @@ public interface DeviceResource {
     List<Device> getAll(
             @ApiParam(hidden = true) @Auth Session session
     );
-
-    /*
-     * POST devices/add { hash }
-     */
-    @POST
-    @Path("add")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create new devices")
-    @ApiResponses(value = {
-            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
-            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @PermitAll
-    Response add(
-            @ApiParam(hidden = true) @Auth Session session,
-            List<Device> devices
-    );
-    
-    /*
-     * POST devices/delete [ deviceId, deviceId]
-     */
-    @POST
-    @Path("delete")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "delete devices by id")
-    @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Device not found"),
-        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
-    Response delete(
-            @ApiParam(hidden = true) @Auth Session session,
-            List<Long> deviceId
-           // @PathParam("deviceId") List<Long> deviceId
-    );
-    
-    /*
-     * DELETE devices/{deviceId}
-     */
-    @DELETE
-    @Path("{deviceId}")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delete a device defined by deviceId")
-    @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Device not found"),
-        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
-    Response delete(
-            @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") Long deviceId
-    );
-
     
     /*
      * GET devices/byIP/<IPAddress>
@@ -265,6 +214,5 @@ public interface DeviceResource {
     List<String> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
-    );
-    
+    );    
 }

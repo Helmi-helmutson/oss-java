@@ -11,6 +11,7 @@ import javax.ws.rs.*;
 
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.AccessInRoom;
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
@@ -240,5 +241,58 @@ public interface RoomResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             AccessInRoom access
+    );
+    
+    // Functions to manage Devices in Rooms
+    /*
+     * POST devices/add { hash }
+     */
+    @POST
+    @Path("{roomId}/addDevices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new devices")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response addDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            List<Device> devices
+    );
+    
+    /*
+     * POST  {roomId}/deleteDevices [ deviceId, deviceId]
+     */
+    @POST
+    @Path("{roomId}/deleteDevices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "delete devices by id")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+    Response deleteDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            List<Long> deviceId
+    );
+    
+    /*
+     * DELETE {roomId}/deleteDevice/{deviceId}
+     */
+    @DELETE
+    @Path("{roomId}/deleteDevice/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delete a device defined by deviceId")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+    Response deleteDevice(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("deviceId") Long deviceId
     );
 }

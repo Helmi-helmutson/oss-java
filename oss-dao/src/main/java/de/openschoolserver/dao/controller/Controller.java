@@ -2,8 +2,6 @@
 package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
-
-
 import javax.persistence.Query;
 import java.util.List;
 import java.util.regex.*;
@@ -66,6 +64,31 @@ public class Controller extends Config {
     	return Pattern.matches("[^a-zA-Z0-9\\.\\-_]",name);
     }
     
+    protected boolean checkBadHostName(String name) {
+    	return Pattern.matches("[^a-zA-Z0-9\\.\\-]",name);
+    }
+
+    protected String isMacUnique(String name){
+    	EntityManager em = this.getEntityManager();
+    	Query query = em.createNamedQuery("Device.getByMAC");
+    	query.setParameter("MAC", name);
+    	List<Device> devices = (List<Device>) query.getResultList();
+    	if( ! devices.isEmpty() ){
+    		return devices.get(0).getName();
+    	}
+    	return "";
+    }
+    
+    protected String isIPUnique(String name){
+    	EntityManager em = this.getEntityManager();
+    	Query query = em.createNamedQuery("Device.getByIP");
+    	query.setParameter("IP", name);
+    	List<Device> devices = (List<Device>) query.getResultList();
+    	if( ! devices.isEmpty() ){
+    		return devices.get(0).getName();
+    	}
+    	return "";
+    }
     protected void startPlugin(String pluginName, Object object){
     	StringBuilder data = new StringBuilder();
     	String[] program   = new String[2];
@@ -73,7 +96,6 @@ public class Controller extends Config {
         StringBuffer error = new StringBuffer();
     	program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
     	program[1] = pluginName;
-   System.err.println("startPlugin: " + object.getClass().getName());
     	switch(object.getClass().getName()) {
     	case "de.openschoolserver.dao.User":
     		User user = (User)object;

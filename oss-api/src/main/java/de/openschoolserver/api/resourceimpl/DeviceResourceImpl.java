@@ -3,13 +3,11 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.ws.rs.WebApplicationException;
 
 import de.openschoolserver.api.resources.DeviceResource;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Response;
-import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DeviceController;
 
@@ -25,7 +23,6 @@ public class DeviceResourceImpl implements DeviceResource {
 	    return device;
 	}
 
-
 	@Override
 	public List<Device> getAll(Session session) {
 		// TODO Auto-generated method stub
@@ -35,20 +32,6 @@ public class DeviceResourceImpl implements DeviceResource {
 	            throw new WebApplicationException(404);
 	    }
 		return devices;
-	}
-
-	@Override
-	public Response add(Session session, List<Device> devices) {
-		// TODO Auto-generated method stub
-		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.add(devices);
-	}
-
-	@Override
-	public Response delete(Session session, List<Long> deviceIds) {
-		// TODO Auto-generated method stub
-		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.delete(deviceIds);
 	}
 
 	@Override
@@ -73,7 +56,6 @@ public class DeviceResourceImpl implements DeviceResource {
 		return device;
 	}
 
-
 	@Override
 	public List<Device> getByType(Session session, String type) {
 		// TODO Auto-generated method stub
@@ -85,7 +67,6 @@ public class DeviceResourceImpl implements DeviceResource {
 		return devices;
 	}
 
-
 	@Override
 	public Device getByName(Session session, String Name) {
 		// TODO Auto-generated method stub
@@ -93,7 +74,6 @@ public class DeviceResourceImpl implements DeviceResource {
 		final Device device = deviceController.getByName(Name);
 		return device;
 	}
-
 
 	@Override
 	public String getDefaultPrinter(Session session, long deviceId) {
@@ -111,7 +91,6 @@ public class DeviceResourceImpl implements DeviceResource {
 		return printers;
 	}
 
-
 	@Override
 	public List<String> getLoggedInUsers(Session session, String IP) {
 		// TODO Auto-generated method stub
@@ -128,21 +107,11 @@ public class DeviceResourceImpl implements DeviceResource {
 		return users;
 	}
 
-
-	@Override
-	public Response delete(Session session, Long deviceId) {
-		// TODO Auto-generated method stub
-		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.delete(deviceId);
-	}
-
-
 	@Override
 	public Response setDefaultPrinter(Session session, long deviceId, long defaultPrinterId) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.setDefaultPrinter(deviceId,defaultPrinterId);
 	}
-
 
 	@Override
 	public Response setAvailablePrinters(Session session, long deviceId, List<Long> availablePrinters) {

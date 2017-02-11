@@ -2,17 +2,18 @@
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.AccessInRoom;
-
-
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.api.resources.RoomResource;
 
 
 import javax.ws.rs.WebApplicationException;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 public class RoomRescourceImpl implements RoomResource {
@@ -126,5 +127,26 @@ public class RoomRescourceImpl implements RoomResource {
 		final RoomController roomController = new RoomController(session);
 		return roomController.setAccessStatus(roomId, access);
 	}
+	
+	@Override
+	public Response addDevices(Session session, long roomId, List<Device> devices) {
+		final RoomController roomController = new RoomController(session);
+		return roomController.addDevices(roomId,devices);
+	}
 
+	@Override
+	public Response deleteDevices(Session session, long roomId, List<Long> deviceIds) {
+		// TODO Auto-generated method stub
+		final RoomController roomController = new RoomController(session);
+		return roomController.deleteDevices(roomId,deviceIds);
+	}
+	
+	@Override
+	public Response deleteDevice(Session session, long roomId, Long deviceId) {
+		// TODO Auto-generated method stub
+		final RoomController roomController = new RoomController(session);
+		List<Long> deviceIds = new ArrayList<Long>();
+		deviceIds.add(deviceId);
+		return roomController.deleteDevices(roomId,deviceIds);
+	}
 }

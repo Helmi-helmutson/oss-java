@@ -13,6 +13,7 @@ import javax.persistence.Query;
 import java.sql.Time;
 
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
@@ -36,7 +37,6 @@ public class RoomController extends Controller {
 			Query query = em.createNamedQuery("Room.getByName");
 			query.setParameter("name", name);
 			List<Room> rooms = (List<Room>) query.getResultList();
-System.err.println(name + ":" + rooms + ":" + rooms.size() + ":" + rooms.isEmpty());
 			return rooms.isEmpty();
 		} catch (Exception e) {
 			//logger.error(e.getMessage());
@@ -109,6 +109,7 @@ System.err.println(name + ":" + rooms + ":" + rooms.size() + ":" + rooms.isEmpty
 		if( room.getStartIP() == "" ) {
 			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
 		}
+		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
 		try {
 			em.getTransaction().begin();
 			em.persist(room);
@@ -482,5 +483,100 @@ System.err.println(name + ":" + rooms + ":" + rooms.size() + ":" + rooms.isEmpty
 			accesses.add(this.getAccessStatus(room));
 		}
 		return accesses;
+	}
+	
+	/*
+	 * Creates new devices in the room
+	 */
+	public Response addDevices(long roomId,List<Device> devices){
+		EntityManager em = getEntityManager();
+		Room room = this.getById(roomId);
+		StringBuilder error = new StringBuilder();
+		for(Device device : devices) {
+			if( this.checkBadHostName(device.getName())){
+				error.append("Devices name contains not allowed characters." );
+			}
+			//Check the MAC address
+			String name =  this.isMacUnique(device.getMac());
+			if( name != "" ){
+				error.append("The MAC address will be used allready:" + name );
+			}
+			device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
+			if( ! IPv4.validateMACAddress(device.getMac())) {
+				error.append("The MAC address is not valid:" + device.getMac() );	
+			}
+			//Check the IP address
+			name =  this.isIPUnique(device.getIp());
+			if( name != "" ){
+				error.append("The IP address will be used allready:" + name );
+			}
+			if( ! IPv4.validateIPAddress(device.getIp())) {
+				error.append("The IP address is not valid:" + device.getIp() );	
+			}
+			if( device.getWlanMac().isEmpty() ) {
+				device.setWlanIp("");
+			}
+			else
+			{ //check WLAN
+				//Check the MAC address
+				name =  this.isMacUnique(device.getMac());
+				if( name != "" ){
+					error.append("The MAC address will be used allready:" + name );
+				}
+				device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
+				if( ! IPv4.validateMACAddress(device.getMac())) {
+					error.append("The MAC address is not valid:" + device.getMac() );	
+				}
+				//Check the IP address
+				name =  this.isIPUnique(device.getIp());
+				if( name != "" ){
+					error.append("The IP address will be used allready:" + name );
+				}
+				if( ! IPv4.validateIPAddress(device.getIp())) {
+					error.append("The IP address is not valid:" + device.getIp() );	
+				}
+			}
+			device.setRoom(room);
+			if(device.getHwconfId() != -1){
+				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
+			} else {
+				device.setHwconf(room.getHwconf());
+			}
+			room.addDevice(device);
+		}
+		if(error.length() > 0){
+			return new Response(this.getSession(),"ERROR",error.toString());
+		}
+		
+		try {
+			em.getTransaction().begin();
+			em.merge(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR ", e.getMessage());
+		}
+		return new Response(this.getSession(),"OK", "Devices were created succesfully." );
+	}
+	
+	/*
+	 * Creates new devices in the room
+	 */
+	public Response deleteDevices(long roomId,List<Long> deviceIDs){
+		EntityManager em = getEntityManager();
+		Room room = this.getById(roomId);
+		for(Long deviceId : deviceIDs) {
+			Device device = em.find(Device.class, deviceId);
+			room.removeDevice(device);
+		}
+		try {
+			em.getTransaction().begin();
+			em.merge(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR ", e.getMessage());
+		}
+		return new Response(this.getSession(),"OK ", "Devices were deleted succesfully.");
 	}
 }

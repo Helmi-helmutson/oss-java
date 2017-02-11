@@ -52,10 +52,12 @@ public class Device implements Serializable {
 
     //bi-directional many-to-one association to DeviceMConfig
     @OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
+    @JsonIgnore
     private List<DeviceMConfig> deviceMConfigs;
 
     //bi-directional many-to-one association to DeviceConfig
     @OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
+    @JsonIgnore
     private List<DeviceConfig> deviceConfigs;
 
 	//bi-directional many-to-many association to Device
@@ -130,6 +132,9 @@ public class Device implements Serializable {
 	@ManyToMany(mappedBy="loggedOn")
 	@JsonIgnore
 	private List<User> loggedIn;
+	
+	@Transient
+	long hwconfId;
 
 	public Device() {
 		this.deviceType = "fatClient";
@@ -151,6 +156,14 @@ public class Device implements Serializable {
 		return super.equals(obj);
 	}
 	
+	public long getHwconfId() {
+		return this.hwconfId;
+	}
+
+	public void setHwconfId(long id) {
+		this.hwconfId = id;
+	}
+
 	public String getName() {
 		return this.name;
 	}

@@ -44,19 +44,21 @@ public class Room implements Serializable {
 	
     //bi-directional many-to-one association to RoomMConfig
     @OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+    @JsonIgnore
     private List<RoomMConfig> roomMConfigs;
 
     //bi-directional many-to-one association to RoomConfig
     @OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+    @JsonIgnore
     private List<RoomConfig> roomConfigs;
 
 	//bi-directional many-to-one association to AccessInRoom
-	@OneToMany(mappedBy="room")
+	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<AccessInRoom> accessInRooms;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="room")
+	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<Device> devices;
 
