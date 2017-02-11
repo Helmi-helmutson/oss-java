@@ -3,6 +3,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 
+
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 @Entity
+@Table(name="UserConfig")
 public class UserConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 

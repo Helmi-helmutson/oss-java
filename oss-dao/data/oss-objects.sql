@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
 
 CREATE TABLE IF NOT EXISTS Rooms (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        hwconf_id    BIGINT UNSIGNED NOT NULL,
+        hwconf_id    BIGINT UNSIGNED DEFAULT NULL,
         name         VARCHAR(32) NOT NULL,
         description  VARCHAR(64) NOT NULL,
         roomType     VARCHAR(16) NOT NULL,
@@ -96,6 +96,8 @@ CREATE TABLE IF NOT EXISTS Rooms (
         PRIMARY KEY  (id)
 );
 
+INSERT INTO Rooms VALUES(NULL,NULL,"SERVER_NET","Logical room for servers","LogicalRoom",10,10,#SERVER_NETWORK#,#SERVER_NETMASK#);
+INSERT INTO Rooms VALUES(NULL,NULL,"ANON_DHCP","Logical room for unknown devices","LogicalRoom",10,10,#ANON_NETWORK#,#ANON_NETMASK#);
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id      BIGINT UNSIGNED NOT NULL,
@@ -264,6 +266,8 @@ INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Library');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory');
+INSERT INTO Enumerates VALUES(NULL,'roomType','LogicalRoom');
+INSERT INTO Enumerates VALUES(NULL,'roomType','WlanAccess');
 INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT');
 INSERT INTO Enumerates VALUES(NULL,'accessType','FW');
 INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
@@ -271,60 +275,76 @@ INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
 
 #Some additional config tables
 CREATE TABLE IF NOT EXISTS UserConfig (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (user_id,keyword,value)
+        PRIMARY KEY  (id)
 );
+CREATE UNIQUE INDEX UserConfigIndex on UserConfig  (user_id,keyword);
 
 CREATE TABLE IF NOT EXISTS UserMConfig (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (user_id,keyword)
+        PRIMARY KEY  (id)
 );
+CREATE UNIQUE INDEX UserMConfigIndex on UserMConfig (user_id,keyword,value);
 
 CREATE TABLE IF NOT EXISTS GroupConfig (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         group_id     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (group_id,keyword,value)
+        PRIMARY KEY  (id)
 );
+CREATE UNIQUE INDEX GroupConfigIndex on GroupConfig (group_id,keyword);
 
 CREATE TABLE IF NOT EXISTS GroupMConfig (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         group_id     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (group_id,keyword)
+        PRIMARY KEY  (id)
 );
+CREATE UNIQUE INDEX GroupMConfigIndex on GroupMConfig (group_id,keyword,value);
 
 CREATE TABLE IF NOT EXISTS DeviceConfig (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         device_id    BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (device_id,keyword,value)
+        PRIMARY KEY  (id)
 );
+CREATE UNIQUE INDEX DeviceConfigIndex on DeviceConfig (device_id,keyword);
 
 CREATE TABLE IF NOT EXISTS DeviceMConfig (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         device_id    BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (device_id,keyword)
+        PRIMARY KEY  (id)
 );
+CREATE UNIQUE INDEX DeviceMConfigIndex on DeviceMConfig  (device_id,keyword);
 
 CREATE TABLE IF NOT EXISTS RoomConfig (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (room_id,keyword,value)
+        PRIMARY KEY  (id)
 );
+CREATE UNIQUE INDEX RoomConfigIndex on RoomConfig  (room_id,keyword);
 
 CREATE TABLE IF NOT EXISTS RoomMConfig (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (room_id,keyword)
+        PRIMARY KEY  (id)
 );
+CREATE UNIQUE INDEX RoomMConfigIndex on RoomMConfig (room_id,keyword,value);
 
 CREATE TABLE IF NOT EXISTS Session (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

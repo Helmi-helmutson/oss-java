@@ -2,6 +2,7 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.List;
 
@@ -30,6 +31,8 @@ public class Room implements Serializable {
 	private String name;
 
 	private int columns;
+	
+	private int rows;
 
 	private String description;
 
@@ -39,22 +42,22 @@ public class Room implements Serializable {
 
 	private String roomType;
 	
-	private int rows;
+    //bi-directional many-to-one association to RoomMConfig
+    @OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+    private List<RoomMConfig> roomMConfigs;
 
-        //bi-directional many-to-one association to RoomMConfig
-        @OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
-        private List<RoomMConfig> roomMConfigs;
-
-        //bi-directional many-to-one association to RoomConfig
-        @OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
-        private List<RoomConfig> roomConfigs;
+    //bi-directional many-to-one association to RoomConfig
+    @OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+    private List<RoomConfig> roomConfigs;
 
 	//bi-directional many-to-one association to AccessInRoom
 	@OneToMany(mappedBy="room")
+	@JsonIgnore
 	private List<AccessInRoom> accessInRooms;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="room")
+	@JsonIgnore
 	private List<Device> devices;
 
 	//bi-directional many-to-many association to Device
@@ -68,6 +71,7 @@ public class Room implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
+	@JsonIgnore
 	private List<Device> availablePrinters;
 
 	//bi-directional many-to-one association to Device
@@ -81,14 +85,17 @@ public class Room implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
+	@JsonIgnore
 	private Device defaultPrinter;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
+	@JsonIgnore
 	private HWConf hwconf;
 
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="room")
+	@JsonIgnore
 	private List<Test> tests;
 
 	@Transient

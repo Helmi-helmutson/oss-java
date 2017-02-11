@@ -133,7 +133,9 @@ public class UserController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return new Response(this.getSession(),"ERROR ", e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
 		}
 		this.startPlugin("add_user",user);
 		return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.");
@@ -159,6 +161,8 @@ public class UserController extends Controller {
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return false;
+		} finally {
+			em.close();
 		}
 		this.startPlugin("modify_user",user);
 		return true;
@@ -188,6 +192,7 @@ public class UserController extends Controller {
 			//TODO restart dhcp and dns
 			
 		}
+		em.close();
 		//TODO find and remove files
 		return true;
 	}
@@ -198,11 +203,11 @@ public class UserController extends Controller {
 		Query query = em.createNamedQuery("Group.findAll");
 		List<Group> allGroups = query.getResultList();
 		allGroups.removeAll(user.getGroups());
+		em.close();
 		return allGroups;
 	}
 
 	public List<Group> getGroups(long userId) {
-		// TODO Auto-generated method stub
 		User user = this.getById(userId);
 		return user.getGroups();
 	}

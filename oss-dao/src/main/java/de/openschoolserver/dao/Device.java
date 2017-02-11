@@ -2,8 +2,6 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.List;
@@ -71,10 +69,12 @@ public class Device implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
+	@JsonIgnore
 	private List<Device> availablePrinters;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="availablePrinters")
+	@JsonIgnore
 	private List<Device> availableForDevices;
 
 	//bi-directional many-to-many association to Device
@@ -88,14 +88,17 @@ public class Device implements Serializable {
 			@JoinColumn(name="printer_id")
 			}
 		)
+	@JsonIgnore
 	private Device defaultPrinter;
 
 	//bi-directional many-to-many association to Device
 	@OneToMany(mappedBy="defaultPrinter")
+	@JsonIgnore
 	private List<Device> defaultForDevices;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
+	@JsonIgnore
 	private HWConf hwconf;
 
 	//bi-directional many-to-one association to Room
@@ -110,10 +113,12 @@ public class Device implements Serializable {
 
 	//bi-directional many-to-many association to Room
 	@ManyToMany(mappedBy="availablePrinters")
+	@JsonIgnore
 	private List<Room> availableInRooms;
 
 	//bi-directional many-to-many association to Room
 	@OneToMany(mappedBy="defaultPrinter")
+	@JsonIgnore
 	private List<Room> defaultInRooms;
 
 	//bi-directional many-to-one association to TestUser
@@ -127,6 +132,7 @@ public class Device implements Serializable {
 	private List<User> loggedIn;
 
 	public Device() {
+		this.deviceType = "fatClient";
 	}
 
 	public long getId() {

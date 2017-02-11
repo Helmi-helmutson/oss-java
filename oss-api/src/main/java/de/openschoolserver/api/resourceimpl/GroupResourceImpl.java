@@ -74,6 +74,4 @@ public class GroupResourceImpl implements GroupResource {
 		return groupController.delete(groupId);
 	}
 
-	
-
 }

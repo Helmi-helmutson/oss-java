@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 @Entity
+@Table(name="DeviceConfig")
 public class DeviceConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 

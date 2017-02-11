@@ -8,6 +8,7 @@ import javax.ws.rs.WebApplicationException;
 
 import de.openschoolserver.api.resources.DeviceResource;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DeviceController;
@@ -37,25 +38,17 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public boolean add(Session session, List<Device> devices) {
+	public Response add(Session session, List<Device> devices) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final boolean result = deviceController.add(devices);
-		if (! result) {
-	            throw new WebApplicationException(404);
-	    }
-		return true;
+		return deviceController.add(devices);
 	}
 
 	@Override
-	public boolean delete(Session session, List<Long> deviceIds) {
+	public Response delete(Session session, List<Long> deviceIds) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final boolean result = deviceController.delete(deviceIds);
-		if (! result) {
-	            throw new WebApplicationException(404);
-	    }
-		return true;
+		return deviceController.delete(deviceIds);
 	}
 
 	@Override
@@ -110,7 +103,6 @@ public class DeviceResourceImpl implements DeviceResource {
 		return printer;
 	}
 
-
 	@Override
 	public List<String> getAvailablePrinters(Session session, long deviceId) {
 		// TODO Auto-generated method stub
@@ -138,10 +130,23 @@ public class DeviceResourceImpl implements DeviceResource {
 
 
 	@Override
-	public boolean delete(Session session, Long deviceId) {
+	public Response delete(Session session, Long deviceId) {
 		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		deviceController.delete(deviceId);
-		return false;
+		return deviceController.delete(deviceId);
+	}
+
+
+	@Override
+	public Response setDefaultPrinter(Session session, long deviceId, long defaultPrinterId) {
+		final DeviceController deviceController = new DeviceController(session);
+		return deviceController.setDefaultPrinter(deviceId,defaultPrinterId);
+	}
+
+
+	@Override
+	public Response setAvailablePrinters(Session session, long deviceId, List<Long> availablePrinters) {
+		final DeviceController deviceController = new DeviceController(session);
+		return deviceController.setAvailablePrinters(deviceId,availablePrinters);
 	}
 }

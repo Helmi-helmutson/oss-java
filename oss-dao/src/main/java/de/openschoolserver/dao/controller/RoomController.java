@@ -3,10 +3,6 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
-
-
-
-
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -17,6 +13,7 @@ import javax.persistence.Query;
 import java.sql.Time;
 
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
@@ -36,9 +33,10 @@ public class RoomController extends Controller {
 	{
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Room.getRoomByName");
+			Query query = em.createNamedQuery("Room.getByName");
 			query.setParameter("name", name);
 			List<Room> rooms = (List<Room>) query.getResultList();
+System.err.println(name + ":" + rooms + ":" + rooms.size() + ":" + rooms.isEmpty());
 			return rooms.isEmpty();
 		} catch (Exception e) {
 			//logger.error(e.getMessage());
@@ -53,7 +51,7 @@ public class RoomController extends Controller {
 	{
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Room.getRoomByDescription");
+			Query query = em.createNamedQuery("Room.getByDescription");
 			query.setParameter("description", description);
 			List<Room> rooms = query.getResultList();
 			return rooms.isEmpty();
@@ -94,14 +92,14 @@ public class RoomController extends Controller {
 		}
 	}
 
-	public boolean add(Room room){
+	public Response add(Room room){
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(room.getName())){
-			return false;
+			return new Response(this.getSession(),"ERROR", "Room name is not unique.");
 		}
 		if( !this.isDescriptionUnique(room.getDescription())){
-			return false;
+			return new Response(this.getSession(),"ERROR", "Room description is not unique.");
 		}
 		// If no network was configured we will use net school network.
 		if( room.getNetwork().equals(""))
@@ -117,13 +115,14 @@ public class RoomController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR ", e.getMessage());
 		}
-		return true;
+		return new Response(this.getSession(),"OK ", "Room was created succesfully.");
 	}
 
-	public boolean delete(long roomId){
+	public Response delete(long roomId){
 		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
 		DeviceController devController = new DeviceController(this.getSession());
 		Room room = this.getById(roomId);
 		List<Long> deviceIds = new ArrayList<Long>();
@@ -132,7 +131,8 @@ public class RoomController extends Controller {
 		}
 		devController.delete(deviceIds);
 		em.remove(room);
-		return false;
+		em.getTransaction().commit();
+		return new Response(this.getSession(),"OK", "Room was removed successfully.");
 	}
 
 	/*
@@ -268,10 +268,11 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the list of accesses in a room
 	 */
-	public void setAccessList(long roomId,List<AccessInRoom> AccessList){
+	public Response setAccessList(long roomId,List<AccessInRoom> AccessList){
 		Room room = this.getById(roomId);
 		//Es ist nicht soo einfach. Als erstes werden die Vorhandene gelöscht und dann die Neue angelegt.
 		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
 		for(AccessInRoom access : room.getAccessInRooms() ){
 			em.remove(access);
 		}
@@ -316,6 +317,8 @@ public class RoomController extends Controller {
 			}
 			em.persist(tmp);
 		}
+		em.getTransaction().commit();
+		return new Response(this.getSession(),"OK","Acces was created succesfully");
 	}
 
 	/*
@@ -379,15 +382,16 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the actual access status in a room 
 	 */
-	public void setAccessStatus(long roomId, AccessInRoom access) {
+	public Response setAccessStatus(long roomId, AccessInRoom access) {
 		Room room = this.getById(roomId);
 		this.setAccessStatus(room, access);
+		return new Response(this.getSession(),"OK", "Access state in "+room.getName()+" was set succesfully." );
 	}
 
 	/*
 	 * Sets the scheduled access status in all rooms
 	 */
-	public void setScheduledAccess(){
+	public Response setScheduledAccess(){
 		EntityManager em = getEntityManager();
 		Calendar rightNow = Calendar.getInstance();
 		String   actTime  = String.format("%02d:%02d", rightNow.get(Calendar.HOUR_OF_DAY),rightNow.get(Calendar.MINUTE));
@@ -396,7 +400,8 @@ public class RoomController extends Controller {
 		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
 			Room room = access.getRoom();
 			this.setAccessStatus(room, access);
-		}	
+		}
+		return new Response(this.getSession(),"OK", "Scheduled access states where set succesfully." );
 	}
 
 	/*

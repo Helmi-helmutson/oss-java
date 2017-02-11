@@ -3,8 +3,10 @@ package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.AccessInRoom;
 
+
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.api.resources.RoomResource;
 
@@ -34,19 +36,17 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
     @Override
-    public boolean delete(Session session, long roomId) {
+    public Response delete(Session session, long roomId) {
         // TODO Auto-generated method stub
     	final RoomController roomController = new RoomController(session);
-    	roomController.delete(roomId);
-    	return true;
+    	return roomController.delete(roomId);
     }
 
     @Override
-    public boolean add(Session session, Room room) {
+    public Response add(Session session, Room room) {
         // TODO Auto-generated method stub
     	final RoomController roomController = new RoomController(session);
-    	roomController.add(room);
-        return false;
+    	return roomController.add(room);
     }
 
     @Override
@@ -91,19 +91,17 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public boolean setAccessList(Session session, long roomId, List<AccessInRoom> accessList) {
+	public Response setAccessList(Session session, long roomId, List<AccessInRoom> accessList) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		roomController.setAccessList(roomId, accessList);
-		return true;
+		return roomController.setAccessList(roomId, accessList);
 	}
 
 	@Override
-	public boolean setScheduledAccess(Session session) {
+	public Response setScheduledAccess(Session session) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		roomController.setScheduledAccess();
-		return true;
+		return roomController.setScheduledAccess();
 	}
 
 	@Override
@@ -123,11 +121,10 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public boolean setAccessStatus(Session session, long roomId, AccessInRoom access) {
+	public Response setAccessStatus(Session session, long roomId, AccessInRoom access) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
-		roomController.setAccessStatus(roomId, access);
-		return true;
+		return roomController.setAccessStatus(roomId, access);
 	}
 
 }

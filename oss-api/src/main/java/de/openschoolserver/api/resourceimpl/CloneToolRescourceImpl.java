@@ -2,9 +2,8 @@
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.HWConf;
-
-
 import de.openschoolserver.dao.Partition;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.CloneToolController;
 import de.openschoolserver.api.resources.CloneToolResource;
@@ -55,52 +54,52 @@ public class CloneToolRescourceImpl implements CloneToolResource {
 	}
 
 	@Override
-	public boolean addHWConf(Session session, HWConf hwconf) {
+	public Response addHWConf(Session session, HWConf hwconf) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.addHWConf(hwconf);
 	}
 
 	@Override
-	public boolean modifyHWConf(Session session, Long hwconfId, HWConf hwconf) {
+	public Response modifyHWConf(Session session, Long hwconfId, HWConf hwconf) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.modifyHWConf(hwconfId, hwconf);
 	}
 
 	@Override
-	public boolean addPartition(Session session, Long hwconfId, Partition partition) {
+	public Response addPartition(Session session, Long hwconfId, Partition partition) {
 		// TODO Auto-generated method stub
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.addPartitionToHWConf(hwconfId, partition);
 	}
 
 	@Override
-	public boolean addPartition(Session session, Long hwconfId, String partitionName) {
+	public Response addPartition(Session session, Long hwconfId, String partitionName) {
 		// TODO Auto-generated method stub
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.addPartitionToHWConf(hwconfId, partitionName );
 	}
 	
 	@Override
-	public boolean setConfigurationValue(Session session, Long hwconfId, String partitionName, String key, String value) {
+	public Response setConfigurationValue(Session session, Long hwconfId, String partitionName, String key, String value) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.setConfigurationValue(hwconfId,partitionName,key,value);
 	}
 
 	@Override
-	public boolean delete(Session session, Long hwconfId) {
+	public Response delete(Session session, Long hwconfId) {
 		// TODO Auto-generated method stub
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.delete(hwconfId);
 	}
 
 	@Override
-	public boolean deletePartition(Session session, Long hwconfId, String partitionName) {
+	public Response deletePartition(Session session, Long hwconfId, String partitionName) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.deletePartition(hwconfId,partitionName);
 	}
 
 	@Override
-	public boolean deleteConfigurationValue(Session session, Long hwconfId, String partitionName, String key) {
+	public Response deleteConfigurationValue(Session session, Long hwconfId, String partitionName, String key) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.deleteConfigurationValue(hwconfId,partitionName,key);
 	}

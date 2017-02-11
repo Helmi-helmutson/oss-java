@@ -4,9 +4,6 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
-
-
-
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;

@@ -1,16 +1,16 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
+
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
-import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Partition;
-import de.openschoolserver.dao.tools.*;
+import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.Session;
 
 public class CloneToolController extends Controller {
 
@@ -41,7 +41,7 @@ public class CloneToolController extends Controller {
 	public String getPartitions(Long hwconfId ) {
 		List<String> partitions = new ArrayList<String>();
 		for( Partition part : this.getById(hwconfId).getPartitions() ) {
-			partitions.add(part.getName());	
+			partitions.add(part.getName());
 		}
 		return String.join(" ", partitions );
 	}
@@ -80,11 +80,11 @@ public class CloneToolController extends Controller {
 		return "";
 	}
 
-	public boolean addHWConf(HWConf hwconf){
+	public Response addHWConf(HWConf hwconf){
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(hwconf.getName())){
-			return false;
+			return new Response(this.getSession(),"ERROR", "Configuration name is not unique.");
 		}
 		try {
 			em.getTransaction().begin();
@@ -92,28 +92,35 @@ public class CloneToolController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
 		}
-		return true;
+		return new Response(this.getSession(),"OK", hwconf.getName() + " (" + hwconf.getDeviceType() + ") was created.");
 	}
 
-	public boolean modifyHWConf(Long hwconfId, HWConf hwconf){
+	public Response modifyHWConf(Long hwconfId, HWConf hwconf){
 		//TODO make some checks!!
 		EntityManager em = getEntityManager();
 		hwconf.setId(hwconfId);
 		// First we check if the parameter are unique.
+		if( ! this.isNameUnique(hwconf.getName())){
+			return new Response(this.getSession(),"ERROR", "Configuration name is not unique.");
+		}
 		try {
 			em.getTransaction().begin();
 			em.merge(hwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
 		}
-		return true;
+		return new Response(this.getSession(),"OK", hwconf.getName() + " (" + hwconf.getDeviceType() + ") was modified.");
 	}
 
-	public boolean addPartitionToHWConf(Long hwconfId, String name ) {
+	public Response addPartitionToHWConf(Long hwconfId, String name ) {
 		EntityManager em = getEntityManager();
 		HWConf hwconf = this.getById(hwconfId);
 		Partition partition = new Partition();
@@ -125,12 +132,14 @@ public class CloneToolController extends Controller {
 			em.getTransaction().commit();			
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
 		}
-		return true;
+		return new Response(this.getSession(),"OK", "Partition: " + name + "was created in" + hwconf.getName() + " (" + hwconf.getDeviceType() + ")");
 	}
 	
-	public boolean addPartitionToHWConf(Long hwconfId, Partition partition ) {
+	public Response addPartitionToHWConf(Long hwconfId, Partition partition ) {
 		EntityManager em = getEntityManager();
 		HWConf hwconf = this.getById(hwconfId);
 		hwconf.addPartition(partition);
@@ -141,13 +150,15 @@ public class CloneToolController extends Controller {
 			em.getTransaction().commit();			
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
 		}
-		return true;
+		return new Response(this.getSession(),"OK", "Partition: " + partition.getName() + " was created in " + hwconf.getName() + " (" + hwconf.getDeviceType() + ")");
 	}
 
 
-	public boolean setConfigurationValue(Long hwconfId, String partitionName, String key, String value) {
+	public Response setConfigurationValue(Long hwconfId, String partitionName, String key, String value) {
 		// TODO Auto-generated method stub
 		Partition partition = this.getPartition(hwconfId, partitionName);
 		switch (key) {
@@ -170,34 +181,55 @@ public class CloneToolController extends Controller {
 			partition.setOs(value);
 		}
 		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
-		em.merge(partition);
-		em.getTransaction().commit();
-		return true;
+		try {
+			em.getTransaction().begin();
+			em.merge(partition);
+			em.getTransaction().commit();			
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK", "Partitions key: " +  key + " was set to " + value );
 	}
 	
-	public boolean delete(Long hwconfId){
+	public Response delete(Long hwconfId){
 		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
-		HWConf hwconf = this.getById(hwconfId);
-		em.remove(hwconf);
-		em.getTransaction().commit();
-		return true;
+		try {
+			em.getTransaction().begin();
+			HWConf hwconf = this.getById(hwconfId);
+			em.remove(hwconf);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK", "Hardware configuration was deleted succesfully.");
 	}
 
-	public boolean deletePartition(Long hwconfId, String partitionName) {
+	public Response deletePartition(Long hwconfId, String partitionName) {
 		// TODO Auto-generated method stub
 		HWConf hwconf = this.getById(hwconfId);
 		Partition partition = this.getPartition(hwconfId, partitionName);
 		hwconf.removePartition(partition);
 		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
-		em.merge(hwconf);
-		em.getTransaction().commit();
-		return true;
+		try {
+			em.getTransaction().begin();
+			em.merge(hwconf);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK", "Partition: " + partitionName + " was deleted from " + hwconf.getName() + " (" + hwconf.getDeviceType() + ")");
 	}
 
-	public boolean deleteConfigurationValue(Long hwconfId, String partitionName, String key) {
+	public Response deleteConfigurationValue(Long hwconfId, String partitionName, String key) {
 		// TODO Auto-generated method stub
 		Partition partition = this.getPartition(hwconfId, partitionName);
 		switch (key) {
@@ -221,10 +253,17 @@ public class CloneToolController extends Controller {
 			break;
 		}
 		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
-		em.merge(partition);
-		em.getTransaction().commit();
-		return true;
+		try {
+			em.getTransaction().begin();
+			em.merge(partition);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK", "Partitions key: " +  key + " was deleted" );
 	}
 
 	public List<HWConf> getAllHWConf() {
@@ -233,7 +272,6 @@ public class CloneToolController extends Controller {
 			Query query = em.createNamedQuery("HWConf.findAll");
 			return (List<HWConf>) query.getResultList();
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
 			System.err.println(e.getMessage()); //TODO
 			return null;
 		} finally {

@@ -8,6 +8,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -74,18 +75,18 @@ public class DeviceController extends Controller {
 	/*
 	 * Deletes a list of device given by the device Ids.
 	 */
-	public boolean delete(List<Long> deviceIds) {
+	public Response delete(List<Long> deviceIds) {
 		EntityManager em = getEntityManager();
 		try {
 			for( Long deviceId : deviceIds) {
 				Device dev = em.find(Device.class, deviceId);
 				em.remove(dev);
 			}
-			return true;
+			return new Response(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
 			// logger.error(e.getMessage());
 			System.err.println(e.getMessage()); //TODO
-			return false;
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -94,16 +95,16 @@ public class DeviceController extends Controller {
 	/*
 	 * Deletes a list of device given by the device Ids.
 	 */
-	public boolean delete(Long deviceId) {
+	public Response delete(Long deviceId) {
 		EntityManager em = getEntityManager();
 		try {
-				Device dev = em.find(Device.class, deviceId);
-				em.remove(dev);
-			return true;
+			Device dev = em.find(Device.class, deviceId);
+			em.remove(dev);
+			return new Response(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
 			// logger.error(e.getMessage());
 			System.err.println(e.getMessage()); //TODO
-			return false;
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -112,7 +113,7 @@ public class DeviceController extends Controller {
 	/*
 	 * Creates devices
 	 */
-	public boolean add(List<Device> devices) {
+	public Response add(List<Device> devices) {
 		EntityManager em = getEntityManager();
 		try {
 			for(Device dev: devices){
@@ -120,10 +121,10 @@ public class DeviceController extends Controller {
 				em.persist(dev);
 				em.getTransaction().commit();
 			}
-			return true;
+			return new Response(this.getSession(),"OK", "Devices were created succesfully.");
 		} catch (Exception e) {
 			System.err.println(e.getMessage()); //TODO
-			return false;
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -242,10 +243,10 @@ public class DeviceController extends Controller {
 		List<String> users = new ArrayList<String>();
 		for( User user : device.getLoggedIn() )
 			users.add(user.getUid());
+			//users.add(user.getUid() + " " + user.getGivenName() + " " +user.getSureName());
 		return users;
 	}
 	
-
 	/*
 	 * Return the list of users which are logged in on this device
 	 */
@@ -255,5 +256,44 @@ public class DeviceController extends Controller {
 		for( User user : device.getLoggedIn() )
 			users.add(user.getUid());
 		return users;
+	}
+
+	public Response setDefaultPrinter(long deviceId, long defaultPrinterId) {
+		// TODO Auto-generated method stub
+		Device device         = this.getById(deviceId);
+		Device defaultPrinter = this.getById(defaultPrinterId);
+		device.setDefaultPrinter(defaultPrinter);
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.merge(device);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK", "Default printer was set succesfully.");
+	}
+	
+	public Response setAvailablePrinters(long deviceId, List<Long> availablePrinterIds) {
+		// TODO Auto-generated method stub
+		Device device         = this.getById(deviceId);
+		List<Device> availablePrinters = new ArrayList<Device>();
+		for( Long aP : availablePrinterIds ) {
+			availablePrinters.add(this.getById(aP));
+		}
+		device.setAvailablePrinters(availablePrinters);
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.merge(device);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK", "Available printers were set succesfully.");
 	}
 }

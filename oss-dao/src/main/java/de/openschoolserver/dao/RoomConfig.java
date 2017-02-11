@@ -11,6 +11,7 @@ import javax.persistence.*;
  *
  */
 @Entity
+@Table(name="RoomConfig")
 public class RoomConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 

@@ -4,6 +4,7 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -11,6 +12,7 @@ import javax.ws.rs.*;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Response;
 
 import java.util.List;
 
@@ -80,7 +82,7 @@ public interface DeviceResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    boolean add(
+    Response add(
             @ApiParam(hidden = true) @Auth Session session,
             List<Device> devices
     );
@@ -96,7 +98,7 @@ public interface DeviceResource {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
-    boolean delete(
+    Response delete(
             @ApiParam(hidden = true) @Auth Session session,
             List<Long> deviceId
            // @PathParam("deviceId") List<Long> deviceId
@@ -113,7 +115,7 @@ public interface DeviceResource {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
-    boolean delete(
+    Response delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") Long deviceId
     );
@@ -184,6 +186,23 @@ public interface DeviceResource {
     );
     
     /*
+     * PUT devices/{deviceId}/defaultPrinter/{defaultPrinterId}
+     */
+    @PUT
+    @Path("{deviceId}/defaultPrinter/{defaultPrinterId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set default printer Name")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response setDefaultPrinter(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") long deviceId,
+            @PathParam("defaulPrinterId") long defaultPrinterId
+    );
+    
+    /*
      * GET devices/{deviceId}/availablePrinters
      */
     @GET
@@ -197,6 +216,23 @@ public interface DeviceResource {
     List<String> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
+    );
+    
+    /*
+     * PUT devices/{deviceId}/availablePrinters
+     */
+    @PUT
+    @Path("{deviceId}/availablePrinters")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set the list of name of the available printers")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response setAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") long deviceId,
+            List<Long> availablePrinters
     );
     
     /*
