@@ -48,8 +48,6 @@ public class Device implements Serializable {
 	@Column(name="WLANMAC")
 	private String wlanmac;
 
-	private String deviceType;
-
     //bi-directional many-to-one association to DeviceMConfig
     @OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
     @JsonIgnore
@@ -137,7 +135,7 @@ public class Device implements Serializable {
 	long hwconfId;
 
 	public Device() {
-		this.deviceType = "fatClient";
+		this.hwconfId = -1;
 	}
 
 	public long getId() {
@@ -218,14 +216,6 @@ public class Device implements Serializable {
 
 	public void setRow(int row) {
 		this.row = row;
-	}
-
-	public String getDeviceType() {
-		return this.deviceType;
-	}
-
-	public void setDeviceType(String devicetype) {
-		this.deviceType = devicetype;
 	}
 
 	public List<Device> getAvailablePrinters() {

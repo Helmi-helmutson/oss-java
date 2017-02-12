@@ -109,7 +109,6 @@ CREATE TABLE IF NOT EXISTS Devices (
         WLANIP       VARCHAR(16) DEFAULT '',
         MAC          VARCHAR(17) NOT NULL,
         WLANMAC      VARCHAR(17) DEFAULT '',
-        deviceType   VARCHAR(16) NOT NULL,
         row          INTEGER  DEFAULT 0,
         place        INTEGER  DEFAULT 0,
         FOREIGN KEY(room_id)   REFERENCES Rooms(id),
