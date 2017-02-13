@@ -2,8 +2,10 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -30,14 +32,16 @@ public class HWConf implements Serializable {
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="hwconf")
+	@JsonIgnore
 	private List<Device> devices;
 
 	//bi-directional many-to-one association to Partition
-	@OneToMany(mappedBy="hwconf")
+	@OneToMany(mappedBy="hwconf", cascade={ CascadeType.REMOVE,CascadeType.PERSIST })
 	private List<Partition> partitions;
 
 	//bi-directional many-to-one association to Room
 	@OneToMany(mappedBy="hwconf")
+	@JsonIgnore
 	private List<Room> rooms;
 
 	public HWConf() {
@@ -67,7 +71,7 @@ public class HWConf implements Serializable {
 		this.name = name;
 	}
 
-	
+
 
 	public String getDeviceType() {
 		return deviceType;

@@ -4,6 +4,7 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -11,6 +12,7 @@ import javax.ws.rs.*;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Response;
 
 import java.util.List;
 
@@ -67,57 +69,6 @@ public interface DeviceResource {
     List<Device> getAll(
             @ApiParam(hidden = true) @Auth Session session
     );
-
-    /*
-     * POST devices/add { hash }
-     */
-    @POST
-    @Path("add")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create new devices")
-    @ApiResponses(value = {
-            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
-            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @PermitAll
-    boolean add(
-            @ApiParam(hidden = true) @Auth Session session,
-            List<Device> devices
-    );
-    
-    /*
-     * POST devices/delete [ deviceId, deviceId]
-     */
-    @POST
-    @Path("delete")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "delete devices by id")
-    @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Device not found"),
-        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
-    boolean delete(
-            @ApiParam(hidden = true) @Auth Session session,
-            List<Long> deviceId
-           // @PathParam("deviceId") List<Long> deviceId
-    );
-    
-    /*
-     * DELETE devices/{deviceId}
-     */
-    @DELETE
-    @Path("{deviceId}")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delete a device defined by deviceId")
-    @ApiResponses(value = {
-        @ApiResponse(code = 404, message = "Device not found"),
-        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
-    boolean delete(
-            @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") Long deviceId
-    );
-
     
     /*
      * GET devices/byIP/<IPAddress>
@@ -184,6 +135,23 @@ public interface DeviceResource {
     );
     
     /*
+     * PUT devices/{deviceId}/defaultPrinter/{defaultPrinterId}
+     */
+    @PUT
+    @Path("{deviceId}/defaultPrinter/{defaultPrinterId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set default printer Name")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response setDefaultPrinter(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") long deviceId,
+            @PathParam("defaulPrinterId") long defaultPrinterId
+    );
+    
+    /*
      * GET devices/{deviceId}/availablePrinters
      */
     @GET
@@ -197,6 +165,23 @@ public interface DeviceResource {
     List<String> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
+    );
+    
+    /*
+     * PUT devices/{deviceId}/availablePrinters
+     */
+    @PUT
+    @Path("{deviceId}/availablePrinters")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set the list of name of the available printers")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response setAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") long deviceId,
+            List<Long> availablePrinters
     );
     
     /*
@@ -216,6 +201,40 @@ public interface DeviceResource {
     );
     
     /*
+     * PUT devices/loggedInUsers/{IP-Address}/{userName}
+     */
+    @PUT
+    @Path("loggedInUsers/{IP}/{userName}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the logged on users on a device defined by IP.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response addLoggedInUser(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP,
+            @PathParam("userName") String userName
+    );
+    
+    /*
+     * DELETE devices/loggedInUsers/{IP-Address}/{userName}
+     */
+    @DELETE
+    @Path("loggedInUsers/{IP}/{userName}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the logged on users on a device defined by IP.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response removeLoggedInUser(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP,
+            @PathParam("userName") String userName
+    );
+    
+    /*
      * GET devices/{deviceId}/loggedInUsers
      */
     @GET
@@ -229,6 +248,5 @@ public interface DeviceResource {
     List<String> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
-    );
-    
+    );    
 }

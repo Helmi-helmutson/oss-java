@@ -2,8 +2,6 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.List;
@@ -16,15 +14,13 @@ import java.util.List;
 @Entity
 @Table(name="Devices")
 @NamedQueries( {
-	@NamedQuery(name="Device.findAll", query="SELECT d FROM Device d"),
-	@NamedQuery(name="Device.getDeviceByType", query="SELECT d FROM Device d where d.deviceType = :type"),
-	@NamedQuery(name="Device.getByIP",   query="SELECT d FROM Device d where d.ip = :IP OR d.wlanip = :IP"),
-	
-	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
-	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device d where d.name = :name"),
-	@NamedQuery(name="Device.search",    query="SELECT d FROM Device d where d.name LIKE :name OR d.ip LIKE :name" ),
-	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :user_id AND c.keyword = :keyword" ),
-	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :user_id AND c.keyword = :keyword" )
+	@NamedQuery(name="Device.findAll",    query="SELECT d FROM Device d"),
+	@NamedQuery(name="Device.getByIP",    query="SELECT d FROM Device d where d.ip = :IP OR d.wlanip = :IP"),
+	@NamedQuery(name="Device.getByMAC",   query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
+	@NamedQuery(name="Device.getByName",  query="SELECT d FROM Device d where d.name = :name"),
+	@NamedQuery(name="Device.search",     query="SELECT d FROM Device d where d.name LIKE :name OR d.ip LIKE :name" ),
+	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" ),
+	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" )
 })
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -33,8 +29,10 @@ public class Device implements Serializable {
 	private long id;
 
 	private String name;
-        @Column(name="col")
-	private int column;
+
+	private int place;
+
+	private int row;
 
 	@Column(name="IP")
 	private String ip;
@@ -48,54 +46,57 @@ public class Device implements Serializable {
 	@Column(name="WLANMAC")
 	private String wlanmac;
 
-	private int row;
+	//bi-directional many-to-one association to DeviceMConfig
+	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
+	@JsonIgnore
+	private List<DeviceMConfig> deviceMConfigs;
 
-	private String deviceType;
-
-        //bi-directional many-to-one association to DeviceMConfig
-        @OneToMany(mappedBy="device", cascade=CascadeType.REMOVE)
-        private List<DeviceMConfig> DeviceMConfig;
-
-        //bi-directional many-to-one association to DeviceConfig
-        @OneToMany(mappedBy="device", cascade=CascadeType.REMOVE)
-        private List<DeviceConfig> DeviceConfig;
+	//bi-directional many-to-one association to DeviceConfig
+	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
+	@JsonIgnore
+	private List<DeviceConfig> deviceConfigs;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
 	@JoinTable(
-		name="AvailablePrinters"
-		, joinColumns={
-			@JoinColumn(name="device_id")
+			name="AvailablePrinters"
+			, joinColumns={
+					@JoinColumn(name="device_id")
 			}
-		, inverseJoinColumns={
-			@JoinColumn(name="printer_id")
+			, inverseJoinColumns={
+					@JoinColumn(name="printer_id")
 			}
-		)
+			)
+	@JsonIgnore
 	private List<Device> availablePrinters;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="availablePrinters")
+	@JsonIgnore
 	private List<Device> availableForDevices;
 
 	//bi-directional many-to-many association to Device
 	@ManyToOne
 	@JoinTable(
-		name="DefaultPrinters"
-		, joinColumns={
-			@JoinColumn(name="device_id")
+			name="DefaultPrinter"
+			, joinColumns={
+					@JoinColumn(name="device_id")
 			}
-		, inverseJoinColumns={
-			@JoinColumn(name="printer_id")
+			, inverseJoinColumns={
+					@JoinColumn(name="printer_id")
 			}
-		)
+			)
+	@JsonIgnore
 	private Device defaultPrinter;
 
 	//bi-directional many-to-many association to Device
 	@OneToMany(mappedBy="defaultPrinter")
+	@JsonIgnore
 	private List<Device> defaultForDevices;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
+	@JsonIgnore
 	private HWConf hwconf;
 
 	//bi-directional many-to-one association to Room
@@ -110,10 +111,12 @@ public class Device implements Serializable {
 
 	//bi-directional many-to-many association to Room
 	@ManyToMany(mappedBy="availablePrinters")
+	@JsonIgnore
 	private List<Room> availableInRooms;
 
 	//bi-directional many-to-many association to Room
 	@OneToMany(mappedBy="defaultPrinter")
+	@JsonIgnore
 	private List<Room> defaultInRooms;
 
 	//bi-directional many-to-one association to TestUser
@@ -126,7 +129,11 @@ public class Device implements Serializable {
 	@JsonIgnore
 	private List<User> loggedIn;
 
+	@Transient
+	long hwconfId;
+
 	public Device() {
+		this.hwconfId = -1;
 	}
 
 	public long getId() {
@@ -136,7 +143,7 @@ public class Device implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Device && obj !=null) {
@@ -144,7 +151,15 @@ public class Device implements Serializable {
 		}
 		return super.equals(obj);
 	}
-	
+
+	public long getHwconfId() {
+		return this.hwconfId;
+	}
+
+	public void setHwconfId(long id) {
+		this.hwconfId = id;
+	}
+
 	public String getName() {
 		return this.name;
 	}
@@ -153,12 +168,12 @@ public class Device implements Serializable {
 		this.name = name;
 	}
 
-	public int getColumn() {
-		return this.column;
+	public int getPlace() {
+		return this.place;
 	}
 
-	public void setColumn(int column) {
-		this.column = column;
+	public void setPlace(int place) {
+		this.place = place;
 	}
 
 	public String getIp() {
@@ -201,14 +216,6 @@ public class Device implements Serializable {
 		this.row = row;
 	}
 
-	public String getDeviceType() {
-		return this.deviceType;
-	}
-
-	public void setDeviceType(String devicetype) {
-		this.deviceType = devicetype;
-	}
-
 	public List<Device> getAvailablePrinters() {
 		return this.availablePrinters;
 	}
@@ -233,14 +240,15 @@ public class Device implements Serializable {
 		this.defaultPrinter = defaultPrinter;
 	}
 
-	public List<Device> getDefaultForDevices() {
+/*
+ * 	public List<Device> getDefaultForDevices() {
 		return this.defaultForDevices;
 	}
 
 	public void setDefaultForDevices(List<Device> defaultForDevices) {
 		this.defaultForDevices = defaultForDevices;
 	}
-
+*/
 	public HWConf getHwconf() {
 		return this.hwconf;
 	}
@@ -309,6 +317,47 @@ public class Device implements Serializable {
 
 	public void setLoggedIn(List<User> loggedIn) {
 		this.loggedIn = loggedIn;
+	}
+
+
+	public List<DeviceConfig> getDeviceConfigs() {
+		return this.deviceConfigs;
+	}
+
+	public void setDeviceConfigs(List<DeviceConfig> deviceConfigs) {
+		this.deviceConfigs = deviceConfigs;
+	}
+
+	public DeviceConfig addDeviceConfig(DeviceConfig deviceConfig) {
+		getDeviceConfigs().add(deviceConfig);
+		deviceConfig.setDevice(this);
+		return deviceConfig;
+	}
+
+	public DeviceConfig removeDeviceConfig(DeviceConfig deviceConfig) {
+		getDeviceConfigs().remove(deviceConfig);
+		deviceConfig.setDevice(null);
+		return deviceConfig;
+	}
+
+	public List<DeviceMConfig> getDeviceMConfigs() {
+		return this.deviceMConfigs;
+	}
+
+	public void setDeviceMConfigs(List<DeviceMConfig> deviceMConfigs) {
+		this.deviceMConfigs = deviceMConfigs;
+	}
+
+	public DeviceMConfig addDeviceMConfig(DeviceMConfig deviceMConfig) {
+		getDeviceMConfigs().add(deviceMConfig);
+		deviceMConfig.setDevice(this);
+		return deviceMConfig;
+	}
+
+	public DeviceMConfig removeDeviceMConfig(DeviceMConfig deviceMConfig) {
+		getDeviceMConfigs().remove(deviceMConfig);
+		deviceMConfig.setDevice(null);
+		return deviceMConfig;
 	}
 
 }

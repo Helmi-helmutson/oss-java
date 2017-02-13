@@ -3,12 +3,11 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.ws.rs.WebApplicationException;
 
 import de.openschoolserver.api.resources.DeviceResource;
 import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.Room;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DeviceController;
 
@@ -24,10 +23,8 @@ public class DeviceResourceImpl implements DeviceResource {
 	    return device;
 	}
 
-
 	@Override
 	public List<Device> getAll(Session session) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final List<Device> devices = deviceController.getAll();
 		if (devices == null) {
@@ -37,30 +34,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public boolean add(Session session, List<Device> devices) {
-		// TODO Auto-generated method stub
-		final DeviceController deviceController = new DeviceController(session);
-		final boolean result = deviceController.add(devices);
-		if (! result) {
-	            throw new WebApplicationException(404);
-	    }
-		return true;
-	}
-
-	@Override
-	public boolean delete(Session session, List<Long> deviceIds) {
-		// TODO Auto-generated method stub
-		final DeviceController deviceController = new DeviceController(session);
-		final boolean result = deviceController.delete(deviceIds);
-		if (! result) {
-	            throw new WebApplicationException(404);
-	    }
-		return true;
-	}
-
-	@Override
 	public Device getByIP(Session session, String IP) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final Device device = deviceController.getByIP(IP);
 		if (device == null) {
@@ -71,7 +45,6 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public Device getByMAC(Session session, String MAC) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final Device device = deviceController.getByMAC(MAC);
 		if (device == null) {
@@ -80,10 +53,8 @@ public class DeviceResourceImpl implements DeviceResource {
 		return device;
 	}
 
-
 	@Override
 	public List<Device> getByType(Session session, String type) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final List<Device> devices = deviceController.getByTpe(type);
 		if (devices == null) {
@@ -92,56 +63,61 @@ public class DeviceResourceImpl implements DeviceResource {
 		return devices;
 	}
 
-
 	@Override
 	public Device getByName(Session session, String Name) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
 		final Device device = deviceController.getByName(Name);
+		if (device == null) {
+            throw new WebApplicationException(404);
+		}
 		return device;
 	}
 
-
 	@Override
 	public String getDefaultPrinter(Session session, long deviceId) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final String printer = deviceController.getDefaultPrinter(deviceId);
-		return printer;
+		return deviceController.getDefaultPrinter(deviceId);
 	}
-
 
 	@Override
 	public List<String> getAvailablePrinters(Session session, long deviceId) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final List<String> printers = deviceController.getAvailablePrinters(deviceId);
-		return printers;
+		return deviceController.getAvailablePrinters(deviceId);
 	}
-
 
 	@Override
 	public List<String> getLoggedInUsers(Session session, String IP) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final List<String> users = deviceController.getLoggedInUsers(IP);
-		return users;
+		return deviceController.getLoggedInUsers(IP);
 	}
 
 	@Override
 	public List<String> getLoggedInUsers(Session session, long deviceId) {
-		// TODO Auto-generated method stub
 		final DeviceController deviceController = new DeviceController(session);
-		final List<String> users = deviceController.getLoggedInUsers(deviceId);
-		return users;
+		return deviceController.getLoggedInUsers(deviceId);
 	}
 
+	@Override
+	public Response setDefaultPrinter(Session session, long deviceId, long defaultPrinterId) {
+		final DeviceController deviceController = new DeviceController(session);
+		return deviceController.setDefaultPrinter(deviceId,defaultPrinterId);
+	}
 
 	@Override
-	public boolean delete(Session session, Long deviceId) {
-		// TODO Auto-generated method stub
+	public Response setAvailablePrinters(Session session, long deviceId, List<Long> availablePrinters) {
 		final DeviceController deviceController = new DeviceController(session);
-		deviceController.delete(deviceId);
-		return false;
+		return deviceController.setAvailablePrinters(deviceId,availablePrinters);
+	}
+
+	@Override
+	public Response addLoggedInUser(Session session, String IP, String userName) {
+		final DeviceController deviceController = new DeviceController(session);
+		return deviceController.addLoggedInUser(IP, userName);
+	}
+
+	@Override
+	public Response removeLoggedInUser(Session session, String IP, String userName) {
+		final DeviceController deviceController = new DeviceController(session);
+		return deviceController.removeLoggedInUser(IP, userName);
 	}
 }

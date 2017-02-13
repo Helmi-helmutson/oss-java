@@ -4,12 +4,13 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import javax.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * The persistent class for the RoomMConfig database table.
  *
  */
 @Entity
+@Table(name="RoomMConfig")
 public class RoomMConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 
@@ -22,6 +23,7 @@ public class RoomMConfig implements Serializable {
 
         //bi-directional many-to-one association to Room
         @ManyToOne
+        @JsonIgnore
         private Room room;
 
         public long getId() {

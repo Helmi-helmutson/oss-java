@@ -3,10 +3,6 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
-
-
-
-
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -17,6 +13,8 @@ import javax.persistence.Query;
 import java.sql.Time;
 
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
@@ -36,7 +34,7 @@ public class RoomController extends Controller {
 	{
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Room.getRoomByName");
+			Query query = em.createNamedQuery("Room.getByName");
 			query.setParameter("name", name);
 			List<Room> rooms = (List<Room>) query.getResultList();
 			return rooms.isEmpty();
@@ -53,7 +51,7 @@ public class RoomController extends Controller {
 	{
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Room.getRoomByDescription");
+			Query query = em.createNamedQuery("Room.getByDescription");
 			query.setParameter("description", description);
 			List<Room> rooms = query.getResultList();
 			return rooms.isEmpty();
@@ -94,14 +92,14 @@ public class RoomController extends Controller {
 		}
 	}
 
-	public boolean add(Room room){
+	public Response add(Room room){
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(room.getName())){
-			return false;
+			return new Response(this.getSession(),"ERROR", "Room name is not unique.");
 		}
 		if( !this.isDescriptionUnique(room.getDescription())){
-			return false;
+			return new Response(this.getSession(),"ERROR", "Room description is not unique.");
 		}
 		// If no network was configured we will use net school network.
 		if( room.getNetwork().equals(""))
@@ -111,19 +109,21 @@ public class RoomController extends Controller {
 		if( room.getStartIP() == "" ) {
 			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
 		}
+		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
 		try {
 			em.getTransaction().begin();
 			em.persist(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR ", e.getMessage());
 		}
-		return true;
+		return new Response(this.getSession(),"OK ", "Room was created succesfully.");
 	}
 
-	public boolean delete(long roomId){
+	public Response delete(long roomId){
 		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
 		DeviceController devController = new DeviceController(this.getSession());
 		Room room = this.getById(roomId);
 		List<Long> deviceIds = new ArrayList<Long>();
@@ -132,7 +132,8 @@ public class RoomController extends Controller {
 		}
 		devController.delete(deviceIds);
 		em.remove(room);
-		return false;
+		em.getTransaction().commit();
+		return new Response(this.getSession(),"OK", "Room was removed successfully.");
 	}
 
 	/*
@@ -158,7 +159,7 @@ public class RoomController extends Controller {
 	 * If the subnet is "" the default school network is meant.
 	 */
 	public String getNextRoomIP( String subnet, int roomNetMask ) throws NumberFormatException {
-		if( subnet.equals("") ){
+		if( subnet == null || subnet.equals("") ){
 			subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
 		}
 		IPv4Net subNetwork = new IPv4Net( subnet );
@@ -182,9 +183,10 @@ public class RoomController extends Controller {
 		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
 
 		// Find the net of the last room
-		query = em.createQuery("SELECT r.netmask FROM WHERE startIP = :startIP",Room.class);
+		query = em.createQuery("SELECT r FROM Room r WHERE r.startIP = :startIP",Room.class);
 		query.setParameter("startIP", lastNetworkIP);
-		int lastNetMask = (int) query.getSingleResult();
+		Room lastRoom = (Room)query.getSingleResult();
+		int lastNetMask = lastRoom.getNetMask(); 
 		//Find the next free net with the network mask of the last room
 		IPv4Net net = new IPv4Net( lastNetworkIP + "/" + lastNetMask );
 		String nextNet = net.getNext();
@@ -268,10 +270,11 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the list of accesses in a room
 	 */
-	public void setAccessList(long roomId,List<AccessInRoom> AccessList){
+	public Response setAccessList(long roomId,List<AccessInRoom> AccessList){
 		Room room = this.getById(roomId);
 		//Es ist nicht soo einfach. Als erstes werden die Vorhandene gelöscht und dann die Neue angelegt.
 		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
 		for(AccessInRoom access : room.getAccessInRooms() ){
 			em.remove(access);
 		}
@@ -316,6 +319,8 @@ public class RoomController extends Controller {
 			}
 			em.persist(tmp);
 		}
+		em.getTransaction().commit();
+		return new Response(this.getSession(),"OK","Acces was created succesfully");
 	}
 
 	/*
@@ -379,15 +384,16 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the actual access status in a room 
 	 */
-	public void setAccessStatus(long roomId, AccessInRoom access) {
+	public Response setAccessStatus(long roomId, AccessInRoom access) {
 		Room room = this.getById(roomId);
 		this.setAccessStatus(room, access);
+		return new Response(this.getSession(),"OK", "Access state in "+room.getName()+" was set succesfully." );
 	}
 
 	/*
 	 * Sets the scheduled access status in all rooms
 	 */
-	public void setScheduledAccess(){
+	public Response setScheduledAccess(){
 		EntityManager em = getEntityManager();
 		Calendar rightNow = Calendar.getInstance();
 		String   actTime  = String.format("%02d:%02d", rightNow.get(Calendar.HOUR_OF_DAY),rightNow.get(Calendar.MINUTE));
@@ -396,7 +402,8 @@ public class RoomController extends Controller {
 		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
 			Room room = access.getRoom();
 			this.setAccessStatus(room, access);
-		}	
+		}
+		return new Response(this.getSession(),"OK", "Scheduled access states where set succesfully." );
 	}
 
 	/*
@@ -477,5 +484,106 @@ public class RoomController extends Controller {
 			accesses.add(this.getAccessStatus(room));
 		}
 		return accesses;
+	}
+	
+	/*
+	 * Creates new devices in the room
+	 */
+	public Response addDevices(long roomId,List<Device> devices){
+		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
+		Room room = this.getById(roomId);
+		StringBuilder error = new StringBuilder();
+		for(Device device : devices) {
+			if( ! this.isNameUnique(device.getName())){
+				error.append("Devices name is not unique." );
+			}
+			if( this.checkBadHostName(device.getName())){
+				error.append("Devices name contains not allowed characters." );
+			}
+			//Check the MAC address
+			String name =  this.isMacUnique(device.getMac());
+			if( name != "" ){
+				error.append("The MAC address will be used allready:" + name );
+			}
+			device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
+			if( ! IPv4.validateMACAddress(device.getMac())) {
+				error.append("The MAC address is not valid:" + device.getMac() );	
+			}
+			//Check the IP address
+			name =  this.isIPUnique(device.getIp());
+			if( name != "" ){
+				error.append("The IP address will be used allready:" + name );
+			}
+			if( ! IPv4.validateIPAddress(device.getIp())) {
+				error.append("The IP address is not valid:" + device.getIp() );	
+			}
+			if( device.getWlanMac().isEmpty() ) {
+				device.setWlanIp("");
+			}
+			else
+			{ //check WLAN
+				//Check the MAC address
+				name =  this.isMacUnique(device.getMac());
+				if( name != "" ){
+					error.append("The MAC address will be used allready:" + name );
+				}
+				device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
+				if( ! IPv4.validateMACAddress(device.getMac())) {
+					error.append("The MAC address is not valid:" + device.getMac() );	
+				}
+				//Check the IP address
+				name =  this.isIPUnique(device.getIp());
+				if( name != "" ){
+					error.append("The IP address will be used allready:" + name );
+				}
+				if( ! IPv4.validateIPAddress(device.getIp())) {
+					error.append("The IP address is not valid:" + device.getIp() );	
+				}
+			}
+			device.setRoom(room);
+			if(device.getHwconfId() != -1){
+				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
+			} else {
+				device.setHwconf(room.getHwconf());
+			}
+			room.addDevice(device);
+		}
+		if(error.length() > 0){
+			return new Response(this.getSession(),"ERROR",error.toString());
+		}
+		
+		try {
+			em.merge(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR ", e.getMessage());
+		}
+		//TODO DNS Configuration
+		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+		dhcpconfig.Create();
+		return new Response(this.getSession(),"OK", "Devices were created succesfully." );
+	}
+	
+	/*
+	 * Creates new devices in the room
+	 */
+	public Response deleteDevices(long roomId,List<Long> deviceIDs){
+		EntityManager em = getEntityManager();
+		Room room = this.getById(roomId);
+		for(Long deviceId : deviceIDs) {
+			Device device = em.find(Device.class, deviceId);
+			room.removeDevice(device);
+		}
+		try {
+			em.getTransaction().begin();
+			em.merge(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR ", e.getMessage());
+		}
+		return new Response(this.getSession(),"OK ", "Devices were deleted succesfully.");
 	}
 }

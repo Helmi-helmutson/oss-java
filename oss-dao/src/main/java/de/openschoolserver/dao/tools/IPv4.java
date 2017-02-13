@@ -99,6 +99,19 @@ public class IPv4 {
 		return false;
 	}
 
+	static public boolean validateMACAddress(String MACAddress) {
+
+		if (MACAddress.isEmpty()) {
+			return false;
+		}
+
+		if (MACAddress
+				.matches("^[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]:[0-9A-F][0-9A-F]$")) {
+
+			return true;
+		}
+		return false;
+	}
 	static public List<String> sortIPAddresses(List<String> ipaddresses) {
 		
 		List<Long> numericIPAddresses = new ArrayList<Long>();

@@ -2,6 +2,7 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import java.util.List;
 
@@ -13,13 +14,13 @@ import java.util.List;
 @Entity
 @Table(name="Rooms")
 @NamedQueries ({
-  @NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
-  @NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
-  @NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
-  @NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
-  @NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id"),
-  @NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :user_id AND c.keyword = :keyword" ),
-  @NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :user_id AND c.keyword = :keyword" )
+	@NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
+	@NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
+	@NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
+	@NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
+	@NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id"),
+	@NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" ),
+	@NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" )
 })
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -29,7 +30,9 @@ public class Room implements Serializable {
 
 	private String name;
 
-	private int columns;
+	private int places;
+
+	private int rows;
 
 	private String description;
 
@@ -38,64 +41,74 @@ public class Room implements Serializable {
 	private String startIP;
 
 	private String roomType;
-	
-	private int rows;
 
-        //bi-directional many-to-one association to RoomMConfig
-        @OneToMany(mappedBy="room", cascade=CascadeType.REMOVE)
-        private List<RoomMConfig> RoomMConfig;
+	//bi-directional many-to-one association to RoomMConfig
+	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
+	private List<RoomMConfig> roomMConfigs;
 
-        //bi-directional many-to-one association to RoomConfig
-        @OneToMany(mappedBy="room", cascade=CascadeType.REMOVE)
-        private List<RoomConfig> RoomConfig;
+	//bi-directional many-to-one association to RoomConfig
+	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
+	private List<RoomConfig> roomConfigs;
 
 	//bi-directional many-to-one association to AccessInRoom
-	@OneToMany(mappedBy="room")
+	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<AccessInRoom> accessInRooms;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="room")
+	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Device> devices;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
 	@JoinTable(
-		name="AvailablePrinters"
-		, joinColumns={
-			@JoinColumn(name="room_id")
+			name="AvailablePrinters"
+			, joinColumns={
+					@JoinColumn(name="room_id")
 			}
-		, inverseJoinColumns={
-			@JoinColumn(name="printer_id")
+			, inverseJoinColumns={
+					@JoinColumn(name="printer_id")
 			}
-		)
+			)
+	@JsonIgnore
 	private List<Device> availablePrinters;
 
 	//bi-directional many-to-one association to Device
 	@ManyToOne
 	@JoinTable(
-		name="DefaultPrinter"
-		, joinColumns={
-			@JoinColumn(name="room_id")
+			name="DefaultPrinter"
+			, joinColumns={
+					@JoinColumn(name="room_id")
 			}
-		, inverseJoinColumns={
-			@JoinColumn(name="printer_id")
+			, inverseJoinColumns={
+					@JoinColumn(name="printer_id")
 			}
-		)
+			)
+	@JsonIgnore
 	private Device defaultPrinter;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
+	@JsonIgnore
 	private HWConf hwconf;
 
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="room")
+	@JsonIgnore
 	private List<Test> tests;
 
 	@Transient
 	private String network;
-	
+
+	@Transient
+	private long hwconfId;
+
 	public Room() {
-		this.network = "";
+		this.network  = "";
+		this.hwconfId = 0;
 	}
 
 	public long getId() {
@@ -113,7 +126,15 @@ public class Room implements Serializable {
 		}
 		return super.equals(obj);
 	}
-	
+
+	public long getHwconfId() {
+		return this.hwconfId;
+	}
+
+	public void setHwconfId(long id) {
+		this.hwconfId = id;
+	}
+
 	public String getName() {
 		return this.name;
 	}
@@ -122,12 +143,12 @@ public class Room implements Serializable {
 		this.name = name;
 	}
 
-	public int getColumns() {
-		return this.columns;
+	public int getPlaces() {
+		return this.places;
 	}
 
-	public void setColumns(int columns) {
-		this.columns = columns;
+	public void setPlaces(int places) {
+		this.places = places;
 	}
 
 	public String getDescription() {
@@ -154,7 +175,7 @@ public class Room implements Serializable {
 		this.startIP = startIP;
 	}
 
-	public String getType() {
+	public String getRoomType() {
 		return this.roomType;
 	}
 
@@ -241,7 +262,7 @@ public class Room implements Serializable {
 
 		return test;
 	}
-	
+
 	public String getNetwork() {
 		return this.network;
 	}
@@ -250,6 +271,45 @@ public class Room implements Serializable {
 		this.network = network;
 	}
 
+	public List<RoomConfig> getRoomConfigs() {
+		return this.roomConfigs;
+	}
+
+	public void setRoomConfigs(List<RoomConfig> roomConfigs) {
+		this.roomConfigs = roomConfigs;
+	}
+
+	public RoomConfig addRoomConfig(RoomConfig roomConfig) {
+		getRoomConfigs().add(roomConfig);
+		roomConfig.setRoom(this);
+		return roomConfig;
+	}
+
+	public RoomConfig removeRoomConfig(RoomConfig roomConfig) {
+		getRoomConfigs().remove(roomConfig);
+		roomConfig.setRoom(null);
+		return roomConfig;
+	}
+
+	public List<RoomMConfig> getRoomMConfigs() {
+		return this.roomMConfigs;
+	}
+
+	public void setRoomMConfigs(List<RoomMConfig> roomMConfigs) {
+		this.roomMConfigs = roomMConfigs;
+	}
+
+	public RoomMConfig addRoomMConfig(RoomMConfig roomMConfig) {
+		getRoomMConfigs().add(roomMConfig);
+		roomMConfig.setRoom(this);
+		return roomMConfig;
+	}
+
+	public RoomMConfig removeRoomMConfig(RoomMConfig roomMConfig) {
+		getRoomMConfigs().remove(roomMConfig);
+		roomMConfig.setRoom(null);
+		return roomMConfig;
+	}
 
 
 }

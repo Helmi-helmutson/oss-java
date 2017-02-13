@@ -4,7 +4,6 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
-
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -12,6 +11,8 @@ import javax.ws.rs.*;
 
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.AccessInRoom;
+import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public interface RoomResource {
     @GET
     @Path("{roomId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get room by id")
+    @ApiOperation(value = "Get a room by id")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Room not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -43,9 +44,9 @@ public interface RoomResource {
      * GET rooms/getAll
      */
     @GET
-    @Path("getAll")
+    @Path("all")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get all rooms")
+    @ApiOperation(value = "Get all rooms")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -61,13 +62,13 @@ public interface RoomResource {
     @POST
     @Path("add")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "create new room")
+    @ApiOperation(value = "Create new room")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    boolean add(
+    Response add(
             @ApiParam(hidden = true) @Auth Session session,
             Room room
     );
@@ -78,12 +79,12 @@ public interface RoomResource {
     @DELETE
     @Path("{roomId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "delete room by id")
+    @ApiOperation(value = "Delete room by id")
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Room not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @PermitAll
-    boolean delete(
+    Response delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
@@ -93,7 +94,7 @@ public interface RoomResource {
      * GET rooms/{roomId}/getAvailableIPAddresses
      */
     @GET
-    @Path("{roomId}/getAvailableIPAddresses")
+    @Path("{roomId}/availableIPAddresses")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "get all available ip-adresses of the room")
         @ApiResponses(value = {
@@ -110,7 +111,7 @@ public interface RoomResource {
      */
     @PUT
     @Path("getNextRoomIP")
-    @Produces(JSON_UTF8)
+    @Produces("text/plain")
     @ApiOperation(value = "Delivers the next free ip address for a room.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
@@ -124,10 +125,10 @@ public interface RoomResource {
     );
     
     /*
-     * GET rooms/{roomId}/getLoggedInUsers
+     * GET rooms/{roomId}/loggedInUsers
      */
     @GET
-    @Path("{roomId}/getLoggedInUsers")
+    @Path("{roomId}/loggedInUsers")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Delivers the list of the users which are logged in in a room.")
     @ApiResponses(value = {
@@ -141,10 +142,10 @@ public interface RoomResource {
     );
     
     /*
-     * GET rooms/{roomId}/getAccessList
+     * GET rooms/{roomId}/accessList
      */
     @GET
-    @Path("{roomId}/getAccessList")
+    @Path("{roomId}/accessList")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Gets the access list in a room")
     @ApiResponses(value = {
@@ -158,10 +159,10 @@ public interface RoomResource {
     );
     
     /*
-     * POST rooms/{roomId}/getAccessList { List<Hash> }
+     * POST rooms/{roomId}/accessList { List<Hash> }
      */
     @POST
-    @Path("{roomId}/setAccessList")
+    @Path("{roomId}/accessList")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Sets the access list in a room")
     @ApiResponses(value = {
@@ -169,17 +170,17 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    boolean setAccessList(
+    Response setAccessList(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             List<AccessInRoom>   accessList
     );
     
     /*
-     * GET rooms/setScheduledAccess
+     * PUT rooms/scheduledAccess
      */
-    @GET
-    @Path("setScheduledAccess")
+    @PUT
+    @Path("scheduledAccess")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Sets access in all rooms corresponding to the access lists and the actual time.")
     @ApiResponses(value = {
@@ -187,17 +188,17 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    boolean setScheduledAccess(
+    Response setScheduledAccess(
     		@ApiParam(hidden = true) @Auth Session session
     );
     
     /*
-     * GET rooms/getAccessStatus
+     * GET rooms/accessStatus
      */
     @GET
-    @Path("getAccessStatus")
+    @Path("accessStatus")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the actual access.")
+    @ApiOperation(value = "Gets the actual access status in all rooms.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -208,10 +209,10 @@ public interface RoomResource {
     );
 
     /*
-     * GET rooms/{roomId}/getAccessStatus
+     * GET rooms/{roomId}/accessStatus
      */
     @GET
-    @Path("{roomId}/getAccessStatus")
+    @Path("{roomId}/accessStatus")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Gets the actual access in a room")
     @ApiResponses(value = {
@@ -225,10 +226,10 @@ public interface RoomResource {
     );
     
     /*
-     * POST rooms/{roomId}/setAccessStatus
+     * POST rooms/{roomId}/accessStatus
      */
     @POST
-    @Path("{roomId}/setAccessStatus")
+    @Path("{roomId}/accessStatus")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Sets the actual access in a room")
     @ApiResponses(value = {
@@ -236,9 +237,62 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    boolean setAccessStatus(
+    Response setAccessStatus(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             AccessInRoom access
+    );
+    
+    // Functions to manage Devices in Rooms
+    /*
+     * POST devices/add { hash }
+     */
+    @POST
+    @Path("{roomId}/addDevices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new devices")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response addDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            List<Device> devices
+    );
+    
+    /*
+     * POST  {roomId}/deleteDevices [ deviceId, deviceId]
+     */
+    @POST
+    @Path("{roomId}/deleteDevices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "delete devices by id")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+    Response deleteDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            List<Long> deviceId
+    );
+    
+    /*
+     * DELETE {roomId}/deleteDevice/{deviceId}
+     */
+    @DELETE
+    @Path("{roomId}/deleteDevice/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delete a device defined by deviceId")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+    Response deleteDevice(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("deviceId") Long deviceId
     );
 }

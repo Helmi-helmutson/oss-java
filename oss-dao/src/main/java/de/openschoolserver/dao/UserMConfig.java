@@ -4,12 +4,13 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import javax.persistence.*;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
  * The persistent class for the UserMConfig database table.
  *
  */
 @Entity
+@Table(name="UserMConfig")
 public class UserMConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 
@@ -22,6 +23,7 @@ public class UserMConfig implements Serializable {
 
         //bi-directional many-to-one association to User
         @ManyToOne
+        @JsonIgnore
         private User user;
 
         public long getId() {

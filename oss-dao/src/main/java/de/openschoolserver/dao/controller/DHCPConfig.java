@@ -38,12 +38,11 @@ public class DHCPConfig extends Controller {
 	
 	public void Create() {
 		EntityManager em = getEntityManager();
-		
 		Query query = em.createNamedQuery("Room.findAll");
 		for( Room room : (List<Room>) query.getResultList() ) {
 			Query subQuery = em.createNamedQuery("Room.getDeviceCount");
 			subQuery.setParameter("id", room.getId());
-			if( (Integer) subQuery.getSingleResult() < 1)
+			if( (Long) subQuery.getSingleResult() < 1)
 				continue;
 			dhcpConfigFile.add("group {");
 			dhcpConfigFile.add("  #Room" + room.getName());
