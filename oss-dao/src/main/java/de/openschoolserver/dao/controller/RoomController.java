@@ -496,10 +496,10 @@ public class RoomController extends Controller {
 		StringBuilder error = new StringBuilder();
 		for(Device device : devices) {
 			if( ! this.isNameUnique(device.getName())){
-				error.append("Devices name is not unique." );
+				error.append("Devices name is not unique. " );
 			}
 			if( this.checkBadHostName(device.getName())){
-				error.append("Devices name contains not allowed characters." );
+				error.append("Devices name contains not allowed characters. " );
 			}
 			//Check the MAC address
 			String name =  this.isMacUnique(device.getMac());
