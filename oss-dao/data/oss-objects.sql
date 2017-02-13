@@ -68,8 +68,8 @@ CREATE TABLE IF NOT EXISTS HWConfs (
         deviceType    VARCHAR(16) NOT NULL,
         PRIMARY KEY  (id)
 );
-INSERT INTO HWConfs VALUES(0,"Server","","Server");
-INSERT INTO HWConfs VALUES(1,"Printer","","Printer");
+INSERT INTO HWConfs VALUES(1,"Server","","Server");
+INSERT INTO HWConfs VALUES(2,"Printer","","Printer");
 
 CREATE TABLE IF NOT EXISTS Partitions (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -83,6 +83,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         PRIMARY KEY  (id)
 );
+
 CREATE TABLE IF NOT EXISTS Rooms (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         hwconf_id    BIGINT UNSIGNED DEFAULT NULL,
@@ -97,8 +98,9 @@ CREATE TABLE IF NOT EXISTS Rooms (
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Rooms VALUES(NULL,0,"SERVER_NET","Logical room for servers","LogicalRoom",10,10,#SERVER_NETWORK#,#SERVER_NETMASK#);
-INSERT INTO Rooms VALUES(NULL,NULL,"ANON_DHCP","Logical room for unknown devices","LogicalRoom",10,10,#ANON_NETWORK#,#ANON_NETMASK#);
+INSERT INTO Rooms VALUES(NULL,0,'SERVER_NET','Virtual room for servers','VirtualRoom',10,10,#SERVER_NETWORK#,#SERVER_NETMASK#);
+INSERT INTO Rooms VALUES(NULL,NULL,'ANON_DHCP','Virtual room for unknown devices','VirtualRoom',10,10,#ANON_NETWORK#,#ANON_NETMASK#);
+
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id      BIGINT UNSIGNED NOT NULL,
@@ -169,7 +171,7 @@ CREATE TABLE IF NOT EXISTS LoggedOn (
         PRIMARY KEY(device_id, user_id)
 );
 
-CREATE TABLE IF NOT EXISTS DefaultPrinters (
+CREATE TABLE IF NOT EXISTS DefaultPrinter (
         room_id      BIGINT UNSIGNED DEFAULT NULL,
         device_id    BIGINT UNSIGNED DEFAULT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
@@ -267,7 +269,7 @@ INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Library');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory');
-INSERT INTO Enumerates VALUES(NULL,'roomType','LogicalRoom');
+INSERT INTO Enumerates VALUES(NULL,'roomType','VirtualRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','WlanAccess');
 INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT');
 INSERT INTO Enumerates VALUES(NULL,'accessType','FW');

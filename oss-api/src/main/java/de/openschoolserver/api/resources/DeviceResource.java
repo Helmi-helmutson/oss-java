@@ -201,6 +201,40 @@ public interface DeviceResource {
     );
     
     /*
+     * PUT devices/loggedInUsers/{IP-Address}/{userName}
+     */
+    @PUT
+    @Path("loggedInUsers/{IP}/{userName}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the logged on users on a device defined by IP.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response addLoggedInUser(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP,
+            @PathParam("userName") String userName
+    );
+    
+    /*
+     * DELETE devices/loggedInUsers/{IP-Address}/{userName}
+     */
+    @DELETE
+    @Path("loggedInUsers/{IP}/{userName}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the logged on users on a device defined by IP.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response removeLoggedInUser(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP,
+            @PathParam("userName") String userName
+    );
+    
+    /*
      * GET devices/{deviceId}/loggedInUsers
      */
     @GET

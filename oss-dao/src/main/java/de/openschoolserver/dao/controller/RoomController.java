@@ -159,7 +159,7 @@ public class RoomController extends Controller {
 	 * If the subnet is "" the default school network is meant.
 	 */
 	public String getNextRoomIP( String subnet, int roomNetMask ) throws NumberFormatException {
-		if( subnet.equals("") ){
+		if( subnet == null || subnet.equals("") ){
 			subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
 		}
 		IPv4Net subNetwork = new IPv4Net( subnet );
@@ -183,9 +183,10 @@ public class RoomController extends Controller {
 		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
 
 		// Find the net of the last room
-		query = em.createQuery("SELECT r.netmask FROM WHERE startIP = :startIP",Room.class);
+		query = em.createQuery("SELECT r FROM Room r WHERE r.startIP = :startIP",Room.class);
 		query.setParameter("startIP", lastNetworkIP);
-		int lastNetMask = (int) query.getSingleResult();
+		Room lastRoom = (Room)query.getSingleResult();
+		int lastNetMask = lastRoom.getNetMask(); 
 		//Find the next free net with the network mask of the last room
 		IPv4Net net = new IPv4Net( lastNetworkIP + "/" + lastNetMask );
 		String nextNet = net.getNext();
@@ -490,9 +491,13 @@ public class RoomController extends Controller {
 	 */
 	public Response addDevices(long roomId,List<Device> devices){
 		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
 		Room room = this.getById(roomId);
 		StringBuilder error = new StringBuilder();
 		for(Device device : devices) {
+			if( ! this.isNameUnique(device.getName())){
+				error.append("Devices name is not unique." );
+			}
 			if( this.checkBadHostName(device.getName())){
 				error.append("Devices name contains not allowed characters." );
 			}
@@ -549,13 +554,15 @@ public class RoomController extends Controller {
 		}
 		
 		try {
-			em.getTransaction().begin();
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return new Response(this.getSession(),"ERROR ", e.getMessage());
 		}
+		//TODO DNS Configuration
+		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+		dhcpconfig.Create();
 		return new Response(this.getSession(),"OK", "Devices were created succesfully." );
 	}
 	

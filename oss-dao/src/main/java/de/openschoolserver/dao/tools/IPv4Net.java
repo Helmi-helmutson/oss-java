@@ -235,11 +235,11 @@ public void setNetmaskNumeric(int netmaskNumeric) {
         }
 
         Integer baseIP = baseIPnumeric & getNetmaskNumeric();
-	if( numberofIPs == 0 ) {
-	    numberofIPs = numberOfIPs;
-	}
-
-        for (int i = 1; i < (numberOfIPs) && i < numberofIPs; i++) {
+	    if( numberofIPs == 0 ) {
+	      numberofIPs = numberOfIPs;
+	    }
+        //We need the first and the last address too.
+        for (int i = 0; i < (numberOfIPs) && i < numberofIPs +2; i++) {
 
             Integer ourIP = baseIP + i;
 

@@ -71,7 +71,7 @@ public class HWConf implements Serializable {
 		this.name = name;
 	}
 
-	
+
 
 	public String getDeviceType() {
 		return deviceType;

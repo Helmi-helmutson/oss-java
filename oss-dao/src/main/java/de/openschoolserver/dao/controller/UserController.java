@@ -53,6 +53,21 @@ public class UserController extends Controller {
 			em.close();
 		}
 	}
+	
+	public User getByUid(String uid) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("User.getByUid");
+			query.setParameter("uid", uid);
+			return (User) query.getResultList().get(0);
+		} catch (Exception e) {
+			//logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
 
 	public List<User> search(String search) {
 		EntityManager em = getEntityManager();

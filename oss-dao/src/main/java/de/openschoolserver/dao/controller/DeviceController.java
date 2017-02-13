@@ -1,8 +1,6 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
-
-
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -210,10 +208,10 @@ public class DeviceController extends Controller {
 		Device device = this.getById(deviceId);
 		Device printer = device.getDefaultPrinter();
 		if( printer != null)
-		   return printer.getName();
+			return printer.getName();
 		printer = device.getRoom().getDefaultPrinter();
 		if( printer != null)
-			   return printer.getName();
+			return printer.getName();
 		return "";
 	}
 
@@ -234,7 +232,7 @@ public class DeviceController extends Controller {
 		}
 		return printers;
 	}
-	
+
 	/*
 	 * Return the list of users which are logged in on this device
 	 */
@@ -243,10 +241,10 @@ public class DeviceController extends Controller {
 		List<String> users = new ArrayList<String>();
 		for( User user : device.getLoggedIn() )
 			users.add(user.getUid());
-			//users.add(user.getUid() + " " + user.getGivenName() + " " +user.getSureName());
+		//users.add(user.getUid() + " " + user.getGivenName() + " " +user.getSureName());
 		return users;
 	}
-	
+
 	/*
 	 * Return the list of users which are logged in on this device
 	 */
@@ -275,7 +273,7 @@ public class DeviceController extends Controller {
 		}
 		return new Response(this.getSession(),"OK", "Default printer was set succesfully.");
 	}
-	
+
 	public Response setAvailablePrinters(long deviceId, List<Long> availablePrinterIds) {
 		// TODO Auto-generated method stub
 		Device device         = this.getById(deviceId);
@@ -295,5 +293,45 @@ public class DeviceController extends Controller {
 			em.close();
 		}
 		return new Response(this.getSession(),"OK", "Available printers were set succesfully.");
+	}
+
+	public Response addLoggedInUser(String IP, String userName) {
+		Device device = this.getByIP(IP);
+		EntityManager em = getEntityManager();
+		UserController userController = new UserController(this.session);
+		User user = userController.getByUid(userName);
+		List<User> loggedInUsers = device.getLoggedIn();
+		loggedInUsers.add(user);
+		device.setLoggedIn(loggedInUsers);
+		try {
+			em.getTransaction().begin();
+			em.merge(device);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK", "Logged in user was added succesfully:" + device.getName() + ";" + IP + ";" + userName);
+	}
+
+	public Response removeLoggedInUser(String IP, String userName) {
+		Device device = this.getByIP(IP);
+		EntityManager em = getEntityManager();
+		UserController userController = new UserController(this.session);
+		User user = userController.getByUid(userName);
+		List<User> loggedInUsers = device.getLoggedIn();
+		loggedInUsers.remove(user);
+		device.setLoggedIn(loggedInUsers);
+		try {
+			em.getTransaction().begin();
+			em.merge(device);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK", "Logged in user was removed succesfully:" + device.getName() + ";" + IP + ";" + userName);
 	}
 }

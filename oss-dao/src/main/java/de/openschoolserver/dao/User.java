@@ -77,28 +77,28 @@ public class User implements Serializable {
 	//bi-directional many-to-many association to Device
 	@ManyToMany
 	@JoinTable(
-		name="LoggedOn"
-		, joinColumns={
-			@JoinColumn(name="user_id")
+			name="LoggedOn"
+			, joinColumns={
+					@JoinColumn(name="user_id")
 			}
-		, inverseJoinColumns={
-			@JoinColumn(name="device_id")
+			, inverseJoinColumns={
+					@JoinColumn(name="device_id")
 			}
-		)
+			)
 	@JsonIgnore
 	private List<Device> loggedOn;
 
 	//bi-directional many-to-many association to Group
 	@ManyToMany
 	@JoinTable(
-		name="GroupMember"
-		, joinColumns={
-			@JoinColumn(name="user_id")
+			name="GroupMember"
+			, joinColumns={
+					@JoinColumn(name="user_id")
 			}
-		, inverseJoinColumns={
-			@JoinColumn(name="group_id")
+			, inverseJoinColumns={
+					@JoinColumn(name="group_id")
 			}
-		)
+			)
 	//@JsonManagedReference
 	@JsonIgnore
 	private List<Group> groups;
@@ -160,11 +160,11 @@ public class User implements Serializable {
 	public void setUid(String uid) {
 		this.uid = uid;
 	}
-	
+
 	public Date getBirthDay() {
 		return this.birthDay;
 	}
-	
+
 	public void setBirthDay(Date birthday) {
 		this.birthDay = birthday;
 	}
@@ -282,7 +282,7 @@ public class User implements Serializable {
 	public void setGroups(List<Group> groups) {
 		this.groups = groups;
 	}
-	
+
 	public List<UserConfig> getUserConfigs() {
 		return this.userConfigs;
 	}
@@ -290,7 +290,7 @@ public class User implements Serializable {
 	public void setUserConfigs(List<UserConfig> userConfigs) {
 		this.userConfigs = userConfigs;
 	}
-	
+
 	public UserConfig addUserConfig(UserConfig userConfig) {
 		getUserConfigs().add(userConfig);
 		userConfig.setUser(this);
@@ -310,7 +310,7 @@ public class User implements Serializable {
 	public void setUserMConfigs(List<UserMConfig> userMConfigs) {
 		this.userMConfigs = userMConfigs;
 	}
-	
+
 	public UserMConfig addUserMConfig(UserMConfig userMConfig) {
 		getUserMConfigs().add(userMConfig);
 		userMConfig.setUser(this);
@@ -326,7 +326,7 @@ public class User implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
+
 	public String getPassword() {
 		return this.password;
 	}

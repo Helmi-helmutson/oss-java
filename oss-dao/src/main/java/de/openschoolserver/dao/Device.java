@@ -14,13 +14,11 @@ import java.util.List;
 @Entity
 @Table(name="Devices")
 @NamedQueries( {
-	@NamedQuery(name="Device.findAll", query="SELECT d FROM Device d"),
-	@NamedQuery(name="Device.getDeviceByType", query="SELECT d FROM Device d where d.deviceType = :type"),
-	@NamedQuery(name="Device.getByIP",   query="SELECT d FROM Device d where d.ip = :IP OR d.wlanip = :IP"),
-	
-	@NamedQuery(name="Device.getByMAC",  query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
-	@NamedQuery(name="Device.getByName", query="SELECT d FROM Device d where d.name = :name"),
-	@NamedQuery(name="Device.search",    query="SELECT d FROM Device d where d.name LIKE :name OR d.ip LIKE :name" ),
+	@NamedQuery(name="Device.findAll",    query="SELECT d FROM Device d"),
+	@NamedQuery(name="Device.getByIP",    query="SELECT d FROM Device d where d.ip = :IP OR d.wlanip = :IP"),
+	@NamedQuery(name="Device.getByMAC",   query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
+	@NamedQuery(name="Device.getByName",  query="SELECT d FROM Device d where d.name = :name"),
+	@NamedQuery(name="Device.search",     query="SELECT d FROM Device d where d.name LIKE :name OR d.ip LIKE :name" ),
 	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" ),
 	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" )
 })
@@ -31,9 +29,9 @@ public class Device implements Serializable {
 	private long id;
 
 	private String name;
-  
+
 	private int place;
-	
+
 	private int row;
 
 	@Column(name="IP")
@@ -48,27 +46,27 @@ public class Device implements Serializable {
 	@Column(name="WLANMAC")
 	private String wlanmac;
 
-    //bi-directional many-to-one association to DeviceMConfig
-    @OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
-    @JsonIgnore
-    private List<DeviceMConfig> deviceMConfigs;
+	//bi-directional many-to-one association to DeviceMConfig
+	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
+	@JsonIgnore
+	private List<DeviceMConfig> deviceMConfigs;
 
-    //bi-directional many-to-one association to DeviceConfig
-    @OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
-    @JsonIgnore
-    private List<DeviceConfig> deviceConfigs;
+	//bi-directional many-to-one association to DeviceConfig
+	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
+	@JsonIgnore
+	private List<DeviceConfig> deviceConfigs;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany
 	@JoinTable(
-		name="AvailablePrinters"
-		, joinColumns={
-			@JoinColumn(name="device_id")
+			name="AvailablePrinters"
+			, joinColumns={
+					@JoinColumn(name="device_id")
 			}
-		, inverseJoinColumns={
-			@JoinColumn(name="printer_id")
+			, inverseJoinColumns={
+					@JoinColumn(name="printer_id")
 			}
-		)
+			)
 	@JsonIgnore
 	private List<Device> availablePrinters;
 
@@ -80,14 +78,14 @@ public class Device implements Serializable {
 	//bi-directional many-to-many association to Device
 	@ManyToOne
 	@JoinTable(
-		name="DefaultPrinters"
-		, joinColumns={
-			@JoinColumn(name="device_id")
+			name="DefaultPrinter"
+			, joinColumns={
+					@JoinColumn(name="device_id")
 			}
-		, inverseJoinColumns={
-			@JoinColumn(name="printer_id")
+			, inverseJoinColumns={
+					@JoinColumn(name="printer_id")
 			}
-		)
+			)
 	@JsonIgnore
 	private Device defaultPrinter;
 
@@ -130,7 +128,7 @@ public class Device implements Serializable {
 	@ManyToMany(mappedBy="loggedOn")
 	@JsonIgnore
 	private List<User> loggedIn;
-	
+
 	@Transient
 	long hwconfId;
 
@@ -145,7 +143,7 @@ public class Device implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Device && obj !=null) {
@@ -153,7 +151,7 @@ public class Device implements Serializable {
 		}
 		return super.equals(obj);
 	}
-	
+
 	public long getHwconfId() {
 		return this.hwconfId;
 	}
@@ -242,14 +240,15 @@ public class Device implements Serializable {
 		this.defaultPrinter = defaultPrinter;
 	}
 
-	public List<Device> getDefaultForDevices() {
+/*
+ * 	public List<Device> getDefaultForDevices() {
 		return this.defaultForDevices;
 	}
 
 	public void setDefaultForDevices(List<Device> defaultForDevices) {
 		this.defaultForDevices = defaultForDevices;
 	}
-
+*/
 	public HWConf getHwconf() {
 		return this.hwconf;
 	}
@@ -320,44 +319,45 @@ public class Device implements Serializable {
 		this.loggedIn = loggedIn;
 	}
 
-        public List<DeviceConfig> getDeviceConfigs() {
-                return this.deviceConfigs;
-        }
 
-        public void setDeviceConfigs(List<DeviceConfig> deviceConfigs) {
-                this.deviceConfigs = deviceConfigs;
-        }
-        
-        public DeviceConfig addDeviceConfig(DeviceConfig deviceConfig) {
-                getDeviceConfigs().add(deviceConfig);
-                deviceConfig.setDevice(this);
-                return deviceConfig;
-        }
+	public List<DeviceConfig> getDeviceConfigs() {
+		return this.deviceConfigs;
+	}
 
-        public DeviceConfig removeDeviceConfig(DeviceConfig deviceConfig) {
-                getDeviceConfigs().remove(deviceConfig);
-                deviceConfig.setDevice(null);
-                return deviceConfig;
-        }
+	public void setDeviceConfigs(List<DeviceConfig> deviceConfigs) {
+		this.deviceConfigs = deviceConfigs;
+	}
 
-        public List<DeviceMConfig> getDeviceMConfigs() {
-                return this.deviceMConfigs;
-        }
+	public DeviceConfig addDeviceConfig(DeviceConfig deviceConfig) {
+		getDeviceConfigs().add(deviceConfig);
+		deviceConfig.setDevice(this);
+		return deviceConfig;
+	}
 
-        public void setDeviceMConfigs(List<DeviceMConfig> deviceMConfigs) {
-                this.deviceMConfigs = deviceMConfigs;
-        }
+	public DeviceConfig removeDeviceConfig(DeviceConfig deviceConfig) {
+		getDeviceConfigs().remove(deviceConfig);
+		deviceConfig.setDevice(null);
+		return deviceConfig;
+	}
 
-        public DeviceMConfig addDeviceMConfig(DeviceMConfig deviceMConfig) {
-                getDeviceMConfigs().add(deviceMConfig);
-                deviceMConfig.setDevice(this);
-                return deviceMConfig;
-        }
+	public List<DeviceMConfig> getDeviceMConfigs() {
+		return this.deviceMConfigs;
+	}
 
-        public DeviceMConfig removeDeviceMConfig(DeviceMConfig deviceMConfig) {
-                getDeviceMConfigs().remove(deviceMConfig);
-                deviceMConfig.setDevice(null);
-                return deviceMConfig;
-        }
+	public void setDeviceMConfigs(List<DeviceMConfig> deviceMConfigs) {
+		this.deviceMConfigs = deviceMConfigs;
+	}
+
+	public DeviceMConfig addDeviceMConfig(DeviceMConfig deviceMConfig) {
+		getDeviceMConfigs().add(deviceMConfig);
+		deviceMConfig.setDevice(this);
+		return deviceMConfig;
+	}
+
+	public DeviceMConfig removeDeviceMConfig(DeviceMConfig deviceMConfig) {
+		getDeviceMConfigs().remove(deviceMConfig);
+		deviceMConfig.setDevice(null);
+		return deviceMConfig;
+	}
 
 }
