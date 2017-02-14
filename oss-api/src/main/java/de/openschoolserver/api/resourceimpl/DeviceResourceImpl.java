@@ -3,6 +3,7 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
 
+
 import javax.ws.rs.WebApplicationException;
 
 import de.openschoolserver.api.resources.DeviceResource;
@@ -10,6 +11,7 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DeviceController;
+import de.openschoolserver.dao.controller.DHCPConfig;
 
 public class DeviceResourceImpl implements DeviceResource {
 
@@ -119,5 +121,11 @@ public class DeviceResourceImpl implements DeviceResource {
 	public Response removeLoggedInUser(Session session, String IP, String userName) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.removeLoggedInUser(IP, userName);
+	}
+	
+	@Override
+	public void refreshConfig(Session session) {
+		final DHCPConfig dhcpConfig = new DHCPConfig(session);
+		dhcpConfig.Create();
 	}
 }

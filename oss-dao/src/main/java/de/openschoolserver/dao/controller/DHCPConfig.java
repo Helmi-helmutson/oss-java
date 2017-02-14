@@ -67,9 +67,10 @@ public class DHCPConfig extends Controller {
 			program[0] = "salt-master";
 			OSSShellTools.exec(program, reply, error, null);
 			
-		}
-		catch( IOException e ) { 
+		} catch( IOException e ) { 
 			e.printStackTrace();
+		} finally { 
+			em.close();
 		}
 	}
 	
@@ -87,7 +88,8 @@ public class DHCPConfig extends Controller {
 				dhcpConfigFile.add("      hardware ethernet " + device.getWlanMac() + ";");
 				dhcpConfigFile.add("      fixed-address " + device.getWlanIp() + ";");
 				//TODO add dhcp options and statements from DeviceConfig
-				dhcpConfigFile.add("    }");	
+				dhcpConfigFile.add("    }");
+				line.add(device.getName() + "-wlan" );
 			}
 		}
 		saltGroupFile.add("  " + room.getName() + ": 'L@" + String.join(",",line) + "'");
