@@ -39,26 +39,31 @@ public class Controller extends Config {
 		query.setParameter("uid", name);
 		List<User> user = (List<User>) query.getResultList();
 		if( ! user.isEmpty() ){
+			em.close();
 			return false;
 		}
 		query = em.createNamedQuery("Group.getByName");
 		query.setParameter("name", name);
 		List<Group> group = (List<Group>) query.getResultList();
 		if( ! group.isEmpty() ){
+			em.close();
 			return false;
 		}
 		query = em.createNamedQuery("Device.getByName");
 		query.setParameter("name", name);
 		List<Device> device = (List<Device>) query.getResultList();
 		if( ! device.isEmpty() ){
+			em.close();
 			return false;
 		}
 		query = em.createNamedQuery("Room.getByName");
 		query.setParameter("name", name);
 		List<Room> room = (List<Room>) query.getResultList();
 		if( ! room.isEmpty() ){
+			em.close();
 			return false;
 		}
+		em.close();
 		return true;
 	}
 
@@ -75,6 +80,7 @@ public class Controller extends Config {
 		Query query = em.createNamedQuery("Device.getByMAC");
 		query.setParameter("MAC", name);
 		List<Device> devices = (List<Device>) query.getResultList();
+		em.close();
 		if( ! devices.isEmpty() ){
 			return devices.get(0).getName();
 		}
@@ -86,6 +92,7 @@ public class Controller extends Config {
 		Query query = em.createNamedQuery("Device.getByIP");
 		query.setParameter("IP", name);
 		List<Device> devices = (List<Device>) query.getResultList();
+		em.close();
 		if( ! devices.isEmpty() ){
 			return devices.get(0).getName();
 		}
