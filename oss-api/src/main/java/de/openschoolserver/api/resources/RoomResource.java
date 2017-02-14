@@ -261,6 +261,23 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             List<Device> devices
     );
+
+    /*
+     * POST devices/add { hash }
+     */
+    @GET
+    @Path("{roomId}/getDevices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new devices")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<Device> getDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+    );
     
     /*
      * POST  {roomId}/deleteDevices [ deviceId, deviceId]

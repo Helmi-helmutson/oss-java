@@ -22,10 +22,12 @@ import java.util.List;
 	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" ),
 	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" )
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String name;

@@ -143,10 +143,15 @@ public class RoomRescourceImpl implements RoomResource {
 	
 	@Override
 	public Response deleteDevice(Session session, long roomId, Long deviceId) {
-		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		List<Long> deviceIds = new ArrayList<Long>();
 		deviceIds.add(deviceId);
 		return roomController.deleteDevices(roomId,deviceIds);
+	}
+
+	@Override
+	public List<Device> getDevices(Session session, long roomId) {
+		final RoomController roomController = new RoomController(session);
+		return roomController.getDevices(roomId);
 	}
 }
