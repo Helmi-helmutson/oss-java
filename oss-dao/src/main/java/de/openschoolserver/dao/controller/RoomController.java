@@ -491,7 +491,6 @@ public class RoomController extends Controller {
 	 */
 	public Response addDevices(long roomId,List<Device> devices){
 		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
 		Room room = this.getById(roomId);
 		StringBuilder error = new StringBuilder();
 		for(Device device : devices) {
@@ -550,19 +549,24 @@ public class RoomController extends Controller {
 			room.addDevice(device);
 		}
 		if(error.length() > 0){
+			em.close();
 			return new Response(this.getSession(),"ERROR",error.toString());
 		}
 		
 		try {
+			em.getTransaction().begin();
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return new Response(this.getSession(),"ERROR ", e.getMessage());
+		} finally {
+			em.close();
 		}
+		em.close();
 		//TODO DNS Configuration
-		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
-		dhcpconfig.Create();
+		//DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+		//dhcpconfig.Create();
 		return new Response(this.getSession(),"OK", "Devices were created succesfully." );
 	}
 	
@@ -583,6 +587,8 @@ public class RoomController extends Controller {
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return new Response(this.getSession(),"ERROR ", e.getMessage());
+		} finally {
+			em.close();
 		}
 		return new Response(this.getSession(),"OK ", "Devices were deleted succesfully.");
 	}

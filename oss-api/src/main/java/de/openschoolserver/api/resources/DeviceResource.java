@@ -248,5 +248,20 @@ public interface DeviceResource {
     List<String> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
-    );    
+    );
+    
+    /*
+     * GET devices/refreshConfig
+     */
+    @PUT
+    @Path("refreshConfig")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Refresh the DHCP DNS and SALT Configuration.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    void refreshConfig(
+            @ApiParam(hidden = true) @Auth Session session
+    );
 }
