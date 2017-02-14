@@ -33,17 +33,17 @@ public class Session implements Principal {
 	private String schoolId = "dummy";
 	
 	@Column(name="device_id")
-	private long deviceId;
+	private Long deviceId;
 	
 	//@OneToOne
 	 @JoinColumn(name = "device_id", insertable = false, updatable = false)
 	private Device device;
 		
 	@Column(name = "user_id")
-	private long userId;
+	private Long userId;
 	
 	@Column(name = "room_id")
-	private long roomId;
+	private Long roomId;
 	   
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)

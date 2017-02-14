@@ -13,7 +13,7 @@ public class OSSDaoTestCase extends TestCase {
 
     protected Session getValidAdminSession() {
     	User user = new User(); 
-    	user.setId(0);
+    	user.setId(1);
     	user.setUid("admin");
     	user.setRole("sysadmins");
     	user.setSureName("Administrator");
