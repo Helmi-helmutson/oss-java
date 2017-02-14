@@ -556,7 +556,6 @@ public class RoomController extends Controller {
 		}
 		
 		try {
-			
 			em.merge(room);
 			em.getTransaction().commit();
 			em.flush();
