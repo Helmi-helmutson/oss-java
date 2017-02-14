@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS Rooms (
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Rooms VALUES(NULL,1,'SERVER_NET','Virtual room for servers','VirtualRoom',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#);
-INSERT INTO Rooms VALUES(NULL,NULL,'ANON_DHCP','Virtual room for unknown devices','VirtualRoom',10,10,'#ANON_NETWORK#',#ANON_NETMASK#);
+INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','VirtualRoom',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#);
+INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','VirtualRoom',10,10,'#ANON_NETWORK#',#ANON_NETMASK#);
 
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
