@@ -492,6 +492,7 @@ public class RoomController extends Controller {
 	public Response addDevices(long roomId,List<Device> devices){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
+		em.getTransaction().begin();
 		StringBuilder error = new StringBuilder();
 		for(Device device : devices) {
 			if( ! this.isNameUnique(device.getName())){
@@ -546,6 +547,7 @@ public class RoomController extends Controller {
 			} else {
 				device.setHwconf(room.getHwconf());
 			}
+			em.persist(device);
 			room.addDevice(device);
 		}
 		if(error.length() > 0){
@@ -554,16 +556,15 @@ public class RoomController extends Controller {
 		}
 		
 		try {
-			em.getTransaction().begin();
 			em.merge(room);
 			em.getTransaction().commit();
+			em.flush();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return new Response(this.getSession(),"ERROR ", e.getMessage());
 		} finally {
 			em.close();
 		}
-		em.close();
 		//TODO DNS Configuration
 		//DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		//dhcpconfig.Create();
