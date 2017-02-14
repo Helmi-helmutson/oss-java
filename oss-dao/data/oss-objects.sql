@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS Rooms (
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Rooms VALUES(NULL,1,'SERVER_NET','Virtual room for servers','VirtualRoom',10,10,#SERVER_NETWORK#,#SERVER_NETMASK#);
-INSERT INTO Rooms VALUES(NULL,NULL,'ANON_DHCP','Virtual room for unknown devices','VirtualRoom',10,10,#ANON_NETWORK#,#ANON_NETMASK#);
+INSERT INTO Rooms VALUES(NULL,1,'SERVER_NET','Virtual room for servers','VirtualRoom',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#);
+INSERT INTO Rooms VALUES(NULL,NULL,'ANON_DHCP','Virtual room for unknown devices','VirtualRoom',10,10,'#ANON_NETWORK#',#ANON_NETMASK#);
 
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -352,14 +352,14 @@ CREATE UNIQUE INDEX RoomMConfigIndex on RoomMConfig (room_id,keyword,value);
 CREATE TABLE IF NOT EXISTS Session (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id      BIGINT UNSIGNED NOT NULL,
-        room_id      BIGINT UNSIGNED NULL,
-        device_id    BIGINT UNSIGNED NULL,
-        createdate   timestamp not null,
-        ip varchar(30),
-        token varchar(60),
+        room_id      BIGINT UNSIGNED DEFAULT NULL,
+        device_id    BIGINT UNSIGNED DEFAULT NULL,
+        createdate   TIMESTAMP NOT NULL,
+        ip           VARCHAR(30),
+        token        VARCHAR(60),
         FOREIGN KEY(user_id)   REFERENCES Users(id),
         FOREIGN KEY(room_id)   REFERENCES Rooms(id),
-	FOREIGN KEY(device_id) REFERENCES DEVICES(id),
+	FOREIGN KEY(device_id) REFERENCES Devices(id),
         PRIMARY KEY (`id`)
  );
 
