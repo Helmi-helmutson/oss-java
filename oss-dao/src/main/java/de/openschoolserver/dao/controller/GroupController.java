@@ -18,11 +18,11 @@ import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.tools.*;
 
 public class GroupController extends Controller {
-	
+
 	public GroupController(Session session) {
 		super(session);
 	}
-	
+
 	public Group getById(long groupId) {
 		EntityManager em = getEntityManager();	
 		try {
@@ -35,7 +35,7 @@ public class GroupController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	public List<Group> getByType(String groupType) {
 		EntityManager em = getEntityManager();
 		try {
@@ -89,18 +89,18 @@ public class GroupController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.persist(group);
-	    	String[] program   = new String[4];
-	        StringBuffer reply = new StringBuffer();
-	        StringBuffer error = new StringBuffer();
-	    	program[0] = "/usr/sbin/oss-add-group.sh";
-	    	program[1] = String.format("--name='%s'",group.getName());
-	    	program[2] = String.format("--description='%s'",group.getDescription());
-	    	program[3] = String.format("--type='%s'",group.getGroupType());
-	    	OSSShellTools.exec(program, reply, error, null);
-	    	if( error.toString() != "") {
-	    		em.getTransaction().rollback();
-	    		return new Response(this.getSession(),"ERROR",error.toString());
-	    	}
+			String[] program   = new String[4];
+			StringBuffer reply = new StringBuffer();
+			StringBuffer error = new StringBuffer();
+			program[0] = "/usr/sbin/oss-add-group.sh";
+			program[1] = String.format("--name='%s'",group.getName());
+			program[2] = String.format("--description='%s'",group.getDescription());
+			program[3] = String.format("--type='%s'",group.getGroupType());
+			OSSShellTools.exec(program, reply, error, null);
+			if( error.toString() != "") {
+				em.getTransaction().rollback();
+				return new Response(this.getSession(),"ERROR",error.toString());
+			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
@@ -124,36 +124,38 @@ public class GroupController extends Controller {
 		this.startPlugin("modify_group", group);
 		return new Response(this.getSession(),"OK","Group was modified");
 	}
-	
+
 	public Response delete(long groupId){
 		Group group = this.getById(groupId);
 		this.startPlugin("delete_group", group);
-		
+
 		//REMOVE THE GROUP FROM SAMBA
 		String[] program   = new String[2];
-        StringBuffer reply = new StringBuffer();
-        StringBuffer error = new StringBuffer();
-    	program[0] = "/usr/sbin/oss-delete-group.sh";
-    	program[1] = String.format("--name='%s'",group.getName());
-    	OSSShellTools.exec(program, reply, error, null);
-    	
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/sbin/oss-delete-group.sh";
+		program[1] = String.format("--name='%s'",group.getName());
+		OSSShellTools.exec(program, reply, error, null);
+
 		// Remove group from GroupMember of table
 		EntityManager em = getEntityManager();
 		try {
-		em.getTransaction().begin();
-		Query query = em.createQuery("DELETE FROM GroupMember WHERE group_id = :groupId");
-		query.setParameter("groupId", groupId);
-		query.executeUpdate();
-		// Let's remove the group
-		em.remove(group);
-		em.getTransaction().commit();
+			em.getTransaction().begin();
+			Query query = em.createQuery("DELETE FROM GroupMember WHERE group_id = :groupId");
+			query.setParameter("groupId", groupId);
+			query.executeUpdate();
+			// Let's remove the group
+			em.remove(group);
+			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
 		}
 		return new Response(this.getSession(),"OK","Group was deleted");
 	}
-	
+
 	public List<User> getAvailableMember(long groupId){
 		EntityManager em = getEntityManager();
 		Group group = this.getById(groupId);
@@ -167,4 +169,50 @@ public class GroupController extends Controller {
 		Group group = this.getById(groupId);
 		return group.getUsers();
 	}
+
+	public Response setMembers(long groupId, List<User> users) {
+		return new Response(this.getSession(),"ERROR","Not Implemented until now");
+	}
+
+	public Response addMember(long groupId, long userId) {
+		EntityManager em = getEntityManager();
+		Group group = em.find(Group.class, groupId);
+		User  user  = em.find(User.class, userId);
+		group.getUsers().add(user);
+		user.getGroups().add(group);
+		try {
+			em.getTransaction().begin();
+			em.merge(user);
+			em.merge(group);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		this.changeMemberPlugin("add", group.getName(), user.getUid());
+		return new Response(this.getSession(),"OK","User " + user.getUid() + " was added to group " + group.getName() );
+	}
+
+	public Response removeMember(long groupId, long userId) {
+		EntityManager em = getEntityManager();
+		Group group = em.find(Group.class, groupId);
+		User  user  = em.find(User.class, userId);
+		group.getUsers().remove(user);
+		user.getGroups().remove(group);
+		try {
+			em.getTransaction().begin();
+			em.merge(user);
+			em.merge(group);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		this.changeMemberPlugin("remove", group.getName(), user.getUid());
+		return new Response(this.getSession(),"OK","User " + user.getUid() + " was removed from group " + group.getName() );
+	}
+
+
 }

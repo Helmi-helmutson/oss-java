@@ -1,6 +1,7 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
+
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -300,12 +301,13 @@ public class DeviceController extends Controller {
 		EntityManager em = getEntityManager();
 		UserController userController = new UserController(this.session);
 		User user = userController.getByUid(userName);
-		List<User> loggedInUsers = device.getLoggedIn();
-		loggedInUsers.add(user);
-		device.setLoggedIn(loggedInUsers);
+		device.getLoggedIn().add(user);
+		user.getLoggedOn().add(device);
 		try {
 			em.getTransaction().begin();
 			em.merge(device);
+			em.merge(user);
+			em.flush();
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new Response(this.getSession(),"ERROR", e.getMessage());

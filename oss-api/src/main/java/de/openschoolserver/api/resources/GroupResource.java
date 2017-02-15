@@ -169,5 +169,63 @@ public interface GroupResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId
     );
+    
+    //Manipulation of memebers
+    
+    /*
+   	 * POST groups/<groupId>/members
+   	 */
+       @POST
+       @Path("{groupId}/members")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Get users which are member in this group.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 404, message = "Group not found"),
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @PermitAll
+       Response setMembers(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("groupId") long groupId,
+               List<User> users
+       );
+       
+       /*
+        * 
+        */
+ 
+       /*
+        * DELETE groups/<groupId>/<userId>
+        */
+       @DELETE
+       @Path("{groupId}/{userId}")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Deletes member of a group by userId.")
+       @ApiResponses(value = {
+           @ApiResponse(code = 404, message = "Group not found"),
+           @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @PermitAll
+       Response removeMember(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("groupId") long groupId,
+               @PathParam("userId") long userId
+       );
+       
+       /*
+        * DELETE groups/<groupId>/<userId>
+        */
+       @PUT
+       @Path("{groupId}/{userId}")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Add member to a group by userId.")
+       @ApiResponses(value = {
+           @ApiResponse(code = 404, message = "Group not found"),
+           @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @PermitAll
+       Response addMember(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("groupId") long groupId,
+               @PathParam("userId") long userId
+       );
+
 
 }

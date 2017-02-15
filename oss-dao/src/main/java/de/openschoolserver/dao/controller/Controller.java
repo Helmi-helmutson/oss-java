@@ -134,13 +134,9 @@ public class Controller extends Config {
 			Group group = (Group)object;
 			switch(pluginName){
 			case "add_group":
+			case "modify_group":
 				data.append(String.format("cn: %s%n", group.getName()));
 				data.append(String.format("description: %s%n", group.getDescription()));
-				String members = "";
-				for(User u : group.getUsers() ){
-					members.concat(u.getUid() + " ");
-				}
-			case "modify_group":
 				break;
 			case "delete_group":
 				data.append(String.format("cn: %s%n", group.getName()));
@@ -173,4 +169,38 @@ public class Controller extends Config {
 		OSSShellTools.exec(program, reply, error, data.toString());
 		System.err.println(pluginName + " : " + data.toString() + " : " + error);
 	}
+	
+	protected void changeMemberPlugin(String type, String group, List<String> users){
+		//type can be only add or remove
+		StringBuilder data = new StringBuilder();
+		String[] program   = new String[2];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
+		program[1] = "change_member";
+		data.append(String.format("changetype: %s%n",type));
+		data.append(String.format("group: %s%n", group));
+		data.append("users: ");
+		for( String user : users ) {
+			data.append(user + " ");
+		}
+		OSSShellTools.exec(program, reply, error, data.toString());
+		System.err.println("change_member  : " + data.toString() + " : " + error);
+	}
+	
+	protected void changeMemberPlugin(String type, String group, String user){
+		//type can be only add or remove
+		StringBuilder data = new StringBuilder();
+		String[] program   = new String[2];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
+		program[1] = "change_member";
+		data.append(String.format("changetype: %s%n",type));
+		data.append(String.format("group: %s%n", group));
+		data.append(String.format("user: %s%n", group));
+		OSSShellTools.exec(program, reply, error, data.toString());
+		System.err.println("change_member  : " + data.toString() + " : " + error);
+	}
+	
 }

@@ -221,11 +221,13 @@ public class RoomController extends Controller {
 		for(Device device : room.getDevices()){
 			for(User user: device.getLoggedIn()){
 				Map<String,String> userMap = new HashMap<>();
-				userMap.put("host", device.getName());
-				userMap.put("id", String.valueOf(user.getId()));
+				userMap.put("device", device.getName());
+				userMap.put("deviceId", String.valueOf(device.getId()));
 				userMap.put("uid", user.getUid());
+				userMap.put("userId", String.valueOf(user.getId()));
 				userMap.put("sureName", user.getSureName());
 				userMap.put("givenName", user.getGivenName());
+				users.add(userMap);
 			}
 		}
 		return users;
