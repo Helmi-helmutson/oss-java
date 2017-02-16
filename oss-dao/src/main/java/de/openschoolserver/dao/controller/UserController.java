@@ -226,4 +226,16 @@ public class UserController extends Controller {
 		User user = this.getById(userId);
 		return user.getGroups();
 	}
+
+	public Response setGroups(long userId, List<Long> groupIds) {
+		EntityManager em = getEntityManager();
+		List<Group> groupToRemove = new ArrayList<Group>();
+		List<Group> groupToAdd    = new ArrayList<Group>();
+		List<Group> groups = new ArrayList<Group>();
+		for( Long groupId : groupIds ) {
+			groups.add(em.find(Group.class, groupId));
+		}
+		User user = this.getById(userId);
+		return null;
+	}
 }

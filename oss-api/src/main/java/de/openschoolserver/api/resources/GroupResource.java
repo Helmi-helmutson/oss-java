@@ -178,7 +178,7 @@ public interface GroupResource {
        @POST
        @Path("{groupId}/members")
        @Produces(JSON_UTF8)
-       @ApiOperation(value = "Get users which are member in this group.")
+       @ApiOperation(value = "Sets the membe of this group.")
        @ApiResponses(value = {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -186,7 +186,7 @@ public interface GroupResource {
        Response setMembers(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
-               List<User> users
+               List<Long> users
        );
        
        /*
@@ -211,7 +211,7 @@ public interface GroupResource {
        );
        
        /*
-        * DELETE groups/<groupId>/<userId>
+        * PUT groups/<groupId>/<userId>
         */
        @PUT
        @Path("{groupId}/{userId}")

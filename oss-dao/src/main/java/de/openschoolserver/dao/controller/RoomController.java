@@ -567,7 +567,6 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
-		//TODO DNS Configuration
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		dhcpconfig.Create();
 		return new Response(this.getSession(),"OK", "Devices were created succesfully." );

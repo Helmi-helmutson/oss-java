@@ -28,7 +28,7 @@ public class GroupResourceImpl implements GroupResource {
 	@Override
 	public List<User> getMembers(Session session, long groupId) {
 		final GroupController groupController = new GroupController(session);
-		return groupController.getMember(groupId);
+		return groupController.getMembers(groupId);
 	}
 	
 	@Override
@@ -68,7 +68,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public Response setMembers(Session session, long groupId, List<User> users) {
+	public Response setMembers(Session session, long groupId, List<Long> users) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.setMembers(groupId,users);
 	}

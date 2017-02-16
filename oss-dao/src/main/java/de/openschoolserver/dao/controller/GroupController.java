@@ -165,13 +165,52 @@ public class GroupController extends Controller {
 		return allUsers;
 	}
 
-	public List<User> getMember(long groupId) {
+	public List<User> getMembers(long groupId) {
 		Group group = this.getById(groupId);
 		return group.getUsers();
 	}
 
-	public Response setMembers(long groupId, List<User> users) {
-		return new Response(this.getSession(),"ERROR","Not Implemented until now");
+	public Response setMembers(long groupId, List<Long> userIds) {
+		EntityManager em = getEntityManager();
+		List<User> userToRemove = new ArrayList<User>();
+		List<User> userToAdd    = new ArrayList<User>();
+		List<User> users = new ArrayList<User>();
+		for( Long userId : userIds ) {
+			users.add(em.find(User.class, userId));
+		}
+		Group group = this.getById(groupId);
+		for( User user : users ){
+			if(! group.getUsers().contains(user)){
+				userToAdd.add(user);
+			}
+		}
+		for( User user : group.getUsers() ) {
+			if(! users.contains(user)) {
+				userToRemove.add(user);
+			}
+		}
+		try {
+			em.getTransaction().begin();
+			for( User user : userToAdd) {
+				group.getUsers().add(user);
+				user.getGroups().add(group);
+				em.merge(user);
+			}
+			for( User user : userToRemove ) {
+				group.getUsers().remove(user);
+				user.getGroups().remove(group);
+				em.merge(user);
+			}
+			em.merge(group);
+			em.getTransaction().commit();
+		}catch (Exception e) {
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		this.changeMemberPlugin("add", group, userToAdd);
+		this.changeMemberPlugin("remove", group, userToRemove);
+		return new Response(this.getSession(),"OK","Group member was set");
 	}
 
 	public Response addMember(long groupId, long userId) {
@@ -213,6 +252,4 @@ public class GroupController extends Controller {
 		this.changeMemberPlugin("remove", group.getName(), user.getUid());
 		return new Response(this.getSession(),"OK","User " + user.getUid() + " was removed from group " + group.getName() );
 	}
-
-
 }

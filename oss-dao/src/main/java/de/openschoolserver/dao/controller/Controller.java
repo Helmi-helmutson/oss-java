@@ -72,7 +72,10 @@ public class Controller extends Config {
 	}
 
 	protected boolean checkBadHostName(String name) {
-		return Pattern.matches("[^a-zA-Z0-9\\-]",name);
+		if( ! Pattern.matches("[^a-zA-Z0-9\\-]",name) ){
+			return Pattern.matches("-wlan$",name);
+		}
+		return true;
 	}
 
 	protected String isMacUnique(String name){
@@ -170,7 +173,7 @@ public class Controller extends Config {
 		System.err.println(pluginName + " : " + data.toString() + " : " + error);
 	}
 	
-	protected void changeMemberPlugin(String type, String group, List<String> users){
+	protected void changeMemberPlugin(String type, Group group, List<User> users){
 		//type can be only add or remove
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
@@ -179,10 +182,10 @@ public class Controller extends Config {
 		program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
 		program[1] = "change_member";
 		data.append(String.format("changetype: %s%n",type));
-		data.append(String.format("group: %s%n", group));
+		data.append(String.format("group: %s%n", group.getName()));
 		data.append("users: ");
-		for( String user : users ) {
-			data.append(user + " ");
+		for( User user : users ) {
+			data.append(user.getUid() + " ");
 		}
 		OSSShellTools.exec(program, reply, error, data.toString());
 		System.err.println("change_member  : " + data.toString() + " : " + error);
