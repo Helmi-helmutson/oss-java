@@ -13,10 +13,12 @@ import javax.persistence.*;
 @Entity
 @Table(name="Aliases")
 @NamedQuery(name="Alias.findAll", query="SELECT a FROM Alias a")
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Alias implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String alias;
@@ -25,6 +27,14 @@ public class Alias implements Serializable {
 	@ManyToOne
 	@JsonIgnore
 	private User user;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof Alias && obj !=null) {
+                        return getId() == ((Alias)obj).getId();
+                }
+                return super.equals(obj);
+        }
 
 	public Alias() {
 	}

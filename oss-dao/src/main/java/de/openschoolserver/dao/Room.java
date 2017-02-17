@@ -22,10 +22,12 @@ import java.util.List;
 	@NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" ),
 	@NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" )
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String name;

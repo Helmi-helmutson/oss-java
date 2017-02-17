@@ -11,10 +11,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name="RoomMConfig")
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class RoomMConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 
         @Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
         private long id;
 
         private String keyword;
@@ -25,6 +27,17 @@ public class RoomMConfig implements Serializable {
         @ManyToOne
         @JsonIgnore
         private Room room;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof RoomMConfig && obj !=null) {
+                        return getId() == ((RoomMConfig)obj).getId();
+                }
+                return super.equals(obj);
+        }
+
+	public RoomMConfig() {
+	}
 
         public long getId() {
                 return this.id;

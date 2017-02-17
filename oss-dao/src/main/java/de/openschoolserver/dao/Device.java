@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
@@ -136,6 +136,8 @@ public class Device implements Serializable {
 
 	public Device() {
 		this.hwconfId = -1;
+		this.wlanip   = "";
+		this.wlanmac  = "";
 	}
 
 	public long getId() {

@@ -18,10 +18,12 @@ import java.util.HashMap;
 	@NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom a WHERE a.room = :room"),
 	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom a WHERE a.accessPIT.pointintime = :time")
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class AccessInRoom implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String accesstype;

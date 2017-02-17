@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
@@ -109,6 +110,65 @@ public class DeviceController extends Controller {
 		}
 	}
 
+	protected String check(Device device,Room room) {
+		StringBuilder error = new StringBuilder();
+		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
+		
+		if( ! this.isNameUnique(device.getName())){
+			error.append("Devices name is not unique. " );
+		}
+		if( this.checkBadHostName(device.getName())){
+			error.append("Devices name contains not allowed characters. " );
+		}
+		//Check the MAC address
+		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
+		String name =  this.isMacUnique(device.getMac());
+		if( name != "" ){
+			error.append("The MAC address will be used allready:" + name );
+		}
+		
+		if( ! IPv4.validateMACAddress(device.getMac())) {
+			error.append("The MAC address is not valid:" + device.getMac() );	
+		}
+		//Check the IP address
+		name =  this.isIPUnique(device.getIp());
+		if( name != "" ){
+			error.append("The IP address will be used allready:" + name );
+		}
+		if( ! IPv4.validateIPAddress(device.getIp())) {
+			error.append("The IP address is not valid:" + device.getIp() );	
+		}
+		if( !net.contains(device.getIp())) {
+			error.append("The IP address is not in the room ip address range.");
+		}
+		
+		if( device.getWlanMac().isEmpty() ) {
+			device.setWlanIp("");
+		} else {
+			//Check the MAC address
+			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
+			name =  this.isMacUnique(device.getWlanMac());
+			if( name != "" ){
+				error.append("The WLAN MAC address will be used allready:" + name );
+			}
+			if( ! IPv4.validateMACAddress(device.getMac())) {
+				error.append("The WLAN MAC address is not valid:" + device.getWlanMac() );	
+			}
+			//Check the IP address
+			name =  this.isIPUnique(device.getWlanIp());
+			if( name != "" ){
+				error.append("The WLAN IP address will be used allready:" + name );
+			}
+			if( ! IPv4.validateIPAddress(device.getWlanIp())) {
+				error.append("The IP address is not valid:" + device.getIp() );	
+			}
+			if( !net.contains(device.getWlanIp())) {
+				error.append("The IP address is not in the room ip address range.");
+			}
+		}
+		return error.toString();
+	}
+	
 	/*
 	 * Creates devices
 	 */

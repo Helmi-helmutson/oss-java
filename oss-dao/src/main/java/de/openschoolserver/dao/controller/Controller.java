@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
@@ -191,7 +191,7 @@ public class Controller extends Config {
 		System.err.println("change_member  : " + data.toString() + " : " + error);
 	}
 	
-	protected void changeMemberPlugin(String type, String group, String user){
+	protected void changeMemberPlugin(String type, Group group, User user){
 		//type can be only add or remove
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
@@ -200,8 +200,8 @@ public class Controller extends Config {
 		program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
 		program[1] = "change_member";
 		data.append(String.format("changetype: %s%n",type));
-		data.append(String.format("group: %s%n", group));
-		data.append(String.format("user: %s%n", group));
+		data.append(String.format("group: %s%n", group.getName()));
+		data.append(String.format("user: %s%n", user.getUid()));
 		OSSShellTools.exec(program, reply, error, data.toString());
 		System.err.println("change_member  : " + data.toString() + " : " + error);
 	}
