@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resources;
 
 
@@ -98,7 +98,8 @@ public interface RoomResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "get all available ip-adresses of the room")
         @ApiResponses(value = {
-        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
     List<String> getAvailableIPAddresses(
@@ -106,6 +107,24 @@ public interface RoomResource {
             @PathParam("roomId") long roomId
     );
 
+    /*
+     * GET rooms/{roomId}/getAvailableIPAddresses
+     */
+    @GET
+    @Path("{roomId}/availableIPAddresses/{count}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get count available ip-adresses of the room. The string list will contains the proposed name too: 'IP-Addres Proposed-Name'")
+        @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "There is no more IP address in this room."),
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<String> getAvailableIPAddresses(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("count") long count
+    );
+    
     /*
      * PUT rooms/getNextRoomIP/ { netMask : 26, netWork : "10.12.0.0/16" }
      */
@@ -245,7 +264,7 @@ public interface RoomResource {
     
     // Functions to manage Devices in Rooms
     /*
-     * POST devices/add { hash }
+     * POST rooms/{roomId}/addDevices { hash }
      */
     @POST
     @Path("{roomId}/addDevices")
@@ -261,9 +280,28 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             List<Device> devices
     );
+    
+    /*
+     * PUT rooms/{roomId}/addDevice/{MAC}/{name}
+     */
+    @PUT
+    @Path("{roomId}/addDevice/{MAC}/{name}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new devices")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response addDevice(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("macAddress") String macAddress,
+            @PathParam("name") String name
+    );
 
     /*
-     * POST devices/add { hash }
+     * GET rooms/{roomId}/getDevices
      */
     @GET
     @Path("{roomId}/getDevices")
@@ -280,7 +318,7 @@ public interface RoomResource {
     );
     
     /*
-     * POST  {roomId}/deleteDevices [ deviceId, deviceId]
+     * POST  rooms/{roomId}/deleteDevices [ deviceId, deviceId]
      */
     @POST
     @Path("{roomId}/deleteDevices")

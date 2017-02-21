@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
@@ -172,8 +172,8 @@ public class GroupController extends Controller {
 
 	public Response setMembers(long groupId, List<Long> userIds) {
 		EntityManager em = getEntityManager();
-		List<User> userToRemove = new ArrayList<User>();
-		List<User> userToAdd    = new ArrayList<User>();
+		List<User> usersToRemove = new ArrayList<User>();
+		List<User> usersToAdd    = new ArrayList<User>();
 		List<User> users = new ArrayList<User>();
 		for( Long userId : userIds ) {
 			users.add(em.find(User.class, userId));
@@ -181,22 +181,22 @@ public class GroupController extends Controller {
 		Group group = this.getById(groupId);
 		for( User user : users ){
 			if(! group.getUsers().contains(user)){
-				userToAdd.add(user);
+				usersToAdd.add(user);
 			}
 		}
 		for( User user : group.getUsers() ) {
 			if(! users.contains(user)) {
-				userToRemove.add(user);
+				usersToRemove.add(user);
 			}
 		}
 		try {
 			em.getTransaction().begin();
-			for( User user : userToAdd) {
+			for( User user : usersToAdd) {
 				group.getUsers().add(user);
 				user.getGroups().add(group);
 				em.merge(user);
 			}
-			for( User user : userToRemove ) {
+			for( User user : usersToRemove ) {
 				group.getUsers().remove(user);
 				user.getGroups().remove(group);
 				em.merge(user);
@@ -208,9 +208,9 @@ public class GroupController extends Controller {
 		} finally {
 			em.close();
 		}
-		this.changeMemberPlugin("add", group, userToAdd);
-		this.changeMemberPlugin("remove", group, userToRemove);
-		return new Response(this.getSession(),"OK","Group member was set");
+		this.changeMemberPlugin("add", group, usersToAdd);
+		this.changeMemberPlugin("remove", group, usersToRemove);
+		return new Response(this.getSession(),"OK","The members of group was set.");
 	}
 
 	public Response addMember(long groupId, long userId) {
@@ -229,7 +229,7 @@ public class GroupController extends Controller {
 		} finally {
 			em.close();
 		}
-		this.changeMemberPlugin("add", group.getName(), user.getUid());
+		this.changeMemberPlugin("add", group, user);
 		return new Response(this.getSession(),"OK","User " + user.getUid() + " was added to group " + group.getName() );
 	}
 
@@ -249,7 +249,7 @@ public class GroupController extends Controller {
 		} finally {
 			em.close();
 		}
-		this.changeMemberPlugin("remove", group.getName(), user.getUid());
+		this.changeMemberPlugin("remove", group, user);
 		return new Response(this.getSession(),"OK","User " + user.getUid() + " was removed from group " + group.getName() );
 	}
 }

@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
@@ -229,13 +229,48 @@ public class UserController extends Controller {
 
 	public Response setGroups(long userId, List<Long> groupIds) {
 		EntityManager em = getEntityManager();
-		List<Group> groupToRemove = new ArrayList<Group>();
-		List<Group> groupToAdd    = new ArrayList<Group>();
+		List<Group> groupsToRemove = new ArrayList<Group>();
+		List<Group> groupsToAdd    = new ArrayList<Group>();
 		List<Group> groups = new ArrayList<Group>();
 		for( Long groupId : groupIds ) {
 			groups.add(em.find(Group.class, groupId));
 		}
 		User user = this.getById(userId);
-		return null;
+		for( Group group : groups ){
+			if( ! user.getGroups().contains(group) ){
+				groupsToAdd.add(group);
+			}
+		}
+		for ( Group group : user.getGroups() ) {
+			if( ! groups.contains(group) ) {
+				groupsToRemove.add(group);
+			}
+		}
+		try {
+			em.getTransaction().begin();
+			for( Group group : groupsToAdd ){
+				group.getUsers().add(user);
+				user.getGroups().add(group);
+				em.merge(group);
+			}
+			for( Group group : groupsToRemove ) {
+				group.getUsers().remove(user);
+				user.getGroups().remove(group);
+				em.merge(group);
+			}
+			em.merge(user);
+			em.getTransaction().commit();
+		}catch (Exception e) {
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		for( Group group : groupsToAdd ){
+			this.changeMemberPlugin("add", group, user);
+		}
+		for( Group group : groupsToRemove ) {
+			this.changeMemberPlugin("remove", group, user);
+		}
+		return new Response(this.getSession(),"OK","The groups of the user was set.");
 	}
 }

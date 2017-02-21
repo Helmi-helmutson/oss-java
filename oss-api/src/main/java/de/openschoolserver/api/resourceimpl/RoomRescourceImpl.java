@@ -1,8 +1,9 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
@@ -45,14 +46,12 @@ public class RoomRescourceImpl implements RoomResource {
 
     @Override
     public Response add(Session session, Room room) {
-        // TODO Auto-generated method stub
     	final RoomController roomController = new RoomController(session);
     	return roomController.add(room);
     }
 
     @Override
     public List<String> getAvailableIPAddresses(Session session, long roomId) {
-        // TODO Auto-generated method stub
         final RoomController roomController = new RoomController(session);
         final List<String> ips = roomController.getAvailableIPAddresses(roomId);
         if ( ips == null) {
@@ -60,12 +59,24 @@ public class RoomRescourceImpl implements RoomResource {
         }
         return ips;
     }
+    
+    @Override
+	public List<String> getAvailableIPAddresses(Session session, long roomId, long count) {
+    	final RoomController roomController = new RoomController(session);
+        final List<String> ips = roomController.getAvailableIPAddresses(roomId,count);
+        if ( ips == null) {
+            throw new WebApplicationException(404);
+        }
+        return ips;
+	}
 
 	@Override
 	public String getNextRoomIP(Session session, String network, int netMask) {
-		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		final String nextIP = roomController.getNextRoomIP(network, netMask);
+        if ( nextIP == null) {
+            throw new WebApplicationException(404);
+        }
 		return nextIP;
 	}
 
@@ -135,6 +146,12 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
+	public Response addDevice(Session session, long roomId, String macAddress, String name) {
+		final RoomController roomController = new RoomController(session);
+		return roomController.addDevice(roomId,macAddress,name);
+	}
+	
+	@Override
 	public Response deleteDevices(Session session, long roomId, List<Long> deviceIds) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
@@ -154,4 +171,19 @@ public class RoomRescourceImpl implements RoomResource {
 		final RoomController roomController = new RoomController(session);
 		return roomController.getDevices(roomId);
 	}
+
+	@Override
+	public HWConf getHwConf(Session session, long roomId) {
+		final RoomController roomController = new RoomController(session);
+		return roomController.getHWConf(roomId);
+	}
+
+	@Override
+	public Response setHwConf(Session session, long roomId, long hwConfId) {
+		final RoomController roomController = new RoomController(session);
+		return roomController.setHWConf(roomId,hwConfId);
+	}
+
+	
+
 }
