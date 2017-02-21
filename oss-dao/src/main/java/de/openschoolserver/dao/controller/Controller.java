@@ -138,11 +138,11 @@ public class Controller extends Config {
 			switch(pluginName){
 			case "add_group":
 			case "modify_group":
-				data.append(String.format("cn: %s%n", group.getName()));
+				data.append(String.format("name: %s%n", group.getName()));
 				data.append(String.format("description: %s%n", group.getDescription()));
 				break;
 			case "delete_group":
-				data.append(String.format("cn: %s%n", group.getName()));
+				data.append(String.format("name: %s%n", group.getName()));
 				break;
 			}
 			break;
@@ -152,8 +152,22 @@ public class Controller extends Config {
 			switch(pluginName){
 			case "add_device":
 			case "modify_device":
+				data.append(String.format("name: %s%n", device.getName()));
+				data.append(String.format("ip: %s%n", device.getIp()));
+				data.append(String.format("mac: %s%n", device.getMac()));
+				if( ! device.getWlanIp().isEmpty() ) {
+					data.append(String.format("wlanip: %s%n", device.getWlanIp()));
+					data.append(String.format("wlanmac: %s%n", device.getWlanMac()));
+				}
 				break;
 			case "delete_device":
+				data.append(String.format("name: %s%n", device.getName()));
+				data.append(String.format("ip: %s%n", device.getIp()));
+				data.append(String.format("mac: %s%n", device.getMac()));
+				if( ! device.getWlanIp().isEmpty() ) {
+					data.append(String.format("wlanip: %s%n", device.getWlanIp()));
+					data.append(String.format("wlanmac: %s%n", device.getWlanMac()));
+				}
 				break;
 			}
 			break;

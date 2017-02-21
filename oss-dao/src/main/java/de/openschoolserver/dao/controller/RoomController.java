@@ -166,7 +166,7 @@ public class RoomController extends Controller {
 		for( String IP : net.getAvailableIPs(0) ){
 			String name =  this.isIPUnique(IP);
 			if( name == "" ){
-				availableIPs.add(String.format("%s %s-%02d", IP,room.getName(),i));
+				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName(),i));
 			}
 			if( count > 0 && availableIPs.size() == count ) {
 				break;
@@ -542,6 +542,9 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
+		for(Device device : devices) {
+		    this.startPlugin("add_device", device);
+		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		dhcpconfig.Create();
 		return new Response(this.getSession(),"OK", "Devices were created succesfully." );
@@ -615,6 +618,8 @@ public class RoomController extends Controller {
 		if( error != "" ) {
 			return new Response(this.getSession(),"ERROR",error);
 		}
+		
+		//Now add to the room
 		device.setRoom(room);
 		room.addDevice(device);
 		try {
@@ -627,6 +632,11 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
+		
+		//Start plugin and create DHCP and salt configuration
+		this.startPlugin("add_device", device);
+		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+		dhcpconfig.Create();
 		return new Response(this.getSession(),"OK","Device was created succesfully.");
 	}
 
