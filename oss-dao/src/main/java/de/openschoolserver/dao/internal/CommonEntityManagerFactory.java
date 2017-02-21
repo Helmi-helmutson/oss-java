@@ -70,6 +70,24 @@ public class CommonEntityManagerFactory {
              * <property name="eclipselink.logging.logger"
              * value="DefaultLogger"/>
              */
+	    try {
+			File file = new File("/opt/oss-java/conf/oss-api.properties");
+			FileInputStream fileInput = new FileInputStream(file);
+			Properties properties = new Properties();
+			properties.load(fileInput);
+			fileInput.close();
+
+			Enumeration enuKeys = properties.keys();
+			while (enuKeys.hasMoreElements()) {
+				String key = (String) enuKeys.nextElement();
+				String value = properties.getProperty(key);
+				properties.put(key, value);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
         }
         return properties;
     }
