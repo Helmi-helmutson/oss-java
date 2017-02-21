@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -165,7 +166,7 @@ public class RoomController extends Controller {
 		for( String IP : net.getAvailableIPs(0) ){
 			String name =  this.isIPUnique(IP);
 			if( name == "" ){
-				availableIPs.add(String.format("%s %s-%02d", IP,room.getName(),i));
+				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName(),i));
 			}
 			if( count > 0 && availableIPs.size() == count ) {
 				break;
@@ -541,6 +542,9 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
+		for(Device device : devices) {
+		    this.startPlugin("add_device", device);
+		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		dhcpconfig.Create();
 		return new Response(this.getSession(),"OK", "Devices were created succesfully." );
@@ -626,6 +630,36 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
+		//Start plugin and create DHCP and salt configuration
+		this.startPlugin("add_device", device);
+		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+		dhcpconfig.Create();
 		return new Response(this.getSession(),"OK","Device was created succesfully.");
+	}
+
+	public HWConf getHWConf(long roomId) {
+		EntityManager em = getEntityManager();
+		try {
+			return em.find(Room.class, roomId).getHwconf();
+		} catch (Exception e) {
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	public Response setHWConf(long roomId, long hwConfId) {
+		EntityManager em = getEntityManager();
+		try {
+			Room room = em.find(Room.class, roomId);
+			room.setHwconf(em.find(HWConf.class, hwConfId));
+		} catch (Exception e) {
+			System.err.println(e.getMessage()); //TODO
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","The hardware configuration of the room was set succesfully.");
 	}
 }

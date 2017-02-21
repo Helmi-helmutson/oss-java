@@ -17,10 +17,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	@NamedQuery(name="Partition.findAll", query="SELECT p FROM Partition p"),
 	@NamedQuery(name="Partition.getPartitionByName", query="SELECT p FROM Partition p WHERE p.hwconf.id = :hwconfId AND p.name = :name")
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Partition implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String description;

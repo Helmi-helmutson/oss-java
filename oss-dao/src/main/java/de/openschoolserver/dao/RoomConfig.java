@@ -12,10 +12,12 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="RoomConfig")
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class RoomConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 
         @Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
         private long id;
 
         private String keyword;
@@ -26,6 +28,17 @@ public class RoomConfig implements Serializable {
         @ManyToOne
         @JsonIgnore
         private Room room;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof RoomConfig && obj !=null) {
+                        return getId() == ((RoomConfig)obj).getId();
+                }
+                return super.equals(obj);
+        }
+
+	public RoomConfig() {
+	}
 
         public long getId() {
                 return this.id;

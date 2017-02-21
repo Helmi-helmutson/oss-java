@@ -14,10 +14,12 @@ import java.util.List;
 @Entity
 @Table(name="Tests")
 @NamedQuery(name="Test.findAll", query="SELECT t FROM Test t")
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Test implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String currentStep;

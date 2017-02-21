@@ -121,11 +121,11 @@ public class DeviceController extends Controller {
 			error.append("Devices name contains not allowed characters. " );
 		}
 		//Check the MAC address
+		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		String name =  this.isMacUnique(device.getMac());
 		if( name != "" ){
 			error.append("The MAC address will be used allready:" + name );
 		}
-		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		if( ! IPv4.validateMACAddress(device.getMac())) {
 			error.append("The MAC address is not valid:" + device.getMac() );	
 		}
@@ -145,13 +145,13 @@ public class DeviceController extends Controller {
 			device.setWlanIp("");
 		} else {
 			//Check the MAC address
-			name =  this.isMacUnique(device.getMac());
+			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
+			name =  this.isMacUnique(device.getWlanMac());
 			if( name != "" ){
-				error.append("The MAC address will be used allready:" + name );
+				error.append("The WLAN MAC address will be used allready:" + name );
 			}
-			device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.append("The MAC address is not valid:" + device.getMac() );	
+				error.append("The WLAN MAC address is not valid:" + device.getWlanMac() );	
 			}
 			//Check the IP address
 			name =  this.isIPUnique(device.getWlanIp());

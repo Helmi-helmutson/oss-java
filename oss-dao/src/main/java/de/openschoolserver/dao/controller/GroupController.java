@@ -1,4 +1,4 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
@@ -89,18 +89,6 @@ public class GroupController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.persist(group);
-			String[] program   = new String[4];
-			StringBuffer reply = new StringBuffer();
-			StringBuffer error = new StringBuffer();
-			program[0] = "/usr/sbin/oss-add-group.sh";
-			program[1] = String.format("--name='%s'",group.getName());
-			program[2] = String.format("--description='%s'",group.getDescription());
-			program[3] = String.format("--type='%s'",group.getGroupType());
-			OSSShellTools.exec(program, reply, error, null);
-			if( error.toString() != "") {
-				em.getTransaction().rollback();
-				return new Response(this.getSession(),"ERROR",error.toString());
-			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
@@ -128,14 +116,6 @@ public class GroupController extends Controller {
 	public Response delete(long groupId){
 		Group group = this.getById(groupId);
 		this.startPlugin("delete_group", group);
-
-		//REMOVE THE GROUP FROM SAMBA
-		String[] program   = new String[2];
-		StringBuffer reply = new StringBuffer();
-		StringBuffer error = new StringBuffer();
-		program[0] = "/usr/sbin/oss-delete-group.sh";
-		program[1] = String.format("--name='%s'",group.getName());
-		OSSShellTools.exec(program, reply, error, null);
 
 		// Remove group from GroupMember of table
 		EntityManager em = getEntityManager();
@@ -208,8 +188,8 @@ public class GroupController extends Controller {
 		} finally {
 			em.close();
 		}
-		this.changeMemberPlugin("add", group, usersToAdd);
-		this.changeMemberPlugin("remove", group, usersToRemove);
+		this.changeMemberPlugin("addmembers", group, usersToAdd);
+		this.changeMemberPlugin("removemembers", group, usersToRemove);
 		return new Response(this.getSession(),"OK","The members of group was set.");
 	}
 
@@ -229,7 +209,7 @@ public class GroupController extends Controller {
 		} finally {
 			em.close();
 		}
-		this.changeMemberPlugin("add", group, user);
+		this.changeMemberPlugin("addmembers", group, user);
 		return new Response(this.getSession(),"OK","User " + user.getUid() + " was added to group " + group.getName() );
 	}
 
@@ -249,7 +229,7 @@ public class GroupController extends Controller {
 		} finally {
 			em.close();
 		}
-		this.changeMemberPlugin("remove", group, user);
+		this.changeMemberPlugin("removemembers", group, user);
 		return new Response(this.getSession(),"OK","User " + user.getUid() + " was removed from group " + group.getName() );
 	}
 }

@@ -23,10 +23,12 @@ import java.util.List;
 	@NamedQuery(name="Group.getByType",  query="SELECT g FROM Group g WHERE g.groupType = :groupType"),
 	@NamedQuery(name="Group.search", query="SELECT g FROM Group g WHERE g.name LIKE :search OR g.description LIKE :search"),
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Group implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String name;

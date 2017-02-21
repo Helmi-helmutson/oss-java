@@ -18,10 +18,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	@NamedQuery(name="HWConf.findAll", query="SELECT h FROM HWConf h"),
 	@NamedQuery(name="HWConf.getByName", query="SELECT h FROM HWConf h WHERE h.name = :name")
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class HWConf implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String description;
@@ -43,6 +45,14 @@ public class HWConf implements Serializable {
 	@OneToMany(mappedBy="hwconf")
 	@JsonIgnore
 	private List<Room> rooms;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof HWConf && obj !=null) {
+                        return getId() == ((HWConf)obj).getId();
+                }
+                return super.equals(obj);
+        }
 
 	public HWConf() {
 	}

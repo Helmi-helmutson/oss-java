@@ -28,10 +28,12 @@ import javax.persistence.*;
 	@NamedQuery(name="User.checkConfig", query="SELECT COUNT(c) FROM UserConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword AND c.value = :value" ),
 	@NamedQuery(name="User.checMkConfig", query="SELECT COUNT(c) FROM UserMConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword AND c.value = :value" ),
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	long id;
 
 	private String givenName;
