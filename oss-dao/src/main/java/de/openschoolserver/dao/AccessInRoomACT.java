@@ -10,6 +10,7 @@ import javax.persistence.*;
  * 
  */
 @Entity
+@Table(name="AccessInRoomACT")
 public class AccessInRoomACT implements Serializable {
 	private static final long serialVersionUID = 1L;
 

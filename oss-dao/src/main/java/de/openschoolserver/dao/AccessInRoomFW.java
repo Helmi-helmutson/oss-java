@@ -12,6 +12,7 @@ import java.sql.Time;
  * 
  */
 @Entity
+@Table(name="AccessInRoomFW")
 public class AccessInRoomFW implements Serializable {
 	private static final long serialVersionUID = 1L;
 

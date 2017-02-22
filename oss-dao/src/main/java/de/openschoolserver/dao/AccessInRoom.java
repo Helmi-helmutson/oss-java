@@ -13,6 +13,7 @@ import java.util.HashMap;
  * 
  */
 @Entity
+@Table(name="AccessInRoom")
 @NamedQueries( {
 	@NamedQuery(name="AccessInRoom.findAll",            query="SELECT a FROM AccessInRoom a"),
 	@NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom a WHERE a.room = :room"),
