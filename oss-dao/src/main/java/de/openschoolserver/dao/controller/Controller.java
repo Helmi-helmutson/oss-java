@@ -26,7 +26,10 @@ public class Controller extends Config {
 	}
 
 	protected EntityManager getEntityManager() {
-		return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
+		if( session != null)
+		   return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
+		else
+			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected Session getSession() {

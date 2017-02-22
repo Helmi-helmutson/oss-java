@@ -136,6 +136,22 @@ public class Session implements Principal {
         this.userId = userId;
     }
 
+    public long getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(long deviceId) {
+        this.deviceId = deviceId;
+    }
+    
+    public long getRoomId() {
+        return roomId;
+    }
+
+    public void setRoomId(long roomId) {
+        this.roomId = roomId;
+    }
+    
     public Date getCreateDate() {
         return createDate;
     }

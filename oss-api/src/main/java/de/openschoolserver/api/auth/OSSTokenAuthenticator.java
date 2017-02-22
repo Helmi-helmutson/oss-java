@@ -4,7 +4,6 @@ package de.openschoolserver.api.auth;
 
 import java.util.Optional;
 
-
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
 
@@ -12,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.controller.SessionController;
 
 public class OSSTokenAuthenticator implements Authenticator<String, Session> {
 
@@ -21,11 +21,10 @@ public class OSSTokenAuthenticator implements Authenticator<String, Session> {
     public Optional<Session> authenticate(String token) throws AuthenticationException {
 
         logger.debug("Token: " + token);
-
-//        final SessionController sessionController = new SessionController(token);
-//        final Session session = sessionController.validateToken(token);
-       Session session = new Session(); //TODO implement
-
+        
+        final SessionController sessionController = new SessionController();
+        final Session session = sessionController.validateToken(token);
+       
         if (session != null) {
             logger.debug("authentication successful!");
             return Optional.of(session);

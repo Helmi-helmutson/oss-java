@@ -4,11 +4,16 @@ package de.openschoolserver.dao.controller;
 
 
 import javax.persistence.EntityManager;
+
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SessionToken;
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.Room;
+import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.controller.UserController;
+import de.openschoolserver.dao.controller.DeviceController;
 
 
 import java.util.List;
@@ -21,20 +26,13 @@ public class SessionController extends Controller {
 
     public SessionController(Session session) {
     	super(session);
-      
     }
 
-   
     public SessionController() {
     	super(null);
-      
     }
 
-
-
    public static Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
-
-
 
     public void removeAllSessionsFromCache() {
         sessions.clear();
@@ -47,18 +45,31 @@ public class SessionController extends Controller {
         }
     }
 
-   
-
-    public Session createSessionWithUser(User user, String password, String ip) {
-       
-
+    public Session createSessionWithUser(String username, String password, String deviceType) {
+    	UserController userController = new UserController(this.session);
+    	DeviceController deviceController = new DeviceController(this.session);
+    	Room room = null;
+    	//TODO check the password
+    	//TODO what to do with deviceType
+    	User user = userController.getByUid(username);
+    	if( user == null )
+    		return null;
+  
+    	Device device = deviceController.getByIP(this.getSession().getIP());
+    	if( device != null )
+    		room = device.getRoom();
+    
         if (user != null && user.getId() > 0) {
             final String token = SessionToken.createSessionToken("dummy");
-            Session session = new Session(token, user.getId(), password, ip);
-            sessions.put(token, session);
-            super.session=session; //note: controller was instanciated without a session
+            this.session.setToken(token);
+            this.session.setUserId(user.getId());
+            if( room != null )
+               this.session.setRoomId(room.getId());
+            if( device != null )
+               this.session.setDeviceId(device.getId());
+            sessions.put(token, this.session);
             save(session);
-            return session;
+            return this.session;
         } else {
             return null;
         }
@@ -90,12 +101,9 @@ public class SessionController extends Controller {
         Session data = null;
         EntityManager em = getEntityManager();
         if (em != null) {
-
             try {
-
                 em.getTransaction().begin();
                 data = em.find(Session.class, id);
-               
                 em.getTransaction().commit();
             } finally {
                 if ((em != null) && (em.isOpen()))
