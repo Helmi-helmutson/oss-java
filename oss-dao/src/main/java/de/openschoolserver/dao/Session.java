@@ -69,6 +69,8 @@ public class Session implements Principal {
     }
 
     public Session() {
+    	this.deviceId = null;
+    	this.roomId   = null;
         // empty constructor
     }
     

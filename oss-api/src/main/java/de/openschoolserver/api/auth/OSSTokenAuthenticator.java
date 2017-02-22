@@ -23,7 +23,7 @@ public class OSSTokenAuthenticator implements Authenticator<String, Session> {
         logger.debug("Token: " + token);
         
         final SessionController sessionController = new SessionController();
-        final Session session = sessionController.validateToken(token);
+        final Session session = sessionController.getByToken(token);
        
         if (session != null) {
             logger.debug("authentication successful!");

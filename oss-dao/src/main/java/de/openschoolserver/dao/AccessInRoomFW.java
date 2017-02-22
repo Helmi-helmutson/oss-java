@@ -13,6 +13,7 @@ import java.sql.Time;
  */
 @Entity
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
+@Table(name="AccessInRoomFW")
 public class AccessInRoomFW implements Serializable {
 	private static final long serialVersionUID = 1L;
 
