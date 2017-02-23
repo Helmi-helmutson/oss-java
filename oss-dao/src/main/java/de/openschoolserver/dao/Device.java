@@ -132,10 +132,10 @@ public class Device implements Serializable {
 	private List<User> loggedIn;
 
 	@Transient
-	long hwconfId;
+	Long hwconfId;
 
 	public Device() {
-		this.hwconfId = -1;
+		this.hwconfId = null;
 		this.wlanip   = "";
 		this.wlanmac  = "";
 	}
@@ -156,11 +156,11 @@ public class Device implements Serializable {
 		return super.equals(obj);
 	}
 
-	public long getHwconfId() {
+	public Long getHwconfId() {
 		return this.hwconfId;
 	}
 
-	public void setHwconfId(long id) {
+	public void setHwconfId(Long id) {
 		this.hwconfId = id;
 	}
 

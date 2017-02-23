@@ -15,7 +15,7 @@ public class Response implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
-    long id;
+	long id;
 
 	private String code;
 	private String text;

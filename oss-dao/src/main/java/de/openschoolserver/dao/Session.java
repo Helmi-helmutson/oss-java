@@ -71,7 +71,6 @@ public class Session implements Principal {
     public Session() {
     	this.deviceId = null;
     	this.roomId   = null;
-        // empty constructor
     }
     
     @Override
@@ -138,19 +137,19 @@ public class Session implements Principal {
         this.userId = userId;
     }
 
-    public long getDeviceId() {
+    public Long getDeviceId() {
         return deviceId;
     }
 
-    public void setDeviceId(long deviceId) {
+    public void setDeviceId(Long deviceId) {
         this.deviceId = deviceId;
     }
     
-    public long getRoomId() {
+    public Long getRoomId() {
         return roomId;
     }
 
-    public void setRoomId(long roomId) {
+    public void setRoomId(Long roomId) {
         this.roomId = roomId;
     }
     

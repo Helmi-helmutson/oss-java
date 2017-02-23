@@ -521,10 +521,10 @@ public class RoomController extends Controller {
 		for(Device device : devices) {
 			error.append(deviceController.check(device, room));
 			device.setRoom(room);
-			if(device.getHwconfId() != -1){
-				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
-			} else {
+			if(device.getHwconfId() == null){
 				device.setHwconf(room.getHwconf());
+			} else {
+				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
 			}
 			room.addDevice(device);
 		}
