@@ -4,7 +4,9 @@ package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.api.resources.SessionsResource;
 
+
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.controller.SessionController;
 
 
 import org.slf4j.Logger;
@@ -27,25 +29,19 @@ public class SessionsResourceImpl implements SessionsResource {
         }
 
         final URI uri = ui.getAbsolutePath();
-//        final SessionController sessionController = new SessionController(uri.getHost() + ":" + uri.getPort(), null);
-//        final Session session = sessionController.createSession(username, password, device);
-//
-//        if (session == null) {
-//            logger.debug("Person authentication failed!");
-//            throw new WebApplicationException(401);
-//        } else {
-//            logger.debug("Person authenticated: " + session.getPerson());
-//            return session;
-//        }
         Session session =  new Session();
         session.setIP(req.getRemoteAddr());
-        //TODO Implement setting user room etc.
-        return session;
+        SessionController sessionController = new SessionController(session);
+        return sessionController.createSessionWithUser(username, password, device);
     }
 
     @Override
     public Session getStatus(Session session) {
-      //  logger.debug("Validating session " + session.getToken());
+ logger.debug("Validating session " + session.getToken());
+ logger.debug("Validating session " + session.getUser().getUid());
+ logger.debug("Validating session " + session.getRoomId());
+ logger.debug("Validating session " + session.getDeviceId());
+ 
         return session;
     }
 

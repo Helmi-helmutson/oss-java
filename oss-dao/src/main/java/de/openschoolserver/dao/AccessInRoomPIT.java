@@ -12,15 +12,25 @@ import java.sql.Time;
  *
  */
 @Entity
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 @Table(name="AccessInRoomPIT")
 public class AccessInRoomPIT implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String  pointintime;
 	private AccessInRoom accessinroom;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof AccessInRoomPIT && obj !=null) {
+                        return getId() == ((AccessInRoomPIT)obj).getId();
+                }
+                return super.equals(obj);
+        }
 
 	public AccessInRoom getAccessinroom() {
 		return accessinroom;

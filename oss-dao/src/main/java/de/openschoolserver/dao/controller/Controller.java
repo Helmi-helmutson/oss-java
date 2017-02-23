@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
@@ -26,7 +26,10 @@ public class Controller extends Config {
 	}
 
 	protected EntityManager getEntityManager() {
-		return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
+		if( session != null)
+		   return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
+		else
+			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected Session getSession() {
@@ -72,7 +75,10 @@ public class Controller extends Config {
 	}
 
 	protected boolean checkBadHostName(String name) {
-		return Pattern.matches("[^a-zA-Z0-9\\-]",name);
+		if( ! Pattern.matches("[^a-zA-Z0-9\\-]",name) ){
+			return Pattern.matches("-wlan$",name);
+		}
+		return true;
 	}
 
 	protected String isMacUnique(String name){
@@ -134,16 +140,12 @@ public class Controller extends Config {
 			Group group = (Group)object;
 			switch(pluginName){
 			case "add_group":
-				data.append(String.format("cn: %s%n", group.getName()));
-				data.append(String.format("description: %s%n", group.getDescription()));
-				String members = "";
-				for(User u : group.getUsers() ){
-					members.concat(u.getUid() + " ");
-				}
 			case "modify_group":
+				data.append(String.format("name: %s%n", group.getName()));
+				data.append(String.format("description: %s%n", group.getDescription()));
 				break;
 			case "delete_group":
-				data.append(String.format("cn: %s%n", group.getName()));
+				data.append(String.format("name: %s%n", group.getName()));
 				break;
 			}
 			break;
@@ -153,8 +155,22 @@ public class Controller extends Config {
 			switch(pluginName){
 			case "add_device":
 			case "modify_device":
+				data.append(String.format("name: %s%n", device.getName()));
+				data.append(String.format("ip: %s%n", device.getIp()));
+				data.append(String.format("mac: %s%n", device.getMac()));
+				if( ! device.getWlanIp().isEmpty() ) {
+					data.append(String.format("wlanip: %s%n", device.getWlanIp()));
+					data.append(String.format("wlanmac: %s%n", device.getWlanMac()));
+				}
 				break;
 			case "delete_device":
+				data.append(String.format("name: %s%n", device.getName()));
+				data.append(String.format("ip: %s%n", device.getIp()));
+				data.append(String.format("mac: %s%n", device.getMac()));
+				if( ! device.getWlanIp().isEmpty() ) {
+					data.append(String.format("wlanip: %s%n", device.getWlanIp()));
+					data.append(String.format("wlanmac: %s%n", device.getWlanMac()));
+				}
 				break;
 			}
 			break;
@@ -173,4 +189,38 @@ public class Controller extends Config {
 		OSSShellTools.exec(program, reply, error, data.toString());
 		System.err.println(pluginName + " : " + data.toString() + " : " + error);
 	}
+	
+	protected void changeMemberPlugin(String type, Group group, List<User> users){
+		//type can be only add or remove
+		StringBuilder data = new StringBuilder();
+		String[] program   = new String[2];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
+		program[1] = "change_member";
+		data.append(String.format("changetype: %s%n",type));
+		data.append(String.format("group: %s%n", group.getName()));
+		data.append("users: ");
+		for( User user : users ) {
+			data.append(user.getUid() + " ");
+		}
+		OSSShellTools.exec(program, reply, error, data.toString());
+		System.err.println("change_member  : " + data.toString() + " : " + error);
+	}
+	
+	protected void changeMemberPlugin(String type, Group group, User user){
+		//type can be only add or remove
+		StringBuilder data = new StringBuilder();
+		String[] program   = new String[2];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
+		program[1] = "change_member";
+		data.append(String.format("changetype: %s%n",type));
+		data.append(String.format("group: %s%n", group.getName()));
+		data.append(String.format("user: %s%n", user.getUid()));
+		OSSShellTools.exec(program, reply, error, data.toString());
+		System.err.println("change_member  : " + data.toString() + " : " + error);
+	}
+	
 }

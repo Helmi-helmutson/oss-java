@@ -22,10 +22,12 @@ import java.util.List;
 	@NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" ),
 	@NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" )
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String name;
@@ -104,11 +106,11 @@ public class Room implements Serializable {
 	private String network;
 
 	@Transient
-	private long hwconfId;
+	private Long hwconfId;
 
 	public Room() {
 		this.network  = "";
-		this.hwconfId = 0;
+		this.hwconfId = null;
 	}
 
 	public long getId() {
@@ -127,11 +129,11 @@ public class Room implements Serializable {
 		return super.equals(obj);
 	}
 
-	public long getHwconfId() {
+	public Long getHwconfId() {
 		return this.hwconfId;
 	}
 
-	public void setHwconfId(long id) {
+	public void setHwconfId(Long id) {
 		this.hwconfId = id;
 	}
 

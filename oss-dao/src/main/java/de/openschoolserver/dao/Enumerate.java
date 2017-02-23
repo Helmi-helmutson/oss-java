@@ -12,15 +12,25 @@ import javax.persistence.*;
 @Entity
 @Table(name="Enumerates")
 @NamedQuery(name="Enumerate.findAll", query="SELECT e FROM Enumerate e")
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Enumerate implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String name;
 
 	private String value;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof Enumerate && obj !=null) {
+                        return getId() == ((Enumerate)obj).getId();
+                }
+                return super.equals(obj);
+        }
 
 	public Enumerate() {
 	}

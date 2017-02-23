@@ -194,5 +194,56 @@ public interface UserResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId
     );
-
+    
+    /*
+   	 * POST users/<userId>/groups
+   	 */
+       @POST
+       @Path("{userId}/groups")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Sets the membe of this group.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 404, message = "Group not found"),
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @PermitAll
+       Response setMembers(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("userId") long userId,
+               List<Long> groups
+       );
+       
+    
+    /*
+     * DELETE users/<userId>/<groupId>
+     */
+    @DELETE
+    @Path("{userId}/{groupId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Removes the user from a group.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "User not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+    Response removeMember(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("groupId") long groupId,
+            @PathParam("userId") long userId
+    );
+    
+    /*
+     * PUT groups/<groupId>/<userId>
+     */
+    @PUT
+    @Path("{userId}/{groupId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Add user to a group.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "User not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+    Response addMember(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("groupId") long groupId,
+            @PathParam("userId") long userId
+    );
 }

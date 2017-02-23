@@ -1,6 +1,7 @@
 package de.openschoolserver.dao.controller;
 
 import de.openschoolserver.dao.Session;
+
 import de.openschoolserver.dao.User;
 
 /* prerequisites:
@@ -25,8 +26,7 @@ public class SessionControllerTestCase extends OSSDaoTestCase {
 
     public void testLoginWithUserSuccess() {
         assertNotNull(c);
-        User user = new User();
-        user.setId(1);
+        String user = "admin";
         Session session = c.createSessionWithUser(user, "test", "testdevice");
         assertNotNull(session);
     }

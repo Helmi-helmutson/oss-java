@@ -9,16 +9,13 @@ import java.nio.file.Paths;
 
 public class OSSDaoTestCase extends TestCase {
 
-     protected SessionController c = null;
+    protected SessionController c = null;
 
     protected Session getValidAdminSession() {
-    	User user = new User(); 
-    	user.setId(1);
-    	user.setUid("admin");
-    	user.setRole("sysadmins");
-    	user.setSureName("Administrator");
+    	String user =     "admin";
+    	String password = "dummy";
     	
-        Session sessionAdmin1 = c.createSessionWithUser(user, null, null); //TODO login
+        Session sessionAdmin1 = c.createSessionWithUser(user, password,""); //TODO login
         return sessionAdmin1;
     }
 

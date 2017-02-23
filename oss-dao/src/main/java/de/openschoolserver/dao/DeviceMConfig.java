@@ -11,10 +11,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name="DeviceMConfig")
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class DeviceMConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 
         @Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
         private long id;
 
         private String keyword;
@@ -25,6 +27,17 @@ public class DeviceMConfig implements Serializable {
         @ManyToOne
         @JsonIgnore
         private Device device;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof DeviceMConfig && obj !=null) {
+                        return getId() == ((DeviceMConfig)obj).getId();
+                }
+                return super.equals(obj);
+        }
+
+	public DeviceMConfig() {
+	}
 
         public long getId() {
                 return this.id;

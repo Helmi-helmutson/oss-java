@@ -12,11 +12,13 @@ import java.sql.Time;
  * 
  */
 @Entity
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 @Table(name="AccessInRoomFW")
 public class AccessInRoomFW implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 	private AccessInRoom accessinroom;
 	public AccessInRoom getAccessinroom() {
@@ -41,6 +43,14 @@ public class AccessInRoomFW implements Serializable {
 
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean proxy;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof AccessInRoomFW && obj !=null) {
+                        return getId() == ((AccessInRoomFW)obj).getId();
+                }
+                return super.equals(obj);
+        }
 
 	public AccessInRoomFW() {
 		this.direct   = false;

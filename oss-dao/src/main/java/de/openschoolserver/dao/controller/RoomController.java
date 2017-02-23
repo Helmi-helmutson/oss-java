@@ -1,7 +1,8 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+
 
 import java.util.List;
 import java.util.Map;
@@ -155,6 +156,27 @@ public class RoomController extends Controller {
 	}
 
 	/*
+	 * Return the list of the available adresses in the room
+	 */
+	public List<String> getAvailableIPAddresses(long roomId, long count){
+		Room room   = this.getById(roomId);
+		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
+		List<String> availableIPs = new ArrayList<String>();
+		int i = 0;
+		for( String IP : net.getAvailableIPs(0) ){
+			String name =  this.isIPUnique(IP);
+			if( name == "" ){
+				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName(),i));
+			}
+			if( count > 0 && availableIPs.size() == count ) {
+				break;
+			}
+			i++;
+		}
+		return availableIPs;
+	}
+
+	/*
 	 * Delivers the next room IP address in a given subnet with the given netmask.
 	 * If the subnet is "" the default school network is meant.
 	 */
@@ -221,11 +243,13 @@ public class RoomController extends Controller {
 		for(Device device : room.getDevices()){
 			for(User user: device.getLoggedIn()){
 				Map<String,String> userMap = new HashMap<>();
-				userMap.put("host", device.getName());
-				userMap.put("id", String.valueOf(user.getId()));
+				userMap.put("device", device.getName());
+				userMap.put("deviceId", String.valueOf(device.getId()));
 				userMap.put("uid", user.getUid());
+				userMap.put("userId", String.valueOf(user.getId()));
 				userMap.put("sureName", user.getSureName());
 				userMap.put("givenName", user.getGivenName());
+				users.add(userMap);
 			}
 		}
 		return users;
@@ -272,7 +296,7 @@ public class RoomController extends Controller {
 	 */
 	public Response setAccessList(long roomId,List<AccessInRoom> AccessList){
 		Room room = this.getById(roomId);
-		//Es ist nicht soo einfach. Als erstes werden die Vorhandene gelöscht und dann die Neue angelegt.
+		//Es ist nicht soo einfach. Als erstes werden die Vorhandene gel��scht und dann die Neue angelegt.
 		EntityManager em = getEntityManager();
 		em.getTransaction().begin();
 		for(AccessInRoom access : room.getAccessInRooms() ){
@@ -492,91 +516,46 @@ public class RoomController extends Controller {
 	public Response addDevices(long roomId,List<Device> devices){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
-		em.getTransaction().begin();
+		DeviceController deviceController = new DeviceController(this.session);
 		StringBuilder error = new StringBuilder();
 		for(Device device : devices) {
-			if( ! this.isNameUnique(device.getName())){
-				error.append("Devices name is not unique. " );
-			}
-			if( this.checkBadHostName(device.getName())){
-				error.append("Devices name contains not allowed characters. " );
-			}
-			//Check the MAC address
-			String name =  this.isMacUnique(device.getMac());
-			if( name != "" ){
-				error.append("The MAC address will be used allready:" + name );
-			}
-			device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
-			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.append("The MAC address is not valid:" + device.getMac() );	
-			}
-			//Check the IP address
-			name =  this.isIPUnique(device.getIp());
-			if( name != "" ){
-				error.append("The IP address will be used allready:" + name );
-			}
-			if( ! IPv4.validateIPAddress(device.getIp())) {
-				error.append("The IP address is not valid:" + device.getIp() );	
-			}
-			if( device.getWlanMac().isEmpty() ) {
-				device.setWlanIp("");
-			}
-			else
-			{ //check WLAN
-				//Check the MAC address
-				name =  this.isMacUnique(device.getMac());
-				if( name != "" ){
-					error.append("The MAC address will be used allready:" + name );
-				}
-				device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
-				if( ! IPv4.validateMACAddress(device.getMac())) {
-					error.append("The MAC address is not valid:" + device.getMac() );	
-				}
-				//Check the IP address
-				name =  this.isIPUnique(device.getIp());
-				if( name != "" ){
-					error.append("The IP address will be used allready:" + name );
-				}
-				if( ! IPv4.validateIPAddress(device.getIp())) {
-					error.append("The IP address is not valid:" + device.getIp() );	
-				}
-			}
+			error.append(deviceController.check(device, room));
 			device.setRoom(room);
-			if(device.getHwconfId() != -1){
-				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
-			} else {
+			if(device.getHwconfId() == null){
 				device.setHwconf(room.getHwconf());
+			} else {
+				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
 			}
-			em.persist(device);
 			room.addDevice(device);
 		}
 		if(error.length() > 0){
 			em.close();
 			return new Response(this.getSession(),"ERROR",error.toString());
 		}
-		
 		try {
+			em.getTransaction().begin();
 			em.merge(room);
 			em.getTransaction().commit();
-			em.flush();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return new Response(this.getSession(),"ERROR ", e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		//TODO DNS Configuration
-		//DHCPConfig dhcpconfig = new DHCPConfig(this.session);
-		//dhcpconfig.Create();
+		for(Device device : devices) {
+		    this.startPlugin("add_device", device);
+		}
+		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+		dhcpconfig.Create();
 		return new Response(this.getSession(),"OK", "Devices were created succesfully." );
 	}
-	
+
 	/*
-	 * Creates new devices in the room
+	 * Deletes devices in the room
 	 */
 	public Response deleteDevices(long roomId,List<Long> deviceIDs){
 		EntityManager em = getEntityManager();
-		Room room = this.getById(roomId);
+		Room room = em.find(Room.class, roomId);
 		for(Long deviceId : deviceIDs) {
 			Device device = em.find(Device.class, deviceId);
 			room.removeDevice(device);
@@ -587,10 +566,100 @@ public class RoomController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return new Response(this.getSession(),"ERROR ", e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		return new Response(this.getSession(),"OK ", "Devices were deleted succesfully.");
+	}
+
+	public List<Device> getDevices(long roomId) {
+		return this.getById(roomId).getDevices();
+	}
+
+	public Response addDevice(long roomId, String macAddress, String name) {
+		// First we check if there is enough IP-Addresses in this room
+		List<String> ipAddress = this.getAvailableIPAddresses(roomId, 1);
+		if( ipAddress.isEmpty() ){
+			return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+		} 
+		EntityManager em = getEntityManager();
+		Device device = new Device();
+		Room   room   = em.find(Room.class, roomId);
+		User   owner  = this.getSession().getUser();
+		if( ! owner.getRole().contains("sysadmins") ) {
+			//non sysadmin user want to register his workstation
+			Query query = em.createNamedQuery("User.checkMConfig");
+			query.setParameter("user_id", this.getSession().getUserId()).setParameter("keyword", "adhocRoom").setParameter("varlue", roomId);
+			if( query.getResultList().isEmpty() ) {
+				return new Response(this.getSession(),"ERROR","You have no rights to register devices in this room");
+			}
+			else
+			{
+				device.setMac(macAddress);
+				device.setName(name + "-" + owner.getUid());
+				device.setOwner(owner);
+				device.setIp(ipAddress.get(0).split(" ")[0]);
+				device.setHwconf(null);
+			}
+		} else {
+			device.setMac(macAddress);
+			device.setIp(ipAddress.get(0).split(" ")[0]);
+			device.setIp(ipAddress.get(0).split(" ")[0]);
+			if( name == "nextFreeName" ) {
+				device.setName(ipAddress.get(0).split(" ")[1]);
+			} else {
+				device.setName(name);
+			}
+		}
+		//Check if the Device settings are OK
+		DeviceController deviceController = new DeviceController(this.session);
+		String error = deviceController.check(device, room);
+		if( error != "" ) {
+			return new Response(this.getSession(),"ERROR",error);
+		}
+		device.setRoom(room);
+		room.addDevice(device);
+		try {
+			em.getTransaction().begin();
+			em.merge(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			System.err.println(e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		//Start plugin and create DHCP and salt configuration
+		this.startPlugin("add_device", device);
+		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+		dhcpconfig.Create();
+		return new Response(this.getSession(),"OK","Device was created succesfully.");
+	}
+
+	public HWConf getHWConf(long roomId) {
+		EntityManager em = getEntityManager();
+		try {
+			return em.find(Room.class, roomId).getHwconf();
+		} catch (Exception e) {
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	public Response setHWConf(long roomId, long hwConfId) {
+		EntityManager em = getEntityManager();
+		try {
+			Room room = em.find(Room.class, roomId);
+			room.setHwconf(em.find(HWConf.class, hwConfId));
+		} catch (Exception e) {
+			System.err.println(e.getMessage()); //TODO
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","The hardware configuration of the room was set succesfully.");
 	}
 }

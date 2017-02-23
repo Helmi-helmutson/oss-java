@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
@@ -22,10 +22,12 @@ import java.util.List;
 	@NamedQuery(name="Device.getConfig",  query="SELECT c.value FROM DeviceConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" ),
 	@NamedQuery(name="Device.getMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :device_id AND c.keyword = :keyword" )
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Device implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String name;
@@ -130,10 +132,12 @@ public class Device implements Serializable {
 	private List<User> loggedIn;
 
 	@Transient
-	long hwconfId;
+	Long hwconfId;
 
 	public Device() {
-		this.hwconfId = -1;
+		this.hwconfId = null;
+		this.wlanip   = "";
+		this.wlanmac  = "";
 	}
 
 	public long getId() {
@@ -152,11 +156,11 @@ public class Device implements Serializable {
 		return super.equals(obj);
 	}
 
-	public long getHwconfId() {
+	public Long getHwconfId() {
 		return this.hwconfId;
 	}
 
-	public void setHwconfId(long id) {
+	public void setHwconfId(Long id) {
 		this.hwconfId = id;
 	}
 

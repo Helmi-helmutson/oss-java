@@ -1,10 +1,11 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.security.Principal;
-import java.util.Date;
 
+import java.util.Date;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
 
@@ -15,155 +16,168 @@ import static javax.persistence.GenerationType.IDENTITY;
 @NamedQueries({ @NamedQuery(name = "Session.getByToken", query = "SELECT s FROM Session s WHERE s.token=:token") })
 public class Session implements Principal {
 
-	 @Id
-	    @Column(name = "id")
-	    @GeneratedValue(strategy = IDENTITY)
-	    private int id;
-	 
-	 @Temporal(TemporalType.TIMESTAMP)
-	    @Column(name = "createdate")
-	    private Date createDate;
-
-	 
-	 
-	@Transient
-	private String password = "dummy";
-	
-	@Transient
-	private String schoolId = "dummy";
-	
-	@Column(name="device_id")
-	private Long deviceId;
-	
-	//@OneToOne
-	 @JoinColumn(name = "device_id", insertable = false, updatable = false)
-	private Device device;
-		
-	@Column(name = "user_id")
-	private Long userId;
-	
-	@Column(name = "room_id")
-	private Long roomId;
-	   
+    @Id
+    @Column(name = "id")
+    @GeneratedValue(strategy = IDENTITY)
+    private int id;
+     
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "createdate")
+    private Date createDate; 
+     
+    @Transient
+    private String password = "dummy";
+    
+    @Transient
+    private String schoolId = "dummy";
+    
+    @Column(name="device_id")
+    private Long deviceId;
+    
+    //@OneToOne
+    @JoinColumn(name = "device_id", insertable = false, updatable = false)
+    @JsonIgnore
+    private Device device;
+        
+    @Column(name = "user_id")
+    private Long userId;
+    
+    @Column(name = "room_id")
+    private Long roomId;
+       
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @JsonIgnore
     private User user;
-	
     
-	@OneToOne
-	@JoinColumn(name = "room_id", insertable = false, updatable = false)
-	private Room room;
-	
-	@Column(name = "ip")
-	private String IP;
-	
+    @OneToOne
+    @JoinColumn(name = "room_id", insertable = false, updatable = false)
+    @JsonIgnore
+    private Room room;
+    
+    @Column(name = "ip")
+    private String IP;
+    
     @Column(name = "token")
-	private String token;
-	
-	@Override
-	public String getName() {	
-		return "dummy";
-	}
-	
-	public String getSchoolId() {
-		return this.schoolId;
-	}
+    private String token;
+    
+    public Session(String token, long userid, String password, String ip) {
+        this.userId = userid;
+        this.password = password;
+        this.token = token;
+        this.schoolId="dummy";
+    }
 
-	public void setSchoolId(String schoolId) {
-		this.schoolId = schoolId;
-	}
+    public Session() {
+    	this.deviceId = null;
+    	this.roomId   = null;
+    }
+    
+    @Override
+    public int hashCode() {
+        return token != null ? token.hashCode() : id;
+    }
 
-	public String getIP() {
-		return this.IP;
-	}
+    @Override
+    public boolean equals(Object obj) {
+        return token != null && obj != null && ((Session) obj).getToken() != null
+                && token.equals(((Session) obj).getToken());
+    }
 
-	public void setIP(String IP) {
-		this.IP = IP;
-	}
+    @Override
+    public String getName() {    
+        return "dummy";
+    }
+    
+    public String getSchoolId() {
+        return this.schoolId;
+    }
 
-	public Room getRoom() {
-		return this.room;
-	}
+    public void setSchoolId(String schoolId) {
+        this.schoolId = schoolId;
+    }
 
-	public void setRoom(Room room) {
-		this.room = room;
-	}
-	
-	public User getUser() {
-		return this.user;
-	}
+    public String getIP() {
+        return this.IP;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
-	
-	public String getPassword() {
-		return password;
-	}
+    public void setIP(String IP) {
+        this.IP = IP;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public Room getRoom() {
+        return this.room;
+    }
 
-	public long getUserId() {
-		return userId;
-	}
+    public void setRoom(Room room) {
+        this.room = room;
+    }
+    
+    public User getUser() {
+        return this.user;
+    }
 
-	public void setUserId(long userId) {
-		this.userId = userId;
-	}
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    public String getPassword() {
+        return password;
+    }
 
-	public Date getCreateDate() {
-		return createDate;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public Device getDevice() {
-		return this.device;
-	}
+    public long getUserId() {
+        return userId;
+    }
 
-	public void setDevice(Device device) {
-		this.device = device;
-	}
-	
-	
-	    public int getId() {
-	        return id;
-	    }
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
 
-	    public void setId(int id) {
-	        this.id = id;
-	    }
+    public Long getDeviceId() {
+        return deviceId;
+    }
 
-	 
-	    public String getToken() {
-	        return token;
-	    }
+    public void setDeviceId(Long deviceId) {
+        this.deviceId = deviceId;
+    }
+    
+    public Long getRoomId() {
+        return roomId;
+    }
 
-	    public void setToken(String token) {
-	        this.token = token;
-	    }
+    public void setRoomId(Long roomId) {
+        this.roomId = roomId;
+    }
+    
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-	    public Session(String token, long userid, String password, String ip) {
-	        this.userId = userid;
-	        this.password = password;
-	        this.token = token;
-	        this.schoolId="dummy";
-	       
-	    }
+    public Device getDevice() {
+        return this.device;
+    }
 
-	    public Session() {
-	        // empty constructor
-	    }
-	    
-	    @Override
-	    public int hashCode() {
-	        return token != null ? token.hashCode() : id;
-	    }
+    public void setDevice(Device device) {
+        this.device = device;
+    }
+    
+    public int getId() {
+        return id;
+    }
 
-	    @Override
-	    public boolean equals(Object obj) {
+    public void setId(int id) {
+        this.id = id;
+    }
 
-	        return token != null && obj != null && ((Session) obj).getToken() != null
-	                && token.equals(((Session) obj).getToken());
-	    }
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }

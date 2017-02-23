@@ -11,6 +11,12 @@ import javax.persistence.Persistence;
 import javax.persistence.Query;
 import javax.swing.JComboBox.KeySelectionManager;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Enumeration;
+import java.util.Properties;
 
 //import org.eclipse.osgi.baseadaptor.BaseAdaptor;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
@@ -70,6 +76,24 @@ public class CommonEntityManagerFactory {
              * <property name="eclipselink.logging.logger"
              * value="DefaultLogger"/>
              */
+	    try {
+			File file = new File("/opt/oss-java/conf/oss-api.properties");
+			FileInputStream fileInput = new FileInputStream(file);
+			Properties props = new Properties();
+			props.load(fileInput);
+			fileInput.close();
+
+			Enumeration enuKeys = props.keys();
+			while (enuKeys.hasMoreElements()) {
+				String key = (String) enuKeys.nextElement();
+				String value = props.getProperty(key);
+				properties.put(key, value);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
         }
         return properties;
     }

@@ -47,3 +47,4 @@ mainClassName = 'de.openschoolserver.api.ServerApplication'
 run {
     args 'server', 'config.yml'
 }
+

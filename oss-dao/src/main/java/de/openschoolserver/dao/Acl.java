@@ -12,10 +12,12 @@ import javax.persistence.*;
 @Entity
 @Table(name="Acls")
 @NamedQuery(name="Acl.findAll", query="SELECT a FROM Acl a")
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Acl implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
 	private String acl;
@@ -27,6 +29,14 @@ public class Acl implements Serializable {
 	private long targetId;
 
 	private String targetType;
+
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof Acl && obj !=null) {
+                        return getId() == ((Acl)obj).getId();
+                }
+                return super.equals(obj);
+        }
 
 	public Acl() {
 	}

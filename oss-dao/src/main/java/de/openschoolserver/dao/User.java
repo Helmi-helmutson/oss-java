@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
@@ -24,12 +24,16 @@ import javax.persistence.*;
 	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
 	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.sureName LIKE :search"),
 	@NamedQuery(name="User.getConfig",  query="SELECT c.value FROM UserConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" ),
-	@NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" )
+	@NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" ),
+	@NamedQuery(name="User.checkConfig", query="SELECT COUNT(c) FROM UserConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword AND c.value = :value" ),
+	@NamedQuery(name="User.checMkConfig", query="SELECT COUNT(c) FROM UserMConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword AND c.value = :value" ),
 })
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	long id;
 
 	private String givenName;

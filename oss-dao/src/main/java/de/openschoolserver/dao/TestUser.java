@@ -30,6 +30,14 @@ public class TestUser implements Serializable {
 	@ManyToOne
 	private User user;
 
+        @Override
+        public boolean equals(Object obj) {
+                if (obj instanceof TestUser && obj !=null) {
+                        return getId() == ((TestUser)obj).getId();
+                }
+                return super.equals(obj);
+        }
+
 	public TestUser() {
 	}
 

@@ -1,8 +1,9 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resources;
 
 
 import io.dropwizard.auth.Auth;
+
 
 import io.swagger.annotations.*;
 
@@ -12,6 +13,7 @@ import javax.ws.rs.*;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
@@ -89,16 +91,51 @@ public interface RoomResource {
             @PathParam("roomId") long roomId
     );
 
+    /*
+     * GET rooms/{roomId}/hwConf
+     */
+    @GET
+    @Path("{roomId}/hwConf")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get hardware configuration of the room")
+        @ApiResponses(value = {
+        	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    HWConf getHwConf(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+    );
     
     /*
-     * GET rooms/{roomId}/getAvailableIPAddresses
+     * SET rooms/{roomId}/hwConf
+     */
+    @PUT
+    @Path("{roomId}/{hwConfId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set hardware configuration of the room")
+        @ApiResponses(value = {
+        	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response setHwConf(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId")   long roomId,
+            @PathParam("hwConfId") long hwConfId
+    );
+
+    /*
+     * GET rooms/{roomId}/availableIPAddresses
      */
     @GET
     @Path("{roomId}/availableIPAddresses")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "get all available ip-adresses of the room")
         @ApiResponses(value = {
-        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
     List<String> getAvailableIPAddresses(
@@ -106,6 +143,24 @@ public interface RoomResource {
             @PathParam("roomId") long roomId
     );
 
+    /*
+     * GET rooms/{roomId}/getAvailableIPAddresses
+     */
+    @GET
+    @Path("{roomId}/availableIPAddresses/{count}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get count available ip-adresses of the room. The string list will contains the proposed name too: 'IP-Addres Proposed-Name'")
+        @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "There is no more IP address in this room."),
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<String> getAvailableIPAddresses(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("count") long count
+    );
+    
     /*
      * PUT rooms/getNextRoomIP/ { netMask : 26, netWork : "10.12.0.0/16" }
      */
@@ -180,7 +235,7 @@ public interface RoomResource {
      * PUT rooms/scheduledAccess
      */
     @PUT
-    @Path("scheduledAccess")
+    @Path("setScheduledAccess")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Sets access in all rooms corresponding to the access lists and the actual time.")
     @ApiResponses(value = {
@@ -245,10 +300,10 @@ public interface RoomResource {
     
     // Functions to manage Devices in Rooms
     /*
-     * POST devices/add { hash }
+     * POST rooms/{roomId}/devices { hash }
      */
     @POST
-    @Path("{roomId}/addDevices")
+    @Path("{roomId}/devices")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Create new devices")
     @ApiResponses(value = {
@@ -263,7 +318,43 @@ public interface RoomResource {
     );
     
     /*
-     * POST  {roomId}/deleteDevices [ deviceId, deviceId]
+     * PUT rooms/{roomId}/device/{MAC}/{name}
+     */
+    @PUT
+    @Path("{roomId}/device/{MAC}/{name}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new devices")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    Response addDevice(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("macAddress") String macAddress,
+            @PathParam("name") String name
+    );
+
+    /*
+     * GET rooms/{roomId}/getDevices
+     */
+    @GET
+    @Path("{roomId}/devices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new devices")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    List<Device> getDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+    );
+    
+    /*
+     * POST  rooms/{roomId}/deleteDevices [ deviceId, deviceId]
      */
     @POST
     @Path("{roomId}/deleteDevices")
@@ -283,7 +374,7 @@ public interface RoomResource {
      * DELETE {roomId}/deleteDevice/{deviceId}
      */
     @DELETE
-    @Path("{roomId}/deleteDevice/{deviceId}")
+    @Path("{roomId}/device/{deviceId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Delete a device defined by deviceId")
     @ApiResponses(value = {
