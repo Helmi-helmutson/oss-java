@@ -184,6 +184,10 @@ public class RoomRescourceImpl implements RoomResource {
 		return roomController.setHWConf(roomId,hwConfId);
 	}
 
-	
+	@Override
+	public List<Room> search(Session session, String search) {
+		final RoomController roomController = new RoomController(session);
+		return roomController.search(search);
+	}
 
 }

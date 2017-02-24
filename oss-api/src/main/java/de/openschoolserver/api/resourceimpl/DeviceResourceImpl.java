@@ -128,4 +128,10 @@ public class DeviceResourceImpl implements DeviceResource {
 		final DHCPConfig dhcpConfig = new DHCPConfig(session);
 		dhcpConfig.Create();
 	}
+
+	@Override
+	public List<Device> search(Session session, String search) {
+		final DeviceController deviceController = new DeviceController(session);
+		return deviceController.search(search);
+	}
 }

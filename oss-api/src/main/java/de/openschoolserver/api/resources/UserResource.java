@@ -173,7 +173,7 @@ public interface UserResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     //@PermitAll
-    @RolesAllowed("user.add")
+    @RolesAllowed("user.modify")
     boolean modify(
             @ApiParam(hidden = true) @Auth Session session,
             User user
@@ -189,7 +189,7 @@ public interface UserResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "User not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("user.delete")
     boolean delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId
@@ -205,7 +205,7 @@ public interface UserResource {
        @ApiResponses(value = {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @PermitAll
+       @RolesAllowed("user.manage")
        Response setMembers(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("userId") long userId,
@@ -223,7 +223,7 @@ public interface UserResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "User not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("user.manage")
     Response removeMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId,
@@ -240,7 +240,7 @@ public interface UserResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "User not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("user.manage")
     Response addMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId,

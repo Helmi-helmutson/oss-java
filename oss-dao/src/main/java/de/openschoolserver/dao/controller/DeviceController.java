@@ -245,12 +245,12 @@ public class DeviceController extends Controller {
 	/*
 	 * Search devices given by a substring
 	 */
-	public Device search(String name) {
+	public List<Device> search(String search) {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.search");
-			query.setParameter("name", name);
-			return (Device) query.getSingleResult();
+			query.setParameter("search", search + "%");
+			return (List<Device>) query.getResultList();
 		} catch (Exception e) {
 			// logger.error(e.getMessage());
 			System.err.println(e.getMessage()); //TODO
