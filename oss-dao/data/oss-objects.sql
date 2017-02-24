@@ -14,11 +14,11 @@ CREATE TABLE IF NOT EXISTS Users (
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Users VALUES(1,'admin','sysadmins','Administrator',NULL,NOW());
-INSERT INTO Users VALUES(2,'tteachers','teachers','TTeachers',NULL,NOW());
-INSERT INTO Users VALUES(3,'tstudents','students','TStudents',NULL,NOW());
-INSERT INTO Users VALUES(4,'tadministration','administrations','TAdinistration',NULL,NOW());
-INSERT INTO Users VALUES(5,'tworkstations','workstations','TWorkstations',NULL,NOW());
+INSERT INTO Users VALUES(1,'admin','sysadmins','Administrator','Main',NOW());
+INSERT INTO Users VALUES(2,'tteachers','teachers','for teachers','Default profile',NOW());
+INSERT INTO Users VALUES(3,'tstudents','students','for students','Default profile',NOW());
+INSERT INTO Users VALUES(4,'tadministration','administrations','for administration','Default profile',NOW());
+INSERT INTO Users VALUES(5,'tworkstations','workstations','for workstations','Default profile',NOW());
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

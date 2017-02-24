@@ -21,7 +21,7 @@ import java.util.List;
 	@NamedQuery(name="Group.findAll", query="SELECT g FROM Group g"),
 	@NamedQuery(name="Group.getByName",  query="SELECT g FROM Group g WHERE g.name = :name OR g.description = :name"),
 	@NamedQuery(name="Group.getByType",  query="SELECT g FROM Group g WHERE g.groupType = :groupType"),
-	@NamedQuery(name="Group.search", query="SELECT g FROM Group g WHERE g.name LIKE :search OR g.description LIKE :search"),
+	@NamedQuery(name="Group.search", query="SELECT g FROM Group g WHERE g.name LIKE :search OR g.description LIKE :search OR g.groupType LIKE :search"),
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Group implements Serializable {
