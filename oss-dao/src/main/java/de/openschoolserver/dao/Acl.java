@@ -12,7 +12,11 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="Acls")
-@NamedQuery(name="Acl.findAll", query="SELECT a FROM Acl a")
+@NamedQueries({
+	@NamedQuery(name="Acl.findAll", query="SELECT a FROM Acl a"),
+	@NamedQuery(name="Acl.findByRole", query="SELECT a FROM Acl a where a.role = :role "),
+	@NamedQuery(name="Acl.checkByRole", query="SELECT a FROM Acl a where a.role = :role AND acl = :acl"),
+})
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Acl implements Serializable {
 	private static final long serialVersionUID = 1L;
