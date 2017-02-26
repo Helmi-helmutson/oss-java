@@ -8,6 +8,7 @@ import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 
 import de.openschoolserver.dao.User;
@@ -33,7 +34,7 @@ public interface GroupResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Group not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("group.search")
     Group getById(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId
@@ -49,7 +50,7 @@ public interface GroupResource {
        @ApiResponses(value = {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @PermitAll
+       @RolesAllowed("group.manage")
        List<User> getMembers(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId
@@ -65,7 +66,7 @@ public interface GroupResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Group not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("group.manage")
     List<User> getAvailableMembers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId
@@ -81,7 +82,7 @@ public interface GroupResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("group.search")
     List<Group> getByType(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type
@@ -98,7 +99,7 @@ public interface GroupResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("group.search")
     List<Group> getAll(
             @ApiParam(hidden = true) @Auth Session session
     );
@@ -114,7 +115,7 @@ public interface GroupResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("group.search")
     List<Group> search(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("search") String search
@@ -131,7 +132,7 @@ public interface GroupResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("group.add")
     Response add(
             @ApiParam(hidden = true) @Auth Session session,
             Group group
@@ -148,7 +149,7 @@ public interface GroupResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("group.modify")
     Response modify(
             @ApiParam(hidden = true) @Auth Session session,
             Group group
@@ -164,7 +165,7 @@ public interface GroupResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Group not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("group.delete")
     Response delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId
@@ -182,7 +183,7 @@ public interface GroupResource {
        @ApiResponses(value = {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @PermitAll
+       @RolesAllowed("group.manage")
        Response setMembers(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
@@ -203,7 +204,7 @@ public interface GroupResource {
        @ApiResponses(value = {
            @ApiResponse(code = 404, message = "Group not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @PermitAll
+       @RolesAllowed("group.manage")
        Response removeMember(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
@@ -220,7 +221,7 @@ public interface GroupResource {
        @ApiResponses(value = {
            @ApiResponse(code = 404, message = "Group not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @PermitAll
+       @RolesAllowed("group.manage")
        Response addMember(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,

@@ -8,6 +8,7 @@ import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 
 import de.openschoolserver.dao.Room;
@@ -16,6 +17,8 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.controller.DeviceController;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +39,7 @@ public interface RoomResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Room not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("room.search")
     Room getById(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -53,9 +56,27 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.search")
     List<Room> getAll(
             @ApiParam(hidden = true) @Auth Session session
+    );
+
+    /*
+     * GET rooms/search/{search}
+     */
+    @GET
+    @Path("search/{search}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Search for room by name and descripton and type with substring.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    //@PermitAll
+    @RolesAllowed("room.search")
+    List<Room> search(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("search") String search
     );
 
     /*
@@ -69,7 +90,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.add")
     Response add(
             @ApiParam(hidden = true) @Auth Session session,
             Room room
@@ -85,7 +106,7 @@ public interface RoomResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Room not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("room.delete")
     Response delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -102,7 +123,7 @@ public interface RoomResource {
         	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.search")
     HWConf getHwConf(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -119,7 +140,7 @@ public interface RoomResource {
         	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.modify")
     Response setHwConf(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")   long roomId,
@@ -137,7 +158,7 @@ public interface RoomResource {
         	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.add")
     List<String> getAvailableIPAddresses(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -154,7 +175,7 @@ public interface RoomResource {
         @ApiResponse(code = 404, message = "There is no more IP address in this room."),
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.add")
     List<String> getAvailableIPAddresses(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -172,7 +193,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.add")
     String getNextRoomIP(
             @ApiParam(hidden = true) @Auth Session session,
             @FormParam("netWork") String netWork,
@@ -190,7 +211,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.manage")
     List<Map<String, String>> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -207,7 +228,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.add")
     List<AccessInRoom> getAccessList(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -224,7 +245,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.add")
     Response setAccessList(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -242,7 +263,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.add")
     Response setScheduledAccess(
     		@ApiParam(hidden = true) @Auth Session session
     );
@@ -258,7 +279,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.add")
     List<AccessInRoom> getAccessStatus(
     		@ApiParam(hidden = true) @Auth Session session
     );
@@ -274,7 +295,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.manage")
     AccessInRoom getAccessStatus(
     		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -291,7 +312,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.manage")
     Response setAccessStatus(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -310,7 +331,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.add")
     Response addDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -342,12 +363,12 @@ public interface RoomResource {
     @GET
     @Path("{roomId}/devices")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create new devices")
+    @ApiOperation(value = "Gets a list of the devices in room.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.manage")
     List<Device> getDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -363,7 +384,7 @@ public interface RoomResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("device.delete")
     Response deleteDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -380,7 +401,7 @@ public interface RoomResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("device.delete")
     Response deleteDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,

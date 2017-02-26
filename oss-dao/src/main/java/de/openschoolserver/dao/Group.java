@@ -21,7 +21,7 @@ import java.util.List;
 	@NamedQuery(name="Group.findAll", query="SELECT g FROM Group g"),
 	@NamedQuery(name="Group.getByName",  query="SELECT g FROM Group g WHERE g.name = :name OR g.description = :name"),
 	@NamedQuery(name="Group.getByType",  query="SELECT g FROM Group g WHERE g.groupType = :groupType"),
-	@NamedQuery(name="Group.search", query="SELECT g FROM Group g WHERE g.name LIKE :search OR g.description LIKE :search"),
+	@NamedQuery(name="Group.search", query="SELECT g FROM Group g WHERE g.name LIKE :search OR g.description LIKE :search OR g.groupType LIKE :search"),
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Group implements Serializable {
@@ -37,6 +37,10 @@ public class Group implements Serializable {
 
 	private String groupType;
 
+	//bi-directional many-to-one association to Alias
+	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<Acl> acls;
+	
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups")
 	@JsonIgnore
@@ -95,6 +99,23 @@ public class Group implements Serializable {
 
 	public void setUsers(List<User> users) {
 		this.users = users;
+	}
+	public List<Acl> getAcls() {
+		return this.acls;
+	}
+
+	public void setAcls(List<Acl> acls) {
+		this.acls = acls;
+	}
+
+	public void addAcl(Acl acl) {
+		getAcls().add(acl);
+		acl.setGroup(this);	
+	}
+
+	public void removeAcl(Acl acl) {
+		getAcls().remove(acl);
+		acl.setGroup(null);
 	}
 
 }

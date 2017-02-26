@@ -92,6 +92,24 @@ public class RoomController extends Controller {
 			em.close();
 		}
 	}
+	
+	/*
+	 * Search devices given by a substring
+	 */
+	public List<Room> search(String search) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Device.search");
+			query.setParameter("search", search + "%");
+			return (List<Room>) query.getResultList();
+		} catch (Exception e) {
+			// logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
 
 	public Response add(Room room){
 		EntityManager em = getEntityManager();

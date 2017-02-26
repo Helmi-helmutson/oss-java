@@ -1,5 +1,5 @@
 #TODO TEST ONLY
-DROP DATABASE OSS;
+#DROP DATABASE OSS;
 
 CREATE DATABASE OSS;
 USE OSS;
@@ -14,11 +14,11 @@ CREATE TABLE IF NOT EXISTS Users (
         PRIMARY KEY  (id)
 );
 
-INSERT INTO Users VALUES(1,'admin','sysadmins','Administrator',NULL,NOW());
-INSERT INTO Users VALUES(2,'tteachers','teachers','TTeachers',NULL,NOW());
-INSERT INTO Users VALUES(3,'tstudents','students','TStudents',NULL,NOW());
-INSERT INTO Users VALUES(4,'tadministration','administrations','TAdinistration',NULL,NOW());
-INSERT INTO Users VALUES(5,'tworkstations','workstations','TWorkstations',NULL,NOW());
+INSERT INTO Users VALUES(1,'admin','sysadmins','Administrator','Main',NOW());
+INSERT INTO Users VALUES(2,'tteachers','teachers','for teachers','Default profile',NOW());
+INSERT INTO Users VALUES(3,'tstudents','students','for students','Default profile',NOW());
+INSERT INTO Users VALUES(4,'tadministration','administrations','for administration','Default profile',NOW());
+INSERT INTO Users VALUES(5,'tworkstations','workstations','for workstations','Default profile',NOW());
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -194,12 +194,34 @@ CREATE TABLE IF NOT EXISTS AvailablePrinters (
 
 CREATE TABLE IF NOT EXISTS Acls (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        object_id    BIGINT UNSIGNED NOT NULL,
-        target_id    BIGINT UNSIGNED,
-        targetType   VARCHAR(32)  NOT NULL,
-        acl          VARCHAR(32)  NOT NULL,
+        user_id      BIGINT UNSIGNED DEFAULT NULL,
+        group_id     BIGINT UNSIGNED DEFAULT NULL,
+        role         VARCHAR(16) DEFAULT NULL,
+        acl          VARCHAR(32) NOT NULL,
+        FOREIGN KEY(user_id)  REFERENCES Users(id),
+        FOREIGN KEY(group_id) REFERENCES Groups(id),
         PRIMARY KEY  (id)
 );
+
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.add');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.delete');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.manage');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.search');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.add');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.delete');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.manage');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.modify');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.search');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.add');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.delete');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.manage');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.modify');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.search');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.add');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.delete');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.manage');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.modify');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.search');
 
 CREATE TABLE IF NOT EXISTS  Tests (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

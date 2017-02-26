@@ -55,7 +55,7 @@ public class GroupController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Group.search");
-			query.setParameter("search", search);
+			query.setParameter("search", search + "%");
 			return query.getResultList();
 		} catch (Exception e) {
 			//logger.error(e.getMessage());

@@ -8,10 +8,12 @@ import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Response;
 
 import java.util.List;
@@ -32,7 +34,7 @@ public interface DeviceResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Device not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("device.manage")
     Device getById(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
@@ -48,7 +50,7 @@ public interface DeviceResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Device not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("device.manage")
     List<Device> getByType(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceType") String type
@@ -65,9 +67,26 @@ public interface DeviceResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.manage")
     List<Device> getAll(
             @ApiParam(hidden = true) @Auth Session session
+    );
+    
+    /*
+     * GET search/{search}
+     */
+    @GET
+    @Path("search/{search}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Search for device by name or IP or MAC address by substring.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.search")
+    List<Device> search(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("search") String search
     );
     
     /*
@@ -80,7 +99,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.search")
     Device getByIP(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP
@@ -96,7 +115,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.search")
     Device getByMAC(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("MAC") String MAC
@@ -112,7 +131,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.search")
     Device getByName(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("Name") String Name
@@ -144,7 +163,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.manage")
     Response setDefaultPrinter(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId,
@@ -177,7 +196,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.manage")
     Response setAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId,
@@ -194,7 +213,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("room.manage")
     List<String> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP
@@ -206,11 +225,11 @@ public interface DeviceResource {
     @PUT
     @Path("loggedInUsers/{IP}/{userName}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Get the logged on users on a device defined by IP.")
+    @ApiOperation(value = "Set the logged on users on a device defined by IP.")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.manage")
     Response addLoggedInUser(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP,
@@ -227,7 +246,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.manage")
     Response removeLoggedInUser(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP,
@@ -244,7 +263,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.manage")
     List<String> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
@@ -260,7 +279,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("device.add")
     void refreshConfig(
             @ApiParam(hidden = true) @Auth Session session
     );
