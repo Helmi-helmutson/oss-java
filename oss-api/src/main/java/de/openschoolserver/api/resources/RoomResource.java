@@ -211,7 +211,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("room.manange")
+    @RolesAllowed("room.manage")
     List<Map<String, String>> getLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId

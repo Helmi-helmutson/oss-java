@@ -51,6 +51,10 @@ public class User implements Serializable {
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Alias> aliases;
 
+	//bi-directional many-to-one association to Alias
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<Acl> acls;
+		
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Device> ownedDevices;
@@ -189,6 +193,24 @@ public class User implements Serializable {
 	public void removeAlias(Alias alias) {
 		getAliases().remove(alias);
 		alias.setUser(null);
+	}
+	
+	public List<Acl> getAcls() {
+		return this.acls;
+	}
+
+	public void setAcls(List<Acl> acls) {
+		this.acls = acls;
+	}
+
+	public void addAcl(Acl acl) {
+		getAcls().add(acl);
+		acl.setUser(this);	
+	}
+
+	public void removeAcl(Acl acl) {
+		getAcls().remove(acl);
+		acl.setUser(null);
 	}
 
 	public List<Device> getOwnedDevices() {

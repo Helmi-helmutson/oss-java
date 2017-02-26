@@ -194,10 +194,12 @@ CREATE TABLE IF NOT EXISTS AvailablePrinters (
 
 CREATE TABLE IF NOT EXISTS Acls (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        object_id    BIGINT UNSIGNED NOT NULL,
-        target_id    BIGINT UNSIGNED,
-        targetType   VARCHAR(32)  NOT NULL,
-        acl          VARCHAR(32)  NOT NULL,
+        user_id      BIGINT UNSIGNED DEFAULT NULL,
+        group_id     BIGINT UNSIGNED DEFAULT NULL,
+        role         VARCHAR(16) DEFAULT NULL,
+        acl          VARCHAR(32) NOT NULL,
+        FOREIGN KEY(user_id)  REFERENCES Users(id),
+        FOREIGN KEY(group_id) REFERENCES Groups(id),
         PRIMARY KEY  (id)
 );
 

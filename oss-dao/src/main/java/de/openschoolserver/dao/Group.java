@@ -37,6 +37,10 @@ public class Group implements Serializable {
 
 	private String groupType;
 
+	//bi-directional many-to-one association to Alias
+	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<Acl> acls;
+	
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups")
 	@JsonIgnore
@@ -95,6 +99,23 @@ public class Group implements Serializable {
 
 	public void setUsers(List<User> users) {
 		this.users = users;
+	}
+	public List<Acl> getAcls() {
+		return this.acls;
+	}
+
+	public void setAcls(List<Acl> acls) {
+		this.acls = acls;
+	}
+
+	public void addAcl(Acl acl) {
+		getAcls().add(acl);
+		acl.setGroup(this);	
+	}
+
+	public void removeAcl(Acl acl) {
+		getAcls().remove(acl);
+		acl.setGroup(null);
 	}
 
 }
