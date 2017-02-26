@@ -15,7 +15,7 @@ import javax.persistence.*;
 @NamedQueries({
 	@NamedQuery(name="Acl.findAll", query="SELECT a FROM Acl a"),
 	@NamedQuery(name="Acl.findByRole", query="SELECT a FROM Acl a where a.role = :role "),
-	@NamedQuery(name="Acl.checkByRole", query="SELECT a FROM Acl a where a.role = :role AND acl = :acl"),
+	@NamedQuery(name="Acl.checkByRole", query="SELECT a FROM Acl a where a.role = :role AND a.acl = :acl"),
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Acl implements Serializable {

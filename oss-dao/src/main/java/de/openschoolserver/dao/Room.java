@@ -18,7 +18,7 @@ import java.util.List;
 	@NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
 	@NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
 	@NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
-	@NamedQuery(name="Room.search", query="SELECT r FROM Room u WHERE r.name LIKE :search OR r.description LIKE :search OR r.roomType LIKE :search"),
+	@NamedQuery(name="Room.search", query="SELECT r FROM Room r WHERE r.name LIKE :search OR r.description LIKE :search OR r.roomType LIKE :search"),
 	@NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id"),
 	@NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" ),
 	@NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" )
