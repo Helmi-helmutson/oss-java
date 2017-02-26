@@ -5,6 +5,7 @@ package de.openschoolserver.api;
 import de.openschoolserver.api.auth.OSSAuthorizer;
 
 
+
 import de.openschoolserver.api.auth.OSSTokenAuthenticator;
 import de.openschoolserver.api.health.TemplateHealthCheck;
 import de.openschoolserver.api.resourceimpl.*;
@@ -20,6 +21,8 @@ import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+
 public class ServerApplication extends Application<ServerConfiguration> {
 
     public static void main(String[] args) throws Exception {
@@ -28,7 +31,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
 
     @Override
     public String getName() {
-        return "ClaXss Infoline API";
+        return "OSS API";
     }
 
     @Override
@@ -53,7 +56,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
 
         environment.jersey().register(new AuthDynamicFeature(tokenAuthorizer));
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(Session.class));
-        // TODO required? environment.jersey().register(RolesAllowedDynamicFeature.class);
+        environment.jersey().register(RolesAllowedDynamicFeature.class);
 
         final SessionsResource sessionsResource = new SessionsResourceImpl();
         environment.jersey().register(sessionsResource);
