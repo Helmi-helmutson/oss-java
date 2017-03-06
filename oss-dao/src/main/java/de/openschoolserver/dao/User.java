@@ -119,6 +119,7 @@ public class User implements Serializable {
 		this.sureName = "";
 		this.givenName = "";
 		this.password = "";
+		this.role = "";
 		this.birthDay = new Date();
 	}
 

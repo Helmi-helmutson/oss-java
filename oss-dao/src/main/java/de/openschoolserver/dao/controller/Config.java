@@ -1,7 +1,6 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.*;
-
 import java.io.IOException;
 import java.nio.file.*;
 
@@ -65,9 +64,7 @@ public class Config {
 			}
 		}
 	}
-	
-	
-	
+
 	public Boolean isConfgiReadOnly(String key){
 		return readOnly.get(key);
 	}
@@ -127,7 +124,6 @@ public class Config {
 /*
 *
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		Config c = new Config();
 		c.Set("SCHOOL_REG_CODE", "BLA_BALÖ");
 		System.out.println(c.GetPaths());
@@ -136,4 +132,3 @@ public class Config {
 *
 */
 }
-
