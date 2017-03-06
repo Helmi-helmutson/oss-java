@@ -537,6 +537,20 @@ public class RoomController extends Controller {
 		DeviceController deviceController = new DeviceController(this.session);
 		StringBuilder error = new StringBuilder();
 		for(Device device : devices) {
+			if( device.getIp().isEmpty() ){
+				List<String> ipAddress = this.getAvailableIPAddresses(roomId, 1);
+				if( ipAddress.isEmpty() )
+					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+				if( device.getName().isEmpty() )
+				  device.setName(ipAddress.get(0).split(" ")[1]);
+				device.setIp(ipAddress.get(0).split(" ")[0]);
+				if( !device.getWlanMac().isEmpty() ){
+				  ipAddress = this.getAvailableIPAddresses(roomId, 1);
+				  if( ipAddress.isEmpty() )
+					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+				  device.setWlanIp(ipAddress.get(0).split(" ")[0]);
+				}
+			}
 			error.append(deviceController.check(device, room));
 			device.setRoom(room);
 			if(device.getHwconfId() == null){
@@ -622,7 +636,6 @@ public class RoomController extends Controller {
 			}
 		} else {
 			device.setMac(macAddress);
-			device.setIp(ipAddress.get(0).split(" ")[0]);
 			device.setIp(ipAddress.get(0).split(" ")[0]);
 			if( name == "nextFreeName" ) {
 				device.setName(ipAddress.get(0).split(" ")[1]);
