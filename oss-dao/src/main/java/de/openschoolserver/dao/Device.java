@@ -137,6 +137,9 @@ public class Device implements Serializable {
 
 	public Device() {
 		this.hwconfId = null;
+		this.name = "";
+		this.ip = "";
+		this.mac = "";
 		this.wlanip   = "";
 		this.wlanmac  = "";
 	}
