@@ -5,6 +5,7 @@ package de.openschoolserver.api.resources;
 import io.dropwizard.auth.Auth;
 
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -17,9 +18,6 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.controller.DeviceController;
-
 import java.util.List;
 import java.util.Map;
 

@@ -1,6 +1,7 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.*;
+
 import java.io.IOException;
 import java.nio.file.*;
 
@@ -98,9 +99,9 @@ public class Config {
 		return keys;
 	}
 	
-	public void setConfigValue(String key, String value){
+	public Boolean setConfigValue(String key, String value){
 		if(readOnly.get(key)){
-			return;
+			return false;
 		}
 		ossConfig.put(key, value);
 		List<String> tmpConfig =  new ArrayList<String>();
@@ -118,7 +119,21 @@ public class Config {
 		}
 		catch( IOException e ) { 
 			e.printStackTrace();
+			return false;
 		}
+		return true;
+	}
+	
+	public List<Map<String,String>> getConfig() {
+		List<Map<String, String>> configs = new ArrayList<>();
+		for( String key : ossConfig.values() ){
+			Map<String,String> configMap = new HashMap<>();
+			configMap.put("key",key);
+			configMap.put("path", ossConfigPath.get(key));
+			configMap.put("readOnly", readOnly.get(key) ? "yes" : "no" );
+			configs.add(configMap);
+		}
+		return configs;
 	}
 
 /*

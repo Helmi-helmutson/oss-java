@@ -11,7 +11,11 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="Enumerates")
-@NamedQuery(name="Enumerate.findAll", query="SELECT e FROM Enumerate e")
+@NamedQueries({
+	@NamedQuery(name="Enumerate.findAll", query="SELECT e FROM Enumerate e"),
+	@NamedQuery(name="Enumerate.getByType", query="SELECT e FROM Enumerate e WHERE e.name = :type"),
+	@NamedQuery(name="Enumerate.get", query="SELECT e FROM Enumerate e WHERE e.name = :type AND e.value = :value" )
+})
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Enumerate implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -24,13 +28,13 @@ public class Enumerate implements Serializable {
 
 	private String value;
 
-        @Override
-        public boolean equals(Object obj) {
-                if (obj instanceof Enumerate && obj !=null) {
-                        return getId() == ((Enumerate)obj).getId();
-                }
-                return super.equals(obj);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Enumerate && obj !=null) {
+           return getId() == ((Enumerate)obj).getId();
         }
+        return super.equals(obj);
+    }
 
 	public Enumerate() {
 	}

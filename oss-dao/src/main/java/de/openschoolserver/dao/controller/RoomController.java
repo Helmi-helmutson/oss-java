@@ -135,9 +135,9 @@ public class RoomController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return new Response(this.getSession(),"ERROR ", e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		}
-		return new Response(this.getSession(),"OK ", "Room was created succesfully.");
+		return new Response(this.getSession(),"OK", "Room was created succesfully.");
 	}
 
 	public Response delete(long roomId){
