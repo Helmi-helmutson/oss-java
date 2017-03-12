@@ -14,8 +14,7 @@ public class SystemResourceImpl implements SystemResource {
 	@Override
 	public List<Map<String, String>> getStatus(Session session) {
 		SystemController systemController = new SystemController(session);
-		// TODO Auto-generated method stub
-		return null;
+		return systemController.getStatus();
 	}
 
 	@Override
