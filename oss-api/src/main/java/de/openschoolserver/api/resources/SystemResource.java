@@ -17,8 +17,8 @@ import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
-@Path("sessions")
-@Api(value = "sessions")
+@Path("system")
+@Api(value = "system")
 public interface SystemResource {
 
     @GET
