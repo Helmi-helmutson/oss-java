@@ -120,7 +120,7 @@ public class User implements Serializable {
 		this.givenName = "";
 		this.password = "";
 		this.role = "";
-		this.birthDay = new Date();
+		this.birthDay = new Date(System.currentTimeMillis());
 	}
 
 	public long getId() {
