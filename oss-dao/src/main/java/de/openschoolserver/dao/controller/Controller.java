@@ -199,7 +199,7 @@ public class Controller extends Config {
 		StringBuffer error = new StringBuffer();
 		program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
 		program[1] = "change_member";
-		data.append(String.format("changetype: %s%n",type));
+		data.append(String.format("changeType: %s%n",type));
 		data.append(String.format("group: %s%n", group.getName()));
 		data.append("users: ");
 		for( User user : users ) {

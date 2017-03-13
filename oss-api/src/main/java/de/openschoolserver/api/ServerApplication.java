@@ -58,6 +58,9 @@ public class ServerApplication extends Application<ServerConfiguration> {
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(Session.class));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
 
+        final SystemResource systemResource = new SystemResourceImpl();
+        environment.jersey().register(systemResource);
+        
         final SessionsResource sessionsResource = new SessionsResourceImpl();
         environment.jersey().register(sessionsResource);
 

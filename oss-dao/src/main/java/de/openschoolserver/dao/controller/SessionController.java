@@ -6,6 +6,7 @@ package de.openschoolserver.dao.controller;
 import javax.persistence.EntityManager;
 
 
+
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Session;
@@ -171,6 +172,10 @@ public class SessionController extends Controller {
     }
     
     public boolean authorize(Session session, String requiredRole){
+    	//The simply way
+    	if( session.getUser().getRole().contains(requiredRole))
+    		return true;
+    	
     	EntityManager em = getEntityManager();
     	if (em != null) {
     		try {
