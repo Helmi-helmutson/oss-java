@@ -92,6 +92,24 @@ public class RoomController extends Controller {
 			em.close();
 		}
 	}
+	
+	/*
+	 * Search devices given by a substring
+	 */
+	public List<Room> search(String search) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Device.search");
+			query.setParameter("search", search + "%");
+			return (List<Room>) query.getResultList();
+		} catch (Exception e) {
+			// logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
 
 	public Response add(Room room){
 		EntityManager em = getEntityManager();
@@ -117,9 +135,9 @@ public class RoomController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return new Response(this.getSession(),"ERROR ", e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		}
-		return new Response(this.getSession(),"OK ", "Room was created succesfully.");
+		return new Response(this.getSession(),"OK", "Room was created succesfully.");
 	}
 
 	public Response delete(long roomId){
@@ -519,6 +537,20 @@ public class RoomController extends Controller {
 		DeviceController deviceController = new DeviceController(this.session);
 		StringBuilder error = new StringBuilder();
 		for(Device device : devices) {
+			if( device.getIp().isEmpty() ){
+				List<String> ipAddress = this.getAvailableIPAddresses(roomId, 1);
+				if( ipAddress.isEmpty() )
+					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+				if( device.getName().isEmpty() )
+				  device.setName(ipAddress.get(0).split(" ")[1]);
+				device.setIp(ipAddress.get(0).split(" ")[0]);
+				if( !device.getWlanMac().isEmpty() ){
+				  ipAddress = this.getAvailableIPAddresses(roomId, 1);
+				  if( ipAddress.isEmpty() )
+					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+				  device.setWlanIp(ipAddress.get(0).split(" ")[0]);
+				}
+			}
 			error.append(deviceController.check(device, room));
 			device.setRoom(room);
 			if(device.getHwconfId() == null){
@@ -604,7 +636,6 @@ public class RoomController extends Controller {
 			}
 		} else {
 			device.setMac(macAddress);
-			device.setIp(ipAddress.get(0).split(" ")[0]);
 			device.setIp(ipAddress.get(0).split(" ")[0]);
 			if( name == "nextFreeName" ) {
 				device.setName(ipAddress.get(0).split(" ")[1]);

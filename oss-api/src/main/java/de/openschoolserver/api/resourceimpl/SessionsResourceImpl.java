@@ -37,11 +37,6 @@ public class SessionsResourceImpl implements SessionsResource {
 
     @Override
     public Session getStatus(Session session) {
- logger.debug("Validating session " + session.getToken());
- logger.debug("Validating session " + session.getUser().getUid());
- logger.debug("Validating session " + session.getRoomId());
- logger.debug("Validating session " + session.getDeviceId());
- 
         return session;
     }
 

@@ -1,10 +1,10 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
+
 import javax.persistence.Query;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.*;
 import de.openschoolserver.dao.Session;
@@ -16,6 +16,7 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
+@SuppressWarnings( "unchecked" )
 public class Controller extends Config {
 
 	protected Session session ;
@@ -198,7 +199,7 @@ public class Controller extends Config {
 		StringBuffer error = new StringBuffer();
 		program[0] = "/usr/share/oss/plugins/plugin_handler.sh";
 		program[1] = "change_member";
-		data.append(String.format("changetype: %s%n",type));
+		data.append(String.format("changeType: %s%n",type));
 		data.append(String.format("group: %s%n", group.getName()));
 		data.append("users: ");
 		for( User user : users ) {

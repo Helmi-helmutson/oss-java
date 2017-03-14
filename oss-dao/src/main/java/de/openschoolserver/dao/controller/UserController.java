@@ -75,7 +75,7 @@ public class UserController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("User.search");
-			query.setParameter("search", search);
+			query.setParameter("search", search + "%");
 			return query.getResultList();
 		} catch (Exception e) {
 			//logger.error(e.getMessage());
@@ -102,6 +102,19 @@ public class UserController extends Controller {
 
 	public Response add(User user){
 		EntityManager em = getEntityManager();
+		//Check role
+		if( user.getRole() == null )
+			return new Response(this.getSession(),"ERROR", "You have to define the role of the user.");
+		//Check Birthday
+		if( user.getBirthDay() == null ) {
+			if( user.getRole().equals("sysadmins") || user.getRole().equals("templates")) {
+				Date now = new Date(System.currentTimeMillis());
+				user.setBirthDay(now);
+			} else {
+				return new Response(this.getSession(),"ERROR", "You have to define the birthday.");
+			}
+				
+		}
 		// Create uid if not given
 		if( user.getUid() == "") {
 			String userId = UserUtil.createUserId( user.getGivenName(),

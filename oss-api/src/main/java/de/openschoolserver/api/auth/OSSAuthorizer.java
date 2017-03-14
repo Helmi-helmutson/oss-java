@@ -4,12 +4,12 @@ package de.openschoolserver.api.auth;
 
 
 import io.dropwizard.auth.Authorizer;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.Session;
-
-import java.util.List;
+import de.openschoolserver.dao.controller.SessionController;
 
 public class OSSAuthorizer implements Authorizer<Session> {
 
@@ -18,20 +18,9 @@ public class OSSAuthorizer implements Authorizer<Session> {
     @Override
     public boolean authorize(Session session, String requiredRole) {
 
-    	session.getUser().getRole().equals(requiredRole);
-//        logger.info("authorize() Person: " + session.getPerson() + ", required role category: " + requiredRole);
-//
-//        List<Role> rolesList = session.getPerson().getRoleItems();
-//        if (!rolesList.isEmpty()) {
-//            for (Role role : rolesList) {
-//                if (requiredRole.equals(role.getCategory())) {
-//                    return true;
-//                }
-//            }
-//        }
-//
-//        return false;
-    	return true; //TODO implement
+        logger.info("authorize() Person: " + session.getUser().getUid() + ", required role category: " + requiredRole);
+        final SessionController sessionController = new SessionController();
+        return sessionController.authorize(session, requiredRole);
     }
 
 }

@@ -7,13 +7,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.*;
 
+@SuppressWarnings( "unchecked" )
 public class DeviceController extends Controller {
 
 	public DeviceController(Session session) {
@@ -111,34 +111,35 @@ public class DeviceController extends Controller {
 	}
 
 	protected String check(Device device,Room room) {
-		StringBuilder error = new StringBuilder();
+		List<String> error = new ArrayList<String>();
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
 		
-		if( ! this.isNameUnique(device.getName())){
-			error.append("Devices name is not unique. " );
-		}
-		if( this.checkBadHostName(device.getName())){
-			error.append("Devices name contains not allowed characters. " );
-		}
 		//Check the MAC address
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		String name =  this.isMacUnique(device.getMac());
 		if( name != "" ){
-			error.append("The MAC address will be used allready:" + name );
+			error.add("The MAC address '" + device.getMac() + "' will be used allready:" + name );
 		}
 		if( ! IPv4.validateMACAddress(device.getMac())) {
-			error.append("The MAC address is not valid:" + device.getMac() );	
+			error.add("The MAC address is not valid:" + device.getMac() );	
+		}
+		//Check the name
+		if( ! this.isNameUnique(device.getName())){
+			error.add("Devices name is not unique. " );
+		}
+		if( this.checkBadHostName(device.getName())){
+			error.add("Devices name contains not allowed characters. " );
 		}
 		//Check the IP address
 		name =  this.isIPUnique(device.getIp());
 		if( name != "" ){
-			error.append("The IP address will be used allready:" + name );
+			error.add("The IP address will be used allready:" + name );
 		}
 		if( ! IPv4.validateIPAddress(device.getIp())) {
-			error.append("The IP address is not valid:" + device.getIp() );	
+			error.add("The IP address is not valid:" + device.getIp() );	
 		}
 		if( !net.contains(device.getIp())) {
-			error.append("The IP address is not in the room ip address range.");
+			error.add("The IP address is not in the room ip address range.");
 		}
 		
 		if( device.getWlanMac().isEmpty() ) {
@@ -148,24 +149,24 @@ public class DeviceController extends Controller {
 			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
 			name =  this.isMacUnique(device.getWlanMac());
 			if( name != "" ){
-				error.append("The WLAN MAC address will be used allready:" + name );
+				error.add("The WLAN MAC address will be used allready:" + name );
 			}
 			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.append("The WLAN MAC address is not valid:" + device.getWlanMac() );	
+				error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );	
 			}
 			//Check the IP address
 			name =  this.isIPUnique(device.getWlanIp());
 			if( name != "" ){
-				error.append("The IP address will be used allready:" + name );
+				error.add("The IP address will be used allready:" + name );
 			}
 			if( ! IPv4.validateIPAddress(device.getWlanIp())) {
-				error.append("The IP address is not valid:" + device.getIp() );	
+				error.add("The IP address is not valid:" + device.getIp() );	
 			}
 			if( !net.contains(device.getWlanIp())) {
-				error.append("The IP address is not in the room ip address range.");
+				error.add("The IP address is not in the room ip address range.");
 			}
 		}
-		return error.toString();
+		return String.join(System.lineSeparator(), error);
 	}
 	
 	/*
@@ -245,12 +246,12 @@ public class DeviceController extends Controller {
 	/*
 	 * Search devices given by a substring
 	 */
-	public Device search(String name) {
+	public List<Device> search(String search) {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.search");
-			query.setParameter("name", name);
-			return (Device) query.getSingleResult();
+			query.setParameter("search", search + "%");
+			return (List<Device>) query.getResultList();
 		} catch (Exception e) {
 			// logger.error(e.getMessage());
 			System.err.println(e.getMessage()); //TODO
