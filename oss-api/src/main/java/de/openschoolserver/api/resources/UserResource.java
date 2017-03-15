@@ -174,7 +174,7 @@ public interface UserResource {
     })
     //@PermitAll
     @RolesAllowed("user.modify")
-    boolean modify(
+    Response modify(
             @ApiParam(hidden = true) @Auth Session session,
             User user
     );
@@ -190,7 +190,7 @@ public interface UserResource {
         @ApiResponse(code = 404, message = "User not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("user.delete")
-    boolean delete(
+    Response delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId
     );

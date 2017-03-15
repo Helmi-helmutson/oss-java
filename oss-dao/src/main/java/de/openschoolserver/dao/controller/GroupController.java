@@ -115,6 +115,9 @@ public class GroupController extends Controller {
 
 	public Response delete(long groupId){
 		Group group = this.getById(groupId);
+		if( this.isProtected(group))
+			return new Response(this.getSession(),"ERROR","This group must not be deleted.");
+		
 		this.startPlugin("delete_group", group);
 
 		// Remove group from GroupMember of table
