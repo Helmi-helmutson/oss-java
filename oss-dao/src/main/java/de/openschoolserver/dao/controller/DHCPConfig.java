@@ -77,6 +77,10 @@ public class DHCPConfig extends Controller {
 	private void WriteRoom(Room room) {
 		List<String> line = new ArrayList<String>();
 		for( Device device : room.getDevices() ){
+			//Do not create configuration for devices without mac adress.
+			if( device.getMac().isEmpty() )
+				continue;
+			
 			line.add(device.getName());
 			dhcpConfigFile.add("    host " + device.getName() + " {");
 			dhcpConfigFile.add("      hardware ethernet " + device.getMac() + ";");
