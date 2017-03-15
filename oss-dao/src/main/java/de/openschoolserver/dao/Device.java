@@ -102,6 +102,9 @@ public class Device implements Serializable {
 	@JsonIgnore
 	private HWConf hwconf;
 
+        @Column(name="hwconf_id", insertable=false, updatable=false)
+        private Long hwconfId;
+
 	//bi-directional many-to-one association to Room
 	@ManyToOne
 	@JsonIgnore
@@ -132,9 +135,6 @@ public class Device implements Serializable {
 	@JsonIgnore
 	private List<User> loggedIn;
 
-	@Transient
-	Long hwconfId;
-
 	public Device() {
 		this.hwconfId = null;
 		this.name = "";
@@ -162,10 +162,6 @@ public class Device implements Serializable {
 
 	public Long getHwconfId() {
 		return this.hwconfId;
-	}
-
-	public void setHwconfId(Long id) {
-		this.hwconfId = id;
 	}
 
 	public String getName() {
