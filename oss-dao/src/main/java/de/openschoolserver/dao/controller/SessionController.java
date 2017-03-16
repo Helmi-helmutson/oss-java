@@ -5,8 +5,6 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
-
-
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Session;
@@ -18,6 +16,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.controller.DeviceController;
+import de.openschoolserver.dao.tools.OSSShellTools;
 
 
 import java.util.List;
@@ -54,6 +53,17 @@ public class SessionController extends Controller {
     	DeviceController deviceController = new DeviceController(this.session);
     	Room room = null;
     	//TODO check the password
+		String[]   program = new String[5];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/bin/smbclient";
+		program[1] = "-L";
+		program[2] = "admin";
+		program[3] = "-U";
+		program[4] = username + "%" + password;
+		OSSShellTools.exec(program, reply, error, null);
+		if( reply.toString().contains("session setup failed"))
+			return null;
     	//TODO what to do with deviceType
     	User user = userController.getByUid(username);
     	if( user == null )

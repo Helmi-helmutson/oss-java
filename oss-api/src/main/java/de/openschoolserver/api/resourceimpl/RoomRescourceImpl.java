@@ -17,8 +17,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class RoomRescourceImpl implements RoomResource {
 	
+	Logger logger = LoggerFactory.getLogger(RoomRescourceImpl.class);
 
     @Override
     public Room getById(Session session, long roomId) {
@@ -142,7 +146,9 @@ public class RoomRescourceImpl implements RoomResource {
 	@Override
 	public Response addDevices(Session session, long roomId, List<Device> devices) {
 		final RoomController roomController = new RoomController(session);
-		return roomController.addDevices(roomId,devices);
+		Response response = roomController.addDevices(roomId,devices);
+		logger.info("Get Response text" + response.getText() );
+		return response;
 	}
 
 	@Override

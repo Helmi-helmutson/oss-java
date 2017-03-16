@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
+
 import javax.persistence.Query;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,6 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.tools.OSSShellTools;
-import org.eclipse.persistence.config.PersistenceUnitProperties;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
