@@ -24,11 +24,12 @@ public class SessionsResourceImpl implements SessionsResource {
     @Override
     public Session createSession(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
 
-        if (username == null || password == null || device == null) {
+        if (username == null || password == null ) {
             throw new WebApplicationException(400);
         }
+        if( device == null)
+        	device = "dummy";
 
-        final URI uri = ui.getAbsolutePath();
         Session session =  new Session();
         session.setIP(req.getRemoteAddr());
         SessionController sessionController = new SessionController(session);
@@ -42,18 +43,12 @@ public class SessionsResourceImpl implements SessionsResource {
 
     @Override
     public void deleteSession(Session session, String token) {
-//        final SessionController sessionController = new SessionController(session);
-//
-//        Session toBeDeletedSession = sessionController.getByToken(token);
-//
-//        if (session == null || session.getPersonId() != toBeDeletedSession.getPersonId()) {
-//            logger.info("deletion of session denied " + token);
-//            throw new WebApplicationException(401);
-//        }
-//
-//        sessionController.deleteSession(toBeDeletedSession);
-//        logger.debug("deleted session " + token);
-    	
-    	//TODO implement
+         final SessionController sessionController = new SessionController(session);
+         if( session == null || ! session.getToken().equals(token) ) {
+        	 logger.info("deletion of session denied " + token);
+        	 throw new WebApplicationException(401);
+         }
+         sessionController.deleteSession(session);
+         logger.debug("deleted session " + token);
     }
 }

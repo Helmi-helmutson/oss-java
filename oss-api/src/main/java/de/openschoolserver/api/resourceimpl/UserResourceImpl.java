@@ -58,13 +58,13 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public boolean delete(Session session, long userId) {
+	public Response delete(Session session, long userId) {
 		final UserController userController = new UserController(session);
 		return userController.delete(userId);
 	}
 
 	@Override
-	public boolean modify(Session session, User user) {
+	public Response modify(Session session, User user) {
 		final UserController userController = new UserController(session);
 		return userController.modify(user);
 	}

@@ -179,7 +179,7 @@ public class UserController extends Controller {
 		return results;
 	}
 	
-	public boolean modify(User user){
+	public Response modify(User user){
 		//TODO make some checks!!
 		EntityManager em = getEntityManager();
 
@@ -190,22 +190,23 @@ public class UserController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
-			return false;
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.startPlugin("modify_user",user);
-		return true;
+		return new Response(this.getSession(),"OK","User was modified sussesfully");
 	}
 	
-	public boolean delete(long userId){
-		
-		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
+	public Response delete(long userId){
 		User user = this.getById(userId);
+		if( this.isProtected(user))
+			return new Response(this.getSession(),"ERROR","This group must not be deleted.");
 
 		this.startPlugin("delete_user",user);
 
+		EntityManager em = getEntityManager();
+		em.getTransaction().begin();
 		List<Device> devices = user.getOwnedDevices();
 		boolean restartDHCP = ! devices.isEmpty();
 		// Remove user from logged on table
@@ -227,7 +228,7 @@ public class UserController extends Controller {
 			dhcpConfig.Create();
 		}
 		em.close();
-		return true;
+		return new Response(this.getSession(),"OK","User was deleted");
 	}
 	
 	public List<Group> getAvailableGroups(long userId){

@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS Devices (
         name         VARCHAR(32) NOT NULL,
         IP           VARCHAR(16) NOT NULL,
         WLANIP       VARCHAR(16) DEFAULT '',
-        MAC          VARCHAR(17) NOT NULL,
+        MAC          VARCHAR(17) DEFAULT '',
         WLANMAC      VARCHAR(17) DEFAULT '',
         row          INTEGER  DEFAULT 0,
         place        INTEGER  DEFAULT 0,
@@ -118,6 +118,12 @@ CREATE TABLE IF NOT EXISTS Devices (
         FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY  (id)
 );
+
+INSERT INTO Devices VALUES(1,1,1,NULL,'admin','#SCHOOL_SERVER#',NULL,'','',0,0);
+INSERT INTO Devices VALUES(2,1,1,NULL,'schoolserver','#SCHOOL_MAILSERVER#',NULL,'','',0,0);
+INSERT INTO Devices VALUES(3,1,1,NULL,'proxy','#SCHOOL_PROXY#',NULL,'','',0,0);
+INSERT INTO Devices VALUES(4,1,1,NULL,'printserver','#SCHOOL_PRINTSERVER#',NULL,'','',0,0);
+INSERT INTO Devices VALUES(5,1,1,NULL,'backup','#SCHOOL_BACKUP_SERVER#',NULL,'','',0,0);
 
 CREATE TABLE IF NOT EXISTS AccessInRoom (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

@@ -93,11 +93,6 @@ public class Room implements Serializable {
 	@JsonIgnore
 	private Device defaultPrinter;
 
-	//bi-directional many-to-one association to HWConf
-	@ManyToOne
-	@JsonIgnore
-	private HWConf hwconf;
-
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="room")
 	@JsonIgnore
@@ -106,12 +101,16 @@ public class Room implements Serializable {
 	@Transient
 	private String network;
 
-	@Transient
+	//bi-directional many-to-one association to HWConf
+	@ManyToOne
+	@JsonIgnore
+	private HWConf hwconf;
+
+	@Column(name="hwconf_id", insertable=false, updatable=false)
 	private Long hwconfId;
 
 	public Room() {
 		this.network  = "";
-		this.hwconfId = null;
 	}
 
 	public long getId() {
@@ -132,10 +131,6 @@ public class Room implements Serializable {
 
 	public Long getHwconfId() {
 		return this.hwconfId;
-	}
-
-	public void setHwconfId(Long id) {
-		this.hwconfId = id;
 	}
 
 	public String getName() {
@@ -209,14 +204,12 @@ public class Room implements Serializable {
 	public Device addDevice(Device device) {
 		getDevices().add(device);
 		device.setRoom(this);
-
 		return device;
 	}
 
 	public Device removeDevice(Device device) {
 		getDevices().remove(device);
 		device.setRoom(null);
-
 		return device;
 	}
 
@@ -241,7 +234,7 @@ public class Room implements Serializable {
 	}
 
 	public void setHwconf(HWConf hwconf) {
-		this.hwconf = hwconf;
+		this.hwconf   = hwconf;
 	}
 
 	public List<Test> getTests() {

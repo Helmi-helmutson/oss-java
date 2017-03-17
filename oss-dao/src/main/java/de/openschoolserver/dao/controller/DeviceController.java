@@ -80,6 +80,8 @@ public class DeviceController extends Controller {
 		try {
 			for( Long deviceId : deviceIds) {
 				Device dev = em.find(Device.class, deviceId);
+				if( this.isProtected(dev) )
+					return new Response(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
 				em.remove(dev);
 			}
 			return new Response(this.getSession(),"OK", "Devices were deleted succesfully.");
