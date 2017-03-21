@@ -31,6 +31,7 @@ public class Room implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
+	@Column(name = "name", updatable = false)
 	private String name;
 
 	private int places;
@@ -39,8 +40,10 @@ public class Room implements Serializable {
 
 	private String description;
 
+	@Column(name = "netMask", updatable = false)
 	private int netMask;
 
+	@Column(name = "startIP", updatable = false)
 	private String startIP;
 
 	private String roomType;

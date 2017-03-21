@@ -42,6 +42,7 @@ public class User implements Serializable {
 
 	private String sureName;
 
+	@Column(name="uid", updatable=false)
 	private String uid;
 
 	@Temporal(TemporalType.DATE)	
