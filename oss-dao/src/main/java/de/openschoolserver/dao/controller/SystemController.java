@@ -53,8 +53,23 @@ public class SystemController extends Controller {
 		//Rooms
 		statusMap = new HashMap<>();
 		statusMap.put("name","rooms");
+		for( String roomType : this.getEnumerates("roomType")) {
+			query = em.createNamedQuery("Room.getByType").setParameter("type",roomType);
+			count = query.getResultList().size();
+			statusMap.put(roomType,count.toString());
+		}
+		statusList.add(statusMap);
 		
-		
+		//Rooms
+		statusMap = new HashMap<>();
+		statusMap.put("name","devices");
+		for( String deviceType : this.getEnumerates("deviceType")) {
+			query = em.createNamedQuery("Device.getByType").setParameter("type",deviceType);
+			count = query.getResultList().size();
+			statusMap.put(deviceType,count.toString());
+		}
+		statusList.add(statusMap);
+
 		return statusList;
 	}
 	
@@ -108,6 +123,4 @@ public class SystemController extends Controller {
 		}
 		return new Response(this.getSession(),"OK","Enumerate was removed succesfully.");
 	}
-	
-
 }
