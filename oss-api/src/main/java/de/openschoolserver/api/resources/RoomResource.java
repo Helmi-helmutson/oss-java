@@ -342,7 +342,7 @@ public interface RoomResource {
     @PUT
     @Path("{roomId}/device/{MAC}/{name}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create new devices")
+    @ApiOperation(value = "Create a new device. This api call can be used only for registering own devices.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
