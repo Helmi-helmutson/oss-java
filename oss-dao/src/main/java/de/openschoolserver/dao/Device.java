@@ -31,6 +31,7 @@ public class Device implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
 
+	@Column(name = "name", updatable = false)
 	private String name;
 
 	private int place;
@@ -102,8 +103,8 @@ public class Device implements Serializable {
 	@JsonIgnore
 	private HWConf hwconf;
 
-        @Column(name="hwconf_id", insertable=false, updatable=false)
-        private Long hwconfId;
+    @Column(name="hwconf_id", insertable=false, updatable=false)
+    private Long hwconfId;
 
 	//bi-directional many-to-one association to Room
 	@ManyToOne

@@ -81,7 +81,7 @@ public interface SystemResource {
     @GET
     @Path("configuration")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get session status")
+    @ApiOperation(value = "Gets the whole system configuration.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -93,7 +93,7 @@ public interface SystemResource {
     @GET
     @Path("configuration/{key}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "get session status")
+    @ApiOperation(value = "Gets a system configuration value.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -106,7 +106,7 @@ public interface SystemResource {
     @PUT
     @Path("configuration/{key}/{value}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Creates a new enumerate")
+    @ApiOperation(value = "Sets a system configuration.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })

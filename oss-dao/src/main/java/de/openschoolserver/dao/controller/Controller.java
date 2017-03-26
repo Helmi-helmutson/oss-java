@@ -14,6 +14,7 @@ import de.openschoolserver.dao.controller.Config;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import java.io.File;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.ArrayList;
 
 @SuppressWarnings( "unchecked" )
 public class Controller extends Config {
@@ -55,7 +57,7 @@ public class Controller extends Config {
 
 	protected EntityManager getEntityManager() {
 		if( session != null)
-		   return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
+			return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
 		else
 			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
@@ -96,6 +98,33 @@ public class Controller extends Config {
 		}
 		em.close();
 		return true;
+	}
+	
+	protected Response checkPassword(String password) {
+		List<String> error = new ArrayList<String>();
+		if( password.length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
+			error.add("User password is to short.");
+		}
+		if( password.length() > Integer.parseInt(this.getConfigValue("SCHOOL_MAXIMAL_PASSWORD_LENGTH")) ) {
+			error.add("User password is to long.");
+		}
+		if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY") == "yes" ) {
+			if( ! Pattern.matches("[A-Z]",password) )
+				error.add("User password should contains upper case letters.");
+			if(! Pattern.matches("[0-9]",password) )
+				error.add("User password should contains numbers.");
+			String[] program    = new String[1];
+			StringBuffer reply  = new StringBuffer();
+			StringBuffer stderr = new StringBuffer();
+			program[0] = "/usr/sbin/cracklib-check";
+			OSSShellTools.exec(program, reply, stderr, password);
+			if( ! reply.toString().startsWith(password + ": OK"))
+				error.add(reply.toString());
+		}
+		if( error.size() > 0 )
+			return new Response(this.getSession(),"ERROR", String.join(System.lineSeparator(), error));
+		
+		return null;
 	}
 
 	protected boolean checkNonASCII(String name) {
@@ -208,8 +237,11 @@ public class Controller extends Config {
 			switch(pluginName){
 			case "add_doom":
 			case "modify_room":
+				data.append(String.format("name: %s%n", room.getName()));
+				data.append(String.format("description: %s%n", room.getDescription()));
 				break;
 			case "delete_room":
+				data.append(String.format("name: %s%n", room.getName()));
 				break;
 			}
 			break;
@@ -256,7 +288,7 @@ public class Controller extends Config {
 		case "de.openschoolserver.dao.User":
 			if(properties.containsKey("de.openschoolserver.dao.User.protected")){
 				User u = (User)object;
-				for( String s : properties.get("de.openschoolserver.dao.User.protected").split(":") ){
+				for( String s : properties.get("de.openschoolserver.dao.User.protected").split(",") ){
 					if( s.equals(u.getUid()))
 						return true;
 				}
@@ -265,7 +297,7 @@ public class Controller extends Config {
 		case "de.openschoolserver.dao.Room":
 			if(properties.containsKey("de.openschoolserver.dao.Room.protected")){
 				Room r = (Room) object;
-				for( String s : properties.get("de.openschoolserver.dao.Room.protected").split(":") ){
+				for( String s : properties.get("de.openschoolserver.dao.Room.protected").split(",") ){
 					if( s.equals(r.getName()))
 						return true;
 				}
@@ -274,17 +306,17 @@ public class Controller extends Config {
 		case "de.openschoolserver.dao.Device":
 			if(properties.containsKey("de.openschoolserver.dao.Device.protected")){
 				Device d = (Device)object;
-				for( String s : properties.get("de.openschoolserver.dao.Device.protected").split(":") ){
+				for( String s : properties.get("de.openschoolserver.dao.Device.protected").split(",") ){
 					if( s.equals(d.getName()))
 						return true;
 				}
 			}
 			return false;
 		case "de.openschoolserver.dao.Group":
-			if(properties.containsKey("de.openschoolserver.dao.Device.protected")){
-				Device d = (Device)object;
-				for( String s : properties.get("de.openschoolserver.dao.Device.protected").split(":") ){
-					if( s.equals(d.getName()))
+			if(properties.containsKey("de.openschoolserver.dao.Group.protected")){
+				Group g = (Group)object;
+				for( String s : properties.get("de.openschoolserver.dao.Group.protected").split(",") ){
+					if( s.equals(g.getName()))
 						return true;
 				}
 			}
@@ -292,5 +324,4 @@ public class Controller extends Config {
 		}
 		return false;
 	}
-	
 }

@@ -47,8 +47,8 @@ public class ServerApplication extends Application<ServerConfiguration> {
     @Override
     public void run(ServerConfiguration configuration, Environment environment) {
 
-        //Das ist das bescheuertste was ich je in meinem Leben gesehen habe.
-        AuthFilter tokenAuthorizer = new OAuthCredentialAuthFilter.Builder<Session>()
+        @SuppressWarnings("rawtypes")
+		AuthFilter tokenAuthorizer = new OAuthCredentialAuthFilter.Builder<Session>()
                 .setAuthenticator(new OSSTokenAuthenticator())
                 .setAuthorizer(new OSSAuthorizer())
                 .setPrefix("Bearer")

@@ -132,30 +132,24 @@ public class UserController extends Controller {
 		}
 		else
 		{
-		// First we check if the parameter are unique.
-				if( ! this.isNameUnique(user.getUid())){
-					return new Response(this.getSession(),"ERROR", "User name is not unique.");
-				}
-				// Check if uid contains non allowed characters
-				if( this.checkNonASCII(user.getUid()) ) {
-					return new Response(this.getSession(),"ERROR", "Uid contains not allowed characters.");
-				}
+			// First we check if the parameter are unique.
+			if( ! this.isNameUnique(user.getUid())){
+				return new Response(this.getSession(),"ERROR", "User name is not unique.");
+			}
+			// Check if uid contains non allowed characters
+			if( this.checkNonASCII(user.getUid()) ) {
+				return new Response(this.getSession(),"ERROR", "Uid contains not allowed characters.");
+			}
 		}
 		// Check the user password
 		if( user.getPassword() == "" ) {
-			user.setPassword(UserUtil.createRandomPassword(8));
+			user.setPassword(UserUtil.createRandomPassword(9,"ACGqfc12#"));
 		}
 		else
 		{
-			if( user.getPassword().length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
-				return new Response(this.getSession(),"ERROR", "User password is to short.");
-			}
-			if( user.getPassword().length() > Integer.parseInt(this.getConfigValue("SCHOOL_MAXIMAL_PASSWORD_LENGTH")) ) {
-				return new Response(this.getSession(),"ERROR", "User password is to long.");
-			}
-			if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY") == "yes" ) {
-				//return new Response(this.getSession(),"ERROR", "User password is to simple.");
-			}
+			Response response = this.checkPassword(user.getPassword());
+			if(response != null)
+				return response;
 		}
 		try {
 			em.getTransaction().begin();
@@ -171,7 +165,8 @@ public class UserController extends Controller {
 		return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.");
 	}
 
-	public List<Response> add(List<User> users){
+		
+	public List<Response> add(List<User> users) {
 		List<Response> results = new ArrayList<Response>();
 		for( User user : users ) {
 			results.add(this.add(user));
@@ -180,10 +175,13 @@ public class UserController extends Controller {
 	}
 	
 	public Response modify(User user){
-		//TODO make some checks!!
+		// First we have to check the password if any. 
+		if(!user.getPassword().isEmpty()) {
+			Response response = this.checkPassword(user.getPassword());
+			if(response != null)
+				return response;
+		}
 		EntityManager em = getEntityManager();
-
-		// First we have to check some parameter
 		try {
 			em.getTransaction().begin();
 			em.merge(user);
@@ -291,5 +289,29 @@ public class UserController extends Controller {
 			this.changeMemberPlugin("removemembers", group, user);
 		}
 		return new Response(this.getSession(),"OK","The groups of the user was set.");
+	}
+
+	public Response syncFsQuotas(List<List<String>> quotas) {
+		EntityManager em = getEntityManager();
+		User user;
+		try {
+			em.getTransaction().begin();
+			for( List<String> quota : quotas) {
+				if( quota.isEmpty() )
+					continue;
+				user = this.getByUid(quota.get(0));
+				if( user != null ) {
+					user.setFsQuotaUsed(Integer.valueOf(quota.get(1)));
+					user.setFsQuota(Integer.valueOf(quota.get(2)));
+					em.merge(user);
+				}
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","The filesystem quotas was synced succesfully");
 	}
 }
