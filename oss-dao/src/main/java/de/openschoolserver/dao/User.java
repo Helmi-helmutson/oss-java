@@ -111,6 +111,11 @@ public class User implements Serializable {
 	//@JsonManagedReference
 	@JsonIgnore
 	private List<Group> groups;
+	
+	private Integer fsQuotaUsed;
+	private Integer fsQuota;
+	private Integer msQuotaUsed;
+	private Integer msQuota;
 
 	@Transient
 	private String password ="";
@@ -121,6 +126,10 @@ public class User implements Serializable {
 		this.givenName = "";
 		this.password = "";
 		this.role = "";
+		this.fsQuota = 0;
+		this.fsQuotaUsed = 0;
+		this.msQuota = 0;
+		this.msQuotaUsed = 0;
 		this.birthDay = new Date(System.currentTimeMillis());
 	}
 
@@ -357,6 +366,38 @@ public class User implements Serializable {
 
 	public String getPassword() {
 		return this.password;
+	}
+
+	public void setFsQuotaUsed(Integer quota) {
+		this.fsQuotaUsed = quota;
+	}
+
+	public void setFsQuota(Integer quota) {
+		this.fsQuota = quota;
+	}
+
+	public void setMsQuotaUsed(Integer quota) {
+		this.msQuotaUsed = quota;
+	}
+
+	public void setMsQuota(Integer quota) {
+		this.msQuota = quota;
+	}
+
+	public Integer getFsQuotaUsed() {
+		return this.fsQuotaUsed;
+	}
+
+	public Integer getFsQuota() {
+		return this.fsQuota;
+	}
+
+	public Integer getMsQuotaUsed() {
+		return this.msQuotaUsed;
+	}
+
+	public Integer getMsQuota() {
+		return this.msQuota;
 	}
 
 }

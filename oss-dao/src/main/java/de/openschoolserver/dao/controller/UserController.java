@@ -290,4 +290,28 @@ public class UserController extends Controller {
 		}
 		return new Response(this.getSession(),"OK","The groups of the user was set.");
 	}
+
+	public Response syncFsQuotas(List<List<String>> quotas) {
+		EntityManager em = getEntityManager();
+		User user;
+		try {
+			em.getTransaction().begin();
+			for( List<String> quota : quotas) {
+				if( quota.isEmpty() )
+					continue;
+				user = this.getByUid(quota.get(0));
+				if( user != null ) {
+					user.setFsQuotaUsed(Integer.valueOf(quota.get(1)));
+					user.setFsQuota(Integer.valueOf(quota.get(2)));
+					em.merge(user);
+				}
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","The filesystem quotas was synced succesfully");
+	}
 }

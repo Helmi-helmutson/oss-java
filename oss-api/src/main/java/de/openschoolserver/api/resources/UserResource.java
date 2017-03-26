@@ -246,4 +246,20 @@ public interface UserResource {
             @PathParam("groupId") long groupId,
             @PathParam("userId") long userId
     );
+    
+    /*
+     * POST syncFsQuotas
+     */
+    @POST
+    @Path("syncFsQuotas")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Synchronize the file system quota values into the JPA")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    Response syncFsQuotas(
+                @ApiParam(hidden = true) @Auth Session session,
+                List<List<String>> Quotas
+    );
 }

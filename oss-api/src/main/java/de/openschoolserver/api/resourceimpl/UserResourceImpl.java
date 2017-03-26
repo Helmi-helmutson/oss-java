@@ -101,7 +101,6 @@ public class UserResourceImpl implements UserResource {
 	
 	@Override
 	public Response setMembers(Session session, long userId, List<Long> groupIds) {
-		//TODO dfsada
 		final UserController userController = new UserController(session);
 		return userController.setGroups(userId,groupIds);
 	}
@@ -116,6 +115,12 @@ public class UserResourceImpl implements UserResource {
 	public Response addMember(Session session, long groupId, long userId) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.addMember(groupId,userId);
+	}
+
+	@Override
+	public Response syncFsQuotas(Session session, List<List<String>> Quotas) {
+		final UserController userController = new UserController(session);
+		return userController.syncFsQuotas(Quotas);
 	}
 
 	
