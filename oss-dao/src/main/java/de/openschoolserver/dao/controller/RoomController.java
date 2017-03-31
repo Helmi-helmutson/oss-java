@@ -293,7 +293,32 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			room.setAccessInRoom(AccessList);
+			for( AccessInRoom air : room.getAccessInRooms() ) {
+				room.removeAccessInRoome(air);
+			}
+			for( AccessInRoom air : AccessList ) {
+				AccessInRoomFW  accessFW  = air.getAccessInRoomFW();
+				AccessInRoomPIT accessPIT = air.getAccessInRoomPIT();
+				AccessInRoomACT accessACT = air.getAccessInRoomACT();
+				if(air.getAccessType().equals("FW") || air.getAccessType().equals("DEFAULT") ) {
+					air.setAccessInRoomACT(null);
+					air.setAccessInRoomFW(accessFW);
+					accessFW.setAccessinroom(air);
+				}
+				if(air.getAccessType().equals("ACT") ) {
+					air.setAccessInRoomFW(null);
+					air.setAccessInRoomACT(accessACT);
+					accessACT.setAccessinroom(air);
+				}
+				if( air.getAccessType().equals("DEFAULT") ) {
+					air.setAccessInRoomPIT(null);
+				} else {
+					air.setAccessInRoomPIT(accessPIT);
+					accessPIT.setAccessinroom(air);
+				}
+				air.setRoom(room);
+				room.addAccessInRoom(air);
+			}
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {

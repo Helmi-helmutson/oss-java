@@ -200,6 +200,18 @@ public class Room implements Serializable {
 		this.accessInRooms = accessinrooms;
 	}
 
+	public AccessInRoom addAccessInRoom(AccessInRoom accessinroom) {
+		getAccessInRooms().add(accessinroom);
+		accessinroom.setRoom(this);
+		return accessinroom;
+	}
+
+	public AccessInRoom removeAccessInRoome(AccessInRoom accessinroom) {
+		getAccessInRooms().remove(accessinroom);
+		accessinroom.setRoom(null);
+		return accessinroom;
+	}
+	
 	public List<Device> getDevices() {
 		return this.devices;
 	}
