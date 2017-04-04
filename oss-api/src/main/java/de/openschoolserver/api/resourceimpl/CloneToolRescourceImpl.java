@@ -2,9 +2,11 @@
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.HWConf;
+
 import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.DeviceConfig;
 import de.openschoolserver.dao.controller.CloneToolController;
 import de.openschoolserver.api.resources.CloneToolResource;
 
@@ -14,7 +16,6 @@ import java.util.List;
 
 public class CloneToolRescourceImpl implements CloneToolResource {
 
-
 	@Override
 	public Long getHWConf(Session session) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
@@ -23,6 +24,18 @@ public class CloneToolRescourceImpl implements CloneToolResource {
 			throw new WebApplicationException(404);
 		}
 		return hwconf;
+	}
+
+	@Override
+	public String isMaster(Session session) {
+		if( session.getDevice() == null )
+			return "";
+		for( DeviceConfig dc : session.getDevice().getDeviceConfigs() )
+		{
+			if( dc.getKeyword().equals("isMaster") && dc.getValue().equals("Y") )
+				return "true";
+		}
+		return "";
 	}
 
 	@Override
@@ -39,6 +52,12 @@ public class CloneToolRescourceImpl implements CloneToolResource {
 	public String getPartitions(Session session, Long hwconfId) {
 		final CloneToolController cloneToolController = new CloneToolController(session);
 		return cloneToolController.getPartitions(hwconfId);
+	}
+	
+	@Override
+	public String getDescription(Session session, Long hwconfId) {
+		final CloneToolController cloneToolController = new CloneToolController(session);
+		return cloneToolController.getDescription(hwconfId);
 	}
 
 	@Override

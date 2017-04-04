@@ -46,6 +46,10 @@ public class CloneToolController extends Controller {
 		return String.join(" ", partitions );
 	}
 
+	public String getDescription(Long hwconfId ) {
+		return this.getById(hwconfId).getName();
+	}
+	
 	public Partition getPartition(Long hwconfId, String partition) {
 		EntityManager em = getEntityManager();
 		try {

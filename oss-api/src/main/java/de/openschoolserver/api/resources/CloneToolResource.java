@@ -45,6 +45,21 @@ public interface CloneToolResource {
 	);
   
 	/*
+	 * Get clonetool/isMaster
+	 */
+	@GET
+	@Path("isMaster")
+	@Produces("text/plain")
+	@ApiOperation(value = "Returns 'true' if the workstation of the session is master. Returns empty if not.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	String isMaster(
+	        @ApiParam(hidden = true) @Auth Session session
+	);
+  
+	/*
 	 * Get clonetool/all
 	 */
 	@GET
@@ -75,9 +90,25 @@ public interface CloneToolResource {
 	        @PathParam("hwconfId") Long hwconfId
 	);
        
-       /*
-        * GET clonetool/{hwconfId}/partitions
-        */
+	/*
+     * GET clonetool/{hwconfId}/description
+    */
+	@GET
+	@Path("{hwconfId}/description")
+	@Produces("text/plain")
+	@ApiOperation(value = "Gets the description of a hardware configuration.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("device.manage")
+	String getDescription(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("hwconfId") Long hwconfId
+	);
+	
+	/*
+     * GET clonetool/{hwconfId}/partitions
+    */
 	@GET
 	@Path("{hwconfId}/partitions")
 	@Produces("text/plain")

@@ -92,7 +92,7 @@ public interface SystemResource {
 
     @GET
     @Path("configuration/{key}")
-    @Produces(JSON_UTF8)
+    @Produces("text/plain")
     @ApiOperation(value = "Gets a system configuration value.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
