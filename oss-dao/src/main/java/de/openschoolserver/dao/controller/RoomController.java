@@ -92,6 +92,29 @@ public class RoomController extends Controller {
 		}
 	}
 	
+	public List<Room> getAllToRegister() {
+		EntityManager em = getEntityManager();
+		try {
+			if( this.getSession().getUser().getRole().contains("sysadmins") ) {
+				Query query = em.createNamedQuery("Room.findAllToRegister"); 
+				return query.getResultList();
+			} else {
+				List<Room> rooms = new ArrayList<Room>();
+				Query query = em.createNamedQuery("User.getMConfig").setParameter("keyword", "adhocRoom").setParameter("user_id",this.session.getUserId());
+        		for(String roomid : (List<String>) query.getResultList() ) {
+        			rooms.add(this.getById(Long.parseLong(roomid)));
+        		}
+        		return rooms;
+			}
+		} catch (Exception e) {
+			//logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return new ArrayList<>();
+		} finally {
+			em.close();
+		}
+	}
+	
 	/*
 	 * Search devices given by a substring
 	 */

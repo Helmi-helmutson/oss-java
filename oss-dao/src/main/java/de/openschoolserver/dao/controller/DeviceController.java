@@ -202,7 +202,7 @@ public class DeviceController extends Controller {
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
 			// logger.error(e.getMessage());
-			System.err.println("device.getByIP " + e.getMessage()); //TODO
+			System.err.println("device.getByIP " + IP + " "+ e.getMessage()); //TODO
 			return null;
 		} finally {
 			em.close();

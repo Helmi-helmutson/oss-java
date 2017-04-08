@@ -5,6 +5,7 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
+
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Session;
@@ -16,7 +17,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.controller.DeviceController;
-import de.openschoolserver.dao.tools.OSSShellTools;
+import de.openschoolserver.dao.tools.*;
 
 
 import java.util.List;
@@ -53,40 +54,50 @@ public class SessionController extends Controller {
     	DeviceController deviceController = new DeviceController(this.session);
     	Room room = null;
     	//TODO check the password
-		String[]   program = new String[5];
-		StringBuffer reply = new StringBuffer();
-		StringBuffer error = new StringBuffer();
-		program[0] = "/usr/bin/smbclient";
-		program[1] = "-L";
-		program[2] = "admin";
-		program[3] = "-U";
-		program[4] = username + "%" + password;
-		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString().contains("session setup failed"))
-			return null;
+    	String[]   program = new String[5];
+    	StringBuffer reply = new StringBuffer();
+    	StringBuffer error = new StringBuffer();
+    	program[0] = "/usr/bin/smbclient";
+    	program[1] = "-L";
+    	program[2] = "admin";
+    	program[3] = "-U";
+    	program[4] = username + "%" + password;
+    	OSSShellTools.exec(program, reply, error, null);
+    	if( reply.toString().contains("session setup failed"))
+    		return null;
     	//TODO what to do with deviceType
     	User user = userController.getByUid(username);
     	if( user == null )
     		return null;
-  
-    	Device device = deviceController.getByIP(this.getSession().getIP());
+
+    	String IP = this.getSession().getIP();
+    	Device device = deviceController.getByIP(IP);
     	if( device != null )
     		room = device.getRoom();
-    
-        if (user != null && user.getId() > 0) {
-            final String token = SessionToken.createSessionToken("dummy");
-            this.session.setToken(token);
-            this.session.setUserId(user.getId());
-            if( room != null )
-               this.session.setRoomId(room.getId());
-            if( device != null )
-               this.session.setDeviceId(device.getId());
-            sessions.put(token, this.session);
-            save(session);
-            return this.session;
-        } else {
-            return null;
-        }
+
+    	final String token = SessionToken.createSessionToken("dummy");
+    	this.session.setToken(token);
+    	this.session.setUserId(user.getId());
+    	this.session.setRole(user.getRole());
+    	if( room != null )
+    		this.session.setRoomId(room.getId()); 
+    	if( device != null ) {
+    		this.session.setDeviceId(device.getId());
+    		this.session.setMac(device.getMac());
+    	} else {
+    		//Evaluate the MAC Address
+    		if( !IP.contains("127.0.0.1") && IPv4.validateIPAddress(IP) && room == null ) {
+    			program = new String[1];
+    			program[0] = "arp -n " + IP + " | grep " + IP + " | gawk '{ print $3 }'";
+    			System.err.println(program[0]);
+    			OSSShellTools.exec(program, reply, error, null);
+    			if( IPv4.validateMACAddress(reply.toString()) )
+    				this.session.setMac(reply.toString());
+    		}
+    	}
+    	sessions.put(token, this.session);
+    	save(session);
+    	return this.session;
     }
 
     private void save(Session obj) {

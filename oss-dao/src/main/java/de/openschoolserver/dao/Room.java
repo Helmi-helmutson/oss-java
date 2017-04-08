@@ -15,6 +15,7 @@ import java.util.List;
 @Table(name="Rooms")
 @NamedQueries ({
 	@NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
+	@NamedQuery(name="Room.findAllToRegister", query="SELECT r FROM Room r WHERE r.name != 'ANON_DHCP'"),
 	@NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
 	@NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
 	@NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),

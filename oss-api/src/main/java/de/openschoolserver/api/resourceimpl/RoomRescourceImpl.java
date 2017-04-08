@@ -196,4 +196,10 @@ public class RoomRescourceImpl implements RoomResource {
 		return roomController.search(search);
 	}
 
+	@Override
+	public List<Room> getRoomsToRegister(Session session) {
+		final RoomController roomController = new RoomController(session);
+		return roomController.getAllToRegister();
+	}
+
 }

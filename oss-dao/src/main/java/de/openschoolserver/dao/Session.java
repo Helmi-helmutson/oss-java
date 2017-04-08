@@ -5,6 +5,7 @@ package de.openschoolserver.dao;
 import java.security.Principal;
 
 import java.util.Date;
+import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
@@ -42,21 +43,27 @@ public class Session implements Principal {
     @Column(name = "user_id")
     private Long userId;
     
-    @Column(name = "room_id")
-    private Long roomId;
-       
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     @JsonIgnore
     private User user;
     
+    @Transient
+    private String role = "dummy";
+    
+    @Column(name = "room_id")
+    private Long roomId;
+
     @OneToOne
     @JoinColumn(name = "room_id", insertable = false, updatable = false)
     @JsonIgnore
     private Room room;
     
+    @Transient
+    private String mac = "dummy";
+    
     @Column(name = "ip")
-    private String IP;
+    private String ip;
     
     @Column(name = "token")
     private String token;
@@ -98,11 +105,11 @@ public class Session implements Principal {
     }
 
     public String getIP() {
-        return this.IP;
+        return this.ip;
     }
 
     public void setIP(String IP) {
-        this.IP = IP;
+        this.ip = IP;
     }
 
     public Room getRoom() {
@@ -122,15 +129,23 @@ public class Session implements Principal {
     }
     
     public String getPassword() {
-        return password;
+        return this.password;
     }
 
     public void setPassword(String password) {
         this.password = password;
     }
 
+    public String getRole() {
+        return this.role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
     public long getUserId() {
-        return userId;
+        return this.userId;
     }
 
     public void setUserId(long userId) {
@@ -138,7 +153,7 @@ public class Session implements Principal {
     }
 
     public Long getDeviceId() {
-        return deviceId;
+        return this.deviceId;
     }
 
     public void setDeviceId(Long deviceId) {
@@ -146,7 +161,7 @@ public class Session implements Principal {
     }
     
     public Long getRoomId() {
-        return roomId;
+        return this.roomId;
     }
 
     public void setRoomId(Long roomId) {
@@ -154,7 +169,7 @@ public class Session implements Principal {
     }
     
     public Date getCreateDate() {
-        return createDate;
+        return this.createDate;
     }
 
     public Device getDevice() {
@@ -166,7 +181,7 @@ public class Session implements Principal {
     }
     
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(int id) {
@@ -174,10 +189,18 @@ public class Session implements Principal {
     }
 
     public String getToken() {
-        return token;
+        return this.token;
     }
 
     public void setToken(String token) {
         this.token = token;
+    }
+    
+    public String getMac() {
+        return this.mac;
+    }
+
+    public void setMac(String mac) {
+        this.mac = mac;
     }
 }
