@@ -110,6 +110,14 @@ public class SessionController extends Controller {
                 } else {
                     em.persist(obj);
                 }
+                Device device = obj.getDevice();
+                if( device != null ) {
+			User user = obj.getUser();
+			user.getLoggedOn().add(device);
+			device.getLoggedIn().add(user);
+			em.merge(device);
+			em.merge(user);
+                }
                 em.flush();
                 em.refresh(obj);
                 em.getTransaction().commit();
@@ -141,12 +149,18 @@ public class SessionController extends Controller {
     private void remove(Session session) {
         EntityManager em = getEntityManager();
         if (em != null) {
-
             try {
-
                 em.getTransaction().begin();
                 Session foundSession = em.find(Session.class, session.getId());
                 if (foundSession != null) {
+                	Device device = foundSession.getDevice();
+                    if( device != null ) {
+                    	User user = foundSession.getUser();
+                    	user.getLoggedOn().remove(device);
+                    	device.getLoggedIn().remove(user);
+                    	em.merge(device);
+                    	em.merge(user);
+                    }   
                     em.remove(foundSession);
                 }
                 em.getTransaction().commit();
