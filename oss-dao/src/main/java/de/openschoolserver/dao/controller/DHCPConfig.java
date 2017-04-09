@@ -54,14 +54,7 @@ public class DHCPConfig extends Controller {
 		}
 		try {
 		    Files.write(DHCP_CONFIG, dhcpConfigFile );
-		    String[] program = new String[3];
-		    //TODO write a own class for controlling systemctl
-		    program[0] = "systemctl";
-		    program[1] = "restart";
-		    program[2] = "dhcpd";
-		    StringBuffer reply = new StringBuffer();
-			StringBuffer error = new StringBuffer();
-			OSSShellTools.exec(program, reply, error, null);
+		    this.systemctl("restart", "dhcpd");
 			//Build groups by hwconf
 			query = em.createNamedQuery("HWConf.findAll");
 			for( HWConf hwconf : (List<HWConf>) query.getResultList() ) {
@@ -72,10 +65,8 @@ public class DHCPConfig extends Controller {
 				if(!line.isEmpty())
 					saltGroupFile.add("  " + hwconf.getName() + ": 'L@" + String.join(",",line) + "'");
 			}
-			//Restart salt-master
 			Files.write(SALT_GROUPS, saltGroupFile );
-			program[0] = "salt-master";
-			OSSShellTools.exec(program, reply, error, null);
+			this.systemctl("restart", "salt-master");
 			
 		} catch( IOException e ) { 
 			e.printStackTrace();
