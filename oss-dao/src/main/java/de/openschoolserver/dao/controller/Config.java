@@ -8,7 +8,7 @@ import java.nio.file.*;
 
 public class Config {
 
-	protected static Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
+	protected Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
 
 	private Map<String,String>   ossConfig;
 	private Map<String,String>   ossConfigPath;

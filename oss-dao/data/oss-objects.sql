@@ -157,7 +157,7 @@ CREATE TABLE IF NOT EXISTS AccessInRoomFW (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         accessinroom_id BIGINT UNSIGNED NOT NULL,
         direct          CHAR(1) DEFAULT 'N',
-        logon           CHAR(1) DEFAULT 'Y',
+        login           CHAR(1) DEFAULT 'Y',
         proxy           CHAR(1) DEFAULT 'Y',
         printing        CHAR(1) DEFAULT 'Y',
         portal          CHAR(1) DEFAULT 'Y',

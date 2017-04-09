@@ -92,7 +92,7 @@ public interface SystemResource {
 
     @GET
     @Path("configuration/{key}")
-    @Produces(JSON_UTF8)
+    @Produces("text/plain")
     @ApiOperation(value = "Gets a system configuration value.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -116,5 +116,81 @@ public interface SystemResource {
             @PathParam("key") String key,
             @PathParam("value") String value
     );
+    
+    // Firewall configuration
+    @GET
+    @Path("firewall/incommingRules")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the incomming firewall rules.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    Map<String, String>  getFirewallIncommingRules(
+    		@ApiParam(hidden = true) @Auth Session session
+    		);
+
+    @POST
+    @Path("firewall/incommingRules")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the incomming firewall rules.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    Response  setFirewallIncommingRules(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		Map<String, String> incommingRules
+    		);
+
+    @GET
+    @Path("firewall/outgoingRules")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the incomming firewall rules.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    List<Map<String, String>>  getFirewallOutgoingRules(
+    		@ApiParam(hidden = true) @Auth Session session
+    		);
+
+    @POST
+    @Path("firewall/outgoingRules")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the incomming firewall rules.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    Response  setFirewallOutgoingRules(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		List<Map<String, String>> incommingRules
+    		);
+
+    @GET
+    @Path("firewall/remoteAccessRules")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the incomming firewall rules.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    List<Map<String, String>>  getFirewallRemoteAccessRules(
+    		@ApiParam(hidden = true) @Auth Session session
+    		);
+
+    @POST
+    @Path("firewall/remoteAccessRules")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the incomming firewall rules.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    Response  setFirewallRemoteAccessRules(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		List<Map<String, String>> incommingRules
+    		);
 
 }

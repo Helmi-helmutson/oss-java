@@ -15,9 +15,11 @@ import java.util.List;
 @Table(name="Rooms")
 @NamedQueries ({
 	@NamedQuery(name="Room.findAll", query="SELECT r FROM Room r"),
+	@NamedQuery(name="Room.findAllToRegister", query="SELECT r FROM Room r WHERE r.name != 'ANON_DHCP'"),
 	@NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
 	@NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
 	@NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
+	@NamedQuery(name="Room.getByIp", query="SELECT r FROM Room r WHERE r.startIP = :ip"),
 	@NamedQuery(name="Room.search", query="SELECT r FROM Room r WHERE r.name LIKE :search OR r.description LIKE :search OR r.roomType LIKE :search"),
 	@NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id"),
 	@NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" ),
@@ -196,6 +198,22 @@ public class Room implements Serializable {
 		return this.accessInRooms;
 	}
 
+	public void setAccessInRoom(List<AccessInRoom> accessinrooms) {
+		this.accessInRooms = accessinrooms;
+	}
+
+	public AccessInRoom addAccessInRoom(AccessInRoom accessinroom) {
+		getAccessInRooms().add(accessinroom);
+		accessinroom.setRoom(this);
+		return accessinroom;
+	}
+
+	public AccessInRoom removeAccessInRoome(AccessInRoom accessinroom) {
+		getAccessInRooms().remove(accessinroom);
+		accessinroom.setRoom(null);
+		return accessinroom;
+	}
+	
 	public List<Device> getDevices() {
 		return this.devices;
 	}

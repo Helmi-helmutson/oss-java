@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.HashMap;
 
 
@@ -31,7 +33,11 @@ public class AccessInRoom implements Serializable {
 
 	//uni-directional many-to-one association to Room
 	@ManyToOne
+	@JsonIgnore
 	private Room room;
+	
+	@Column(name="room_id", insertable=false, updatable=false)
+	private Long roomId;
 
 	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
 	private AccessInRoomFW fwAccess;
@@ -41,9 +47,6 @@ public class AccessInRoom implements Serializable {
 
 	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
 	private AccessInRoomPIT accessPIT;
-
-	@Transient
-	private HashMap<String, Object> access = new HashMap<String, Object>();
 
 	public AccessInRoom() {
 		this.accesstype = "DEFAULT";
@@ -58,6 +61,14 @@ public class AccessInRoom implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+	
+	public long getRoomId() {
+		return this.roomId;
+	}
+
+	public void setRoomId(long roomid) {
+		this.roomId = roomid;
 	}
 	
 	@Override
@@ -81,14 +92,6 @@ public class AccessInRoom implements Serializable {
 
 	public void setAccessType(String accesstype) {
 		this.accesstype = accesstype;
-	}
-
-	public HashMap<String, Object> getAccess() {
-		return this.access;
-	}
-
-	public void setAccess(HashMap<String, Object> access) {
-		this.access = access;
 	}
 
 	public AccessInRoomFW getAccessInRoomFW() {

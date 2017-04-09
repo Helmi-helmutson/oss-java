@@ -2,9 +2,6 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
-
-
-
 import java.util.Date;
 import java.util.List;
 import java.lang.Integer;
@@ -143,7 +140,7 @@ public class UserController extends Controller {
 		}
 		// Check the user password
 		if( user.getPassword() == "" ) {
-			user.setPassword(UserUtil.createRandomPassword(9,"ACGqfc12#"));
+			user.setPassword(UserUtil.createRandomPassword(9,"ACGqf123#"));
 		}
 		else
 		{

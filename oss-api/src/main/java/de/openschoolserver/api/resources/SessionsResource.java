@@ -38,6 +38,23 @@ public interface SessionsResource {
             @Context HttpServletRequest req
     );
 
+    @POST
+    @Path("login")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("text/plain")
+    @ApiOperation(value = "create a new session")
+    @ApiResponses(value = {
+            @ApiResponse(code = 401, message = "Login is incorrect"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    String createToken(
+            @Context UriInfo ui,
+            @FormParam("username") String username,
+            @FormParam("password") String password,
+            @FormParam("device") String device,
+            @Context HttpServletRequest req
+    );
+
     @GET
     @Produces(JSON_UTF8)
     @ApiOperation(value = "get session status")
@@ -64,4 +81,16 @@ public interface SessionsResource {
             @PathParam("token") String token
     );
 
+    @GET
+    @Path("{key}")
+    @Produces("text/plain")
+    @ApiOperation(value = "Get some session values. Possible keys are: defaultPrinter, availablePrinters, dnsName, domainName.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    String getSessionValue(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("key") String key
+    );
 }

@@ -17,7 +17,7 @@ public class RoomConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 
         @Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
+	    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
         private long id;
 
         private String keyword;
@@ -37,8 +37,8 @@ public class RoomConfig implements Serializable {
                 return super.equals(obj);
         }
 
-	public RoomConfig() {
-	}
+	    public RoomConfig() {
+	    }
 
         public long getId() {
                 return this.id;

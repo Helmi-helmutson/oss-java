@@ -4,6 +4,9 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.sql.Time;
 
 
@@ -22,15 +25,18 @@ public class AccessInRoomPIT implements Serializable {
 	private long id;
 
 	private String  pointintime;
+	
+	@ManyToOne
+    @JsonIgnore
 	private AccessInRoom accessinroom;
 
-        @Override
-        public boolean equals(Object obj) {
-                if (obj instanceof AccessInRoomPIT && obj !=null) {
-                        return getId() == ((AccessInRoomPIT)obj).getId();
-                }
-                return super.equals(obj);
-        }
+    @Override
+    public boolean equals(Object obj) {
+           if (obj instanceof AccessInRoomPIT && obj !=null) {
+                   return getId() == ((AccessInRoomPIT)obj).getId();
+           }
+           return super.equals(obj);
+    }
 
 	public AccessInRoom getAccessinroom() {
 		return accessinroom;

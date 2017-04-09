@@ -2,6 +2,7 @@
 package de.openschoolserver.dao.controller;
 
 import java.io.IOException;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,8 +13,7 @@ import java.util.ArrayList;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.RoomConfig;
-import de.openschoolserver.dao.DeviceConfig;
+import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.tools.*;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -54,18 +54,19 @@ public class DHCPConfig extends Controller {
 		}
 		try {
 		    Files.write(DHCP_CONFIG, dhcpConfigFile );
-		    String[] program = new String[3];
-		    //TODO write a own class for controlling systemctl
-		    program[0] = "systemctl";
-		    program[1] = "restart";
-		    program[2] = "dhcpd";
-		    StringBuffer reply = new StringBuffer();
-			StringBuffer error = new StringBuffer();
-			OSSShellTools.exec(program, reply, error, null);
-			//Restart salt-master
+		    this.systemctl("restart", "dhcpd");
+			//Build groups by hwconf
+			query = em.createNamedQuery("HWConf.findAll");
+			for( HWConf hwconf : (List<HWConf>) query.getResultList() ) {
+				List<String> line = new ArrayList<String>();
+				for( Device device : hwconf.getDevices() ) {
+					line.add(device.getName());
+				}
+				if(!line.isEmpty())
+					saltGroupFile.add("  " + hwconf.getName() + ": 'L@" + String.join(",",line) + "'");
+			}
 			Files.write(SALT_GROUPS, saltGroupFile );
-			program[0] = "salt-master";
-			OSSShellTools.exec(program, reply, error, null);
+			this.systemctl("restart", "salt-master");
 			
 		} catch( IOException e ) { 
 			e.printStackTrace();
@@ -96,6 +97,7 @@ public class DHCPConfig extends Controller {
 				line.add(device.getName() + "-wlan" );
 			}
 		}
-		saltGroupFile.add("  " + room.getName() + ": 'L@" + String.join(",",line) + "'");
+		if( !line.isEmpty())
+			saltGroupFile.add("  " + room.getName() + ": 'L@" + String.join(",",line) + "'");
 	}
 }

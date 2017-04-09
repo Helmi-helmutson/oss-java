@@ -4,6 +4,9 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.sql.Time;
 
 
@@ -20,6 +23,9 @@ public class AccessInRoomFW implements Serializable {
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private long id;
+	
+	@ManyToOne
+    @JsonIgnore
 	private AccessInRoom accessinroom;
 	public AccessInRoom getAccessinroom() {
 		return accessinroom;

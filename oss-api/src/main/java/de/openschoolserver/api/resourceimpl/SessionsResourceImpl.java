@@ -3,9 +3,8 @@
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.api.resources.SessionsResource;
-
-
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.controller.SessionController;
 
 
@@ -15,7 +14,8 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.UriInfo;
-import java.net.URI;
+import java.util.List;
+import java.util.ArrayList;
 
 public class SessionsResourceImpl implements SessionsResource {
 	
@@ -51,4 +51,51 @@ public class SessionsResourceImpl implements SessionsResource {
          sessionController.deleteSession(session);
          logger.debug("deleted session " + token);
     }
+
+	@Override
+	public String createToken(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
+		Session session = createSession(ui, username,password, device, req);
+		if( session == null)
+			return "";
+		else
+			return session.getToken();
+	}
+	
+	@Override
+	public String getSessionValue(Session session,String key){
+		Device defaultPrinter  = null;
+		List<Device> availablePrinters = null;
+		List<String> data = new ArrayList<String>();
+		final SessionController sessionController = new SessionController(session);
+		switch(key) {
+		  case "defaultPrinter":
+			  if( session.getDevice() != null )
+				  defaultPrinter = session.getDevice().getDefaultPrinter();
+			  if( defaultPrinter != null )
+				  return defaultPrinter.getName();
+			  defaultPrinter = session.getRoom().getDefaultPrinter();
+			  if( defaultPrinter != null )
+				  return defaultPrinter.getName();
+			  break;
+		  case "availablePrinters":
+			  if( session.getDevice() != null)
+				  availablePrinters = session.getDevice().getAvailablePrinters();
+			  if( availablePrinters == null )
+				  availablePrinters = session.getRoom().getAvailablePrinters();
+			  if( availablePrinters != null ) {
+				  for( Device printer : availablePrinters ) {
+					  data.add(printer.getName());
+				  }
+				  return String.join(" ", data);
+			   }
+			  break;
+		  case "dnsName":
+			  if( session.getDevice() != null)
+				  session.getDevice().getName();
+			  break;
+		  case "domainName": 
+			  return sessionController.getConfigValue("SCHOOL_DOMAIN");
+		}
+		return "";
+	}
 }

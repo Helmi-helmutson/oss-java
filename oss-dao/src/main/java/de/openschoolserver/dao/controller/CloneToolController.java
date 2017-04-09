@@ -2,6 +2,7 @@
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
+
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -46,6 +47,10 @@ public class CloneToolController extends Controller {
 		return String.join(" ", partitions );
 	}
 
+	public String getDescription(Long hwconfId ) {
+		return this.getById(hwconfId).getName();
+	}
+	
 	public Partition getPartition(Long hwconfId, String partition) {
 		EntityManager em = getEntityManager();
 		try {

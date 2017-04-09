@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * The persistent class for the AccessInRoom database table.
  * 
@@ -21,8 +23,9 @@ public class AccessInRoomACT implements Serializable {
 
 	private String action;
 	
+	@ManyToOne
+    @JsonIgnore
 	private AccessInRoom accessinroom;
-
 
 	public AccessInRoom getAccessinroom() {
 		return accessinroom;
@@ -31,13 +34,14 @@ public class AccessInRoomACT implements Serializable {
 	public void setAccessinroom(AccessInRoom accessinroom) {
 		this.accessinroom = accessinroom;
 	}
-        @Override
-        public boolean equals(Object obj) {
-                if (obj instanceof AccessInRoomACT && obj !=null) {
-                        return getId() == ((AccessInRoomACT)obj).getId();
-                }
-                return super.equals(obj);
-        }
+	
+    @Override
+    public boolean equals(Object obj) {
+           if (obj instanceof AccessInRoomACT && obj !=null) {
+                   return getId() == ((AccessInRoomACT)obj).getId();
+           }
+           return super.equals(obj);
+    }
 
 	public AccessInRoomACT() {
 		this.action  = "";
