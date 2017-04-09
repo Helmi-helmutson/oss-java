@@ -325,4 +325,15 @@ public class Controller extends Config {
 		}
 		return false;
 	}
+	
+	protected boolean systemctl(String action, String service) {
+		 String[] program = new String[3];
+		 program[0] = "systemctl";
+		 program[1] = action;
+		 program[2] = service;
+		 StringBuffer reply = new StringBuffer();
+		 StringBuffer error = new StringBuffer();
+		 OSSShellTools.exec(program, reply, error, null);
+		 return  error.length() == 0;
+	}
 }
