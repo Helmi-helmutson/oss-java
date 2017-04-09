@@ -56,4 +56,39 @@ public class SystemResourceImpl implements SystemResource {
 			return new Response(session,"ERROR","Global configuration value could not be set.");
 	}
 
+	@Override
+	public Map<String, String> getFirewallIncommingRules(Session session) {
+		SystemController systemController = new SystemController(session);
+		return systemController.getFirewallIncommingRules();
+	}
+
+	@Override
+	public Response setFirewallIncommingRules(Session session, Map<String, String> incommingRules) {
+		SystemController systemController = new SystemController(session);
+		return systemController.setFirewallIncommingRules(incommingRules);
+	}
+
+	@Override
+	public List<Map<String, String>> getFirewallOutgoingRules(Session session) {
+		SystemController systemController = new SystemController(session);
+		return systemController.getFirewallOutgoingRules();
+	}
+
+	@Override
+	public Response setFirewallOutgoingRules(Session session, List<Map<String, String>> outgoingRules) {
+		SystemController systemController = new SystemController(session);
+		return systemController.setFirewallOutgoingRules(outgoingRules);
+	}
+
+	@Override
+	public List<Map<String, String>> getFirewallRemoteAccessRules(Session session) {
+		SystemController systemController = new SystemController(session);
+		return systemController.getFirewallRemoteAccessRules();
+	}
+
+	@Override
+	public Response setFirewallRemoteAccessRules(Session session, List<Map<String, String>> remoteAccessRules) {
+		SystemController systemController = new SystemController(session);
+		return systemController.setFirewallRemoteAccessRules(remoteAccessRules);
+		}
 }

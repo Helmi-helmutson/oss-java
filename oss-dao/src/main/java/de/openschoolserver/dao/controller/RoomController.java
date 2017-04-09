@@ -82,7 +82,7 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Room.findAll"); 
-			return query.getResultList();
+			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
 			//logger.error(e.getMessage());
 			System.err.println(e.getMessage()); //TODO
@@ -92,6 +92,20 @@ public class RoomController extends Controller {
 		}
 	}
 	
+	public Room getByIP(String ip) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Room.getByIp").setParameter("ip", ip); 
+			return (Room) query.getResultList().get(0);
+		} catch (Exception e) {
+			//logger.error(e.getMessage());
+			System.err.println(e.getMessage()); //TODO
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
 	public List<Room> getAllToRegister() {
 		EntityManager em = getEntityManager();
 		try {
