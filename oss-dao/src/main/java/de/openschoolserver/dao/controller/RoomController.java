@@ -157,13 +157,13 @@ public class RoomController extends Controller {
 			return new Response(this.getSession(),"ERROR", "Room description is not unique.");
 		}
 		// If no network was configured we will use net school network.
-		if( room.getNetwork().equals(""))
+		if( room.getNetwork().isEmpty() )
 			room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
 		
 		// If the starIp is not given we have to search the next room IP
-		if( room.getStartIP() == "" ) {
+		if( room.getStartIP().isEmpty() )
 			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
-		}
+
 		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
 		try {
 			em.getTransaction().begin();
@@ -224,7 +224,7 @@ public class RoomController extends Controller {
 		int i = 0;
 		for( String IP : net.getAvailableIPs(0) ){
 			String name =  this.isIPUnique(IP);
-			if( name == "" ){
+			if( name.isEmpty() ){
 				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName(),i));
 			}
 			if( count > 0 && availableIPs.size() == count ) {
@@ -240,7 +240,7 @@ public class RoomController extends Controller {
 	 * If the subnet is "" the default school network is meant.
 	 */
 	public String getNextRoomIP( String subnet, int roomNetMask ) throws NumberFormatException {
-		if( subnet == null || subnet.equals("") ){
+		if( subnet == null || subnet.isEmpty() ){
 			subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
 		}
 		IPv4Net subNetwork = new IPv4Net( subnet );
@@ -378,7 +378,7 @@ public class RoomController extends Controller {
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 
-		if(access.getAccessType() == "ACT" ) {
+		if(access.getAccessType().equals("ACT") ) {
 			//TODO 	
 		}
 		else
@@ -474,7 +474,7 @@ public class RoomController extends Controller {
 		// Direct internet
 		program[2] = "direct";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "1" )
+		if( reply.toString().equals("1") )
 			accessFW.setDirect(true);
 		else
 			accessFW.setDirect(false);
@@ -482,7 +482,7 @@ public class RoomController extends Controller {
 		// Portal Access
 		program[2] = "portal";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "1" )
+		if( reply.toString().equals("1") )
 			accessFW.setPortal(true);
 		else
 			accessFW.setPortal(false);
@@ -490,7 +490,7 @@ public class RoomController extends Controller {
 		// Proxy Access
 		program[2] = "proxy";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "1" )
+		if( reply.toString().equals("1") )
 			accessFW.setProxy(true);
 		else
 			accessFW.setProxy(false);
@@ -498,7 +498,7 @@ public class RoomController extends Controller {
 		// Printing Access
 		program[2] = "printing";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "1" )
+		if( reply.toString().equals("1") )
 			accessFW.setPrinting(true);
 		else
 			accessFW.setPrinting(false);
@@ -506,7 +506,7 @@ public class RoomController extends Controller {
 		// Login
 		program[2] = "login";
 		OSSShellTools.exec(program, reply, error, null);
-		if( reply.toString() == "1" )
+		if( reply.toString().equals("1") )
 			accessFW.setLogin(true);
 		else
 			accessFW.setLogin(false);
@@ -645,7 +645,7 @@ public class RoomController extends Controller {
 		} else {
 			device.setMac(macAddress);
 			device.setIp(ipAddress.get(0).split(" ")[0]);
-			if( name == "nextFreeName" ) {
+			if( name.equals("nextFreeName") ) {
 				device.setName(ipAddress.get(0).split(" ")[1]);
 			} else {
 				device.setName(name);

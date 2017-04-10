@@ -129,7 +129,7 @@ public class SystemController extends Controller {
 	
 	// Functions for manipulating firewall
 	
-	public Map<String, String> getFirewallIncommingRules() {
+	public Map<String, String> getFirewallIncomingRules() {
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
 		Map<String,String> statusMap;
 		//External Ports
@@ -160,20 +160,20 @@ public class SystemController extends Controller {
 		return statusMap;
 	}
 	
-	public Response setFirewallIncommingRules(Map<String, String> firewallExt) {
+	public Response setFirewallIncomingRules(Map<String, String> firewallExt) {
 		List<String> fwServicesExtTcp = new ArrayList<String>();
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
-		if( firewallExt.get("ssh") == "true" )
+		if( firewallExt.get("ssh").equals("true") )
 			fwServicesExtTcp.add("ssh");
-		if( firewallExt.get("https") == "true" )
+		if( firewallExt.get("https").equals("true"))
 			fwServicesExtTcp.add("https");
-		if( firewallExt.get("rdesktop") == "true" )
+		if( firewallExt.get("rdesktop").equals("true") )
 			fwServicesExtTcp.add("3389");
-		if( firewallExt.get("other") != null && firewallExt.get("other") != "")
+		if( firewallExt.get("other") != null && !firewallExt.get("other").isEmpty())
 			fwServicesExtTcp.add(firewallExt.get("other"));
 		fwConfig.setConfigValue("FW_SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
 		this.systemctl("start", "SuSEfirewall2");
-		return new Response(this.getSession(),"OK","Firewall incomming access rule  was set succesfully.");
+		return new Response(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
 	}
 	
 	public List<Map<String, String>> getFirewallOutgoingRules() {
@@ -187,7 +187,6 @@ public class SystemController extends Controller {
 			statusMap = new HashMap<>();
 			String[] rule = outRule.split(",");
 			String[] host = rule[0].split("/");
-	System.err.println(host[0] + " " + host[1]);
 			String   dest = rule[1];
 			String   prot = rule.length > 2 ? rule[2] : "all";
 			String   port = rule.length > 3 ? rule[3] : "all";
@@ -202,7 +201,7 @@ public class SystemController extends Controller {
 				statusMap.put("name", room.getName());
 				statusMap.put("type", "room" );
 			}
-			statusMap.put("dest",dest);
+			statusMap.put("dest", dest);
 			statusMap.put("prot", prot);
 			statusMap.put("port", port);
 			firewallList.add(statusMap);
