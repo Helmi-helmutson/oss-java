@@ -57,15 +57,15 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public Map<String, String> getFirewallIncommingRules(Session session) {
+	public Map<String, String> getFirewallIncomingRules(Session session) {
 		SystemController systemController = new SystemController(session);
-		return systemController.getFirewallIncommingRules();
+		return systemController.getFirewallIncomingRules();
 	}
 
 	@Override
-	public Response setFirewallIncommingRules(Session session, Map<String, String> incommingRules) {
+	public Response setFirewallIncomingRules(Session session, Map<String, String> incommingRules) {
 		SystemController systemController = new SystemController(session);
-		return systemController.setFirewallIncommingRules(incommingRules);
+		return systemController.setFirewallIncomingRules(incommingRules);
 	}
 
 	@Override

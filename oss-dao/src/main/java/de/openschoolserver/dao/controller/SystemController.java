@@ -129,7 +129,7 @@ public class SystemController extends Controller {
 	
 	// Functions for manipulating firewall
 	
-	public Map<String, String> getFirewallIncommingRules() {
+	public Map<String, String> getFirewallIncomingRules() {
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
 		Map<String,String> statusMap;
 		//External Ports
@@ -160,7 +160,7 @@ public class SystemController extends Controller {
 		return statusMap;
 	}
 	
-	public Response setFirewallIncommingRules(Map<String, String> firewallExt) {
+	public Response setFirewallIncomingRules(Map<String, String> firewallExt) {
 		List<String> fwServicesExtTcp = new ArrayList<String>();
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
 		if( firewallExt.get("ssh").equals("true") )
@@ -173,7 +173,7 @@ public class SystemController extends Controller {
 			fwServicesExtTcp.add(firewallExt.get("other"));
 		fwConfig.setConfigValue("FW_SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
 		this.systemctl("start", "SuSEfirewall2");
-		return new Response(this.getSession(),"OK","Firewall incomming access rule  was set succesfully.");
+		return new Response(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
 	}
 	
 	public List<Map<String, String>> getFirewallOutgoingRules() {
