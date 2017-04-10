@@ -105,7 +105,7 @@ public class DeviceController extends Controller {
 			em.remove(dev);
 			return new Response(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
-			logger.error("deviceId: " + deviceId " " + e.getMessage());
+			logger.error("deviceId: " + deviceId + " " + e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
