@@ -1,11 +1,10 @@
 /* (c) 2017 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.dao.controller;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
-
-
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Session;
@@ -24,16 +23,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("unchecked")
 public class SessionController extends Controller {
 
-   
+    Logger logger = LoggerFactory.getLogger(SessionController.class); 
 
     public SessionController(Session session) {
-    	super(session);
+        super(session);
     }
 
     public SessionController() {
-    	super(null);
+        super(null);
     }
 
    public static Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
@@ -50,54 +50,52 @@ public class SessionController extends Controller {
     }
 
     public Session createSessionWithUser(String username, String password, String deviceType) {
-    	UserController userController = new UserController(this.session);
-    	DeviceController deviceController = new DeviceController(this.session);
-    	Room room = null;
-    	//TODO check the password
-    	String[]   program = new String[5];
-    	StringBuffer reply = new StringBuffer();
-    	StringBuffer error = new StringBuffer();
-    	program[0] = "/usr/bin/smbclient";
-    	program[1] = "-L";
-    	program[2] = "admin";
-    	program[3] = "-U";
-    	program[4] = username + "%" + password;
-    	OSSShellTools.exec(program, reply, error, null);
-    	if( reply.toString().contains("session setup failed"))
-    		return null;
-    	//TODO what to do with deviceType
-    	User user = userController.getByUid(username);
-    	if( user == null )
-    		return null;
+        UserController userController = new UserController(this.session);
+        DeviceController deviceController = new DeviceController(this.session);
+        Room room = null;
+        String[]   program = new String[5];
+        StringBuffer reply = new StringBuffer();
+        StringBuffer error = new StringBuffer();
+        program[0] = "/usr/bin/smbclient";
+        program[1] = "-L";
+        program[2] = "admin";
+        program[3] = "-U";
+        program[4] = username + "%" + password;
+        OSSShellTools.exec(program, reply, error, null);
+        if( reply.toString().contains("session setup failed"))
+            return null;
+        //TODO what to do with deviceType
+        User user = userController.getByUid(username);
+        if( user == null )
+            return null;
 
-    	String IP = this.getSession().getIP();
-    	Device device = deviceController.getByIP(IP);
-    	if( device != null )
-    		room = device.getRoom();
+        String IP = this.getSession().getIP();
+        Device device = deviceController.getByIP(IP);
+        if( device != null )
+            room = device.getRoom();
 
-    	final String token = SessionToken.createSessionToken("dummy");
-    	this.session.setToken(token);
-    	this.session.setUserId(user.getId());
-    	this.session.setRole(user.getRole());
-    	if( room != null )
-    		this.session.setRoomId(room.getId()); 
-    	if( device != null ) {
-    		this.session.setDeviceId(device.getId());
-    		this.session.setMac(device.getMac());
-    	} else {
-    		//Evaluate the MAC Address
-    		if( !IP.contains("127.0.0.1") && IPv4.validateIPAddress(IP) && room == null ) {
-    			program = new String[1];
-    			program[0] = "arp -n " + IP + " | grep " + IP + " | gawk '{ print $3 }'";
-    			System.err.println(program[0]);
-    			OSSShellTools.exec(program, reply, error, null);
-    			if( IPv4.validateMACAddress(reply.toString()) )
-    				this.session.setMac(reply.toString());
-    		}
-    	}
-    	sessions.put(token, this.session);
-    	save(session);
-    	return this.session;
+        final String token = SessionToken.createSessionToken("dummy");
+        this.session.setToken(token);
+        this.session.setUserId(user.getId());
+        this.session.setRole(user.getRole());
+        if( room != null )
+            this.session.setRoomId(room.getId()); 
+        if( device != null ) {
+            this.session.setDeviceId(device.getId());
+            this.session.setMac(device.getMac());
+        } else {
+            //Evaluate the MAC Address
+            if( !IP.contains("127.0.0.1") && IPv4.validateIPAddress(IP) && room == null ) {
+                program = new String[1];
+                program[0] = "arp -n " + IP + " | grep " + IP + " | gawk '{ print $3 }'";
+                OSSShellTools.exec(program, reply, error, null);
+                if( IPv4.validateMACAddress(reply.toString()) )
+                    this.session.setMac(reply.toString());
+            }
+        }
+        sessions.put(token, this.session);
+        save(session);
+        return this.session;
     }
 
     private void save(Session obj) {
@@ -112,18 +110,17 @@ public class SessionController extends Controller {
                 }
                 Device device = obj.getDevice();
                 if( device != null ) {
-			User user = obj.getUser();
-			user.getLoggedOn().add(device);
-			device.getLoggedIn().add(user);
-			em.merge(device);
-			em.merge(user);
+                    User user = obj.getUser();
+                    user.getLoggedOn().add(device);
+                    device.getLoggedIn().add(user);
+                    em.merge(device);
+                    em.merge(user);
                 }
                 em.flush();
                 em.refresh(obj);
                 em.getTransaction().commit();
             } catch (Exception e) {
-                //TODO PGR LOG.error("create failed: " + e.getMessage());
-            	System.err.println(e.getMessage());
+                logger.error(e.getMessage());
             } finally {
                 em.close();
             }
@@ -138,6 +135,8 @@ public class SessionController extends Controller {
                 em.getTransaction().begin();
                 data = em.find(Session.class, id);
                 em.getTransaction().commit();
+            } catch (Exception e) {
+                logger.error(e.getMessage());
             } finally {
                 if ((em != null) && (em.isOpen()))
                     em.close();
@@ -153,17 +152,19 @@ public class SessionController extends Controller {
                 em.getTransaction().begin();
                 Session foundSession = em.find(Session.class, session.getId());
                 if (foundSession != null) {
-                	Device device = foundSession.getDevice();
+                    Device device = foundSession.getDevice();
                     if( device != null ) {
-                    	User user = foundSession.getUser();
-                    	user.getLoggedOn().remove(device);
-                    	device.getLoggedIn().remove(user);
-                    	em.merge(device);
-                    	em.merge(user);
+                        User user = foundSession.getUser();
+                        user.getLoggedOn().remove(device);
+                        device.getLoggedIn().remove(user);
+                        em.merge(device);
+                        em.merge(user);
                     }   
                     em.remove(foundSession);
                 }
                 em.getTransaction().commit();
+            } catch (Exception e) {
+                logger.error(e.getMessage());
             } finally {
                 if ((em != null) && (em.isOpen()))
                     em.close();
@@ -176,17 +177,15 @@ public class SessionController extends Controller {
         Session data = null;
         if (em != null) {
             try {
-
                 em.getTransaction().begin();
                 Query q = em.createNamedQuery("Session.getByToken").setParameter("token", token).setMaxResults(1);
-                @SuppressWarnings("unchecked")
                 List<Session> sessions = q.getResultList();
-
                 if ((sessions != null) && (sessions.size() > 0)) {
                     data = sessions.get(0);
                 }
-
                 em.getTransaction().commit();
+            } catch (Exception e) {
+                logger.error(e.getMessage());
             } finally {
                 if ((em != null) && (em.isOpen()))
                     em.close();
@@ -207,37 +206,39 @@ public class SessionController extends Controller {
     }
     
     public boolean authorize(Session session, String requiredRole){
-    	//The simply way
-    	if( session.getUser().getRole().contains(requiredRole))
-    		return true;
-    	
-    	EntityManager em = getEntityManager();
-    	if (em != null) {
-    		try {
-    			Query q = em.createNamedQuery("Acl.checkByRole").setParameter("role", session.getUser().getRole()).setParameter("acl",requiredRole).setMaxResults(1);
-    			@SuppressWarnings("unchecked")
-                List<Acl> acls = q.getResultList();
-    			//If there is one result this is allowed by role.
-    			if( ! acls.isEmpty() )
-    				return true;
-    			//Is it allowed by the user
-    			for( Acl acl : session.getUser().getAcls() ){
-    				if( acl.getAcl().equals(requiredRole))
-    					return true;
-    			}
-    			//Is it allowed by one of the groups of the user
-    			for( Group group : session.getUser().getGroups() ) {
-    				for( Acl acl : group.getAcls() ) {
-    					if( acl.getAcl().equals(requiredRole))
-        					return true;
-    				}
-    			}
-    		} finally {
-    			if ((em != null) && (em.isOpen()))
+        //The simply way
+        if( session.getUser().getRole().contains(requiredRole))
+            return true;
+        
+        EntityManager em = getEntityManager();
+        if (em != null) {
+            try {
+                Query q = em.createNamedQuery("Acl.checkByRole").setParameter("role", session.getUser().getRole()).setParameter("acl",requiredRole).setMaxResults(1);
+                @SuppressWarnings("unchecked")
+                    List<Acl> acls = q.getResultList();
+                //If there is one result this is allowed by role.
+                if( ! acls.isEmpty() )
+                    return true;
+                //Is it allowed by the user
+                for( Acl acl : session.getUser().getAcls() ){
+                    if( acl.getAcl().equals(requiredRole))
+                        return true;
+                }
+                //Is it allowed by one of the groups of the user
+                for( Group group : session.getUser().getGroups() ) {
+                    for( Acl acl : group.getAcls() ) {
+                        if( acl.getAcl().equals(requiredRole))
+                            return true;
+                    }
+                }
+            } catch (Exception e) {
+                logger.error(e.getMessage());
+            } finally {
+                if ((em != null) && (em.isOpen()))
                     em.close();
-    		}
-    	}
-    	return false;
+            }
+        }
+        return false;
     }
 
    

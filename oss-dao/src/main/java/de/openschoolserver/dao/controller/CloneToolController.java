@@ -2,6 +2,8 @@
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import javax.persistence.EntityManager;
@@ -14,6 +16,8 @@ import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
 public class CloneToolController extends Controller {
+
+	Logger logger = LoggerFactory.getLogger(CloneToolController.class);
 
 	public CloneToolController(Session session) {
 		super(session);
@@ -31,8 +35,7 @@ public class CloneToolController extends Controller {
 		try {
 			return em.find(HWConf.class, hwconfId);
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -58,8 +61,7 @@ public class CloneToolController extends Controller {
 			query.setParameter("hwconfId", hwconfId).setParameter("name",partition);
 			return (Partition) query.getSingleResult();
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -96,7 +98,7 @@ public class CloneToolController extends Controller {
 			em.persist(hwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -106,6 +108,7 @@ public class CloneToolController extends Controller {
 
 	public Response modifyHWConf(Long hwconfId, HWConf hwconf){
 		//TODO make some checks!!
+		//If the name will be modified then some files must be moved too!!! TODO
 		EntityManager em = getEntityManager();
 		hwconf.setId(hwconfId);
 		// First we check if the parameter are unique.
@@ -117,7 +120,7 @@ public class CloneToolController extends Controller {
 			em.merge(hwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -136,7 +139,7 @@ public class CloneToolController extends Controller {
 			em.merge(hwconf);
 			em.getTransaction().commit();			
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -154,7 +157,7 @@ public class CloneToolController extends Controller {
 			em.merge(hwconf);
 			em.getTransaction().commit();			
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -164,7 +167,6 @@ public class CloneToolController extends Controller {
 
 
 	public Response setConfigurationValue(Long hwconfId, String partitionName, String key, String value) {
-		// TODO Auto-generated method stub
 		Partition partition = this.getPartition(hwconfId, partitionName);
 		switch (key) {
 		case "Description" :
@@ -191,7 +193,7 @@ public class CloneToolController extends Controller {
 			em.merge(partition);
 			em.getTransaction().commit();			
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -207,7 +209,7 @@ public class CloneToolController extends Controller {
 			em.remove(hwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -216,7 +218,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public Response deletePartition(Long hwconfId, String partitionName) {
-		// TODO Auto-generated method stub
 		HWConf hwconf = this.getById(hwconfId);
 		Partition partition = this.getPartition(hwconfId, partitionName);
 		hwconf.removePartition(partition);
@@ -226,7 +227,7 @@ public class CloneToolController extends Controller {
 			em.merge(hwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -235,7 +236,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public Response deleteConfigurationValue(Long hwconfId, String partitionName, String key) {
-		// TODO Auto-generated method stub
 		Partition partition = this.getPartition(hwconfId, partitionName);
 		switch (key) {
 		case "Description" :
@@ -263,7 +263,7 @@ public class CloneToolController extends Controller {
 			em.merge(partition);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -277,7 +277,7 @@ public class CloneToolController extends Controller {
 			Query query = em.createNamedQuery("HWConf.findAll");
 			return (List<HWConf>) query.getResultList();
 		} catch (Exception e) {
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();

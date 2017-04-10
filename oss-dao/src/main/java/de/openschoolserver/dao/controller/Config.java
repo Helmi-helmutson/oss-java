@@ -60,7 +60,6 @@ public class Config {
 					ossConfig.put(sline[0], value);
 					ossConfigPath.put(sline[0],path);
 					ro = false;
-					// System.out.println(sline[0] + "=>" + value);
 				}
 			}
 		}
@@ -94,7 +93,6 @@ public class Config {
 			if( ossConfigPath.get(key).startsWith(path) )
 			  keys.add(key);
 		}
-		System.out.println(path);
 		Collections.sort(keys);
 		return keys;
 	}
@@ -135,15 +133,4 @@ public class Config {
 		}
 		return configs;
 	}
-
-/*
-*
-	public static void main(String[] args) {
-		Config c = new Config();
-		c.Set("SCHOOL_REG_CODE", "BLA_BALÖ");
-		System.out.println(c.GetPaths());
-		System.out.println(c.GetKeysOfPath("Backup"));
-	}
-*
-*/
 }

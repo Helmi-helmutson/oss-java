@@ -23,7 +23,6 @@ public class OSSDaoTestCase extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
        
-        Config.OSS_CONFIG=Paths.get("src/test/resources/schoolserver");
         c = new SessionController();
        
      

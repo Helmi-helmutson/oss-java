@@ -2,6 +2,9 @@
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -15,6 +18,8 @@ import de.openschoolserver.dao.tools.*;
 
 @SuppressWarnings( "unchecked" )
 public class DeviceController extends Controller {
+	
+	Logger logger = LoggerFactory.getLogger(DeviceController.class);
 
 	public DeviceController(Session session) {
 		super(session);
@@ -29,8 +34,7 @@ public class DeviceController extends Controller {
 		try {
 			return em.find(Device.class, deviceId);
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error("DeviceId:" + deviceId + " " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -47,8 +51,7 @@ public class DeviceController extends Controller {
 			query.setParameter("deviceType", type);
 			return query.getResultList();
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error("DeviceType:" + type + " " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -64,8 +67,7 @@ public class DeviceController extends Controller {
 			Query query = em.createNamedQuery("Device.findAll");
 			return query.getResultList();
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -86,8 +88,7 @@ public class DeviceController extends Controller {
 			}
 			return new Response(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -104,8 +105,7 @@ public class DeviceController extends Controller {
 			em.remove(dev);
 			return new Response(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error("deviceId: " + deviceId " " + e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -184,7 +184,7 @@ public class DeviceController extends Controller {
 			}
 			return new Response(this.getSession(),"OK", "Devices were created succesfully.");
 		} catch (Exception e) {
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -201,8 +201,7 @@ public class DeviceController extends Controller {
 			query.setParameter("IP", IP);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println("device.getByIP " + IP + " "+ e.getMessage()); //TODO
+			logger.error("device.getByIP " + IP + " "+ e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -219,8 +218,7 @@ public class DeviceController extends Controller {
 			query.setParameter("MAC", MAC);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error("MAC " + MAC + " " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -237,8 +235,7 @@ public class DeviceController extends Controller {
 			query.setParameter("name", name);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error("name " + name  + " " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -255,8 +252,7 @@ public class DeviceController extends Controller {
 			query.setParameter("search", search + "%");
 			return (List<Device>) query.getResultList();
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -302,6 +298,8 @@ public class DeviceController extends Controller {
 	public List<String> getLoggedInUsers(String IP) {
 		Device device = this.getByIP(IP);
 		List<String> users = new ArrayList<String>();
+		if( device == null)
+			return users;
 		for( User user : device.getLoggedIn() )
 			users.add(user.getUid());
 		//users.add(user.getUid() + " " + user.getGivenName() + " " +user.getSureName());
@@ -314,6 +312,8 @@ public class DeviceController extends Controller {
 	public List<String> getLoggedInUsers(Long deviceId) {
 		Device device = this.getById(deviceId);
 		List<String> users = new ArrayList<String>();
+		if( device == null)
+			return users;
 		for( User user : device.getLoggedIn() )
 			users.add(user.getUid());
 		return users;

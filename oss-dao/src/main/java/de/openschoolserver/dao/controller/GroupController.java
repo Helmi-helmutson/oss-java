@@ -3,6 +3,8 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -19,6 +21,8 @@ import de.openschoolserver.dao.tools.*;
 
 public class GroupController extends Controller {
 
+	Logger logger = LoggerFactory.getLogger(DeviceController.class);
+
 	public GroupController(Session session) {
 		super(session);
 	}
@@ -28,8 +32,7 @@ public class GroupController extends Controller {
 		try {
 			return em.find(Group.class, groupId);
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -43,8 +46,7 @@ public class GroupController extends Controller {
 			query.setParameter("groupType", groupType);
 			return query.getResultList();
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -58,8 +60,7 @@ public class GroupController extends Controller {
 			query.setParameter("search", search + "%");
 			return query.getResultList();
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -72,8 +73,7 @@ public class GroupController extends Controller {
 			Query query = em.createNamedQuery("Group.findAll"); 
 			return query.getResultList();
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -91,7 +91,7 @@ public class GroupController extends Controller {
 			em.persist(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
 		this.startPlugin("add_group", group);
@@ -106,7 +106,7 @@ public class GroupController extends Controller {
 			em.merge(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
 		this.startPlugin("modify_group", group);
@@ -131,7 +131,7 @@ public class GroupController extends Controller {
 			em.remove(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
