@@ -309,6 +309,19 @@ public class DeviceController extends Controller {
 	/*
 	 * Return the list of users which are logged in on this device
 	 */
+	public List<User> getLoggedInUsersObject(String IP) {
+		Device device = this.getByIP(IP);
+		List<User> users = new ArrayList<User>();
+		if( device == null)
+			return users;
+		for( User user : device.getLoggedIn() )
+			users.add(user);
+		return users;
+	}
+
+	/*
+	 * Return the list of users which are logged in on this device
+	 */
 	public List<String> getLoggedInUsers(Long deviceId) {
 		Device device = this.getById(deviceId);
 		List<String> users = new ArrayList<String>();
