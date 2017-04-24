@@ -93,7 +93,7 @@ public class SessionsResourceImpl implements SessionsResource {
 			  break;
 		  case "dnsName":
 			  if( session.getDevice() != null)
-				  session.getDevice().getName();
+				  return session.getDevice().getName();
 			  break;
 		  case "domainName": 
 			  return sessionController.getConfigValue("SCHOOL_DOMAIN");
