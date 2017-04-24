@@ -2,7 +2,11 @@ package de.openschoolserver.api;
 import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.Session;
-import java.util.Scanner;
+import de.openschoolserver.dao.User;
+import java.io.InputStreamReader;
+
+import java.io.BufferedReader;
+import java.io.IOException;
 
 public class OssLoggedIn {
 
@@ -16,15 +20,20 @@ public class OssLoggedIn {
          String token = sessionController.getProperty("de.openschoolserver.api.auth.localhost");
          session = sessionController.getByToken(token);
          final DeviceController deviceController = new DeviceController(session);
-         Scanner sc = new Scanner(System.in);
-         while( sc.hasNextLine() ){
-             String ip = sc.nextLine();
-             if( deviceController.getLoggedInUsers(ip).isEmpty() )
-                 System.out.println("no");
-             else
-                 System.out.println(deviceController.getLoggedInUsers(ip).get(0));
+         BufferedReader in = new BufferedReader(new  InputStreamReader(System.in));
+         while( true ){
+        	 try {
+        		 String ip = in.readLine();
+        		 if( deviceController.getLoggedInUsersObject(ip).isEmpty() ) {
+        			 System.out.println("ERR user=\"No user logged in " + ip + "\"");
+        		 } else {
+        			 User user = deviceController.getLoggedInUsersObject(ip).get(0);
+        			 //TODO check internetDisabled
+        			 System.out.println("OK user=\"" + user.getUid() + "\"");
+        		 }
+        	 } catch (IOException e) {
+        		 System.err.println("IO ERROR: " + e.getMessage());
+        	 }
          }
-         sc.close();
     }
-
 }
