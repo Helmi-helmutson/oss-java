@@ -3,7 +3,8 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.persistence.Query;
 import java.util.List;
@@ -29,6 +30,8 @@ import java.util.ArrayList;
 
 @SuppressWarnings( "unchecked" )
 public class Controller extends Config {
+
+        Logger logger = LoggerFactory.getLogger(Controller.class);
 
 	protected Session session ;
 	private Map<String, String> properties;
@@ -65,6 +68,10 @@ public class Controller extends Config {
 
 	protected Session getSession() {
 		return this.session;
+	}
+
+	public String getProperty(String property) {
+		return properties.get(property);
 	}
 
 	protected boolean isNameUnique(String name){
@@ -248,7 +255,7 @@ public class Controller extends Config {
 			break;
 		}
 		OSSShellTools.exec(program, reply, error, data.toString());
-		System.err.println(pluginName + " : " + data.toString() + " : " + error);
+		logger.debug(pluginName + " : " + data.toString() + " : " + error);
 	}
 	
 	protected void changeMemberPlugin(String type, Group group, List<User> users){
@@ -266,7 +273,7 @@ public class Controller extends Config {
 			data.append(user.getUid() + " ");
 		}
 		OSSShellTools.exec(program, reply, error, data.toString());
-		System.err.println("change_member  : " + data.toString() + " : " + error);
+		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
 	
 	protected void changeMemberPlugin(String type, Group group, User user){
@@ -281,7 +288,7 @@ public class Controller extends Config {
 		data.append(String.format("group: %s%n", group.getName()));
 		data.append(String.format("user: %s%n", user.getUid()));
 		OSSShellTools.exec(program, reply, error, data.toString());
-		System.err.println("change_member  : " + data.toString() + " : " + error);
+		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
 	
 	protected boolean isProtected(Object object){

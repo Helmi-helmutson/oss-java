@@ -3,7 +3,8 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ import de.openschoolserver.dao.tools.*;
 
 public class RoomController extends Controller {
 
+	Logger logger = LoggerFactory.getLogger(RoomController.class);
+
 	public RoomController(Session session) {
 		super(session);
 	}
@@ -39,8 +42,7 @@ public class RoomController extends Controller {
 			List<Room> rooms = (List<Room>) query.getResultList();
 			return rooms.isEmpty();
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return false;
 		} finally {
 			em.close();
@@ -56,8 +58,7 @@ public class RoomController extends Controller {
 			List<Room> rooms = query.getResultList();
 			return rooms.isEmpty();
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return false;
 		} finally {
 			em.close();
@@ -70,8 +71,7 @@ public class RoomController extends Controller {
 		try {
 			return em.find(Room.class, roomId);
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -84,8 +84,7 @@ public class RoomController extends Controller {
 			Query query = em.createNamedQuery("Room.findAll"); 
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -98,8 +97,7 @@ public class RoomController extends Controller {
 			Query query = em.createNamedQuery("Room.getByIp").setParameter("ip", ip); 
 			return (Room) query.getResultList().get(0);
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -121,8 +119,7 @@ public class RoomController extends Controller {
         		return rooms;
 			}
 		} catch (Exception e) {
-			//logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -139,8 +136,7 @@ public class RoomController extends Controller {
 			query.setParameter("search", search + "%");
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
-			// logger.error(e.getMessage());
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -170,7 +166,7 @@ public class RoomController extends Controller {
 			em.persist(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		}
 		return new Response(this.getSession(),"OK", "Room was created succesfully.");
@@ -359,7 +355,7 @@ public class RoomController extends Controller {
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -577,7 +573,7 @@ public class RoomController extends Controller {
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -605,7 +601,7 @@ public class RoomController extends Controller {
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -664,7 +660,7 @@ public class RoomController extends Controller {
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -681,7 +677,7 @@ public class RoomController extends Controller {
 		try {
 			return em.find(Room.class, roomId).getHwconf();
 		} catch (Exception e) {
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -694,7 +690,7 @@ public class RoomController extends Controller {
 			Room room = em.find(Room.class, roomId);
 			room.setHwconf(em.find(HWConf.class, hwConfId));
 		} catch (Exception e) {
-			System.err.println(e.getMessage()); //TODO
+			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();

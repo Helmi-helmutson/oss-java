@@ -4,8 +4,6 @@ package de.openschoolserver.api;
 
 import de.openschoolserver.api.auth.OSSAuthorizer;
 
-
-
 import de.openschoolserver.api.auth.OSSTokenAuthenticator;
 import de.openschoolserver.api.health.TemplateHealthCheck;
 import de.openschoolserver.api.resourceimpl.*;
@@ -21,12 +19,37 @@ import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 
+//import de.openschoolserver.dao.controller.GetJPAInf;
+//import java.io.IOException;
+//import java.net.ServerSocket;
+
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 public class ServerApplication extends Application<ServerConfiguration> {
 
     public static void main(String[] args) throws Exception {
         new ServerApplication().run(args);
+  /*      ServerSocket  server = null;
+        try{
+            server = new ServerSocket(4444);
+          } catch (IOException e) {
+            System.out.println("Could not listen on port 4444");
+            System.exit(-1);
+          } finally {
+        	  server.close();
+          }
+          while(true){
+            GetJPAInf w;
+            try {
+              w = new GetJPAInf(null, server.accept());
+              Thread t = new Thread(w);
+              t.start();
+            } catch (IOException e) {
+              System.out.println("Accept failed: 4444");
+              System.exit(-1);
+            }
+          }
+          */
     }
 
     @Override

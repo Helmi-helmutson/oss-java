@@ -3,6 +3,8 @@
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.api.resources.SessionsResource;
+
+
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.controller.SessionController;
@@ -91,7 +93,7 @@ public class SessionsResourceImpl implements SessionsResource {
 			  break;
 		  case "dnsName":
 			  if( session.getDevice() != null)
-				  session.getDevice().getName();
+				  return session.getDevice().getName();
 			  break;
 		  case "domainName": 
 			  return sessionController.getConfigValue("SCHOOL_DOMAIN");
