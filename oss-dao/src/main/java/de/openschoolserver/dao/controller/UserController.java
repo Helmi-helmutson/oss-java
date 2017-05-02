@@ -190,7 +190,7 @@ public class UserController extends Controller {
             em.close();
         }
         this.startPlugin("modify_user",user);
-        return new Response(this.getSession(),"OK","User was modified sussesfully");
+        return new Response(this.getSession(),"OK","User was modified succesfully");
     }
     
     public Response delete(long userId){
