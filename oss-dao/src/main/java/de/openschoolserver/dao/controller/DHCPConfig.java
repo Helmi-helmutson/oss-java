@@ -18,8 +18,11 @@ import de.openschoolserver.dao.tools.*;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class DHCPConfig extends Controller {
-	
+	private static Logger LOG = LoggerFactory.getLogger(DHCPConfig.class);
 	private Path DHCP_CONFIG   = Paths.get("/etc/dhcpd.conf");
 	private Path SALT_GROUPS   = Paths.get("/etc/salt/master.d/groups.conf");
 	private Path DHCP_TEMPLATE = Paths.get("/usr/share/oss/templates/dhcpd.conf");
@@ -29,7 +32,12 @@ public class DHCPConfig extends Controller {
 	public DHCPConfig(Session session) {
 		super(session);
 		try {
-			dhcpConfigFile = Files.readAllLines(DHCP_TEMPLATE);
+			try {
+				dhcpConfigFile = Files.readAllLines(DHCP_TEMPLATE);
+			} catch (java.nio.file.NoSuchFileException e) {
+				LOG.error(e.getMessage());
+				dhcpConfigFile = new ArrayList<String>();
+			}
 			saltGroupFile  = new ArrayList<String>();
 		}
 		catch( IOException e ) { 
