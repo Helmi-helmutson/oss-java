@@ -303,6 +303,7 @@ INSERT INTO Enumerates VALUES(NULL,'roomType','Library');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory');
 INSERT INTO Enumerates VALUES(NULL,'roomType','VirtualRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','WlanAccess');
+INSERT INTO Enumerates VALUES(NULL,'roomType','AdHocAccess');
 INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT');
 INSERT INTO Enumerates VALUES(NULL,'accessType','FW');
 INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
