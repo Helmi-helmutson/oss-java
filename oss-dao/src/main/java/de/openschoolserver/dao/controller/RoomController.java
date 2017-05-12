@@ -221,7 +221,7 @@ public class RoomController extends Controller {
 		for( String IP : net.getAvailableIPs(0) ){
 			String name =  this.isIPUnique(IP);
 			if( name.isEmpty() ){
-				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName(),i));
+				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName().replace("_", "-").toLowerCase(),i));
 			}
 			if( count > 0 && availableIPs.size() == count ) {
 				break;
