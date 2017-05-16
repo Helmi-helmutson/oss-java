@@ -1,13 +1,8 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import java.util.HashMap;
 
 
 /**
@@ -15,44 +10,105 @@ import java.util.HashMap;
  * 
  */
 @Entity
-@Table(name="AccessInRoom")
 @NamedQueries( {
-	@NamedQuery(name="AccessInRoom.findAll",            query="SELECT a FROM AccessInRoom a"),
-	@NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom a WHERE a.room = :room"),
-	@NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom a WHERE a.accessPIT.pointintime = :time")
+    @NamedQuery(name="AccessInRoom.findAll",            query="SELECT a FROM AccessInRoom a"),
+    @NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom a WHERE a.room = :room"),
+    @NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom a WHERE a.pointInTime = :time")
 })
-@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
+
 public class AccessInRoom implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
+	@SequenceGenerator(name="ACCESSINROOM_ID_GENERATOR", sequenceName="SEQ")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ACCESSINROOM_ID_GENERATOR")
 	private long id;
-
-	private String accesstype;
 
 	//uni-directional many-to-one association to Room
 	@ManyToOne
 	@JsonIgnore
 	private Room room;
+
+	private String accessType;
+
+	private String action;
+
+	@Column(name="room_id")
+	private long roomId;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean monday;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean tusday;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean wednesday;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean thursday;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean friday;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean saturday;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean sunday;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean holiday;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean direct;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean login;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean portal;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean printing;
+
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean proxy;
 	
-	@Column(name="room_id", insertable=false, updatable=false)
-	private Long roomId;
-
-	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
-	private AccessInRoomFW fwAccess;
-
-	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
-	private AccessInRoomACT actAccess;
-
-	@OneToOne(mappedBy="accessinroom", cascade=CascadeType.REMOVE )
-	private AccessInRoomPIT accessPIT;
+	private String  pointInTime;
 
 	public AccessInRoom() {
-		this.accesstype = "DEFAULT";
-		this.fwAccess   = null;
-		this.actAccess  = null;
-		this.accessPIT  = null;
+		this.pointInTime = "06:00";
+		this.monday   = true;
+		this.tusday   = true;
+		this.wednesday= true;
+		this.thursday = true;
+		this.friday   = true;
+		this.saturday = false;
+		this.sunday   = false;
+		this.holiday  = false;
+		this.direct   = false;
+		this.login    = true;
+		this.portal   = true;
+		this.printing = true;
+		this.proxy    = true;
+		this.action  = "";
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof AccessInRoom && obj !=null) {
+			return getId() == ((AccessInRoom)obj).getId();
+		}
+		return super.equals(obj);
+	}
+
+	public Room getRoom() {
+		return this.room;
+	}
+
+	public void setRoom(Room room) {
+		this.room = room;
 	}
 
 	public long getId() {
@@ -62,60 +118,141 @@ public class AccessInRoom implements Serializable {
 	public void setId(long id) {
 		this.id = id;
 	}
-	
+
+	public String getAccessType() {
+		return this.accessType;
+	}
+
+	public void setAccessType(String accessType) {
+		this.accessType = accessType;
+	}
+
+	public String getAction() {
+		return this.action;
+	}
+
+	public void setAction(String action) {
+		this.action = action;
+	}
+
+	public Boolean getDirect() {
+		return this.direct;
+	}
+
+	public void setDirect(Boolean direct) {
+		this.direct = direct;
+	}
+
+	public Boolean getFriday() {
+		return this.friday;
+	}
+
+	public void setFriday(Boolean friday) {
+		this.friday = friday;
+	}
+
+	public Boolean getHoliday() {
+		return this.holiday;
+	}
+
+	public void setHoliday(Boolean holiday) {
+		this.holiday = holiday;
+	}
+
+	public Boolean getLogin() {
+		return this.login;
+	}
+
+	public void setLogin(Boolean login) {
+		this.login = login;
+	}
+
+	public Boolean getMonday() {
+		return this.monday;
+	}
+
+	public void setMonday(Boolean monday) {
+		this.monday = monday;
+	}
+
+	public String getPointInTime() {
+		return this.pointInTime;
+	}
+
+	public void setPointInTime(String pointInTime) {
+		this.pointInTime = pointInTime;
+	}
+
+	public Boolean getPortal() {
+		return this.portal;
+	}
+
+	public void setPortal(Boolean portal) {
+		this.portal = portal;
+	}
+
+	public Boolean getPrinting() {
+		return this.printing;
+	}
+
+	public void setPrinting(Boolean printing) {
+		this.printing = printing;
+	}
+
+	public Boolean getProxy() {
+		return this.proxy;
+	}
+
+	public void setProxy(Boolean proxy) {
+		this.proxy = proxy;
+	}
+
 	public long getRoomId() {
 		return this.roomId;
 	}
 
-	public void setRoomId(long roomid) {
-		this.roomId = roomid;
-	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof AccessInRoom && obj !=null) {
-			return getId() == ((AccessInRoom)obj).getId();
-		}
-		return super.equals(obj);
-	}
-	public Room getRoom() {
-		return this.room;
+	public void setRoomId(long roomId) {
+		this.roomId = roomId;
 	}
 
-	public void setRoom(Room room) {
-		this.room = room;
+	public Boolean getSaturday() {
+		return this.saturday;
 	}
 
-	public String getAccessType() {
-		return this.accesstype;
+	public void setSaturday(Boolean saturday) {
+		this.saturday = saturday;
 	}
 
-	public void setAccessType(String accesstype) {
-		this.accesstype = accesstype;
+	public Boolean getSunday() {
+		return this.sunday;
 	}
 
-	public AccessInRoomFW getAccessInRoomFW() {
-		return this.fwAccess;
+	public void setSunday(Boolean sunday) {
+		this.sunday = sunday;
 	}
 
-	public void setAccessInRoomFW(AccessInRoomFW fwAccess) {
-		this.fwAccess = fwAccess;
+	public Boolean getThursday() {
+		return this.thursday;
 	}
 
-	public AccessInRoomACT getAccessInRoomACT() {
-		return this.actAccess;
+	public void setThursday(Boolean thursday) {
+		this.thursday = thursday;
 	}
 
-	public void setAccessInRoomACT(AccessInRoomACT actAccess) {
-		this.actAccess = actAccess;
+	public Boolean getTusday() {
+		return this.tusday;
 	}
 
-	public AccessInRoomPIT getAccessInRoomPIT() {
-		return this.accessPIT;
+	public void setTusday(Boolean tusday) {
+		this.tusday = tusday;
 	}
 
-	public void setAccessInRoomPIT(AccessInRoomPIT accessPIT) {
-		this.accessPIT = accessPIT;
+	public Boolean getWednesday() {
+		return this.wednesday;
+	}
+
+	public void setWednesday(Boolean wednesday) {
+		this.wednesday = wednesday;
 	}
 
 }
