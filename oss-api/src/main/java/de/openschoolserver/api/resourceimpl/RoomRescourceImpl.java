@@ -147,7 +147,6 @@ public class RoomRescourceImpl implements RoomResource {
 	public Response addDevices(Session session, long roomId, List<Device> devices) {
 		final RoomController roomController = new RoomController(session);
 		Response response = roomController.addDevices(roomId,devices);
-		logger.info("Get Response text" + response.getText() );
 		return response;
 	}
 
