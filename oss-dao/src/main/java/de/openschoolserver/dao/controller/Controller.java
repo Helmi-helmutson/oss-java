@@ -286,7 +286,7 @@ public class Controller extends Config {
 		program[1] = "change_member";
 		data.append(String.format("changetype: %s%n",type));
 		data.append(String.format("group: %s%n", group.getName()));
-		data.append(String.format("user: %s%n", user.getUid()));
+		data.append(String.format("users: %s%n", user.getUid()));
 		OSSShellTools.exec(program, reply, error, data.toString());
 		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}

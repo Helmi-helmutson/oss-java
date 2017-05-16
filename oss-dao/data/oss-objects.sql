@@ -1,4 +1,4 @@
-#TODO TEST ONLY
+#TEST ONLY
 #DROP DATABASE OSS;
 
 CREATE DATABASE OSS;
@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS Users (
 	fsQuotaUsed  INTEGER DEFAULT 0,
 	msQuota	     INTEGER DEFAULT 0,
 	msQuotaUsed  INTEGER DEFAULT 0,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 INSERT INTO Users VALUES(1,'admin','sysadmins','Administrator','Main',NOW(),0,0,0,0);
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS Groups (
         name        VARCHAR(32) NOT NULL,
         description VARCHAR(64) NOT NULL,
         groupType   VARCHAR(16) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 INSERT INTO Groups VALUES(1,'sysadmins','Sysadmins','primary');
@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS GroupMember (
         group_id       BIGINT UNSIGNED NOT NULL,
 	FOREIGN KEY(user_id)  REFERENCES Users(id),
 	FOREIGN KEY(group_id) REFERENCES Groups(id),
-	PRIMARY KEY  (user_id,group_id)
+	PRIMARY KEY(user_id,group_id)
 );
 
 INSERT INTO GroupMember VALUES(1,1);
@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS Aliases (
         user_id         BIGINT UNSIGNED NOT NULL,
         alias           VARCHAR(64) NOT NULL,
         FOREIGN KEY(user_id)  REFERENCES Users(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS HWConfs (
@@ -70,7 +70,7 @@ CREATE TABLE IF NOT EXISTS HWConfs (
         name          VARCHAR(32) NOT NULL,
         description   VARCHAR(32) DEFAULT "",
         deviceType    VARCHAR(16) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 INSERT INTO HWConfs VALUES(1,"Server","","Server");
 INSERT INTO HWConfs VALUES(2,"Printer","","Printer");
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
         tool         VARCHAR(16) DEFAULT NULL,
         format       VARCHAR(16) DEFAULT NULL,
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS Rooms (
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
         startIP      VARCHAR(16) NOT NULL,
         netMask      INTEGER  NOT NULL,
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','VirtualRoom',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#);
@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS Devices (
         FOREIGN KEY(room_id)   REFERENCES Rooms(id),
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         FOREIGN KEY(owner_id)  REFERENCES Users(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 INSERT INTO Devices VALUES(1,1,1,NULL,'admin','#SCHOOL_SERVER#',NULL,'','',0,0);
@@ -133,13 +133,6 @@ CREATE TABLE IF NOT EXISTS AccessInRoom (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id        BIGINT UNSIGNED NOT NULL,
         accessType     VARCHAR(8) NOT NULL,
-        FOREIGN KEY(room_id) REFERENCES Rooms(id),
-        PRIMARY KEY  (id)
-);
-
-CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
-        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        accessinroom_id BIGINT UNSIGNED NOT NULL,
         pointInTime    CHAR(5) DEFAULT '06:00',
 	monday         CHAR(1) DEFAULT 'Y',
 	tusday         CHAR(1) DEFAULT 'Y',
@@ -149,27 +142,13 @@ CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
 	saturday       CHAR(1) DEFAULT 'N',
 	sunday         CHAR(1) DEFAULT 'N',
 	holiday        CHAR(1) DEFAULT 'N',
-        FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
-        PRIMARY KEY  (id)
-);
-
-CREATE TABLE IF NOT EXISTS AccessInRoomFW (
-        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        accessinroom_id BIGINT UNSIGNED NOT NULL,
         direct          CHAR(1) DEFAULT 'N',
         login           CHAR(1) DEFAULT 'Y',
         proxy           CHAR(1) DEFAULT 'Y',
         printing        CHAR(1) DEFAULT 'Y',
         portal          CHAR(1) DEFAULT 'Y',
-        FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
-        PRIMARY KEY  (id)
-);
-
-CREATE TABLE IF NOT EXISTS AccessInRoomACT (
-        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        accessinroom_id BIGINT UNSIGNED NOT NULL,
 	action          VARCHAR(32) DEFAULT '',
-        FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
+        FOREIGN KEY(room_id) REFERENCES Rooms(id),
         PRIMARY KEY(id)
 );
 
@@ -210,7 +189,7 @@ CREATE TABLE IF NOT EXISTS Acls (
         acl          VARCHAR(32) NOT NULL,
         FOREIGN KEY(user_id)  REFERENCES Users(id),
         FOREIGN KEY(group_id) REFERENCES Groups(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.add');
@@ -248,7 +227,7 @@ CREATE TABLE IF NOT EXISTS  Tests (
         portal        CHAR(1) NOT NULL DEFAULT 'N',
         FOREIGN KEY(teacher_id) REFERENCES Users(id),
         FOREIGN KEY(room_id)    REFERENCES Rooms(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS TestFiles (
@@ -260,7 +239,7 @@ CREATE TABLE IF NOT EXISTS TestFiles (
         dateTime     DATETIME NOT NULL,
         FOREIGN KEY(test_id) REFERENCES Tests(id),
         FOREIGN KEY(user_id) REFERENCES Users(id),
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS TestUsers (
@@ -270,14 +249,14 @@ CREATE TABLE IF NOT EXISTS TestUsers (
         FOREIGN KEY(test_id) REFERENCES Tests(id),
         FOREIGN KEY(user_id) REFERENCES Users(id),
         FOREIGN KEY(device_id) REFERENCES Devices(id),
-        PRIMARY KEY (test_id,user_id)
+        PRIMARY KEY(test_id,user_id)
 );
 
 CREATE TABLE IF NOT EXISTS Enumerates (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name         VARCHAR(32)  NOT NULL,
         value        VARCHAR(32)  NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
 
 INSERT INTO Enumerates VALUES(NULL,'deviceType','FatClient');
@@ -303,83 +282,87 @@ INSERT INTO Enumerates VALUES(NULL,'roomType','Library');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory');
 INSERT INTO Enumerates VALUES(NULL,'roomType','VirtualRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','WlanAccess');
+INSERT INTO Enumerates VALUES(NULL,'roomType','AdHocAccess');
 INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT');
 INSERT INTO Enumerates VALUES(NULL,'accessType','FW');
 INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
-
+INSERT INTO Enumerates VALUES(NULL,'licenseType','NONE');
+INSERT INTO Enumerates VALUES(NULL,'licenseType','FILE');
+INSERT INTO Enumerates VALUES(NULL,'licenseType','XML');
+INSERT INTO Enumerates VALUES(NULL,'licenseType','CMD');
 
 #Some additional config tables
 CREATE TABLE IF NOT EXISTS UserConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        user_id      BIGINT UNSIGNED NOT NULL,
-        keyword      VARCHAR(64) NOT NULL,
-        value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (id)
+	user_id      BIGINT UNSIGNED NOT NULL,
+	keyword      VARCHAR(64) NOT NULL,
+	value        VARCHAR(128) NOT NULL,
+	PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX UserConfigIndex on UserConfig  (user_id,keyword);
+CREATE UNIQUE INDEX UserConfigIndex on UserConfig(user_id,keyword);
 
 CREATE TABLE IF NOT EXISTS UserMConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX UserMConfigIndex on UserMConfig (user_id,keyword,value);
+CREATE UNIQUE INDEX UserMConfigIndex on UserMConfig(user_id,keyword,value);
 
 CREATE TABLE IF NOT EXISTS GroupConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         group_id     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX GroupConfigIndex on GroupConfig (group_id,keyword);
+CREATE UNIQUE INDEX GroupConfigIndex on GroupConfig(group_id,keyword);
 
 CREATE TABLE IF NOT EXISTS GroupMConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         group_id     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX GroupMConfigIndex on GroupMConfig (group_id,keyword,value);
+CREATE UNIQUE INDEX GroupMConfigIndex on GroupMConfig(group_id,keyword,value);
 
 CREATE TABLE IF NOT EXISTS DeviceConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         device_id    BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX DeviceConfigIndex on DeviceConfig (device_id,keyword);
+CREATE UNIQUE INDEX DeviceConfigIndex on DeviceConfig(device_id,keyword);
 
 CREATE TABLE IF NOT EXISTS DeviceMConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         device_id    BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX DeviceMConfigIndex on DeviceMConfig  (device_id,keyword);
+CREATE UNIQUE INDEX DeviceMConfigIndex on DeviceMConfig(device_id,keyword);
 
 CREATE TABLE IF NOT EXISTS RoomConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX RoomConfigIndex on RoomConfig  (room_id,keyword);
+CREATE UNIQUE INDEX RoomConfigIndex on RoomConfig(room_id,keyword);
 
 CREATE TABLE IF NOT EXISTS RoomMConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        PRIMARY KEY  (id)
+        PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX RoomMConfigIndex on RoomMConfig (room_id,keyword,value);
+CREATE UNIQUE INDEX RoomMConfigIndex on RoomMConfig(room_id,keyword,value);
 
 CREATE TABLE IF NOT EXISTS Session (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -392,7 +375,7 @@ CREATE TABLE IF NOT EXISTS Session (
         FOREIGN KEY(user_id)   REFERENCES Users(id),
         FOREIGN KEY(room_id)   REFERENCES Rooms(id),
 	FOREIGN KEY(device_id) REFERENCES Devices(id),
-        PRIMARY KEY (`id`)
+        PRIMARY KEY(id)
  );
 
 CREATE TABLE IF NOT EXISTS Responses (
@@ -401,5 +384,110 @@ CREATE TABLE IF NOT EXISTS Responses (
 	code	VARCHAR(64) NOT NULL,
 	value   VARCHAR(1024) NOT NULL,
 	FOREIGN KEY(session_id) REFERENCES Session(id),
-	PRIMARY KEY (`id`)
+	PRIMARY KEY(id)
 );
+
+CREATE TABLE IF NOT EXISTS Software (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	name        VARCHAR(32) NOT NULL,
+	description VARCHAR(64) DEFAULT NULL,
+	manuell     CHAR(1) DEFAULT 'N',
+        PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS SoftwareVersion (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        software_id    BIGINT UNSIGNED,
+	version        VARCHAR(32) NOT NULL,
+        FOREIGN KEY(software_id)    REFERENCES Software(id),
+        PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS SoftwareStatus (
+        version_id         BIGINT UNSIGNED NOT NULL,
+        device_id          BIGINT UNSIGNED NOT NULL,
+	status             VARCHAR(32) NOT NULL,
+	FOREIGN KEY(version_id)  REFERENCES SoftwareVersion(id),
+	FOREIGN KEY(device_id)   REFERENCES Devices(id),
+	PRIMARY KEY(version_id,device_id)
+);
+
+CREATE TABLE IF NOT EXISTS SoftwareLicenses (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        software_id    BIGINT UNSIGNED,
+	licenseType    VARCHAR(4) DEFAULT 'CMD',
+	count          INTEGER DEFAULT 1,
+	value          VARCHAR(1024) NOT NULL,
+        FOREIGN KEY(software_id)    REFERENCES Software(id),
+        PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS LicenseToDevice (
+        license_id         BIGINT UNSIGNED NOT NULL,
+        device_id          BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(license_id)  REFERENCES SoftwareLicenses(id),
+	FOREIGN KEY(device_id)   REFERENCES Devices(id),
+	PRIMARY KEY(licenses_id,device_id)
+);
+
+CREATE TABLE IF NOT EXISTS Categories (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	name         VARCHAR(32) NOT NULL,
+	desciption   VARCHAR(32) NOT NULL,
+        PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS SoftwareInCategories (
+        software_id        BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(software_id)  REFERENCES Software(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(software_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS RoomInCategories (
+        room_id            BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(room_id)      REFERENCES Rooms(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(room_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS DeviceInCategories (
+        device_id          BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(device_id)    REFERENCES Devices(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(device_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS GroupInCategories (
+        group_id           BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(group_id)     REFERENCES Groups(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(group_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS UserInCategories (
+        user_id            BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(user_id)      REFERENCES Users(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(user_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS AssignedSoftware (
+        software_id        BIGINT UNSIGNED NOT NULL,
+        device_id          BIGINT UNSIGNED DEFAULT NULL,
+        room_id            BIGINT UNSIGNED DEFAULT NULL,
+        hwconf_id          BIGINT UNSIGNED DEFAULT NULL,
+        category_id        BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(software_id)  REFERENCES Software(id),
+	FOREIGN KEY(device_id)    REFERENCES Devices(id),
+	FOREIGN KEY(room_id)      REFERENCES Rooms(id),
+	FOREIGN KEY(hwconf_id)    REFERENCES HWConfs(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(software_id,device_id,room_id,hwconf_id,category_id)
+);
+

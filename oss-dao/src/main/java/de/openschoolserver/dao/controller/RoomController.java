@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,9 +21,6 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.AccessInRoom;
-import de.openschoolserver.dao.AccessInRoomACT;
-import de.openschoolserver.dao.AccessInRoomFW;
-import de.openschoolserver.dao.AccessInRoomPIT;
 import de.openschoolserver.dao.tools.*;
 
 public class RoomController extends Controller {
@@ -221,7 +219,7 @@ public class RoomController extends Controller {
 		for( String IP : net.getAvailableIPs(0) ){
 			String name =  this.isIPUnique(IP);
 			if( name.isEmpty() ){
-				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName(),i));
+				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName().replace("_", "-").toLowerCase(),i));
 			}
 			if( count > 0 && availableIPs.size() == count ) {
 				break;
@@ -330,25 +328,6 @@ public class RoomController extends Controller {
 				room.removeAccessInRoome(air);
 			}
 			for( AccessInRoom air : AccessList ) {
-				AccessInRoomFW  accessFW  = air.getAccessInRoomFW();
-				AccessInRoomPIT accessPIT = air.getAccessInRoomPIT();
-				AccessInRoomACT accessACT = air.getAccessInRoomACT();
-				if(air.getAccessType().equals("FW") || air.getAccessType().equals("DEFAULT") ) {
-					air.setAccessInRoomACT(null);
-					air.setAccessInRoomFW(accessFW);
-					accessFW.setAccessinroom(air);
-				}
-				if(air.getAccessType().equals("ACT") ) {
-					air.setAccessInRoomFW(null);
-					air.setAccessInRoomACT(accessACT);
-					accessACT.setAccessinroom(air);
-				}
-				if( air.getAccessType().equals("DEFAULT") ) {
-					air.setAccessInRoomPIT(null);
-				} else {
-					air.setAccessInRoomPIT(accessPIT);
-					accessPIT.setAccessinroom(air);
-				}
 				air.setRoom(room);
 				room.addAccessInRoom(air);
 			}
@@ -381,7 +360,7 @@ public class RoomController extends Controller {
 		{
 			// Direct internet
 			program[3] = "direct";
-			if( access.getAccessInRoomFW().getDirect() )
+			if( access.getDirect() )
 				program[1] = "1";
 			else
 				program[1] = "0";
@@ -389,7 +368,7 @@ public class RoomController extends Controller {
 
 			// Portal Access
 			program[3] = "portal";
-			if( access.getAccessInRoomFW().getPortal())
+			if( access.getPortal())
 				program[1] = "1";
 			else
 				program[1] = "0";
@@ -397,7 +376,7 @@ public class RoomController extends Controller {
 
 			// Proxy Access
 			program[3] = "proxy";
-			if( access.getAccessInRoomFW().getProxy() )
+			if( access.getProxy() )
 				program[1] = "1";
 			else
 				program[1] = "0";
@@ -405,7 +384,7 @@ public class RoomController extends Controller {
 
 			// Printing Access
 			program[3] = "printing";
-			if( access.getAccessInRoomFW().getPrinting() )
+			if( access.getPrinting() )
 				program[1] = "1";
 			else
 				program[1] = "0";
@@ -413,7 +392,7 @@ public class RoomController extends Controller {
 
 			// Login
 			program[3] = "login";
-			if( access.getAccessInRoomFW().getLogin() ) 
+			if( access.getLogin() ) 
 				program[1] = "1";
 			else
 				program[1] = "0";
@@ -452,12 +431,7 @@ public class RoomController extends Controller {
 	public AccessInRoom getAccessStatus(Room room) {
 
 		AccessInRoom access = new AccessInRoom();
-		AccessInRoomFW  accessFW  = new AccessInRoomFW();
-		AccessInRoomPIT accessPIT = new AccessInRoomPIT();
-		AccessInRoomACT accessACT = new AccessInRoomACT();
 		access.setAccessType("FW");
-		access.setAccessInRoomPIT(accessPIT);
-		access.setAccessInRoomACT(accessACT);
 		access.setRoomId(room.getId());
 		
 		String[] program = new String[3];
@@ -471,43 +445,41 @@ public class RoomController extends Controller {
 		program[2] = "direct";
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
-			accessFW.setDirect(true);
+			access.setDirect(true);
 		else
-			accessFW.setDirect(false);
+			access.setDirect(false);
 
 		// Portal Access
 		program[2] = "portal";
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
-			accessFW.setPortal(true);
+			access.setPortal(true);
 		else
-			accessFW.setPortal(false);
+			access.setPortal(false);
 
 		// Proxy Access
 		program[2] = "proxy";
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
-			accessFW.setProxy(true);
+			access.setProxy(true);
 		else
-			accessFW.setProxy(false);
+			access.setProxy(false);
 
 		// Printing Access
 		program[2] = "printing";
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
-			accessFW.setPrinting(true);
+			access.setPrinting(true);
 		else
-			accessFW.setPrinting(false);
+			access.setPrinting(false);
 
 		// Login
 		program[2] = "login";
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
-			accessFW.setLogin(true);
+			access.setLogin(true);
 		else
-			accessFW.setLogin(false);
-		
-		access.setAccessInRoomFW(accessFW);
+			access.setLogin(false);
 		return access;
 	}
 
