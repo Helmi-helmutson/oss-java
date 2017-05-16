@@ -133,13 +133,6 @@ CREATE TABLE IF NOT EXISTS AccessInRoom (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id        BIGINT UNSIGNED NOT NULL,
         accessType     VARCHAR(8) NOT NULL,
-        FOREIGN KEY(room_id) REFERENCES Rooms(id),
-        PRIMARY KEY(id)
-);
-
-CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
-        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        accessinroom_id BIGINT UNSIGNED NOT NULL,
         pointInTime    CHAR(5) DEFAULT '06:00',
 	monday         CHAR(1) DEFAULT 'Y',
 	tusday         CHAR(1) DEFAULT 'Y',
@@ -149,27 +142,13 @@ CREATE TABLE IF NOT EXISTS AccessInRoomPIT (
 	saturday       CHAR(1) DEFAULT 'N',
 	sunday         CHAR(1) DEFAULT 'N',
 	holiday        CHAR(1) DEFAULT 'N',
-        FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
-        PRIMARY KEY(id)
-);
-
-CREATE TABLE IF NOT EXISTS AccessInRoomFW (
-        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        accessinroom_id BIGINT UNSIGNED NOT NULL,
         direct          CHAR(1) DEFAULT 'N',
         login           CHAR(1) DEFAULT 'Y',
         proxy           CHAR(1) DEFAULT 'Y',
         printing        CHAR(1) DEFAULT 'Y',
         portal          CHAR(1) DEFAULT 'Y',
-        FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
-        PRIMARY KEY(id)
-);
-
-CREATE TABLE IF NOT EXISTS AccessInRoomACT (
-        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        accessinroom_id BIGINT UNSIGNED NOT NULL,
 	action          VARCHAR(32) DEFAULT '',
-        FOREIGN KEY(accessinroom_id) REFERENCES AccessInRoom(id),
+        FOREIGN KEY(room_id) REFERENCES Rooms(id),
         PRIMARY KEY(id)
 );
 
@@ -307,6 +286,10 @@ INSERT INTO Enumerates VALUES(NULL,'roomType','AdHocAccess');
 INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT');
 INSERT INTO Enumerates VALUES(NULL,'accessType','FW');
 INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
+INSERT INTO Enumerates VALUES(NULL,'licenseType','NONE');
+INSERT INTO Enumerates VALUES(NULL,'licenseType','FILE');
+INSERT INTO Enumerates VALUES(NULL,'licenseType','XML');
+INSERT INTO Enumerates VALUES(NULL,'licenseType','CMD');
 
 #Some additional config tables
 CREATE TABLE IF NOT EXISTS UserConfig (
@@ -407,7 +390,8 @@ CREATE TABLE IF NOT EXISTS Responses (
 CREATE TABLE IF NOT EXISTS Software (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name        VARCHAR(32) NOT NULL,
-	description VARCHAR(64) NOT NULL,
+	description VARCHAR(64) DEFAULT NULL,
+	manuell     CHAR(1) DEFAULT 'N',
         PRIMARY KEY(id)
 );
 
@@ -426,6 +410,24 @@ CREATE TABLE IF NOT EXISTS SoftwareStatus (
 	FOREIGN KEY(version_id)  REFERENCES SoftwareVersion(id),
 	FOREIGN KEY(device_id)   REFERENCES Devices(id),
 	PRIMARY KEY(version_id,device_id)
+);
+
+CREATE TABLE IF NOT EXISTS SoftwareLicenses (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        software_id    BIGINT UNSIGNED,
+	licenseType    VARCHAR(4) DEFAULT 'CMD',
+	count          INTEGER DEFAULT 1,
+	value          VARCHAR(1024) NOT NULL,
+        FOREIGN KEY(software_id)    REFERENCES Software(id),
+        PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS LicenseToDevice (
+        license_id         BIGINT UNSIGNED NOT NULL,
+        device_id          BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(license_id)  REFERENCES SoftwareLicenses(id),
+	FOREIGN KEY(device_id)   REFERENCES Devices(id),
+	PRIMARY KEY(licenses_id,device_id)
 );
 
 CREATE TABLE IF NOT EXISTS Categories (
