@@ -7,6 +7,7 @@ USE OSS;
 CREATE TABLE IF NOT EXISTS Users (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         uid          VARCHAR(32) NOT NULL,
+        uuid         VARCHAR(64) DEFAULT NULL,
         role         VARCHAR(16) NOT NULL,
         sureName     VARCHAR(64) NOT NULL,
         givenName    VARCHAR(64),
@@ -427,7 +428,7 @@ CREATE TABLE IF NOT EXISTS LicenseToDevice (
         device_id          BIGINT UNSIGNED NOT NULL,
 	FOREIGN KEY(license_id)  REFERENCES SoftwareLicenses(id),
 	FOREIGN KEY(device_id)   REFERENCES Devices(id),
-	PRIMARY KEY(licenses_id,device_id)
+	PRIMARY KEY(license_id,device_id)
 );
 
 CREATE TABLE IF NOT EXISTS Categories (

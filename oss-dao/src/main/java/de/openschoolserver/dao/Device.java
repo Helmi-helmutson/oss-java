@@ -50,6 +50,10 @@ public class Device implements Serializable {
 	@Column(name="WLANMAC")
 	private String wlanmac;
 
+	//bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="devices")
+	private List<Category> categories;
+
 	//bi-directional many-to-one association to DeviceMConfig
 	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
 	@JsonIgnore
@@ -63,14 +67,10 @@ public class Device implements Serializable {
 	//bi-directional many-to-many association to Device
 	@ManyToMany
 	@JoinTable(
-			name="AvailablePrinters"
-			, joinColumns={
-					@JoinColumn(name="device_id")
-			}
-			, inverseJoinColumns={
-					@JoinColumn(name="printer_id")
-			}
-			)
+			name="AvailablePrinters",
+			joinColumns={ @JoinColumn(name="device_id")	},
+			inverseJoinColumns={ @JoinColumn(name="printer_id") }
+	)
 	@JsonIgnore
 	private List<Device> availablePrinters;
 
@@ -82,14 +82,10 @@ public class Device implements Serializable {
 	//bi-directional many-to-many association to Device
 	@ManyToOne
 	@JoinTable(
-			name="DefaultPrinter"
-			, joinColumns={
-					@JoinColumn(name="device_id")
-			}
-			, inverseJoinColumns={
-					@JoinColumn(name="printer_id")
-			}
-			)
+			name="DefaultPrinter",
+			joinColumns={@JoinColumn(name="device_id")},
+			inverseJoinColumns={@JoinColumn(name="printer_id")}
+		)
 	@JsonIgnore
 	private Device defaultPrinter;
 
@@ -97,6 +93,11 @@ public class Device implements Serializable {
 	@OneToMany(mappedBy="defaultPrinter")
 	@JsonIgnore
 	private List<Device> defaultForDevices;
+
+	//bi-directional many-to-many association to Device
+	@ManyToMany(mappedBy="devices")
+	@JsonIgnore
+	private List<SoftwareLicense> softwareLicenses;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
@@ -365,4 +366,27 @@ public class Device implements Serializable {
 		return deviceMConfig;
 	}
 
+    public List<Category> getCategories() {
+            return this.categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+            this.categories = categories;
+    }
+        
+    public List<SoftwareLicense> getSoftwareLicences() {
+    	return this.softwareLicenses;
+    }
+    
+    public void getSoftwareLicences(List<SoftwareLicense> licenses) {
+    	this.softwareLicenses = licenses;
+    }
+    
+    public void addSoftwareLicens(SoftwareLicense sl) {
+    	this.softwareLicenses.add(sl);
+    }
+
+    public void removeSoftwareLicens(SoftwareLicense sl) {
+    	this.softwareLicenses.remove(sl);
+    }
 }

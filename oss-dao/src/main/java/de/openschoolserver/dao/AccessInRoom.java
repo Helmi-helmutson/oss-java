@@ -33,7 +33,7 @@ public class AccessInRoom implements Serializable {
 
 	private String action;
 
-	@Column(name="room_id")
+	@Column(name="room_id", insertable = false, updatable = false)
 	private long roomId;
 
 	@Convert(converter=BooleanToStringConverter.class)

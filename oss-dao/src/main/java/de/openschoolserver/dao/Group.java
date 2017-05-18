@@ -38,14 +38,17 @@ public class Group implements Serializable {
 
 	private String groupType;
 
-	//bi-directional many-to-one association to Alias
+	//bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="groups")
+	private List<Category> categories;
+
+	//bi-directional many-to-one association to Acls
 	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Acl> acls;
 	
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups")
 	@JsonIgnore
-	//@JsonBackReference
 	private List<User> users;
 
 	public Group() {
@@ -119,4 +122,11 @@ public class Group implements Serializable {
 		acl.setGroup(null);
 	}
 
+        public List<Category> getCategories() {
+                return this.categories;
+        }
+
+        public void setCategories(List<Category> categories) {
+                this.categories = categories;
+        }
 }
