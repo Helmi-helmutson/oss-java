@@ -44,6 +44,8 @@ public class User implements Serializable {
 
 	@Column(name="uid", updatable=false)
 	private String uid;
+	
+	private String uuid;
 
 	@Temporal(TemporalType.DATE)	
 	private Date birthDay;
@@ -83,16 +85,16 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<Test> tests;
 
+	//bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="users")
+	private List<Category> categories;
+		
 	//bi-directional many-to-many association to Device
 	@ManyToMany
 	@JoinTable(
-			name="LoggedOn"
-			, joinColumns={
-					@JoinColumn(name="user_id")
-			}
-			, inverseJoinColumns={
-					@JoinColumn(name="device_id")
-			}
+			name="LoggedOn", 
+			joinColumns={ @JoinColumn(name="user_id") },
+			inverseJoinColumns={@JoinColumn(name="device_id")}
 			)
 	@JsonIgnore
 	private List<Device> loggedOn;
@@ -100,13 +102,9 @@ public class User implements Serializable {
 	//bi-directional many-to-many association to Group
 	@ManyToMany
 	@JoinTable(
-			name="GroupMember"
-			, joinColumns={
-					@JoinColumn(name="user_id")
-			}
-			, inverseJoinColumns={
-					@JoinColumn(name="group_id")
-			}
+			name="GroupMember",
+			joinColumns={@JoinColumn(name="user_id")},
+			inverseJoinColumns={@JoinColumn(name="group_id")}
 			)
 	//@JsonManagedReference
 	@JsonIgnore
@@ -122,6 +120,7 @@ public class User implements Serializable {
 
 	public User() {
 		this.uid = "";
+		this.uuid = "";
 		this.sureName = "";
 		this.givenName = "";
 		this.password = "";
@@ -178,6 +177,14 @@ public class User implements Serializable {
 
 	public void setUid(String uid) {
 		this.uid = uid;
+	}
+
+	public String getUuid() {
+		return this.uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uid = uuid;
 	}
 
 	public Date getBirthDay() {
@@ -399,5 +406,11 @@ public class User implements Serializable {
 	public Integer getMsQuota() {
 		return this.msQuota;
 	}
+    public List<Category> getCategories() {
+        return this.categories;
+}
 
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
 }

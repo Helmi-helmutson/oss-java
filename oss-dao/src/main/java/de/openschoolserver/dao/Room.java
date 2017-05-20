@@ -50,6 +50,10 @@ public class Room implements Serializable {
 
 	private String roomType;
 
+    //bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="rooms")
+    private List<Category> categories;
+
 	//bi-directional many-to-one association to RoomMConfig
 	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
@@ -328,5 +332,12 @@ public class Room implements Serializable {
 		return roomMConfig;
 	}
 
+        public List<Category> getCategories() {
+                return this.categories;
+        }
+
+        public void setCategories(List<Category> categories) {
+                this.categories = categories;
+        }
 
 }

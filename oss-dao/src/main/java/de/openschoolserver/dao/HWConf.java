@@ -45,14 +45,18 @@ public class HWConf implements Serializable {
 	@OneToMany(mappedBy="hwconf")
 	@JsonIgnore
 	private List<Room> rooms;
+	
+	//bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="hwconfs")
+	private List<Category> categories;
 
-        @Override
-        public boolean equals(Object obj) {
-                if (obj instanceof HWConf && obj !=null) {
-                        return getId() == ((HWConf)obj).getId();
-                }
-                return super.equals(obj);
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof HWConf && obj !=null) {
+            return getId() == ((HWConf)obj).getId();
         }
+        return super.equals(obj);
+    }
 
 	public HWConf() {
 	}
@@ -134,7 +138,7 @@ public class HWConf implements Serializable {
 
 		return partition;
 	}
-
+	
 	public List<Room> getRooms() {
 		return this.rooms;
 	}
@@ -146,15 +150,21 @@ public class HWConf implements Serializable {
 	public Room addRoom(Room room) {
 		getRooms().add(room);
 		room.setHwconf(this);
-
 		return room;
 	}
 
 	public Room removeRoom(Room room) {
 		getRooms().remove(room);
 		room.setHwconf(null);
-
 		return room;
 	}
+
+    public List<Category> getCategories() {
+        return this.categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
 
 }

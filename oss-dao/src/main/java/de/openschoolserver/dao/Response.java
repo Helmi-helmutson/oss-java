@@ -21,10 +21,11 @@ public class Response implements Serializable {
 
 	private String code;
 	private String value;
+	
 	@ManyToOne
     Session session;
 
-	@Column(name="session_id")
+	@Column(name="session_id", insertable = false, updatable = false)
 	private java.math.BigInteger sessionId;
 	
     @Override
