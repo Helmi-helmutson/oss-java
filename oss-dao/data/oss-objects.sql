@@ -392,6 +392,7 @@ CREATE TABLE IF NOT EXISTS Software (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name        VARCHAR(32) NOT NULL,
 	description VARCHAR(64) DEFAULT NULL,
+	weigth      INTEGER DEFAULT 0,
 	manuell     CHAR(1) DEFAULT 'N',
         PRIMARY KEY(id)
 );
@@ -438,22 +439,6 @@ CREATE TABLE IF NOT EXISTS Categories (
         PRIMARY KEY(id)
 );
 
-CREATE TABLE IF NOT EXISTS SoftwareInCategories (
-        software_id        BIGINT UNSIGNED NOT NULL,
-        category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(software_id)  REFERENCES Software(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
-	PRIMARY KEY(software_id,category_id)
-);
-
-CREATE TABLE IF NOT EXISTS RoomInCategories (
-        room_id            BIGINT UNSIGNED NOT NULL,
-        category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(room_id)      REFERENCES Rooms(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
-	PRIMARY KEY(room_id,category_id)
-);
-
 CREATE TABLE IF NOT EXISTS DeviceInCategories (
         device_id          BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
@@ -468,6 +453,30 @@ CREATE TABLE IF NOT EXISTS GroupInCategories (
 	FOREIGN KEY(group_id)     REFERENCES Groups(id),
 	FOREIGN KEY(category_id)  REFERENCES Categories(id),
 	PRIMARY KEY(group_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS HWConfInCategories (
+        hwconf_id          BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(hwconf_id)    REFERENCES HWConfs(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(hwconf_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS RoomInCategories (
+        room_id            BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(room_id)      REFERENCES Rooms(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(room_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS SoftwareInCategories (
+        software_id        BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(software_id)  REFERENCES Software(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(software_id,category_id)
 );
 
 CREATE TABLE IF NOT EXISTS UserInCategories (

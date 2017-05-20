@@ -26,6 +26,8 @@ public class Software implements Serializable {
 
 	private String name;
 
+	private Integer weigth;
+	
 	//bi-directional many-to-one association to SoftwareLicens
 	@OneToMany(mappedBy="software")
 	private List<SoftwareLicense> softwareLicenses;
@@ -52,6 +54,14 @@ public class Software implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public Integer getWeigth() {
+		return this.weigth;
+	}
+
+	public void setWeigth(Integer weigth) {
+		this.weigth = weigth;
 	}
 
 	public String getDescription() {

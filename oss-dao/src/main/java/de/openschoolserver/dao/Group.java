@@ -122,11 +122,11 @@ public class Group implements Serializable {
 		acl.setGroup(null);
 	}
 
-        public List<Category> getCategories() {
-                return this.categories;
-        }
+    public List<Category> getCategories() {
+            return this.categories;
+    }
 
-        public void setCategories(List<Category> categories) {
-                this.categories = categories;
-        }
+    public void setCategories(List<Category> categories) {
+            this.categories = categories;
+    }
 }

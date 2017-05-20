@@ -1,6 +1,7 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -46,6 +47,16 @@ public class Category implements Serializable {
         @JsonIgnore
 	private List<Group> groups;
 
+    //bi-directional many-to-many association to Group
+        @ManyToMany
+        @JoinTable(
+            name="HWConfInCategories", 
+			joinColumns={ @JoinColumn(name="category_id") },
+			inverseJoinColumns={ @JoinColumn(name="hwconf_id") }
+        )
+        @JsonIgnore
+	private List<HWConf> hwconfs;
+        
 	//bi-directional many-to-many association to Room
         @ManyToMany
         @JoinTable(
@@ -125,6 +136,14 @@ public class Category implements Serializable {
 
 	public void setGroups(List<Group> groups) {
 		this.groups = groups;
+	}
+
+	public List<HWConf> getHWConfs() {
+		return this.hwconfs;
+	}
+
+	public void setHWConfs(List<HWConf> hwconfs) {
+		this.hwconfs = hwconfs;
 	}
 
 	public List<Room> getRooms() {
