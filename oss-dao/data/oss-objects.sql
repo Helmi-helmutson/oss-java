@@ -436,6 +436,8 @@ CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name         VARCHAR(32) NOT NULL,
 	description  VARCHAR(64) NOT NULL,
+        owner_id     BIGINT UNSIGNED DEFAULT NULL,
+        FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
 
