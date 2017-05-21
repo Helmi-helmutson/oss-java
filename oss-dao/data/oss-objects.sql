@@ -193,6 +193,9 @@ CREATE TABLE IF NOT EXISTS Acls (
         PRIMARY KEY(id)
 );
 
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.add');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.modify');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.search');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.add');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.delete');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.manage');
@@ -207,6 +210,7 @@ INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.delete');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.manage');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.modify');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.search');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','sysadmins');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.add');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.delete');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.manage');

@@ -16,6 +16,7 @@ import java.util.List;
 @Table(name="Devices")
 @NamedQueries( {
 	@NamedQuery(name="Device.findAll",    query="SELECT d FROM Device d"),
+	@NamedQuery(name="Device.findAllId",  query="SELECT d.id FROM Device d"),
 	@NamedQuery(name="Device.getByIP",    query="SELECT d FROM Device d where d.ip = :IP OR d.wlanip = :IP"),
 	@NamedQuery(name="Device.getByMAC",   query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
 	@NamedQuery(name="Device.getByName",  query="SELECT d FROM Device d where d.name = :name"),

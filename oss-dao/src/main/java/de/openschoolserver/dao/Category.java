@@ -2,6 +2,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 
+
 import javax.persistence.*;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -17,7 +18,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NamedQueries({
 	@NamedQuery(name="Category.findAll", query="SELECT c FROM Category c"),
 	@NamedQuery(name="Category.getByName",  query="SELECT c FROM Category c where c.name = :name"),
-	@NamedQuery(name="Category.getByDescription",  query="SELECT c FROM Category c where c.description = :description")
+	@NamedQuery(name="Category.getByDescription",  query="SELECT c FROM Category c where c.description = :description"),
+	@NamedQuery(name="Category.search", query="SELECT c FROM Category c WHERE c.name LIKE :search OR c.description = :search")
 })
 
 public class Category implements Serializable {
@@ -32,84 +34,92 @@ public class Category implements Serializable {
 
 	private String name;
 
+	//bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User owner;
+
+	@Column(name="owner_id", insertable=false, updatable=false)
+	private Long ownerId;
+
 	//bi-directional many-to-many association to Device
-        @ManyToMany
-        @JoinTable(        
-        	name="DeviceInCategories",
+	@ManyToMany
+	@JoinTable(        
+			name="DeviceInCategories",
 			joinColumns={ @JoinColumn(name="category_id") },
 			inverseJoinColumns={ @JoinColumn(name="device_id") }
-        )
+			)
 	@JsonIgnore
 	private List<Device> devices;
 
 	//bi-directional many-to-many association to Group
-        @ManyToMany
-        @JoinTable(
-            name="GroupInCategories", 
+	@ManyToMany
+	@JoinTable(
+			name="GroupInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
 			inverseJoinColumns={ @JoinColumn(name="group_id") }
-        )
-        @JsonIgnore
+			)
+	@JsonIgnore
 	private List<Group> groups;
 
-    //bi-directional many-to-many association to Group
-        @ManyToMany
-        @JoinTable(
-            name="HWConfInCategories", 
+	//bi-directional many-to-many association to Group
+	@ManyToMany
+	@JoinTable(
+			name="HWConfInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
 			inverseJoinColumns={ @JoinColumn(name="hwconf_id") }
-        )
-        @JsonIgnore
+			)
+	@JsonIgnore
 	private List<HWConf> hwconfs;
-        
+
 	//bi-directional many-to-many association to Room
-        @ManyToMany
-        @JoinTable(
-            name="RoomInCategories", 
+	@ManyToMany
+	@JoinTable(
+			name="RoomInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
 			inverseJoinColumns={ @JoinColumn(name="room_id") }
-        )
-        @JsonIgnore
+			)
+	@JsonIgnore
 	private List<Room> rooms;
 
 	//bi-directional many-to-many association to Software
-        @ManyToMany
-        @JoinTable(
-            name="SoftwareInCategories", 
+	@ManyToMany
+	@JoinTable(
+			name="SoftwareInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
 			inverseJoinColumns={ @JoinColumn(name="software_id") }
-        )
-        @JsonIgnore
+			)
+	@JsonIgnore
 	private List<Software> softwares;
-        
-    //bi-directional many-to-many association to Software
-    @ManyToMany
-    @JoinTable(
-        name="SoftwareRemovedFromCategories", 
-	    joinColumns={ @JoinColumn(name="category_id") },
-		inverseJoinColumns={ @JoinColumn(name="software_id") }
-    )
-    @JsonIgnore
+
+	//bi-directional many-to-many association to Software
+	@ManyToMany
+	@JoinTable(
+			name="SoftwareRemovedFromCategories", 
+			joinColumns={ @JoinColumn(name="category_id") },
+			inverseJoinColumns={ @JoinColumn(name="software_id") }
+			)
+	@JsonIgnore
 	private List<Software> removedSoftwares;
 
 	//bi-directional many-to-many association to User
-        @ManyToMany
-        @JoinTable(
-            name="UserInCategories", 
+	@ManyToMany
+	@JoinTable(
+			name="UserInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
 			inverseJoinColumns={ @JoinColumn(name="user_id") }
-        )
-        @JsonIgnore
+			)
+	@JsonIgnore
 	private List<User> users;
 
-    @Override
-    public boolean equals(Object obj) {
-          if (obj instanceof Category && obj !=null) {
-                  return getId() == ((Category)obj).getId();
-          }
-          return super.equals(obj);
-    }
-        
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof Category && obj !=null) {
+			return getId() == ((Category)obj).getId();
+		}
+		return super.equals(obj);
+	}
+
 	public Category() {
 	}
 
@@ -135,6 +145,14 @@ public class Category implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public User getOwner() {
+		return this.owner;
+	}
+
+	public void setOwner(User owner) {
+		this.owner = owner;
 	}
 
 	public List<Device> getDevices() {

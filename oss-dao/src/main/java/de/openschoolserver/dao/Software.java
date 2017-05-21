@@ -1,16 +1,19 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 import java.util.List;
-
 
 /**
  * The persistent class for the Software database table.
  * 
  */
 @Entity
-@NamedQuery(name="Software.findAll", query="SELECT s FROM Software s")
+@NamedQueries({
+	@NamedQuery(name="Software.findAll", query="SELECT s FROM Software s"),
+	@NamedQuery(name="Software.findAllId", query="SELECT s.id FROM Software s")
+})
 public class Software implements Serializable {
 	private static final long serialVersionUID = 1L;
 

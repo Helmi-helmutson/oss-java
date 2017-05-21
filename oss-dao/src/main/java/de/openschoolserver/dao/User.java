@@ -18,6 +18,7 @@ import javax.persistence.*;
 @Table(name="Users")
 @NamedQueries({
 	@NamedQuery(name="User.findAll", query="SELECT u FROM User u"),
+	@NamedQuery(name="User.findAllId", query="SELECT u.id FROM User u"),
 	@NamedQuery(name="User.findAllStudents", query="SELECT u FROM User u WHERE u.role = 'students' "),
 	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' "),
 	@NamedQuery(name="User.getByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
@@ -61,6 +62,10 @@ public class User implements Serializable {
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Device> ownedDevices;
+
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<Category> ownedCategories;
 
 	//bi-directional many-to-one association to TestFile
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
@@ -231,6 +236,14 @@ public class User implements Serializable {
 		acl.setUser(null);
 	}
 
+	public List<Category> getOwnedCategories() {
+		return this.ownedCategories;
+	}
+
+	public void setOwnedCagegories(List<Category> ownedCategories) {
+		this.ownedCategories = ownedCategories;
+	}
+	
 	public List<Device> getOwnedDevices() {
 		return this.ownedDevices;
 	}
