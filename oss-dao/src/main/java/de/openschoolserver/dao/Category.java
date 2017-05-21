@@ -14,7 +14,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name="Categories")
-@NamedQuery(name="Category.findAll", query="SELECT c FROM Category c")
+@NamedQueries({
+	@NamedQuery(name="Category.findAll", query="SELECT c FROM Category c"),
+	@NamedQuery(name="Category.getByName",  query="SELECT c FROM Category c where c.name = :name"),
+	@NamedQuery(name="Category.getByDescription",  query="SELECT c FROM Category c where c.description = :description")
+})
+
 public class Category implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -23,7 +28,7 @@ public class Category implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CATEGORIES_ID_GENERATOR")
 	private long id;
 
-	private String desciption;
+	private String description;
 
 	private String name;
 
@@ -76,6 +81,16 @@ public class Category implements Serializable {
         )
         @JsonIgnore
 	private List<Software> softwares;
+        
+    //bi-directional many-to-many association to Software
+    @ManyToMany
+    @JoinTable(
+        name="SoftwareRemovedFromCategories", 
+	    joinColumns={ @JoinColumn(name="category_id") },
+		inverseJoinColumns={ @JoinColumn(name="software_id") }
+    )
+    @JsonIgnore
+	private List<Software> removedSoftwares;
 
 	//bi-directional many-to-many association to User
         @ManyToMany
@@ -106,12 +121,12 @@ public class Category implements Serializable {
 		this.id = id;
 	}
 
-	public String getDesciption() {
-		return this.desciption;
+	public String getDescription() {
+		return this.description;
 	}
 
-	public void setDesciption(String desciption) {
-		this.desciption = desciption;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getName() {
@@ -162,6 +177,13 @@ public class Category implements Serializable {
 		this.softwares = softwares;
 	}
 
+	public List<Software> getRemovedSoftwares() {
+		return this.removedSoftwares;
+	}
+
+	public void setRemovedSoftwares(List<Software> softwares) {
+		this.removedSoftwares = softwares;
+	}
 	public List<User> getUsers() {
 		return this.users;
 	}

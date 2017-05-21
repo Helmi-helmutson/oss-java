@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS Aliases (
 CREATE TABLE IF NOT EXISTS HWConfs (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name          VARCHAR(32) NOT NULL,
-        description   VARCHAR(32) DEFAULT "",
+        description   VARCHAR(64) DEFAULT "",
         deviceType    VARCHAR(16) NOT NULL,
         PRIMARY KEY(id)
 );
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         hwconf_id    BIGINT UNSIGNED NOT NULL,
         name         VARCHAR(32) DEFAULT NULL,
-        description  VARCHAR(32) DEFAULT NULL,
+        description  VARCHAR(64) DEFAULT NULL,
         OS           VARCHAR(16) DEFAULT NULL,
         joinType     VARCHAR(16) DEFAULT NULL,
         tool         VARCHAR(16) DEFAULT NULL,
@@ -435,7 +435,7 @@ CREATE TABLE IF NOT EXISTS LicenseToDevice (
 CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name         VARCHAR(32) NOT NULL,
-	desciption   VARCHAR(32) NOT NULL,
+	description  VARCHAR(64) NOT NULL,
         PRIMARY KEY(id)
 );
 
@@ -472,6 +472,14 @@ CREATE TABLE IF NOT EXISTS RoomInCategories (
 );
 
 CREATE TABLE IF NOT EXISTS SoftwareInCategories (
+        software_id        BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(software_id)  REFERENCES Software(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(software_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS SoftwareRemovedFromCategories (
         software_id        BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
 	FOREIGN KEY(software_id)  REFERENCES Software(id),

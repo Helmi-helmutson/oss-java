@@ -35,6 +35,14 @@ public class Software implements Serializable {
 	//bi-directional many-to-one association to SoftwareVersion
 	@OneToMany(mappedBy="software")
 	private List<SoftwareVersion> softwareVersions;
+	
+	//bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="softwares")
+	private List<Category> categories;
+
+	//bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="removedSoftwares")
+	private List<Category> removedFromCategories;
 
 	public Software() {
 		this.manuell = false;
@@ -131,5 +139,21 @@ public class Software implements Serializable {
 
 		return softwareVersion;
 	}
+
+    public List<Category> getCategories() {
+        return this.categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+    
+    public List<Category> getRemovedFromCategories() {
+        return this.removedFromCategories;
+    }
+
+    public void setRemovedFromCategories(List<Category> categories) {
+        this.removedFromCategories = categories;
+    }
 
 }
