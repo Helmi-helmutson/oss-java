@@ -162,8 +162,8 @@ CREATE TABLE IF NOT EXISTS LoggedOn (
 );
 
 CREATE TABLE IF NOT EXISTS DefaultPrinter (
-        room_id      BIGINT UNSIGNED DEFAULT NULL,
-        device_id    BIGINT UNSIGNED DEFAULT NULL,
+        room_id      BIGINT UNSIGNED  NOT NULL,
+        device_id    BIGINT UNSIGNED NOT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
         FOREIGN KEY(room_id)    REFERENCES Rooms(id),
         FOREIGN KEY(device_id)  REFERENCES Devices(id),
@@ -512,6 +512,6 @@ CREATE TABLE IF NOT EXISTS AssignedSoftware (
 	FOREIGN KEY(room_id)      REFERENCES Rooms(id),
 	FOREIGN KEY(hwconf_id)    REFERENCES HWConfs(id),
 	FOREIGN KEY(category_id)  REFERENCES Categories(id),
-	PRIMARY KEY(software_id,device_id,room_id,hwconf_id,category_id)
+	PRIMARY KEY(software_id,device_id,room_id,hwconf_id,category_id)  -- dieser key passt nicht. elemente dürfen nicht null sein
 );
 
