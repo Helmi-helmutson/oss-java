@@ -27,7 +27,6 @@ public class SoftwareController extends Controller {
 	
 	public Software getById(long softwareId) {
 		EntityManager em = getEntityManager();
-
 		try {
 			return em.find(Software.class, softwareId);
 		} catch (Exception e) {
@@ -36,6 +35,51 @@ public class SoftwareController extends Controller {
 		} finally {
 			em.close();
 		}
+	}
+
+	public List<Software> search(String search) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("SoftwareStatus.search").setParameter("search",search);
+			return query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	public Response add(Software software) {
+		EntityManager em = getEntityManager();
+		//TODO it may be too simple
+		try {
+			em.getTransaction().begin();
+			em.persist(software);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Software was created succesfully");
+	}
+
+	public Response modify(Software software) {
+		EntityManager em = getEntityManager();
+		//TODO it may be too simple
+		try {
+			em.getTransaction().begin();
+			em.merge(software);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Software was created succesfully");
 	}
 
 	public Map<String, String> statistic() {
@@ -118,6 +162,11 @@ public class SoftwareController extends Controller {
 			em.merge(s);
 			em.merge(c);
 			em.getTransaction().commit();
+			for(Room r : c.getRooms() ) {
+				for( Device d : r.getDevices() ) {
+					this.removeSoftwareFromDevice(s,d);
+				}
+			}
 		} catch (Exception e) {
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		} finally {
@@ -126,6 +175,8 @@ public class SoftwareController extends Controller {
 		return new Response(this.getSession(),"OK","SoftwareState was added to category succesfully");
 	}
 	
+	private void removeSoftwareFromDevice(Software s, Device d) {
+	}
 	public Response saveSoftwareState(){
 		EntityManager em = getEntityManager();
 		RoomController   roomController   = new RoomController(this.session);
@@ -177,7 +228,7 @@ public class SoftwareController extends Controller {
 			for( String key : softwaresToDeinstall ) {
 				deviceSls.add(key+":");
 				deviceSls.add("  - pkg:");
-				deviceSls.add("    - deinstalled:");
+				deviceSls.add("    - removed:");
 		    }
 			if( deviceSls.size() > 0) {
 				Path SALT_ROOM   = Paths.get("/srv/salt/oss_device_" + device.getName() + ".sls");
@@ -223,7 +274,7 @@ public class SoftwareController extends Controller {
 			for( String key : softwaresToDeinstall ) {
 				roomSls.add(key+":");
 				roomSls.add("  - pkg:");
-				roomSls.add("    - deinstalled:");
+				roomSls.add("    - removed:");
 		    }
 			if( roomSls.size() > 0) {
 				Path SALT_ROOM   = Paths.get("/srv/salt/oss_room_" + room.getName() + ".sls");
@@ -271,7 +322,7 @@ public class SoftwareController extends Controller {
 			for( String key : softwaresToDeinstall ) {
 					hwconfSls.add(key+":");
 					hwconfSls.add("  - pkg:");
-					hwconfSls.add("    - deinstalled:");
+					hwconfSls.add("    - removed:");
 			}
 			if( hwconfSls.size() > 0) {
 				Path SALT_ROOM   = Paths.get("/srv/salt/oss_hwconf_" + hwconf.getName() + ".sls");

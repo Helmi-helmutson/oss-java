@@ -75,6 +75,22 @@ public class DeviceController extends Controller {
 	}
 
 	/*
+	 * Delivers a list of all existing devices
+	 */
+	public List<Long> getAllId() {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Device.findAllId");
+			return query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	/*
 	 * Deletes a list of device given by the device Ids.
 	 */
 	public Response delete(List<Long> deviceIds) {

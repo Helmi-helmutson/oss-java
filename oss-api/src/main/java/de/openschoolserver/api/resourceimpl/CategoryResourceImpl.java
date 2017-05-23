@@ -54,19 +54,25 @@ public class CategoryResourceImpl implements CategoryResources {
 	@Override
 	public Response addMember(Session session, long categoryId, String memberType, long memberId) {
 		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.addMember(memberId, categoryId, memberType);
+		return categoryController.addMember(categoryId, memberType, memberId);
 	}
 	
 	@Override
 	public Response removeMember(Session session, long categoryId, String memberType, long memberId) {
 		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.removeMember(memberId, categoryId, memberType);
+		return categoryController.removeMember(memberId, memberType, memberId);
 	}
 
 	@Override
 	public Response modify(Session session, Category category) {
 		final CategoryController categoryController = new CategoryController(session);
 		return categoryController.modify(category);
+	}
+
+	@Override
+	public Response delete(Session session, long categoryId) {
+		final CategoryController categoryController = new CategoryController(session);
+		return categoryController.delete(categoryId);
 	}
 
 }

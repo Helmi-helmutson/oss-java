@@ -137,12 +137,12 @@ public interface CategoryResources {
 			);
 	
 	/*
-	 * POST categories/add { hash }
+	 * POST categories/modify { hash }
 	 */
 	@POST
 	@Path("{categoryId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Create new category")
+	@ApiOperation(value = "Modify a category")
 	@ApiResponses(value = {
 			// TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -173,7 +173,23 @@ public interface CategoryResources {
 			);
 
 	/*
-	 * PUT categories/<categoryId>/<memeberType>/<memberId>
+	 * DELETE categories/<categoryId>
+	 */
+	@DELETE
+	@Path("{categoryId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Delets a category defined by id.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "Category not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("category.delete")
+	Response delete(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("categoryId") long categoryId
+			);
+
+	/*
+	 * DELETE categories/<categoryId>/<memeberType>/<memberId>
 	 */
 	@DELETE
 	@Path("{categoryId}/{memberType}/{memberId}")

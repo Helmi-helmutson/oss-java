@@ -29,7 +29,7 @@ public class CategoryController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Category.findAll"); 
-            return query.getResultList();
+			return query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -51,18 +51,18 @@ public class CategoryController extends Controller {
 	}
 	
 	public List<Category> search(String search) {
-        EntityManager em = getEntityManager();
-        try {
-            Query query = em.createNamedQuery("Category.search");
-            query.setParameter("search", search + "%");
-            return query.getResultList();
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return new ArrayList<>();
-        } finally {
-            em.close();
-        }
-    }
+		EntityManager em = getEntityManager();
+			try {
+				Query query = em.createNamedQuery("Category.search");
+				query.setParameter("search", search + "%");
+				return query.getResultList();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				return new ArrayList<>();
+			} finally {
+				em.close();
+			}
+		}
 
 	public Response add(Category category){
 		EntityManager em = getEntityManager();
@@ -137,36 +137,36 @@ public class CategoryController extends Controller {
 			objectIds.add(l);
 		}
 		switch(objectName){
-		case("Device"):
-			for(Device d : c.getDevices()) {
-				objectIds.remove(d.getId());
-			}
-		break;
-		case("Group"):
-			for(Group g : c.getGroups()) {
-				objectIds.remove(g.getId());
-			}
-		break;
-		case("HWConf"):
-			for(HWConf h : c.getHWConfs()) {
-				objectIds.remove(h.getId());
-			}
-		break;
-		case("Room"):
-			for(Room r: c.getRooms()) {
-				objectIds.remove(r.getId());
-			}
-		break;
-		case("Software"):
-			for(Software s: c.getSoftwares()) {
-				objectIds.remove(s.getId());
-			}
-		break;
-		case("User"):
-			for(User u: c.getUsers()) {
-				objectIds.remove(u.getId());
-			}
-		break;
+			case("Device"):
+				for(Device d : c.getDevices()) {
+					objectIds.remove(d.getId());
+				}
+			break;
+			case("Group"):
+				for(Group g : c.getGroups()) {
+					objectIds.remove(g.getId());
+				}
+			break;
+			case("HWConf"):
+				for(HWConf h : c.getHWConfs()) {
+					objectIds.remove(h.getId());
+				}
+			break;
+			case("Room"):
+				for(Room r: c.getRooms()) {
+					objectIds.remove(r.getId());
+				}
+			break;
+			case("Software"):
+				for(Software s: c.getSoftwares()) {
+					objectIds.remove(s.getId());
+				}
+			break;
+			case("User"):
+				for(User u: c.getUsers()) {
+					objectIds.remove(u.getId());
+				}
+			break;
 		}
 		return objectIds;
 	}
@@ -174,42 +174,56 @@ public class CategoryController extends Controller {
 	public List<Long> getAvailableMembers(Long categoryId, String objectName ) {
 		Category c = this.getById(categoryId);
 		List<Long> objectIds = new ArrayList<Long>();
+		EntityManager em = getEntityManager();
+		Query query;
 		switch(objectName){
-		case("Device"):
+			case("Device"):
+				query = em.createNamedQuery("Device.findAllId");
+			objectIds = query.getResultList();
 			for(Device d : c.getDevices()) {
-				objectIds.add(d.getId());
+				objectIds.remove(d.getId());
 			}
-		break;
-		case("Group"):
+			break;
+			case("Group"):
+				query = em.createNamedQuery("Group.findAllId");
+			objectIds = query.getResultList();
 			for(Group g : c.getGroups()) {
-				objectIds.add(g.getId());
+				objectIds.remove(g.getId());
 			}
-		break;
-		case("HWConf"):
+			break;
+			case("HWConf"):
+				query = em.createNamedQuery("HWConf.findAllId");
+			objectIds = query.getResultList();
 			for(HWConf h : c.getHWConfs()) {
-				objectIds.add(h.getId());
+				objectIds.remove(h.getId());
 			}
-		break;
-		case("Room"):
+			break;
+			case("Room"):
+				query = em.createNamedQuery("Room.findAllId");
+			objectIds = query.getResultList();
 			for(Room r: c.getRooms()) {
-				objectIds.add(r.getId());
+				objectIds.remove(r.getId());
 			}
-		break;
-		case("Software"):
+			break;
+			case("Software"):
+				query = em.createNamedQuery("Software.findAllId");
+			objectIds = query.getResultList();
 			for(Software s: c.getSoftwares()) {
-				objectIds.add(s.getId());
+				objectIds.remove(s.getId());
 			}
-		break;
-		case("User"):
+			break;
+			case("User"):
+				query = em.createNamedQuery("User.findAllId");
+			objectIds = query.getResultList();
 			for(User u: c.getUsers()) {
-				objectIds.add(u.getId());
+				objectIds.remove(u.getId());
 			}
-		break;
+			break;
 		}
 		return objectIds;
 	}
-	
-	public Response addMember(Long objectId,Long categoryId, String objectName ) {
+
+	public Response addMember(Long categoryId, String objectName,Long objectId ) {
 		String table = objectName + "InCategory";
 		EntityManager em = getEntityManager();
 		try {
@@ -226,8 +240,8 @@ public class CategoryController extends Controller {
 		return new Response(this.getSession(),"OK","Category was modified");
 	}
 	
-	public Response removeMember(Long objectId,Long categoryId, String objectName ) {
-		String table  = objectName + "InCategory";
+	public Response removeMember(Long categoryId, String objectName, Long objectId ) {
+		String table = objectName + "InCategory";
 		String idName = objectName.toLowerCase()+"_id";
 		EntityManager em = getEntityManager();
 		try {
@@ -235,6 +249,12 @@ public class CategoryController extends Controller {
 			Query query = em.createQuery("DELETE FROM "+table+" WHERE " + idName + " = " + objectId + " AND category_id = " + categoryId);
 			query.executeUpdate();
 			em.getTransaction().commit();
+			if( objectName.equals("Software") ) {
+				em.getTransaction().begin();
+				query = em.createQuery("INSER INTO SoftwareRemovedFromCategories Values(" + categoryId + "," + objectId + ")");
+				query.executeUpdate();
+				em.getTransaction().commit();
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());

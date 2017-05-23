@@ -32,6 +32,8 @@ public class SystemController extends Controller {
         Query query;
         Integer count;
         
+        //TODO System Load, HD, License, ....
+
         //Groups;
         statusMap = new HashMap<>();
         statusMap.put("name","groups");
@@ -76,7 +78,12 @@ public class SystemController extends Controller {
             statusMap.put(deviceType,count.toString());
         }
         statusList.add(statusMap);
-
+        
+        //Software
+        SoftwareController softwareController = new SoftwareController(this.session);
+        statusList.add(softwareController.statistic());
+        
+        
         return statusList;
     }
     

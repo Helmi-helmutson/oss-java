@@ -100,13 +100,18 @@ public class Device implements Serializable {
 	@JsonIgnore
 	private List<SoftwareLicense> softwareLicenses;
 
+	//bi-directional many-to-one association to SoftwareStatus
+	@OneToMany(mappedBy="device")
+	@JsonIgnore
+	private List<SoftwareStatus> softwareStatus;
+
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
 	@JsonIgnore
 	private HWConf hwconf;
 
-    @Column(name="hwconf_id", insertable=false, updatable=false)
-    private Long hwconfId;
+	@Column(name="hwconf_id", insertable=false, updatable=false)
+	private Long hwconfId;
 
 	//bi-directional many-to-one association to Room
 	@ManyToOne
@@ -367,27 +372,35 @@ public class Device implements Serializable {
 		return deviceMConfig;
 	}
 
-    public List<Category> getCategories() {
-            return this.categories;
-    }
+	public List<Category> getCategories() {
+	        return this.categories;
+	}
 
-    public void setCategories(List<Category> categories) {
-            this.categories = categories;
-    }
-        
-    public List<SoftwareLicense> getSoftwareLicences() {
-    	return this.softwareLicenses;
-    }
-    
-    public void getSoftwareLicences(List<SoftwareLicense> licenses) {
-    	this.softwareLicenses = licenses;
-    }
-    
-    public void addSoftwareLicens(SoftwareLicense sl) {
-    	this.softwareLicenses.add(sl);
-    }
+	public void setCategories(List<Category> categories) {
+	        this.categories = categories;
+	}
 
-    public void removeSoftwareLicens(SoftwareLicense sl) {
-    	this.softwareLicenses.remove(sl);
-    }
+	public List<SoftwareLicense> getSoftwareLicences() {
+		return this.softwareLicenses;
+	}
+
+	public void getSoftwareLicences(List<SoftwareLicense> licenses) {
+		this.softwareLicenses = licenses;
+	}
+
+	public void addSoftwareLicens(SoftwareLicense sl) {
+		this.softwareLicenses.add(sl);
+	}
+
+	public void removeSoftwareLicens(SoftwareLicense sl) {
+		this.softwareLicenses.remove(sl);
+	}
+
+	public void setSofwareStatus(List<SoftwareStatus> st) {
+		this.softwareStatus = st;
+	}
+
+	public List<SoftwareStatus> getSofwareStatus() {
+		return this.softwareStatus;
+	}
 }
