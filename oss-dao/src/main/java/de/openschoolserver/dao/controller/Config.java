@@ -98,7 +98,8 @@ public class Config {
 	}
 	
 	public Boolean setConfigValue(String key, String value){
-		if(readOnly.get(key)){
+		Boolean ro = readOnly.get(key);
+		if(ro!=null && ro.booleanValue()){
 			return false;
 		}
 		ossConfig.put(key, value);

@@ -185,6 +185,7 @@ public class SystemController extends Controller {
         DeviceController deviceController = new DeviceController(this.session);
         
         for( String outRule : fwConfig.getConfigValue("FW_MASQ_NETS").split(" ") ) {
+        	if (outRule.length() > 0) {
             statusMap = new HashMap<>();
             String[] rule = outRule.split(",");
             String[] host = rule[0].split("/");
@@ -206,6 +207,7 @@ public class SystemController extends Controller {
             statusMap.put("prot", prot);
             statusMap.put("port", port);
             firewallList.add(statusMap);
+        	}
         }
         return firewallList;
     }
@@ -223,7 +225,9 @@ public class SystemController extends Controller {
                 room = roomController.getById(Long.parseLong(map.get("id")));
                 data.append(room.getNetwork() + "/" + String.valueOf(room.getNetMask()) +",");
             } else {
+            	
                 device = deviceController.getById(Long.parseLong(map.get("id")));
+                
                 data.append(device.getIp() + "/32,");
             }
             data.append(map.get("dest"));
