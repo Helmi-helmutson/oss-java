@@ -223,7 +223,7 @@ public class SystemController extends Controller {
             StringBuilder data = new StringBuilder();
             if( map.get("type").equals("room")) {
                 room = roomController.getById(Long.parseLong(map.get("id")));
-                data.append(room.getNetwork() + "/" + String.valueOf(room.getNetMask()) +",");
+                data.append(room.getStartIP() + "/" + String.valueOf(room.getNetMask()) +",");
             } else {
             	
                 device = deviceController.getById(Long.parseLong(map.get("id")));
@@ -250,14 +250,18 @@ public class SystemController extends Controller {
         DeviceController deviceController = new DeviceController(this.session);
         
         for( String outRule : fwConfig.getConfigValue("FW_FORWARD_MASQ").split(" ") ) {
-            statusMap = new HashMap<>();
-            String[] rule = outRule.split(",");
-            Device device = deviceController.getByIP(rule[1]);
-            statusMap.put("ext", rule[3]);
-            statusMap.put("id",  Long.toString(device.getId()) );
-            statusMap.put("name", device.getName() );
-            statusMap.put("port", rule[4]);
-            firewallList.add(statusMap);
+        	if (outRule!=null && outRule.length()>0) {
+	            statusMap = new HashMap<>();
+	            String[] rule = outRule.split(",");
+	            if (rule!=null && rule.length>=4) {
+		            Device device = deviceController.getByIP(rule[1]);
+		            statusMap.put("ext", rule[3]);
+		            statusMap.put("id",  Long.toString(device.getId()) );
+		            statusMap.put("name", device.getName() );
+		            statusMap.put("port", rule[4]);
+		            firewallList.add(statusMap);
+	            }
+        	}
         }
         return firewallList;
     }
