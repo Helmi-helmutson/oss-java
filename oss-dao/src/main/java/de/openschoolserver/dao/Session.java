@@ -13,7 +13,7 @@ import javax.persistence.*;
 import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
-@Table(name = "Session")
+@Table(name = "Sessions")
 @NamedQueries({ @NamedQuery(name = "Session.getByToken", query = "SELECT s FROM Session s WHERE s.token=:token") })
 public class Session implements Principal {
 
