@@ -87,7 +87,7 @@ public class SessionController extends Controller {
             this.session.setDeviceId(device.getId());
             this.session.setMac(device.getMac());
             this.session.setIP(device.getIp());
-            this.session.setDNSName(device.name());
+            this.session.setDNSName(device.getName());
         } else {
             //Evaluate the MAC Address
             if( !IP.contains("127.0.0.1") && IPv4.validateIPAddress(IP) && room == null ) {
