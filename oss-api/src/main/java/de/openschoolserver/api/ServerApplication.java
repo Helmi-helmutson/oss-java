@@ -99,9 +99,12 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final DeviceResource devicesResource = new DeviceResourceImpl();
         environment.jersey().register(devicesResource);
         
-        final CloneToolResource cloneToolResource = new CloneToolRescourceImpl();
+        final CloneToolResource cloneToolResource = new CloneToolResourceImpl();
         environment.jersey().register(cloneToolResource);
         
+        final SoftwareResource softwareResource = new SoftwareResourceImpl();
+        environment.jersey().register(softwareResource);
+
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
 
