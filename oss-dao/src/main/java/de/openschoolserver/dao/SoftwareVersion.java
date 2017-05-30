@@ -10,6 +10,7 @@ import java.util.List;
  * 
  */
 @Entity
+@Table(name = "SoftwareVersion")
 @NamedQuery(name="SoftwareVersion.findAll", query="SELECT s FROM SoftwareVersion s")
 public class SoftwareVersion implements Serializable {
 	private static final long serialVersionUID = 1L;

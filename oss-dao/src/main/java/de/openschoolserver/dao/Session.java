@@ -60,7 +60,10 @@ public class Session implements Principal {
     private Room room;
     
     @Transient
-    private String mac = "dummy";
+    private String mac;
+    
+    @Transient
+    private String dnsName;
     
     @Column(name = "ip")
     private String ip;
@@ -78,6 +81,8 @@ public class Session implements Principal {
     public Session() {
     	this.deviceId = null;
     	this.roomId   = null;
+    	this.dnsName  = null;
+    	this.mac      = null;
     }
     
     @Override
@@ -202,5 +207,13 @@ public class Session implements Principal {
 
     public void setMac(String mac) {
         this.mac = mac;
+    }
+    
+    public String getDNSName() {
+        return this.dnsName;
+    }
+
+    public void setDNSName(String dnsName) {
+        this.dnsName = dnsName;
     }
 }
