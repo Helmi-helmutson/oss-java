@@ -99,17 +99,18 @@ public class GroupController extends Controller {
 	}
 
 	public Response modify(Group group){
-		//TODO make some checks!!
+		Group oldGroup = this.getById(group.getId());
+		oldGroup.setDescription(group.getDescription());
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			em.merge(group);
+			em.merge(oldGroup);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
-		this.startPlugin("modify_group", group);
+		this.startPlugin("modify_group", oldGroup);
 		return new Response(this.getSession(),"OK","Group was modified");
 	}
 

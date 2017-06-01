@@ -1,6 +1,8 @@
+/* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
+
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
@@ -59,7 +61,7 @@ public interface SoftwareResource {
 			);
 	
 	/*
-	 * GET software/search/{search}
+	 * GET softwares/search/{search}
 	 */
 	@GET
 	@Path("search/{search}")
@@ -77,7 +79,7 @@ public interface SoftwareResource {
 			);
 
 	/*
-	 * POST software/add { hash }
+	 * POST softwares/add { hash }
 	 */
 	@POST
 	@Path("add")
@@ -95,7 +97,7 @@ public interface SoftwareResource {
 			);
 	
 	/*
-	 * POST software/modify { hash }
+	 * POST softwares/modify { hash }
 	 */
 	@POST
 	@Path("{softwareId}")
@@ -113,7 +115,7 @@ public interface SoftwareResource {
 			);
 	
 	/*
-	 * DELETE software/<softwareId>
+	 * DELETE softwares/<softwareId>
 	 */
 	@DELETE
 	@Path("{softwareId}")
@@ -127,4 +129,20 @@ public interface SoftwareResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("softwareId") long softwareId
 			);
+	
+	/*
+	 * PUT 
+	 */
+	@PUT
+	@Path("saveState")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Save the actuall software configuration.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "Software not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.modify")
+	Response saveState(
+			@ApiParam(hidden = true) @Auth Session session
+			);
+	
 }

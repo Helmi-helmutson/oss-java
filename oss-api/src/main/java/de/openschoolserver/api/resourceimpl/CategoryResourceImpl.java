@@ -3,13 +3,13 @@ package de.openschoolserver.api.resourceimpl;
 import java.util.List;
 
 
-import de.openschoolserver.api.resources.CategoryResources;
+import de.openschoolserver.api.resources.CategoryResource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.CategoryController;
 
-public class CategoryResourceImpl implements CategoryResources {
+public class CategoryResourceImpl implements CategoryResource {
 
 	public CategoryResourceImpl() {
 		// TODO Auto-generated constructor stub

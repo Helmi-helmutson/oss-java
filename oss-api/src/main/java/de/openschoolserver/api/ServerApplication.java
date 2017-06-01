@@ -102,12 +102,13 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final CloneToolResource cloneToolResource = new CloneToolResourceImpl();
         environment.jersey().register(cloneToolResource);
         
+        final CategoryResource categoryResource = new CategoryResourceImpl();
+        environment.jersey().register(categoryResource);
+
         final SoftwareResource softwareResource = new SoftwareResourceImpl();
         environment.jersey().register(softwareResource);
 
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
-
     }
-
 }

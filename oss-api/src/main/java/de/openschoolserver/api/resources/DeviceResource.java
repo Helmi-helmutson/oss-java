@@ -5,6 +5,7 @@ package de.openschoolserver.api.resources;
 import io.dropwizard.auth.Auth;
 
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -276,11 +277,45 @@ public interface DeviceResource {
     @Path("refreshConfig")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Refresh the DHCP DNS and SALT Configuration.")
-        @ApiResponses(value = {
+    @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.add")
     void refreshConfig(
             @ApiParam(hidden = true) @Auth Session session
     );
+    
+    /*
+     * PUSH devices/modify
+     */
+    @POST
+    @Path("modify")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Modify the configuration of one device.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.modify")
+    Response modify(
+    		@ApiParam(hidden = true) @Auth Session session,
+            Device device
+    );
+    
+    /*
+     * DELETE 
+     */
+    @DELETE
+    @Path("{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Removes a device.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.modify")
+    Response delete(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("deviceId") long deviceId
+    );
+    
+    
 }

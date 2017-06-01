@@ -11,7 +11,12 @@ import java.util.List;
  */
 @Entity
 @Table(name = "SoftwareVersions")
-@NamedQuery(name="SoftwareVersion.findAll", query="SELECT s FROM SoftwareVersion s")
+@NamedQueries({
+	@NamedQuery(name="SoftwareVersion.findAll",       query="SELECT s FROM SoftwareVersion s"),
+	@NamedQuery(name="SoftwareVersion.get", query="SELECT s FROM SoftwareVersion s WHERE s.softwareId = :SOFTWARE and s.version = :VERSION"),
+	@NamedQuery(name="SoftwareVersion.getBySoftware", query="SELECT s FROM SoftwareVersion s WHERE s.softwareId = :SOFTWARE"),
+	
+})
 public class SoftwareVersion implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -22,15 +27,22 @@ public class SoftwareVersion implements Serializable {
 
 	private String version;
 
-	//bi-directional many-to-one association to SoftwareStatus
-	@OneToMany(mappedBy="softwareVersion")
+	//bi-directional many-to-one associatio, cascade=CascadeType.REMOVEn to SoftwareStatus
+	@OneToMany(mappedBy="softwareVersion", cascade=CascadeType.REMOVE)
 	private List<SoftwareStatus> softwareStatuses;
 
 	//bi-directional many-to-one association to Software
 	@ManyToOne
 	private Software software;
+	@Column(name = "software_id", insertable = false, updatable = false)
+    private Long softwareId;
 
 	public SoftwareVersion() {
+	}
+
+	public SoftwareVersion(Software software, String version) {
+		this.software = software;
+		this.version  = version;
 	}
 
 	public long getId() {

@@ -1,6 +1,7 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,22 @@ public class SoftwareController extends Controller {
 		}
 		return new Response(this.getSession(),"OK","Software was created succesfully");
 	}
+	
+	public Response delete(Long softwareId) {
+		EntityManager em = getEntityManager();
+		Software software = this.getById(softwareId);
+		try {
+			em.getTransaction().begin();
+			em.remove(software);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Software was deleted succesfully");
+	}
 
 	public Map<String, String> statistic() {
 		Map<String,String> statusMap = new HashMap<>();
@@ -118,6 +135,12 @@ public class SoftwareController extends Controller {
 		return (List<Software>)query.getResultList();
 	}
 
+	public Software getByNam(String name) {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Software.getByName").setParameter("name", name);
+		return (Software) query.getResultList().get(0);
+	}
+	
 	public List<SoftwareVersion> getAllVersion() {
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("SoftwareVersion.findAll");
@@ -164,7 +187,7 @@ public class SoftwareController extends Controller {
 			em.getTransaction().commit();
 			for(Room r : c.getRooms() ) {
 				for( Device d : r.getDevices() ) {
-					this.removeSoftwareFromDevice(s,d);
+					this.modifySoftwareStatusOnDevice(d,s,"","deinstallation_scheduled");
 				}
 			}
 		} catch (Exception e) {
@@ -175,8 +198,137 @@ public class SoftwareController extends Controller {
 		return new Response(this.getSession(),"OK","SoftwareState was added to category succesfully");
 	}
 	
-	private void removeSoftwareFromDevice(Software s, Device d) {
+	public void setSoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
+		EntityManager em = getEntityManager();
+		List<SoftwareVersion> lsv;
+		Query query= em.createNamedQuery("SoftwareStatus.get")
+				.setParameter("SOFTWARE", s.getId())
+				.setParameter("DEVICE", d.getId());
+		
+		List<SoftwareStatus> lss = query.getResultList();
+		try {
+			em.getTransaction().begin();
+			if( !lss.isEmpty()) {
+				for( SoftwareStatus ss : lss ) {
+					if( ss.getSoftwareVersion().getVersion().equals(version) ) {
+						ss.setStatus(status);
+						em.merge(ss);
+					} else {
+						em.remove(ss);
+					}
+				}
+			} else {
+				query = em.createNamedQuery("SoftwareVersion.getBySDoftware")
+						.setParameter("SOFTWARE", s.getId());
+				lsv = query.getResultList();
+				if( lsv.isEmpty() ) {
+					SoftwareVersion sv = new SoftwareVersion(s,"0.0");
+					em.persist(sv);
+					SoftwareStatus ss = new SoftwareStatus(d,sv,status);
+					em.persist(ss);
+				} else {
+					for( SoftwareVersion sv : lsv ) {
+						SoftwareStatus ss = new SoftwareStatus(d,sv,status);
+						em.persist(ss);
+					}
+				}
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			em.close();
+		}
 	}
+
+	public void modifySoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
+		EntityManager em = getEntityManager();
+		List<SoftwareVersion> lsv;
+		Query query;
+		if( version.isEmpty() ) {
+			query = em.createNamedQuery("SoftwareStatus.get")
+					.setParameter("SOFTWARE", s.getId())
+					.setParameter("DEVICE", d.getId());
+		} else {
+			query = em.createNamedQuery("SoftwareStatus.get")
+					.setParameter("SOFTWARE", s.getId())
+					.setParameter("DEVICE", d.getId())
+					.setParameter("VERSION", version);
+		}
+		List<SoftwareStatus> lss = query.getResultList();
+		try {
+			em.getTransaction().begin();
+			for( SoftwareStatus ss : lss ) {
+					ss.setStatus(status);
+					em.merge(ss);
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			em.close();
+		}
+	}
+
+	public void removeSoftwareStatusOnDevice(Device d, Software s,  String version) {
+		EntityManager em = getEntityManager();
+		List<SoftwareVersion> lsv;
+		Query query;
+		if( version.isEmpty() ) {
+			query = em.createNamedQuery("SoftwareStatus.get")
+					.setParameter("SOFTWARE", s.getId())
+					.setParameter("DEVICE", d.getId());
+		} else {
+			query = em.createNamedQuery("SoftwareStatus.get")
+					.setParameter("SOFTWARE", s.getId())
+					.setParameter("DEVICE", d.getId())
+					.setParameter("VERSION", version);
+		}
+		List<SoftwareStatus> lss = query.getResultList();
+		try {
+			em.getTransaction().begin();
+			for( SoftwareStatus ss : lss ) {
+					em.remove(ss);
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			em.close();
+		}
+	}
+
+	public String getSoftwareStatusOnDevice(Device d, Software s,  String version) {
+		EntityManager em = getEntityManager();
+		List<SoftwareVersion> lsv;
+		Query query;
+		if( version.isEmpty() ) {
+			query = em.createNamedQuery("SoftwareStatus.get")
+					.setParameter("SOFTWARE", s.getId())
+					.setParameter("DEVICE", d.getId());
+		} else {
+			query = em.createNamedQuery("SoftwareStatus.get")
+					.setParameter("SOFTWARE", s.getId())
+					.setParameter("DEVICE", d.getId())
+					.setParameter("VERSION", version);
+		}
+		List<SoftwareStatus> lss = query.getResultList();
+		for( SoftwareStatus ss : lss ) {
+			return ss.getStatus();
+		}
+		em.close();
+		return "";
+	}
+
+	public boolean checkSoftwareStatusOnDevice(Device d, Software s,  String version) {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("SoftwareStatus.get")
+					.setParameter("SOFTWARE", s.getId())
+					.setParameter("DEVICE", d.getId())
+					.setParameter("VERSION", version);
+		return ! query.getResultList().isEmpty();
+	}
+
 	public Response saveSoftwareState(){
 		EntityManager em = getEntityManager();
 		RoomController   roomController   = new RoomController(this.session);
@@ -219,16 +371,24 @@ public class SoftwareController extends Controller {
 			if( !keys.isEmpty() ) {
 				keys.sort((String s1, String s2) -> { return s2.compareTo(s1); });
 				for( String key : keys ){
-					deviceSls.add(softwareMap.get(key)+":");
+					String sw = softwareMap.get(key);
+					Software software = this.getByNam(sw);
+					deviceSls.add(sw+":");
 					deviceSls.add("  - pkg:");
 					deviceSls.add("    - installed:");
+					if(! this.checkSoftwareStatusOnDevice(device, software, "installed")){
+						this.setSoftwareStatusOnDevice(device, software, "", "installation_scheduled");
+					}
 				}
-				
 			}
 			for( String key : softwaresToDeinstall ) {
 				deviceSls.add(key+":");
 				deviceSls.add("  - pkg:");
 				deviceSls.add("    - removed:");
+				Software software = this.getByNam(key);
+				if( this.checkSoftwareStatusOnDevice(device, software, "installed") ){
+					this.setSoftwareStatusOnDevice(device, software, "", "deinstallation_scheduled");
+				}
 		    }
 			if( deviceSls.size() > 0) {
 				Path SALT_ROOM   = Paths.get("/srv/salt/oss_device_" + device.getName() + ".sls");

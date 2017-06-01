@@ -1,3 +1,4 @@
+/* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
@@ -39,14 +40,20 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public Response modify(Session session, Software software) {
-		// TODO Auto-generated method stub
-		return null;
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.modify(software);
 	}
 
 	@Override
 	public Response delete(Session session, long softwareId) {
-		// TODO Auto-generated method stub
-		return null;
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.delete(softwareId);
+	}
+
+	@Override
+	public Response saveState(Session session) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.saveSoftwareState();
 	}
 
 }

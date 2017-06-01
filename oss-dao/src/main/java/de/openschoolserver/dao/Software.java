@@ -32,11 +32,11 @@ public class Software implements Serializable {
 	private Integer weigth;
 	
 	//bi-directional many-to-one association to SoftwareLicens
-	@OneToMany(mappedBy="software")
+	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	private List<SoftwareLicense> softwareLicenses;
 
 	//bi-directional many-to-one association to SoftwareVersion
-	@OneToMany(mappedBy="software")
+	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	private List<SoftwareVersion> softwareVersions;
 	
 	//bi-directional many-to-many association to Category

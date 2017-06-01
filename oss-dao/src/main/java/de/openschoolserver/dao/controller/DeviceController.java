@@ -96,12 +96,16 @@ public class DeviceController extends Controller {
 	public Response delete(List<Long> deviceIds) {
 		EntityManager em = getEntityManager();
 		try {
+			em.getTransaction().begin();
 			for( Long deviceId : deviceIds) {
 				Device dev = em.find(Device.class, deviceId);
-				if( this.isProtected(dev) )
+				if( this.isProtected(dev) ) {
 					return new Response(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
+				}
 				em.remove(dev);
+				this.startPlugin("delete_device", dev);
 			}
+			em.getTransaction().commit();
 			return new Response(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -112,13 +116,21 @@ public class DeviceController extends Controller {
 	}
 
 	/*
-	 * Deletes a list of device given by the device Ids.
+	 * Deletes a device given by the device Ids.
 	 */
 	public Response delete(Long deviceId) {
 		EntityManager em = getEntityManager();
 		try {
+			em.getTransaction().begin();
 			Device dev = em.find(Device.class, deviceId);
+			if( this.isProtected(dev) ) {
+				return new Response(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
+			}
 			em.remove(dev);
+			em.getTransaction().commit();
+			this.startPlugin("delete_device", dev);
+			DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+			dhcpconfig.Create();
 			return new Response(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("deviceId: " + deviceId + " " + e.getMessage());
@@ -426,5 +438,49 @@ public class DeviceController extends Controller {
 			em.close();
 		}
 		return new Response(this.getSession(),"OK", "Logged in user was removed succesfully:" + device.getName() + ";" + IP + ";" + userName);
+	}
+	
+	public Response modify(Device device) {
+		Device oldDevice = this.getById(device.getId());
+		List<String> error = new ArrayList<String>();
+		//Check the MAC address
+		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
+		String name =  this.isMacUnique(device.getMac());
+		if( name != "" ){
+			error.add("The MAC address '" + device.getMac() + "' will be used allready:" + name );
+		}
+		if( ! IPv4.validateMACAddress(device.getMac())) {
+			error.add("The MAC address is not valid:" + device.getMac() );	
+		}
+		if( !device.getWlanMac().isEmpty() ) {
+			//Check the MAC address
+			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
+			name =  this.isMacUnique(device.getWlanMac());
+			if( name != "" ){
+				error.add("The WLAN MAC address will be used allready:" + name );
+			}
+			if( ! IPv4.validateMACAddress(device.getMac())) {
+				error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );	
+			}
+		}
+		if(!error.isEmpty()){
+			return new Response(this.getSession(),"ERROR",String.join(System.lineSeparator(),error));
+		}
+		EntityManager em = getEntityManager();
+		try {
+			oldDevice.setMac(device.getMac());
+			oldDevice.setWlanMac(device.getWlanMac());
+			oldDevice.setPlace(device.getPlace());
+			oldDevice.setRow(device.getPlace());
+			em.getTransaction().begin();
+			em.merge(oldDevice);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		this.startPlugin("modify_device", oldDevice);
+		return new Response(this.getSession(),"OK", "Device was modified succesfully.");
 	}
 }
