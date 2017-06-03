@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import de.openschoolserver.dao.*;
 
+@SuppressWarnings( "unchecked" )
 public class CategoryController extends Controller {
 	
 	static String[] categoriesIn = { 
@@ -174,8 +175,6 @@ public class CategoryController extends Controller {
 	public List<Long> getMembers(Long categoryId, String objectName ) {
 		Category c = this.getById(categoryId);
 		List<Long> objectIds = new ArrayList<Long>();
-		EntityManager em = getEntityManager();
-		Query query;
 		switch(objectName){
 		case("Device"):
 			for(Device d : c.getDevices()) {

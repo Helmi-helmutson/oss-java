@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,14 +12,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
-import de.openschoolserver.dao.tools.*;
 
+@SuppressWarnings( "unchecked" )
 public class GroupController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(DeviceController.class);

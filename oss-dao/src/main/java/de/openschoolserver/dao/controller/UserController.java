@@ -22,7 +22,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.controller.DHCPConfig;
 
-
+@SuppressWarnings( "unchecked" )
 public class UserController extends Controller {
 
     Logger logger = LoggerFactory.getLogger(UserController.class);

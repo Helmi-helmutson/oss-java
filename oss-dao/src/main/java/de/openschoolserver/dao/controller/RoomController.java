@@ -1,4 +1,4 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.tools.*;
 
+@SuppressWarnings( "unchecked" )
 public class RoomController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(RoomController.class);

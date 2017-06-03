@@ -16,6 +16,7 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Room;
 import java.util.*;
 
+@SuppressWarnings( "unchecked" )
 public class SystemController extends Controller {
 
     Logger logger = LoggerFactory.getLogger(SystemController.class);
