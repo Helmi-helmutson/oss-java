@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import de.openschoolserver.dao.*;
 
+@SuppressWarnings( "unchecked" )
 public class SoftwareController extends Controller {
 	
 	Logger logger = LoggerFactory.getLogger(CloneToolController.class);
@@ -198,6 +199,90 @@ public class SoftwareController extends Controller {
 		return new Response(this.getSession(),"OK","SoftwareState was added to category succesfully");
 	}
 	
+	/*
+	 * Add a license to a software
+	 */
+	public Response addLicenseToSoftware(SoftwareLicense softwareLicense, Long softwareId ) {
+		EntityManager em = getEntityManager();
+		Software software = this.getById(softwareId);
+		try {
+			//TODO save the file.
+			em.getTransaction().begin();
+			software.getSoftwareLicenses().add(softwareLicense);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","License was added to the software succesfully");
+	}
+	
+	/*
+	 *  Add Licenses to a HWConf 
+	 */
+	public Response addSoftwareLicenseToHWConf(Software software, HWConf hwconf) {
+		return this.addSoftwareLicenseToDevices(software, hwconf.getDevices());
+	}
+	
+	/*
+	 *  Add Licenses to a Room
+	 */
+	public Response addSoftwareLicenseToRoom(Software software, Room room) {
+		return this.addSoftwareLicenseToDevices(software, room.getDevices());
+	}
+	
+	/*
+	 * Add Licenses to devices
+	 */
+	public Response addSoftwareLicenseToDevices(Software software, List<Device> devices ){
+		EntityManager em = getEntityManager();
+		SoftwareLicense softwareLicense;
+ 		List<String> failedDevices = new ArrayList<String>();
+ 		for( Device device : devices ) {
+ 			for( SoftwareLicense myLicense : device.getSoftwareLicences() ) {
+ 				if( myLicense.getSoftware().equals(software) ){
+ 					continue;
+ 				}
+ 			}
+ 			softwareLicense = this.getNextFreeLicenseId(software);
+ 			if( softwareLicense == null) {
+ 				failedDevices.add(device.getName());
+ 			} else {
+ 				try {
+ 					em.getTransaction().begin();
+ 					device.getSoftwareLicences().add(softwareLicense);
+ 					softwareLicense.getDevices().add(device);
+ 					em.getTransaction().commit();
+ 				} catch (Exception e) {
+ 					logger.error(e.getMessage());
+ 					em.close();
+ 					return new Response(this.getSession(),"ERROR",e.getMessage());
+ 				}
+ 			}
+ 		}
+ 		em.close();
+ 		if(failedDevices.isEmpty() ) {
+ 			return new Response(this.getSession(),"OK","License was added to the devices succesfully");
+ 		}
+ 		return new Response(this.getSession(),"ERROR","License could not be added to the following devices" + String.join(", ", failedDevices));
+	}
+	
+	/*
+	 * Return the next free license
+	 */
+	private  SoftwareLicense getNextFreeLicenseId(Software software) {
+		for( SoftwareLicense softwareLicense : software.getSoftwareLicenses() ) {
+			if( softwareLicense.getCount() > softwareLicense.getDevices().size() ) {
+				return softwareLicense;
+			}
+		}
+		return null;
+	}
+
+	/*
+	 * Sets the software status on a device to a given version and remove the other status.
+	 */
 	public void setSoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
 		EntityManager em = getEntityManager();
 		List<SoftwareVersion> lsv;
@@ -241,9 +326,11 @@ public class SoftwareController extends Controller {
 		}
 	}
 
+	/*
+	 * Modify the software status on a device. If there is no status nothing will be happenend.
+	 */
 	public void modifySoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
 		EntityManager em = getEntityManager();
-		List<SoftwareVersion> lsv;
 		Query query;
 		if( version.isEmpty() ) {
 			query = em.createNamedQuery("SoftwareStatus.get")
@@ -270,9 +357,11 @@ public class SoftwareController extends Controller {
 		}
 	}
 
+	/*
+	 * Remove the software status from a device.
+	 */
 	public void removeSoftwareStatusOnDevice(Device d, Software s,  String version) {
 		EntityManager em = getEntityManager();
-		List<SoftwareVersion> lsv;
 		Query query;
 		if( version.isEmpty() ) {
 			query = em.createNamedQuery("SoftwareStatus.get")
@@ -298,9 +387,11 @@ public class SoftwareController extends Controller {
 		}
 	}
 
+	/*
+	 * Reads the software status to a given version of a software on a device.
+	 */
 	public String getSoftwareStatusOnDevice(Device d, Software s,  String version) {
 		EntityManager em = getEntityManager();
-		List<SoftwareVersion> lsv;
 		Query query;
 		if( version.isEmpty() ) {
 			query = em.createNamedQuery("SoftwareStatus.get")
@@ -320,6 +411,9 @@ public class SoftwareController extends Controller {
 		return "";
 	}
 
+	/*
+	 * Checks if there is a software status to a given version of a software on a device.
+	 */
 	public boolean checkSoftwareStatusOnDevice(Device d, Software s,  String version) {
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("SoftwareStatus.get")
@@ -329,6 +423,9 @@ public class SoftwareController extends Controller {
 		return ! query.getResultList().isEmpty();
 	}
 
+	/*
+	 * Save the software status what shall be installed where.
+	 */
 	public Response saveSoftwareState(){
 		EntityManager em = getEntityManager();
 		RoomController   roomController   = new RoomController(this.session);
@@ -429,7 +526,6 @@ public class SoftwareController extends Controller {
 					roomSls.add("  - pkg:");
 					roomSls.add("    - installed:");
 				}
-					
 			}
 			for( String key : softwaresToDeinstall ) {
 				roomSls.add(key+":");
@@ -448,7 +544,7 @@ public class SoftwareController extends Controller {
 				topSls.add("    - oss_room_" + room.getName());
 			}
 		}
-		
+
 		//Create the hwconf state files
 		Query query = em.createNamedQuery("HWConf.findAll");
 		for( HWConf hwconf : (List<HWConf>)  query.getResultList() ) {
