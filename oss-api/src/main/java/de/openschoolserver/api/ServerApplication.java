@@ -19,6 +19,8 @@ import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 
+import de.extis.xpluginlib.PluginHandler;
+
 //import de.openschoolserver.dao.controller.GetJPAInf;
 //import java.io.IOException;
 //import java.net.ServerSocket;
@@ -102,8 +104,13 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final CloneToolResource cloneToolResource = new CloneToolRescourceImpl();
         environment.jersey().register(cloneToolResource);
         
+        final ImporterResource importerResource = new ImporterResourceImpl();
+        environment.jersey().register(importerResource);
+        PluginHandler.registerPlugins(environment);
+        
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
+        
 
     }
 
