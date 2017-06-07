@@ -2,6 +2,7 @@
 package de.openschoolserver.dao.controller;
 
 import org.slf4j.Logger;
+
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.controller.DHCPConfig;
 
-
+@SuppressWarnings( "unchecked" )
 public class UserController extends Controller {
 
     Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -172,16 +173,20 @@ public class UserController extends Controller {
     }
     
     public Response modify(User user){
-        // First we have to check the password if any. 
+        User oldUser = this.getById(user.getId());
         if(!user.getPassword().isEmpty()) {
             Response response = this.checkPassword(user.getPassword());
             if(response != null)
                 return response;
         }
+        oldUser.setGivenName( user.getGivenName());
+        oldUser.setSureName(user.getSureName());
+        oldUser.setBirthDay(user.getBirthDay());
+        oldUser.setPassword(user.getPassword());
         EntityManager em = getEntityManager();
         try {
             em.getTransaction().begin();
-            em.merge(user);
+            em.merge(oldUser);
             em.getTransaction().commit();
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -189,7 +194,7 @@ public class UserController extends Controller {
         } finally {
             em.close();
         }
-        this.startPlugin("modify_user",user);
+        this.startPlugin("modify_user",oldUser);
         return new Response(this.getSession(),"OK","User was modified succesfully");
     }
     

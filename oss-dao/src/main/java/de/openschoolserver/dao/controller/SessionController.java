@@ -66,31 +66,40 @@ public class SessionController extends Controller {
             return null;
         //TODO what to do with deviceType
         User user = userController.getByUid(username);
-        if( user == null )
+        if( user == null ) {
             return null;
+        }
 
         String IP = this.getSession().getIP();
         Device device = deviceController.getByIP(IP);
-        if( device != null )
+        if( device != null ) {
             room = device.getRoom();
+        }
 
         final String token = SessionToken.createSessionToken("dummy");
         this.session.setToken(token);
         this.session.setUserId(user.getId());
         this.session.setRole(user.getRole());
-        if( room != null )
+        if( room != null ) {
             this.session.setRoomId(room.getId()); 
+        }
         if( device != null ) {
             this.session.setDeviceId(device.getId());
             this.session.setMac(device.getMac());
+            this.session.setIP(device.getIp());
+            this.session.setDNSName(device.getName());
         } else {
             //Evaluate the MAC Address
             if( !IP.contains("127.0.0.1") && IPv4.validateIPAddress(IP) && room == null ) {
-                program = new String[1];
-                program[0] = "arp -n " + IP + " | grep " + IP + " | gawk '{ print $3 }'";
+                reply = new StringBuffer();
+                error = new StringBuffer();
+                program = new String[3];
+                program[0] = "arp";
+                program[1] = "-n";
+                program[2] = IP;
                 OSSShellTools.exec(program, reply, error, null);
-                if( IPv4.validateMACAddress(reply.toString()) )
-                    this.session.setMac(reply.toString());
+                String MAC = reply.toString().split("\\n")[1].split("\\s+")[2];
+		this.session.setMac(MAC);
             }
         }
         sessions.put(token, this.session);

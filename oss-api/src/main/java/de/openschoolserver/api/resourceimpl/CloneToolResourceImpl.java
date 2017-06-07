@@ -14,7 +14,7 @@ import de.openschoolserver.api.resources.CloneToolResource;
 import javax.ws.rs.WebApplicationException;
 import java.util.List;
 
-public class CloneToolRescourceImpl implements CloneToolResource {
+public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
 	public Long getHWConf(Session session) {

@@ -11,10 +11,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  */
 @Entity
+@Table(name="SoftwareStatus")
 @NamedQueries({
 	@NamedQuery(name="SoftwareStatus.findAll", query="SELECT s FROM SoftwareStatus s"),
-	@NamedQuery(name="SoftwareStatus.findByStatus", query="SELECT s FROM SoftwareStatus s WHERE s.status = :STATUS")
+	@NamedQuery(name="SoftwareStatus.findByStatus", query="SELECT s FROM SoftwareStatus s WHERE s.status = :STATUS"),
+	@NamedQuery(name="SoftwareStatus.getAllForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE"),
+	@NamedQuery(name="SoftwareStatus.getForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE AND sv.version = :VERSION"),
 })
+
 public class SoftwareStatus implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -44,6 +48,11 @@ public class SoftwareStatus implements Serializable {
 	public SoftwareStatus() {
 	}
 
+	public SoftwareStatus(Device d, SoftwareVersion sv, String status) {
+		this.device = d;
+		this.softwareVersion = sv;
+		this.status = status;
+	}
 	public SoftwareStatusPK getId() {
 		return this.id;
 	}

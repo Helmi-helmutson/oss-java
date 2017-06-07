@@ -1,16 +1,19 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
 import java.util.List;
-
 
 /**
  * The persistent class for the Software database table.
  * 
  */
 @Entity
-@NamedQuery(name="Software.findAll", query="SELECT s FROM Software s")
+@NamedQueries({
+	@NamedQuery(name="Software.findAll", query="SELECT s FROM Software s"),
+	@NamedQuery(name="Software.findAllId", query="SELECT s.id FROM Software s")
+})
 public class Software implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -29,12 +32,20 @@ public class Software implements Serializable {
 	private Integer weigth;
 	
 	//bi-directional many-to-one association to SoftwareLicens
-	@OneToMany(mappedBy="software")
+	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	private List<SoftwareLicense> softwareLicenses;
 
 	//bi-directional many-to-one association to SoftwareVersion
-	@OneToMany(mappedBy="software")
+	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	private List<SoftwareVersion> softwareVersions;
+	
+	//bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="softwares")
+	private List<Category> categories;
+
+	//bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="removedSoftwares")
+	private List<Category> removedFromCategories;
 
 	public Software() {
 		this.manuell = false;
@@ -131,5 +142,21 @@ public class Software implements Serializable {
 
 		return softwareVersion;
 	}
+
+    public List<Category> getCategories() {
+        return this.categories;
+    }
+
+    public void setCategories(List<Category> categories) {
+        this.categories = categories;
+    }
+    
+    public List<Category> getRemovedFromCategories() {
+        return this.removedFromCategories;
+    }
+
+    public void setRemovedFromCategories(List<Category> categories) {
+        this.removedFromCategories = categories;
+    }
 
 }

@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS Aliases (
 CREATE TABLE IF NOT EXISTS HWConfs (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name          VARCHAR(32) NOT NULL,
-        description   VARCHAR(32) DEFAULT "",
+        description   VARCHAR(64) DEFAULT "",
         deviceType    VARCHAR(16) NOT NULL,
         PRIMARY KEY(id)
 );
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         hwconf_id    BIGINT UNSIGNED NOT NULL,
         name         VARCHAR(32) DEFAULT NULL,
-        description  VARCHAR(32) DEFAULT NULL,
+        description  VARCHAR(64) DEFAULT NULL,
         OS           VARCHAR(16) DEFAULT NULL,
         joinType     VARCHAR(16) DEFAULT NULL,
         tool         VARCHAR(16) DEFAULT NULL,
@@ -193,6 +193,9 @@ CREATE TABLE IF NOT EXISTS Acls (
         PRIMARY KEY(id)
 );
 
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.add');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.modify');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.search');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.add');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.delete');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.manage');
@@ -207,6 +210,7 @@ INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.delete');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.manage');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.modify');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.search');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','sysadmins');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.add');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.delete');
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.manage');
@@ -365,7 +369,7 @@ CREATE TABLE IF NOT EXISTS RoomMConfig (
 );
 CREATE UNIQUE INDEX RoomMConfigIndex on RoomMConfig(room_id,keyword,value);
 
-CREATE TABLE IF NOT EXISTS Session (
+CREATE TABLE IF NOT EXISTS Sessions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id      BIGINT UNSIGNED NOT NULL,
         room_id      BIGINT UNSIGNED DEFAULT NULL,
@@ -384,7 +388,7 @@ CREATE TABLE IF NOT EXISTS Responses (
 	session_id   BIGINT UNSIGNED NOT NULL,
 	code	VARCHAR(64) NOT NULL,
 	value   VARCHAR(1024) NOT NULL,
-	FOREIGN KEY(session_id) REFERENCES Session(id),
+	FOREIGN KEY(session_id) REFERENCES Sessions(id),
 	PRIMARY KEY(id)
 );
 
@@ -397,7 +401,7 @@ CREATE TABLE IF NOT EXISTS Software (
         PRIMARY KEY(id)
 );
 
-CREATE TABLE IF NOT EXISTS SoftwareVersion (
+CREATE TABLE IF NOT EXISTS SoftwareVersions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
 	version        VARCHAR(32) NOT NULL,
@@ -409,7 +413,7 @@ CREATE TABLE IF NOT EXISTS SoftwareStatus (
         version_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
 	status             VARCHAR(32) NOT NULL,
-	FOREIGN KEY(version_id)  REFERENCES SoftwareVersion(id),
+	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id),
 	FOREIGN KEY(device_id)   REFERENCES Devices(id),
 	PRIMARY KEY(version_id,device_id)
 );
@@ -435,7 +439,9 @@ CREATE TABLE IF NOT EXISTS LicenseToDevice (
 CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name         VARCHAR(32) NOT NULL,
-	desciption   VARCHAR(32) NOT NULL,
+	description  VARCHAR(64) NOT NULL,
+        owner_id     BIGINT UNSIGNED DEFAULT NULL,
+        FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
 
@@ -472,6 +478,14 @@ CREATE TABLE IF NOT EXISTS RoomInCategories (
 );
 
 CREATE TABLE IF NOT EXISTS SoftwareInCategories (
+        software_id        BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(software_id)  REFERENCES Software(id),
+	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	PRIMARY KEY(software_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS SoftwareRemovedFromCategories (
         software_id        BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
 	FOREIGN KEY(software_id)  REFERENCES Software(id),

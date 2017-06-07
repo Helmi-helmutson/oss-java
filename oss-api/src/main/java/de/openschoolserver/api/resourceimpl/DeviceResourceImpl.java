@@ -134,4 +134,16 @@ public class DeviceResourceImpl implements DeviceResource {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.search(search);
 	}
+
+	@Override
+	public Response modify(Session session, Device device) {
+		final DeviceController deviceController = new DeviceController(session);
+		return deviceController.modify(device);
+	}
+
+	@Override
+	public Response delete(Session session, long deviceId) {
+		final DeviceController deviceController = new DeviceController(session);
+		return deviceController.delete(deviceId);
+	}
 }

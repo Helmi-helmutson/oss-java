@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,14 +12,12 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
-import de.openschoolserver.dao.tools.*;
 
+@SuppressWarnings( "unchecked" )
 public class GroupController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(DeviceController.class);
@@ -99,24 +98,26 @@ public class GroupController extends Controller {
 	}
 
 	public Response modify(Group group){
-		//TODO make some checks!!
+		Group oldGroup = this.getById(group.getId());
+		oldGroup.setDescription(group.getDescription());
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			em.merge(group);
+			em.merge(oldGroup);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
-		this.startPlugin("modify_group", group);
+		this.startPlugin("modify_group", oldGroup);
 		return new Response(this.getSession(),"OK","Group was modified");
 	}
 
 	public Response delete(long groupId){
 		Group group = this.getById(groupId);
-		if( this.isProtected(group))
+		if( this.isProtected(group)) {
 			return new Response(this.getSession(),"ERROR","This group must not be deleted.");
+		}
 		
 		this.startPlugin("delete_group", group);
 

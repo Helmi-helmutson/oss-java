@@ -14,7 +14,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="Partitions")
 @NamedQueries({
-	@NamedQuery(name="Partition.findAll", query="SELECT p FROM Partition p"),
+	@NamedQuery(name="Partition.findAll",   query="SELECT p FROM Partition p"),
+	@NamedQuery(name="Partition.findAllId", query="SELECT p.id FROM Partition p"),
 	@NamedQuery(name="Partition.getPartitionByName", query="SELECT p FROM Partition p WHERE p.hwconf.id = :hwconfId AND p.name = :name")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
