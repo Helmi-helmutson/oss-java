@@ -23,8 +23,10 @@ public class OSSDaoTestCase extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
        
-        c = new SessionController();
-       
+    
+        Session session =  new Session();
+        session.setIP("1.1.1.1");
+         c = new SessionController(session);
      
 
 //      

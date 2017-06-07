@@ -24,16 +24,19 @@ dependencies {
     compile project(':de.openschoolserver.dao')
     compile fileTree(dir: '../oss-dao/build/libs', include: 'oss-dao-1.0-SNAPSHOT.jar')
 
-    ext.dropwizardVersion = '1.0.3'
+
+    ext.dropwizardVersion = '1.0.6'
     compile "io.dropwizard:dropwizard-core:$dropwizardVersion"
     compile "io.dropwizard:dropwizard-auth:$dropwizardVersion"
-    compile "com.smoketurner:dropwizard-swagger:1.0.0-1"
-
+    compile "com.smoketurner:dropwizard-swagger:1.0.6-1"
+    compile ("de.extis:XPluginLib:1.0.1-SNAPSHOT") { changing = true }
+    compile ("de.claxss:claxssimportlib:1.0.1-SNAPSHOT") { changing = true }
     compile "org.apache.maven.plugins:maven-shade-plugin:2.4.3"
     compile "com.google.guava:guava:19.0"
     compile "com.google.code.gson:gson:2.4"
     compile "org.eclipse.persistence:eclipselink:2.6.0"
-
+    
+  
     runtime "mysql:mysql-connector-java:5.1.21"
 
 }
