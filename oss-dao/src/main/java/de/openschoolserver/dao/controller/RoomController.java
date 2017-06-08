@@ -1,4 +1,4 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.tools.*;
 
+@SuppressWarnings( "unchecked" )
 public class RoomController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(RoomController.class);
@@ -166,27 +167,42 @@ public class RoomController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
 		}
+		this.startPlugin("add_room", room);
 		return new Response(this.getSession(),"OK", "Room was created succesfully.");
 	}
 
 	public Response delete(long roomId){
 		EntityManager em = getEntityManager();
-		em.getTransaction().begin();
-		DeviceController devController = new DeviceController(this.getSession());
 		Room room = this.getById(roomId);
-		if( this.isProtected(room) )
-			return new Response(this.getSession(),"ERROR","This room must not be deleted.");
-		List<Long> deviceIds = new ArrayList<Long>();
-		for( Device device : room.getDevices()) {
-			deviceIds.add(device.getId());
-		}
-		Response response = devController.delete(deviceIds);
-		//If an error happened during deleting the devices the room must not be removed.
-		if( response.getCode().equals("ERROR") )
+		try {
+
+			em.getTransaction().begin();
+			DeviceController devController = new DeviceController(this.getSession());
+			if( this.isProtected(room) )
+				return new Response(this.getSession(),"ERROR","This room must not be deleted.");
+			List<Long> deviceIds = new ArrayList<Long>();
+			for( Device device : room.getDevices()) {
+				deviceIds.add(device.getId());
+			}
+			Response response = devController.delete(deviceIds);
+			//If an error happened during deleting the devices the room must not be removed.
+			if( response.getCode().equals("ERROR") ) {
 				return response;
-		em.remove(room);
-		em.getTransaction().commit();
+			}
+			em.remove(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+		dhcpconfig.Create();
+		this.startPlugin("delete_room", room);
 		return new Response(this.getSession(),"OK", "Room was removed successfully.");
 	}
 
@@ -668,5 +684,27 @@ public class RoomController extends Controller {
 			em.close();
 		}
 		return new Response(this.getSession(),"OK","The hardware configuration of the room was set succesfully.");
+	}
+	
+	public Response modify(Room room){
+		EntityManager em = getEntityManager();
+		Room oldRoom = this.getById(room.getId());
+		oldRoom.setDescription(room.getDescription());
+		oldRoom.setHwconf(room.getHwconf());
+		oldRoom.setRoomType(room.getRoomType());
+		oldRoom.setRows(room.getRows());
+		oldRoom.setPlaces(room.getPlaces());
+		try {
+			em.getTransaction().begin();
+			em.merge(oldRoom);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new Response(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		this.startPlugin("modify_room", oldRoom);
+		
+		return new Response(this.getSession(),"OK","The room was modified succesfully.");
 	}
 }

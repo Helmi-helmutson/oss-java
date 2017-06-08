@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import de.openschoolserver.dao.*;
 
+@SuppressWarnings( "unchecked" )
 public class CategoryController extends Controller {
 	
 	static String[] categoriesIn = { 
@@ -128,7 +129,7 @@ public class CategoryController extends Controller {
 		return new Response(this.getSession(),"OK","Category was deleted");
 	}
 	
-	public List<Long> getMembers(Long categoryId, String objectName ) {
+	public List<Long> getAvailableMembers(Long categoryId, String objectName ) {
 		Category c = this.getById(categoryId);
 		List<Long> objectIds = new ArrayList<Long>();
 		EntityManager em = getEntityManager();
@@ -171,54 +172,40 @@ public class CategoryController extends Controller {
 		return objectIds;
 	}
 	
-	public List<Long> getAvailableMembers(Long categoryId, String objectName ) {
+	public List<Long> getMembers(Long categoryId, String objectName ) {
 		Category c = this.getById(categoryId);
 		List<Long> objectIds = new ArrayList<Long>();
-		EntityManager em = getEntityManager();
-		Query query;
 		switch(objectName){
-			case("Device"):
-				query = em.createNamedQuery("Device.findAllId");
-			objectIds = query.getResultList();
+		case("Device"):
 			for(Device d : c.getDevices()) {
-				objectIds.remove(d.getId());
+				objectIds.add(d.getId());
 			}
-			break;
-			case("Group"):
-				query = em.createNamedQuery("Group.findAllId");
-			objectIds = query.getResultList();
+		break;
+		case("Group"):
 			for(Group g : c.getGroups()) {
-				objectIds.remove(g.getId());
+				objectIds.add(g.getId());
 			}
-			break;
-			case("HWConf"):
-				query = em.createNamedQuery("HWConf.findAllId");
-			objectIds = query.getResultList();
+		break;
+		case("HWConf"):
 			for(HWConf h : c.getHWConfs()) {
-				objectIds.remove(h.getId());
+				objectIds.add(h.getId());
 			}
-			break;
-			case("Room"):
-				query = em.createNamedQuery("Room.findAllId");
-			objectIds = query.getResultList();
+		break;
+		case("Room"):
 			for(Room r: c.getRooms()) {
-				objectIds.remove(r.getId());
+				objectIds.add(r.getId());
 			}
-			break;
-			case("Software"):
-				query = em.createNamedQuery("Software.findAllId");
-			objectIds = query.getResultList();
+		break;
+		case("Software"):
 			for(Software s: c.getSoftwares()) {
-				objectIds.remove(s.getId());
+				objectIds.add(s.getId());
 			}
-			break;
-			case("User"):
-				query = em.createNamedQuery("User.findAllId");
-			objectIds = query.getResultList();
+		break;
+		case("User"):
 			for(User u: c.getUsers()) {
-				objectIds.remove(u.getId());
+				objectIds.add(u.getId());
 			}
-			break;
+		break;
 		}
 		return objectIds;
 	}

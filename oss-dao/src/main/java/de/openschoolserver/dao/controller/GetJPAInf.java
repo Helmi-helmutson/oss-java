@@ -3,9 +3,8 @@ package de.openschoolserver.dao.controller;
 import de.openschoolserver.dao.Session;
 
 
-import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.lang.Runnable;
 import java.net.Socket;

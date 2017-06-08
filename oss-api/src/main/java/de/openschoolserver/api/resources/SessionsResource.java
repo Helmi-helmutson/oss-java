@@ -1,4 +1,4 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api.resources;
 
@@ -20,6 +20,10 @@ import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
 @Path("sessions")
 @Api(value = "sessions")
+@SwaggerDefinition(securityDefinition = @SecurityDefinition(apiKeyAuthDefinitions = {@ApiKeyAuthDefinition(
+	       key = "apiKeyAuth", name = "Authorization", in = ApiKeyAuthDefinition.ApiKeyLocation.HEADER)
+
+		}))
 public interface SessionsResource {
 
     @POST

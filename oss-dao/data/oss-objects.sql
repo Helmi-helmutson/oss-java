@@ -369,7 +369,7 @@ CREATE TABLE IF NOT EXISTS RoomMConfig (
 );
 CREATE UNIQUE INDEX RoomMConfigIndex on RoomMConfig(room_id,keyword,value);
 
-CREATE TABLE IF NOT EXISTS Session (
+CREATE TABLE IF NOT EXISTS Sessions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id      BIGINT UNSIGNED NOT NULL,
         room_id      BIGINT UNSIGNED DEFAULT NULL,
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS Responses (
 	session_id   BIGINT UNSIGNED NOT NULL,
 	code	VARCHAR(64) NOT NULL,
 	value   VARCHAR(1024) NOT NULL,
-	FOREIGN KEY(session_id) REFERENCES Session(id),
+	FOREIGN KEY(session_id) REFERENCES Sessions(id),
 	PRIMARY KEY(id)
 );
 
@@ -401,7 +401,7 @@ CREATE TABLE IF NOT EXISTS Software (
         PRIMARY KEY(id)
 );
 
-CREATE TABLE IF NOT EXISTS SoftwareVersion (
+CREATE TABLE IF NOT EXISTS SoftwareVersions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
 	version        VARCHAR(32) NOT NULL,
@@ -413,7 +413,7 @@ CREATE TABLE IF NOT EXISTS SoftwareStatus (
         version_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
 	status             VARCHAR(32) NOT NULL,
-	FOREIGN KEY(version_id)  REFERENCES SoftwareVersion(id),
+	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id),
 	FOREIGN KEY(device_id)   REFERENCES Devices(id),
 	PRIMARY KEY(version_id,device_id)
 );

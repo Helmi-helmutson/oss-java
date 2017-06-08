@@ -33,7 +33,7 @@ import java.util.List;
 
 @Path("categories")
 @Api(value = "categories")
-public interface CategoryResources {
+public interface CategoryResource {
 	/*
 	 * Get categories/all
 	 */

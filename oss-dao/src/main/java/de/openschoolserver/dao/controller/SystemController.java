@@ -16,6 +16,7 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Room;
 import java.util.*;
 
+@SuppressWarnings( "unchecked" )
 public class SystemController extends Controller {
 
     Logger logger = LoggerFactory.getLogger(SystemController.class);
@@ -180,7 +181,7 @@ public class SystemController extends Controller {
         if( firewallExt.get("other") != null && !firewallExt.get("other").isEmpty())
             fwServicesExtTcp.add(firewallExt.get("other"));
         fwConfig.setConfigValue("FW_SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
-        this.systemctl("start", "SuSEfirewall2");
+        this.systemctl("restart", "SuSEfirewall2");
         return new Response(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
     }
     
@@ -230,23 +231,21 @@ public class SystemController extends Controller {
             StringBuilder data = new StringBuilder();
             if( map.get("type").equals("room")) {
                 room = roomController.getById(Long.parseLong(map.get("id")));
-                data.append(room.getNetwork() + "/" + String.valueOf(room.getNetMask()) +",");
+                data.append(room.getNetwork()).append("/").append(String.valueOf(room.getNetMask())).append(",");
             } else {
-            	
                 device = deviceController.getById(Long.parseLong(map.get("id")));
-                
-                data.append(device.getIp() + "/32,");
+                data.append(device.getIp()).append("/32,");
             }
             data.append(map.get("dest"));
             if( !map.get("prot").equals("all") ) {
-                data.append("," + map.get("prot") + "," + map.get("port"));
+                data.append(",").append(map.get("prot")).append(",").append(map.get("port"));
             }
             fwMasqNets.add(data.toString());
         }
         fwConfig.setConfigValue("FW_ROUTE","yes");
         fwConfig.setConfigValue("FW_MASQUERADE","yes");
         fwConfig.setConfigValue("FW_MASQ_NETS", String.join(" ", fwMasqNets));
-        this.systemctl("start", "SuSEfirewall2");
+        this.systemctl("restart", "SuSEfirewall2");
         return new Response(this.getSession(),"OK","Firewall outgoing access rule  was set succesfully.");
     }
     
@@ -257,14 +256,18 @@ public class SystemController extends Controller {
         DeviceController deviceController = new DeviceController(this.session);
         
         for( String outRule : fwConfig.getConfigValue("FW_FORWARD_MASQ").split(" ") ) {
-            statusMap = new HashMap<>();
-            String[] rule = outRule.split(",");
-            Device device = deviceController.getByIP(rule[1]);
-            statusMap.put("ext", rule[3]);
-            statusMap.put("id",  Long.toString(device.getId()) );
-            statusMap.put("name", device.getName() );
-            statusMap.put("port", rule[4]);
-            firewallList.add(statusMap);
+        	if (outRule!=null && outRule.length()>0) {
+	            statusMap = new HashMap<>();
+	            String[] rule = outRule.split(",");
+	            if (rule!=null && rule.length>=4) {
+		            Device device = deviceController.getByIP(rule[1]);
+		            statusMap.put("ext", rule[3]);
+		            statusMap.put("id",  Long.toString(device.getId()) );
+		            statusMap.put("name", device.getName() );
+		            statusMap.put("port", rule[4]);
+		            firewallList.add(statusMap);
+	            }
+        	}
         }
         return firewallList;
     }
@@ -278,7 +281,7 @@ public class SystemController extends Controller {
             fwForwardMasq.add("0/0," + device.getIp() + ",tcp," + map.get("ext") + "," + map.get("port") );
         }
         fwConfig.setConfigValue("FW_FORWARD_MASQ", String.join(" ", fwForwardMasq));
-        this.systemctl("start", "SuSEfirewall2");
+        this.systemctl("restart", "SuSEfirewall2");
         return new Response(this.getSession(),"OK","Firewall remote access rule  was set succesfully.");
     }
 }

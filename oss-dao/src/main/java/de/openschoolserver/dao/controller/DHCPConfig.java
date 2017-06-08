@@ -22,6 +22,7 @@ import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+@SuppressWarnings( "unchecked" )
 public class DHCPConfig extends Controller {
 	private static Logger LOG = LoggerFactory.getLogger(DHCPConfig.class);
 	private Path DHCP_CONFIG   = Paths.get("/etc/dhcpd.conf");

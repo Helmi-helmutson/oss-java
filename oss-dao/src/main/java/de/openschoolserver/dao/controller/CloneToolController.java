@@ -16,6 +16,7 @@ import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
+@SuppressWarnings( "unchecked" )
 public class CloneToolController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(CloneToolController.class);
