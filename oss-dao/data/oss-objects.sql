@@ -501,17 +501,3 @@ CREATE TABLE IF NOT EXISTS UserInCategories (
 	PRIMARY KEY(user_id,category_id)
 );
 
-CREATE TABLE IF NOT EXISTS AssignedSoftware (
-        software_id        BIGINT UNSIGNED NOT NULL,
-        device_id          BIGINT UNSIGNED DEFAULT NULL,
-        room_id            BIGINT UNSIGNED DEFAULT NULL,
-        hwconf_id          BIGINT UNSIGNED DEFAULT NULL,
-        category_id        BIGINT UNSIGNED DEFAULT NULL,
-	FOREIGN KEY(software_id)  REFERENCES Software(id),
-	FOREIGN KEY(device_id)    REFERENCES Devices(id),
-	FOREIGN KEY(room_id)      REFERENCES Rooms(id),
-	FOREIGN KEY(hwconf_id)    REFERENCES HWConfs(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
-	PRIMARY KEY(software_id,device_id,room_id,hwconf_id,category_id)  -- dieser key passt nicht. elemente dürfen nicht null sein
-);
-
