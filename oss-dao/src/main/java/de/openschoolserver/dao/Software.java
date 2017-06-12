@@ -29,7 +29,7 @@ public class Software implements Serializable {
 
 	private String name;
 
-	private Integer weigth;
+	private Integer weight;
 	
 	//bi-directional many-to-one association to SoftwareLicens
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
