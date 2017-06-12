@@ -396,7 +396,7 @@ CREATE TABLE IF NOT EXISTS Software (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name        VARCHAR(32) NOT NULL,
 	description VARCHAR(64) DEFAULT NULL,
-	weigth      INTEGER DEFAULT 0,
+	weight      INTEGER DEFAULT 0,
 	manuell     CHAR(1) DEFAULT 'N',
         PRIMARY KEY(id)
 );
