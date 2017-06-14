@@ -71,6 +71,15 @@ public class Session implements Principal {
     @Column(name = "token")
     private String token;
     
+    private transient Object temporaryUploadData;
+	
+	public Object getTemporaryUploadData() {
+		return temporaryUploadData;
+	}
+	public void setTemporaryUploadData(Object temporaryUploadData) {
+		this.temporaryUploadData = temporaryUploadData;
+	}
+    
     public Session(String token, long userid, String password, String ip) {
         this.userId = userid;
         this.password = password;
