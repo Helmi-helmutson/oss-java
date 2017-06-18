@@ -459,7 +459,7 @@ public class SoftwareController extends Controller {
 			for( Category category : device.getCategories() ) {
 				for( Software software : category.getSoftwares() ) {
 					softwaresToDeinstall.remove(software);
-					String key = String.format("%04d-%s",software.getWeigth(),software.getName());
+					String key = String.format("%04d-%s",software.getWeight(),software.getName());
 					softwareMap.put(key,software.getName());
 					keys.add(key);
 				}
@@ -513,7 +513,7 @@ public class SoftwareController extends Controller {
 			for( Category category : room.getCategories() ) {
 				for( Software software : category.getSoftwares() ) {
 					softwaresToDeinstall.remove(software);
-					String key = String.format("%04d-%s",software.getWeigth(),software.getName());
+					String key = String.format("%04d-%s",software.getWeight(),software.getName());
 					softwareMap.put(key,software.getName());
 					keys.add(key);
 				}
@@ -561,7 +561,7 @@ public class SoftwareController extends Controller {
 			for( Category category : hwconf.getCategories() ) {
 				for( Software software : category.getSoftwares() ) {
 					softwaresToDeinstall.remove(software);
-					String key = String.format("%04d-%s",software.getWeigth(),software.getName());
+					String key = String.format("%04d-%s",software.getWeight(),software.getName());
 					softwareMap.put(key,software.getName());
 					keys.add(key);
 				}
