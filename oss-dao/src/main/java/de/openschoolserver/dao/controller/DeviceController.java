@@ -109,6 +109,7 @@ public class DeviceController extends Controller {
 				this.startPlugin("delete_device", dev);
 			}
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 			DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 			dhcpconfig.Create();
 			return new Response(this.getSession(),"OK", "Devices were deleted succesfully.");
@@ -133,6 +134,7 @@ public class DeviceController extends Controller {
 			}
 			em.remove(dev);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 			this.startPlugin("delete_device", dev);
 			DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 			dhcpconfig.Create();
