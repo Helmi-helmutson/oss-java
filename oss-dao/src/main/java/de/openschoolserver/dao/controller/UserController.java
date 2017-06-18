@@ -150,8 +150,15 @@ public class UserController extends Controller {
                 return response;
         }
         try {
+
+            GroupController groupController = new GroupController(this.session);
+            Group group = groupController.getByName(user.getRole());
             em.getTransaction().begin();
             em.persist(user);
+            if( group != null ) {
+            	group.getUsers().add(user);
+            	user.getGroups().add(group);
+            }
             em.getTransaction().commit();
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -160,7 +167,7 @@ public class UserController extends Controller {
             em.close();
         }
         this.startPlugin("add_user",user);
-        return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.");
+        return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.");
     }
 
         
@@ -210,18 +217,20 @@ public class UserController extends Controller {
         List<Device> devices = user.getOwnedDevices();
         boolean restartDHCP = ! devices.isEmpty();
         // Remove user from logged on table
-        Query query = em.createQuery("DELETE FROM LoggedOn WHERE user_id = :userId");
-        query.setParameter("userId", userId);
-        query.executeUpdate();
+        //Query query = em.createQuery("DELETE FROM LoggedOn WHERE user_id = :userId");
+        //query.setParameter("userId", userId);
+        //query.executeUpdate();
         // Remove user from GroupMember of table
-        query = em.createQuery("DELETE FROM GroupMember WHERE user_id = :userId");
-        query.setParameter("userId", userId);
-        query.executeUpdate();
+        //query = em.createQuery("DELETE FROM GroupMember WHERE user_id = :userId");
+        //query.setParameter("userId", userId);
+        //query.executeUpdate();
         // Let's remove the user
-        em.remove(user);
         for( Device device : devices ) {
             em.remove(device);
         }
+        //User userToDelete = em.merge(user);
+        //em.remove(userToDelete);
+        em.remove(user);
         em.getTransaction().commit();
         if( restartDHCP ) {
             DHCPConfig dhcpConfig = new DHCPConfig(this.session);
@@ -233,6 +242,7 @@ public class UserController extends Controller {
     
     public List<Group> getAvailableGroups(long userId){
         EntityManager em = getEntityManager();
+        
         User user = this.getById(userId);
         Query query = em.createNamedQuery("Group.findAll");
         List<Group> allGroups = query.getResultList();

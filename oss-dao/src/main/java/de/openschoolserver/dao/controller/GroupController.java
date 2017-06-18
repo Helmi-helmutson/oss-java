@@ -52,6 +52,20 @@ public class GroupController extends Controller {
 		}
 	}
 
+	public Group getByName(String name) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Group.getByName");
+			query.setParameter("name", name);
+			return (Group) query.getResultList().get(0);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+	
 	public List<Group> search(String search) {
 		EntityManager em = getEntityManager();
 		try {

@@ -43,8 +43,8 @@ INSERT INTO Groups VALUES(6,'templates','Templates','primary');
 CREATE TABLE IF NOT EXISTS GroupMember (
         user_id        BIGINT UNSIGNED NOT NULL,
         group_id       BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(user_id)  REFERENCES Users(id),
-	FOREIGN KEY(group_id) REFERENCES Groups(id),
+	FOREIGN KEY(user_id)  REFERENCES Users(id)  ON DELETE CASCADE,
+	FOREIGN KEY(group_id) REFERENCES Groups(id) ON DELETE CASCADE,
 	PRIMARY KEY(user_id,group_id)
 );
 
@@ -156,13 +156,13 @@ CREATE TABLE IF NOT EXISTS AccessInRoom (
 CREATE TABLE IF NOT EXISTS LoggedOn (
         user_id      BIGINT UNSIGNED NOT NULL,
         device_id    BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY(user_id)   REFERENCES Users(id),
-        FOREIGN KEY(device_id) REFERENCES Devices(id),
+        FOREIGN KEY(user_id)   REFERENCES Users(id)   ON DELETE CASCADE,
+        FOREIGN KEY(device_id) REFERENCES Devices(id) ON DELETE CASCADE,
         PRIMARY KEY(device_id, user_id)
 );
 
 CREATE TABLE IF NOT EXISTS DefaultPrinter (
-        room_id      BIGINT UNSIGNED  NOT NULL,
+        room_id      BIGINT UNSIGNED NOT NULL,
         device_id    BIGINT UNSIGNED NOT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
         FOREIGN KEY(room_id)    REFERENCES Rooms(id),
@@ -230,8 +230,8 @@ CREATE TABLE IF NOT EXISTS  Tests (
         proxy         CHAR(1) NOT NULL DEFAULT 'N',
         direct        CHAR(1) NOT NULL DEFAULT 'N',
         portal        CHAR(1) NOT NULL DEFAULT 'N',
-        FOREIGN KEY(teacher_id) REFERENCES Users(id),
-        FOREIGN KEY(room_id)    REFERENCES Rooms(id),
+        FOREIGN KEY(teacher_id) REFERENCES Users(id) ON DELETE SET NULL,
+        FOREIGN KEY(room_id)    REFERENCES Rooms(id) ON DELETE SET NULL,
         PRIMARY KEY(id)
 );
 
@@ -242,8 +242,8 @@ CREATE TABLE IF NOT EXISTS TestFiles (
         getOrPost    VARCHAR(128) NOT NULL,
         fileName     VARCHAR(256) NOT NULL,
         dateTime     DATETIME NOT NULL,
-        FOREIGN KEY(test_id) REFERENCES Tests(id),
-        FOREIGN KEY(user_id) REFERENCES Users(id),
+        FOREIGN KEY(test_id) REFERENCES Tests(id) ON DELETE CASCADE,
+        FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE SET NULL,
         PRIMARY KEY(id)
 );
 
@@ -251,9 +251,9 @@ CREATE TABLE IF NOT EXISTS TestUsers (
         test_id      BIGINT UNSIGNED NOT NULL,
         user_id      BIGINT UNSIGNED NOT NULL,
         device_id    BIGINT UNSIGNED,
-        FOREIGN KEY(test_id) REFERENCES Tests(id),
-        FOREIGN KEY(user_id) REFERENCES Users(id),
-        FOREIGN KEY(device_id) REFERENCES Devices(id),
+        FOREIGN KEY(test_id) REFERENCES   Tests(id)   ON DELETE CASCADE,
+        FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE SET NULL,
+        FOREIGN KEY(device_id) REFERENCES Devices(id) ON DELETE SET NULL,
         PRIMARY KEY(test_id,user_id)
 );
 
@@ -377,7 +377,7 @@ CREATE TABLE IF NOT EXISTS Sessions (
         createdate   TIMESTAMP NOT NULL,
         ip           VARCHAR(30),
         token        VARCHAR(60),
-        FOREIGN KEY(user_id)   REFERENCES Users(id),
+        FOREIGN KEY(user_id)   REFERENCES Users(id)   ON DELETE CASCADE,
         FOREIGN KEY(room_id)   REFERENCES Rooms(id),
 	FOREIGN KEY(device_id) REFERENCES Devices(id),
         PRIMARY KEY(id)
@@ -388,7 +388,7 @@ CREATE TABLE IF NOT EXISTS Responses (
 	session_id   BIGINT UNSIGNED NOT NULL,
 	code	VARCHAR(64) NOT NULL,
 	value   VARCHAR(1024) NOT NULL,
-	FOREIGN KEY(session_id) REFERENCES Sessions(id),
+	FOREIGN KEY(session_id) REFERENCES Sessions(id) ON DELETE CASCADE,
 	PRIMARY KEY(id)
 );
 
@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
 	version        VARCHAR(32) NOT NULL,
-        FOREIGN KEY(software_id)    REFERENCES Software(id),
+        FOREIGN KEY(software_id)    REFERENCES Software(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -413,8 +413,8 @@ CREATE TABLE IF NOT EXISTS SoftwareStatus (
         version_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
 	status             VARCHAR(32) NOT NULL,
-	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id),
-	FOREIGN KEY(device_id)   REFERENCES Devices(id),
+	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
+	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
 	PRIMARY KEY(version_id,device_id)
 );
 
@@ -424,15 +424,15 @@ CREATE TABLE IF NOT EXISTS SoftwareLicenses (
 	licenseType    VARCHAR(4) DEFAULT 'CMD',
 	count          INTEGER DEFAULT 1,
 	value          VARCHAR(1024) NOT NULL,
-        FOREIGN KEY(software_id)    REFERENCES Software(id),
+        FOREIGN KEY(software_id)    REFERENCES Software(id)     ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS LicenseToDevice (
         license_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(license_id)  REFERENCES SoftwareLicenses(id),
-	FOREIGN KEY(device_id)   REFERENCES Devices(id),
+	FOREIGN KEY(license_id)  REFERENCES SoftwareLicenses(id) ON DELETE CASCADE,
+	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
 	PRIMARY KEY(license_id,device_id)
 );
 
@@ -441,63 +441,63 @@ CREATE TABLE IF NOT EXISTS Categories (
 	name         VARCHAR(32) NOT NULL,
 	description  VARCHAR(64) NOT NULL,
         owner_id     BIGINT UNSIGNED DEFAULT NULL,
-        FOREIGN KEY(owner_id)  REFERENCES Users(id),
+        FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS DeviceInCategories (
         device_id          BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(device_id)    REFERENCES Devices(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	FOREIGN KEY(device_id)    REFERENCES Devices(id)     ON DELETE CASCADE,
+	FOREIGN KEY(category_id)  REFERENCES Categories(id)  ON DELETE CASCADE,
 	PRIMARY KEY(device_id,category_id)
 );
 
 CREATE TABLE IF NOT EXISTS GroupInCategories (
         group_id           BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(group_id)     REFERENCES Groups(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	FOREIGN KEY(group_id)     REFERENCES Groups(id)     ON DELETE CASCADE,	
+	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(group_id,category_id)
 );
 
 CREATE TABLE IF NOT EXISTS HWConfInCategories (
         hwconf_id          BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(hwconf_id)    REFERENCES HWConfs(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	FOREIGN KEY(hwconf_id)    REFERENCES HWConfs(id)    ON DELETE CASCADE,
+	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(hwconf_id,category_id)
 );
 
 CREATE TABLE IF NOT EXISTS RoomInCategories (
         room_id            BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(room_id)      REFERENCES Rooms(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	FOREIGN KEY(room_id)      REFERENCES Rooms(id)      ON DELETE CASCADE,
+	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(room_id,category_id)
 );
 
 CREATE TABLE IF NOT EXISTS SoftwareInCategories (
         software_id        BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(software_id)  REFERENCES Software(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	FOREIGN KEY(software_id)  REFERENCES Software(id)   ON DELETE CASCADE,
+	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(software_id,category_id)
 );
 
 CREATE TABLE IF NOT EXISTS SoftwareRemovedFromCategories (
         software_id        BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(software_id)  REFERENCES Software(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	FOREIGN KEY(software_id)  REFERENCES Software(id)   ON DELETE CASCADE,
+	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(software_id,category_id)
 );
 
 CREATE TABLE IF NOT EXISTS UserInCategories (
         user_id            BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(user_id)      REFERENCES Users(id),
-	FOREIGN KEY(category_id)  REFERENCES Categories(id),
+	FOREIGN KEY(user_id)      REFERENCES Users(id)      ON DELETE CASCADE,
+	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(user_id,category_id)
 );
 
