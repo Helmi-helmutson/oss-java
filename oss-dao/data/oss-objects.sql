@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS Aliases (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id         BIGINT UNSIGNED NOT NULL,
         alias           VARCHAR(64) NOT NULL,
-        FOREIGN KEY(user_id)  REFERENCES Users(id),
+        FOREIGN KEY(user_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
         joinType     VARCHAR(16) DEFAULT NULL,
         tool         VARCHAR(16) DEFAULT NULL,
         format       VARCHAR(16) DEFAULT NULL,
-        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
+        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE CASCADE,,
         PRIMARY KEY(id)
 );
 
@@ -99,7 +99,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
         places       INTEGER  DEFAULT 5,
         startIP      VARCHAR(16) NOT NULL,
         netMask      INTEGER  NOT NULL,
-        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
+        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
         PRIMARY KEY(id)
 );
 
@@ -118,9 +118,9 @@ CREATE TABLE IF NOT EXISTS Devices (
         WLANMAC      VARCHAR(17) DEFAULT '',
         row          INTEGER  DEFAULT 0,
         place        INTEGER  DEFAULT 0,
-        FOREIGN KEY(room_id)   REFERENCES Rooms(id),
-        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
-        FOREIGN KEY(owner_id)  REFERENCES Users(id),
+        FOREIGN KEY(room_id)   REFERENCES Rooms(id)   ON DELETE RESTRICT,
+        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
+        FOREIGN KEY(owner_id)  REFERENCES Users(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS AccessInRoom (
         printing        CHAR(1) DEFAULT 'Y',
         portal          CHAR(1) DEFAULT 'Y',
 	action          VARCHAR(32) DEFAULT '',
-        FOREIGN KEY(room_id) REFERENCES Rooms(id),
+        FOREIGN KEY(room_id) REFERENCES Rooms(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -162,13 +162,14 @@ CREATE TABLE IF NOT EXISTS LoggedOn (
 );
 
 CREATE TABLE IF NOT EXISTS DefaultPrinter (
-        room_id      BIGINT UNSIGNED NOT NULL,
-        device_id    BIGINT UNSIGNED NOT NULL,
+        id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        room_id      BIGINT UNSIGNED DEFAULT NULL,
+        device_id    BIGINT UNSIGNED DEFAULT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY(room_id)    REFERENCES Rooms(id),
-        FOREIGN KEY(device_id)  REFERENCES Devices(id),
-        FOREIGN KEY(printer_id) REFERENCES Devices(id),
-        PRIMARY KEY(device_id, room_id)
+        FOREIGN KEY(room_id)    REFERENCES Rooms(id)   ON DELETE CASCADE,
+        FOREIGN KEY(device_id)  REFERENCES Devices(id) ON DELETE CASCADE,
+        FOREIGN KEY(printer_id) REFERENCES Devices(id) ON DELETE CASCADE,
+        PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS AvailablePrinters (
@@ -176,9 +177,9 @@ CREATE TABLE IF NOT EXISTS AvailablePrinters (
         room_id      BIGINT UNSIGNED DEFAULT NULL,
         device_id    BIGINT UNSIGNED DEFAULT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY(room_id)    REFERENCES Rooms(id),
-        FOREIGN KEY(device_id)  REFERENCES Devices(id),
-        FOREIGN KEY(printer_id) REFERENCES Devices(id),
+        FOREIGN KEY(room_id)    REFERENCES Rooms(id)   ON DELETE CASCADE,
+        FOREIGN KEY(device_id)  REFERENCES Devices(id) ON DELETE CASCADE,
+        FOREIGN KEY(printer_id) REFERENCES Devices(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -188,8 +189,8 @@ CREATE TABLE IF NOT EXISTS Acls (
         group_id     BIGINT UNSIGNED DEFAULT NULL,
         role         VARCHAR(16) DEFAULT NULL,
         acl          VARCHAR(32) NOT NULL,
-        FOREIGN KEY(user_id)  REFERENCES Users(id),
-        FOREIGN KEY(group_id) REFERENCES Groups(id),
+        FOREIGN KEY(user_id)  REFERENCES Users(id)  ON DELETE CASCADE,
+        FOREIGN KEY(group_id) REFERENCES Groups(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -378,8 +379,8 @@ CREATE TABLE IF NOT EXISTS Sessions (
         ip           VARCHAR(30),
         token        VARCHAR(60),
         FOREIGN KEY(user_id)   REFERENCES Users(id)   ON DELETE CASCADE,
-        FOREIGN KEY(room_id)   REFERENCES Rooms(id),
-	FOREIGN KEY(device_id) REFERENCES Devices(id),
+        FOREIGN KEY(room_id)   REFERENCES Rooms(id)   ON DELETE SET NULL,
+	FOREIGN KEY(device_id) REFERENCES Devices(id) ON DELETE SET NULL,
         PRIMARY KEY(id)
  );
 
