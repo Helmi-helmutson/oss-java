@@ -150,16 +150,14 @@ public class UserController extends Controller {
                 return response;
         }
         try {
-
-            GroupController groupController = new GroupController(this.session);
-            Group group = groupController.getByName(user.getRole());
             em.getTransaction().begin();
             em.persist(user);
-            if( group != null ) {
-            	group.getUsers().add(user);
-            	user.getGroups().add(group);
-            }
             em.getTransaction().commit();
+            GroupController groupController = new GroupController(this.session);
+            Group group = groupController.getByName(user.getRole());
+            if( group != null ) {
+            	groupController.addMember(group,user);;
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
             return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -211,26 +209,13 @@ public class UserController extends Controller {
             return new Response(this.getSession(),"ERROR","This group must not be deleted.");
 
         this.startPlugin("delete_user",user);
-
         EntityManager em = getEntityManager();
-        em.getTransaction().begin();
         List<Device> devices = user.getOwnedDevices();
         boolean restartDHCP = ! devices.isEmpty();
-        // Remove user from logged on table
-        //Query query = em.createQuery("DELETE FROM LoggedOn WHERE user_id = :userId");
-        //query.setParameter("userId", userId);
-        //query.executeUpdate();
-        // Remove user from GroupMember of table
-        //query = em.createQuery("DELETE FROM GroupMember WHERE user_id = :userId");
-        //query.setParameter("userId", userId);
-        //query.executeUpdate();
-        // Let's remove the user
-        for( Device device : devices ) {
-            em.remove(device);
-        }
-        //User userToDelete = em.merge(user);
-        //em.remove(userToDelete);
-        em.remove(user);
+        em.getTransaction().begin();
+        User userToDelete = em.merge(user);
+        em.remove(userToDelete);
+        //em.remove(user);
         em.getTransaction().commit();
         if( restartDHCP ) {
             DHCPConfig dhcpConfig = new DHCPConfig(this.session);

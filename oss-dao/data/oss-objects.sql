@@ -85,7 +85,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
         joinType     VARCHAR(16) DEFAULT NULL,
         tool         VARCHAR(16) DEFAULT NULL,
         format       VARCHAR(16) DEFAULT NULL,
-        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE CASCADE,,
+        FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -221,7 +221,7 @@ INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.search');
 CREATE TABLE IF NOT EXISTS  Tests (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         testName      VARCHAR(128) NOT NULL,
-        teacher_id    BIGINT UNSIGNED NOT NULL,
+        teacher_id    BIGINT UNSIGNED,
         room_id       BIGINT UNSIGNED,
         testDir       VARCHAR(128) NOT NULL,
         currentStep   VARCHAR(128) NOT NULL,
@@ -239,7 +239,7 @@ CREATE TABLE IF NOT EXISTS  Tests (
 CREATE TABLE IF NOT EXISTS TestFiles (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         test_id      BIGINT UNSIGNED NOT NULL,
-        user_id      BIGINT UNSIGNED NOT NULL,
+        user_id      BIGINT UNSIGNED,
         getOrPost    VARCHAR(128) NOT NULL,
         fileName     VARCHAR(256) NOT NULL,
         dateTime     DATETIME NOT NULL,
@@ -249,13 +249,14 @@ CREATE TABLE IF NOT EXISTS TestFiles (
 );
 
 CREATE TABLE IF NOT EXISTS TestUsers (
+        id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         test_id      BIGINT UNSIGNED NOT NULL,
-        user_id      BIGINT UNSIGNED NOT NULL,
+        user_id      BIGINT UNSIGNED,
         device_id    BIGINT UNSIGNED,
         FOREIGN KEY(test_id) REFERENCES   Tests(id)   ON DELETE CASCADE,
         FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE SET NULL,
         FOREIGN KEY(device_id) REFERENCES Devices(id) ON DELETE SET NULL,
-        PRIMARY KEY(test_id,user_id)
+        PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS Enumerates (

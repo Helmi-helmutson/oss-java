@@ -211,10 +211,9 @@ public class GroupController extends Controller {
 		return new Response(this.getSession(),"OK","The members of group was set.");
 	}
 
-	public Response addMember(long groupId, long userId) {
+
+	public Response addMember(Group group, User user) {
 		EntityManager em = getEntityManager();
-		Group group = em.find(Group.class, groupId);
-		User  user  = em.find(User.class, userId);
 		group.getUsers().add(user);
 		user.getGroups().add(group);
 		try {
@@ -229,6 +228,13 @@ public class GroupController extends Controller {
 		}
 		this.changeMemberPlugin("addmembers", group, user);
 		return new Response(this.getSession(),"OK","User " + user.getUid() + " was added to group " + group.getName() );
+	}
+
+	public Response addMember(long groupId, long userId) {
+		EntityManager em = getEntityManager();
+		Group group = em.find(Group.class, groupId);
+		User  user  = em.find(User.class, userId);
+		return this.addMember(group, user);
 	}
 
 	public Response removeMember(long groupId, long userId) {
