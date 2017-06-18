@@ -52,7 +52,7 @@ public class Device implements Serializable {
 	private String wlanmac;
 
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="devices")
+	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	private List<Category> categories;
 
 	//bi-directional many-to-one association to DeviceMConfig
@@ -66,7 +66,7 @@ public class Device implements Serializable {
 	private List<DeviceConfig> deviceConfigs;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name="AvailablePrinters",
 			joinColumns={ @JoinColumn(name="device_id")	},
@@ -76,7 +76,7 @@ public class Device implements Serializable {
 	private List<Device> availablePrinters;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany(mappedBy="availablePrinters")
+	@ManyToMany(mappedBy="availablePrinters",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<Device> availableForDevices;
 
@@ -96,7 +96,7 @@ public class Device implements Serializable {
 	private List<Device> defaultForDevices;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany(mappedBy="devices")
+	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<SoftwareLicense> softwareLicenses;
 
@@ -124,7 +124,7 @@ public class Device implements Serializable {
 	private User owner;
 
 	//bi-directional many-to-many association to Room
-	@ManyToMany(mappedBy="availablePrinters")
+	@ManyToMany(mappedBy="availablePrinters", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<Room> availableInRooms;
 
@@ -139,7 +139,7 @@ public class Device implements Serializable {
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-many association to User
-	@ManyToMany(mappedBy="loggedOn")
+	@ManyToMany(mappedBy="loggedOn", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<User> loggedIn;
 

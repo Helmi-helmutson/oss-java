@@ -123,6 +123,7 @@ public class CategoryController extends Controller {
 			}
 			em.remove(category);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());

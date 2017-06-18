@@ -40,11 +40,11 @@ public class Software implements Serializable {
 	private List<SoftwareVersion> softwareVersions;
 	
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="softwares")
+	@ManyToMany(mappedBy="softwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<Category> categories;
 
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="removedSoftwares")
+	@ManyToMany(mappedBy="removedSoftwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<Category> removedFromCategories;
 
 	public Software() {
@@ -52,7 +52,7 @@ public class Software implements Serializable {
 	}
 
 	@Override
-    public boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 	      if (obj instanceof Software && obj !=null) {
 	                  return getId() == ((Software)obj).getId();
 	      }

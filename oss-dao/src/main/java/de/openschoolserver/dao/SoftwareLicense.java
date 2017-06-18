@@ -30,21 +30,21 @@ public class SoftwareLicense implements Serializable {
 	private String value;
 	
 	//bi-directional many-to-many association to Device
-    @ManyToMany
-    @JoinTable(        
-    	name="LicenseToDevice",
-		joinColumns={ @JoinColumn(name="license_id") },
-		inverseJoinColumns={ @JoinColumn(name="device_id") }
-    )
-    @JsonIgnore
-    private List<Device> devices;
+	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
+	@JoinTable(        
+		name="LicenseToDevice",
+	    	joinColumns={ @JoinColumn(name="license_id") },
+	    	inverseJoinColumns={ @JoinColumn(name="device_id") }
+	)
+	@JsonIgnore
+	private List<Device> devices;
 
 	//bi-directional many-to-one association to Software
 	@ManyToOne
 	private Software software;
 
 	@Override
-    public boolean equals(Object obj) {
+	public boolean equals(Object obj) {
 	      if (obj instanceof SoftwareLicense && obj !=null) {
 	                  return getId() == ((SoftwareLicense)obj).getId();
 	      }

@@ -94,6 +94,7 @@ public class SoftwareController extends Controller {
 			}
 			em.remove(software);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());

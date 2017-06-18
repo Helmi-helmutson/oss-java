@@ -213,6 +213,7 @@ public class CloneToolController extends Controller {
 			}
 			em.remove(hwconf);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -231,6 +232,7 @@ public class CloneToolController extends Controller {
 			em.getTransaction().begin();
 			em.merge(hwconf);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evict(hwconf.getClass());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());

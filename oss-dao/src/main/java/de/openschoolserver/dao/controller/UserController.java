@@ -218,6 +218,7 @@ public class UserController extends Controller {
         }
         em.remove(user);
         em.getTransaction().commit();
+        em.getEntityManagerFactory().getCache().evictAll();
         if( restartDHCP ) {
             DHCPConfig dhcpConfig = new DHCPConfig(this.session);
             dhcpConfig.Create();

@@ -47,7 +47,7 @@ public class HWConf implements Serializable {
 	private List<Room> rooms;
 	
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="hwconfs")
+	@ManyToMany(mappedBy="hwconfs",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<Category> categories;
 
     @Override

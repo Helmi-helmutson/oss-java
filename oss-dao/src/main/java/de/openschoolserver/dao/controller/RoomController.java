@@ -197,6 +197,7 @@ public class RoomController extends Controller {
 			}
 			em.remove(room);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -531,20 +532,24 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomId);
 		DeviceController deviceController = new DeviceController(this.session);
 		StringBuilder error = new StringBuilder();
+		List<String> ipAddress;
 		for(Device device : devices) {
 			if( device.getIp().isEmpty() ){
-				List<String> ipAddress = this.getAvailableIPAddresses(roomId, 1);
-				if( ipAddress.isEmpty() )
+				ipAddress = this.getAvailableIPAddresses(roomId, 1);
+				if( ipAddress.isEmpty() ) {
 					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
-				if( device.getName().isEmpty() )
-				  device.setName(ipAddress.get(0).split(" ")[1]);
-				device.setIp(ipAddress.get(0).split(" ")[0]);
-				if( !device.getWlanMac().isEmpty() ){
-				  ipAddress = this.getAvailableIPAddresses(roomId, 1);
-				  if( ipAddress.isEmpty() )
-					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
-				  device.setWlanIp(ipAddress.get(0).split(" ")[0]);
 				}
+				if( device.getName().isEmpty() ) {
+				  device.setName(ipAddress.get(0).split(" ")[1]);
+				}
+				device.setIp(ipAddress.get(0).split(" ")[0]);
+			}
+			if( !device.getWlanMac().isEmpty() ){
+				ipAddress = this.getAvailableIPAddresses(roomId, 1);
+				if( ipAddress.isEmpty() ) {
+					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+				}
+				device.setWlanIp(ipAddress.get(0).split(" ")[0]);
 			}
 			error.append(deviceController.check(device, room));
 			device.setRoom(room);
@@ -591,6 +596,7 @@ public class RoomController extends Controller {
 			em.getTransaction().begin();
 			em.merge(room);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
