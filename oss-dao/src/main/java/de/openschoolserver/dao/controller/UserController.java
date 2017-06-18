@@ -213,9 +213,10 @@ public class UserController extends Controller {
         List<Device> devices = user.getOwnedDevices();
         boolean restartDHCP = ! devices.isEmpty();
         em.getTransaction().begin();
-        User userToDelete = em.merge(user);
-        em.remove(userToDelete);
-        //em.remove(user);
+        if( ! em.contains(user)) {
+        	user = em.merge(user);
+        }
+        em.remove(user);
         em.getTransaction().commit();
         if( restartDHCP ) {
             DHCPConfig dhcpConfig = new DHCPConfig(this.session);

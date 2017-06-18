@@ -208,6 +208,9 @@ public class CloneToolController extends Controller {
 		try {
 			em.getTransaction().begin();
 			HWConf hwconf = this.getById(hwconfId);
+			if( ! em.contains(hwconf)) {
+				hwconf = em.merge(hwconf);
+			}
 			em.remove(hwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {

@@ -89,6 +89,9 @@ public class SoftwareController extends Controller {
 		Software software = this.getById(softwareId);
 		try {
 			em.getTransaction().begin();
+			if( !em.contains(software)) {
+				software = em.merge(software);
+			}
 			em.remove(software);
 			em.getTransaction().commit();
 		} catch (Exception e) {

@@ -192,6 +192,9 @@ public class RoomController extends Controller {
 			if( response.getCode().equals("ERROR") ) {
 				return response;
 			}
+			if( ! em.contains(room)) {
+				room = em.merge(room);
+			}
 			em.remove(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {

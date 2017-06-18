@@ -102,10 +102,15 @@ public class DeviceController extends Controller {
 				if( this.isProtected(dev) ) {
 					return new Response(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
 				}
+				if( !em.contains(dev)) {
+					dev = em.merge(dev);
+				}
 				em.remove(dev);
 				this.startPlugin("delete_device", dev);
 			}
 			em.getTransaction().commit();
+			DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+			dhcpconfig.Create();
 			return new Response(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
 			logger.error(e.getMessage());

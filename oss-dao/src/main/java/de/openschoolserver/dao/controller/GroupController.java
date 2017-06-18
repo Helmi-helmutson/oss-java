@@ -139,10 +139,9 @@ public class GroupController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			Query query = em.createQuery("DELETE FROM GroupMember WHERE group_id = :groupId");
-			query.setParameter("groupId", groupId);
-			query.executeUpdate();
-			// Let's remove the group
+			if( !em.contains(group)) {
+				group = em.merge(group);
+			}
 			em.remove(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
