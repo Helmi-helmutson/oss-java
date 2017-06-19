@@ -534,8 +534,8 @@ public class RoomController extends Controller {
 		StringBuilder error = new StringBuilder();
 		List<String> ipAddress;
 		for(Device device : devices) {
+			ipAddress = this.getAvailableIPAddresses(roomId, 2);
 			if( device.getIp().isEmpty() ){
-				ipAddress = this.getAvailableIPAddresses(roomId, 1);
 				if( ipAddress.isEmpty() ) {
 					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
 				}
@@ -545,11 +545,10 @@ public class RoomController extends Controller {
 				device.setIp(ipAddress.get(0).split(" ")[0]);
 			}
 			if( !device.getWlanMac().isEmpty() ){
-				ipAddress = this.getAvailableIPAddresses(roomId, 1);
-				if( ipAddress.isEmpty() ) {
+				if( ipAddress.size() < 2 ) {
 					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
 				}
-				device.setWlanIp(ipAddress.get(0).split(" ")[0]);
+				device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 			}
 			error.append(deviceController.check(device, room));
 			device.setRoom(room);
@@ -559,21 +558,21 @@ public class RoomController extends Controller {
 				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
 			}
 			room.addDevice(device);
+			if(error.length() > 0){
+				em.close();
+				return new Response(this.getSession(),"ERROR",error.toString());
+			}
+			try {
+				em.getTransaction().begin();
+				em.merge(room);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				em.close();
+				return new Response(this.getSession(),"ERROR", e.getMessage());
+			}
 		}
-		if(error.length() > 0){
-			em.close();
-			return new Response(this.getSession(),"ERROR",error.toString());
-		}
-		try {
-			em.getTransaction().begin();
-			em.merge(room);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
-		} finally {
-			em.close();
-		}
+		em.close();
 		for(Device device : devices) {
 		    this.startPlugin("add_device", device);
 		}
