@@ -4,6 +4,7 @@ package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -192,8 +193,12 @@ public class RoomController extends Controller {
 			if( response.getCode().equals("ERROR") ) {
 				return response;
 			}
+			if( ! em.contains(room)) {
+				room = em.merge(room);
+			}
 			em.remove(room);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -528,20 +533,25 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomId);
 		DeviceController deviceController = new DeviceController(this.session);
 		StringBuilder error = new StringBuilder();
+		List<String> ipAddress;
 		for(Device device : devices) {
+			//Remove trailing and ending spaces.
+			device.setName(device.getName().trim());
+			ipAddress = this.getAvailableIPAddresses(roomId, 2);
 			if( device.getIp().isEmpty() ){
-				List<String> ipAddress = this.getAvailableIPAddresses(roomId, 1);
-				if( ipAddress.isEmpty() )
+				if( ipAddress.isEmpty() ) {
 					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
-				if( device.getName().isEmpty() )
-				  device.setName(ipAddress.get(0).split(" ")[1]);
-				device.setIp(ipAddress.get(0).split(" ")[0]);
-				if( !device.getWlanMac().isEmpty() ){
-				  ipAddress = this.getAvailableIPAddresses(roomId, 1);
-				  if( ipAddress.isEmpty() )
-					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
-				  device.setWlanIp(ipAddress.get(0).split(" ")[0]);
 				}
+				if( device.getName().isEmpty() ) {
+				  device.setName(ipAddress.get(0).split(" ")[1]);
+				}
+				device.setIp(ipAddress.get(0).split(" ")[0]);
+			}
+			if( !device.getWlanMac().isEmpty() ){
+				if( ipAddress.size() < 2 ) {
+					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+				}
+				device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 			}
 			error.append(deviceController.check(device, room));
 			device.setRoom(room);
@@ -551,23 +561,31 @@ public class RoomController extends Controller {
 				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
 			}
 			room.addDevice(device);
+			if(error.length() > 0){
+				em.close();
+				return new Response(this.getSession(),"ERROR",error.toString());
+			}
+			try {
+				em.getTransaction().begin();
+				em.merge(room);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				em.close();
+				return new Response(this.getSession(),"ERROR", e.getMessage());
+			}
 		}
-		if(error.length() > 0){
-			em.close();
-			return new Response(this.getSession(),"ERROR",error.toString());
-		}
-		try {
-			em.getTransaction().begin();
-			em.merge(room);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
-		} finally {
-			em.close();
-		}
+		em.close();
+		UserController userController = new UserController(this.session);
 		for(Device device : devices) {
 		    this.startPlugin("add_device", device);
+		    User user = new User();
+		    user.setUid(device.getName());
+		    user.setSureName(device.getName() + "  Workstation-User");
+		    user.setRole("workstations");
+		    //TODO do not ignore response.
+		    Response answer = userController.add(user);
+		    logger.debug(answer.getValue());
 		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		dhcpconfig.Create();
@@ -588,6 +606,7 @@ public class RoomController extends Controller {
 			em.getTransaction().begin();
 			em.merge(room);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -621,7 +640,7 @@ public class RoomController extends Controller {
 			else
 			{
 				device.setMac(macAddress);
-				device.setName(name + "-" + owner.getUid());
+				device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
 				device.setOwner(owner);
 				device.setIp(ipAddress.get(0).split(" ")[0]);
 				device.setHwconf(null);

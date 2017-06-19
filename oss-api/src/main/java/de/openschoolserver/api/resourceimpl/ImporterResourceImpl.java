@@ -3,8 +3,6 @@ package de.openschoolserver.api.resourceimpl;
 import java.io.InputStream;
 import java.util.List;
 
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-
 import de.claxss.importlib.ImporterDescription;
 import de.claxss.importlib.ImporterFactory;
 import de.claxss.importlib.ImporterObject;

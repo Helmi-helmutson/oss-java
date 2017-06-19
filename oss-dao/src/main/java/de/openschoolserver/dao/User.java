@@ -91,11 +91,11 @@ public class User implements Serializable {
 	private List<Test> tests;
 
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="users")
+	@ManyToMany(mappedBy="users", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	private List<Category> categories;
 		
 	//bi-directional many-to-many association to Device
-	@ManyToMany
+	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
 			name="LoggedOn", 
 			joinColumns={ @JoinColumn(name="user_id") },
@@ -105,7 +105,7 @@ public class User implements Serializable {
 	private List<Device> loggedOn;
 
 	//bi-directional many-to-many association to Group
-	@ManyToMany
+	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
 			name="GroupMember",
 			joinColumns={@JoinColumn(name="user_id")},

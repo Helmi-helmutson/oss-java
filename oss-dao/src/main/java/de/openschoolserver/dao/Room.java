@@ -51,9 +51,9 @@ public class Room implements Serializable {
 
 	private String roomType;
 
-    //bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="rooms")
-    private List<Category> categories;
+        //bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="rooms", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	private List<Category> categories;
 
 	//bi-directional many-to-one association to RoomMConfig
 	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
@@ -76,7 +76,7 @@ public class Room implements Serializable {
 	private List<Device> devices;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany
+	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
 			name="AvailablePrinters"
 			, joinColumns={
@@ -90,7 +90,7 @@ public class Room implements Serializable {
 	private List<Device> availablePrinters;
 
 	//bi-directional many-to-one association to Device
-	@ManyToOne
+	@ManyToOne( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
 			name="DefaultPrinter"
 			, joinColumns={

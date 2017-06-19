@@ -52,6 +52,20 @@ public class GroupController extends Controller {
 		}
 	}
 
+	public Group getByName(String name) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Group.getByName");
+			query.setParameter("name", name);
+			return (Group) query.getResultList().get(0);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+	
 	public List<Group> search(String search) {
 		EntityManager em = getEntityManager();
 		try {
@@ -125,12 +139,12 @@ public class GroupController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			Query query = em.createQuery("DELETE FROM GroupMember WHERE group_id = :groupId");
-			query.setParameter("groupId", groupId);
-			query.executeUpdate();
-			// Let's remove the group
+			if( !em.contains(group)) {
+				group = em.merge(group);
+			}
 			em.remove(group);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
@@ -197,10 +211,9 @@ public class GroupController extends Controller {
 		return new Response(this.getSession(),"OK","The members of group was set.");
 	}
 
-	public Response addMember(long groupId, long userId) {
+
+	public Response addMember(Group group, User user) {
 		EntityManager em = getEntityManager();
-		Group group = em.find(Group.class, groupId);
-		User  user  = em.find(User.class, userId);
 		group.getUsers().add(user);
 		user.getGroups().add(group);
 		try {
@@ -215,6 +228,13 @@ public class GroupController extends Controller {
 		}
 		this.changeMemberPlugin("addmembers", group, user);
 		return new Response(this.getSession(),"OK","User " + user.getUid() + " was added to group " + group.getName() );
+	}
+
+	public Response addMember(long groupId, long userId) {
+		EntityManager em = getEntityManager();
+		Group group = em.find(Group.class, groupId);
+		User  user  = em.find(User.class, userId);
+		return this.addMember(group, user);
 	}
 
 	public Response removeMember(long groupId, long userId) {

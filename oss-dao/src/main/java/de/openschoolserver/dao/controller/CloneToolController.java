@@ -208,8 +208,12 @@ public class CloneToolController extends Controller {
 		try {
 			em.getTransaction().begin();
 			HWConf hwconf = this.getById(hwconfId);
+			if( ! em.contains(hwconf)) {
+				hwconf = em.merge(hwconf);
+			}
 			em.remove(hwconf);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -228,6 +232,7 @@ public class CloneToolController extends Controller {
 			em.getTransaction().begin();
 			em.merge(hwconf);
 			em.getTransaction().commit();
+			em.getEntityManagerFactory().getCache().evict(hwconf.getClass());
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR", e.getMessage());

@@ -136,14 +136,15 @@ public class Controller extends Config {
 	}
 
 	protected boolean checkNonASCII(String name) {
-		return Pattern.matches("[^a-zA-Z0-9\\.\\-_]",name);
+		return ! Pattern.matches("[a-zA-Z0-9\\.\\-_]+",name);
 	}
 
 	protected boolean checkBadHostName(String name) {
-		if( ! Pattern.matches("[^a-zA-Z0-9\\-]",name) ){
-			return Pattern.matches("-wlan$",name);
+		if( !name.matches("[a-zA-Z0-9\\-]+")) {
+			logger.debug("Bad name match '" + name + "'");
+			return true;
 		}
-		return true;
+		return name.matches(".*-wlan");
 	}
 
 	protected String isMacUnique(String name){

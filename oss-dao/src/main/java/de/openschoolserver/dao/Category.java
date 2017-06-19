@@ -43,7 +43,7 @@ public class Category implements Serializable {
 	private Long ownerId;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(        
 			name="DeviceInCategories",
 			joinColumns={ @JoinColumn(name="category_id") },
@@ -53,7 +53,7 @@ public class Category implements Serializable {
 	private List<Device> devices;
 
 	//bi-directional many-to-many association to Group
-	@ManyToMany
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name="GroupInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
@@ -63,7 +63,7 @@ public class Category implements Serializable {
 	private List<Group> groups;
 
 	//bi-directional many-to-many association to Group
-	@ManyToMany
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name="HWConfInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
@@ -73,7 +73,7 @@ public class Category implements Serializable {
 	private List<HWConf> hwconfs;
 
 	//bi-directional many-to-many association to Room
-	@ManyToMany
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name="RoomInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
@@ -83,7 +83,7 @@ public class Category implements Serializable {
 	private List<Room> rooms;
 
 	//bi-directional many-to-many association to Software
-	@ManyToMany
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name="SoftwareInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
@@ -93,7 +93,7 @@ public class Category implements Serializable {
 	private List<Software> softwares;
 
 	//bi-directional many-to-many association to Software
-	@ManyToMany
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name="SoftwareRemovedFromCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },
@@ -103,7 +103,7 @@ public class Category implements Serializable {
 	private List<Software> removedSoftwares;
 
 	//bi-directional many-to-many association to User
-	@ManyToMany
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
 			name="UserInCategories", 
 			joinColumns={ @JoinColumn(name="category_id") },

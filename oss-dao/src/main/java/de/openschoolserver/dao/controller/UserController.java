@@ -131,7 +131,8 @@ public class UserController extends Controller {
         else
         {
             // First we check if the parameter are unique.
-            if( ! this.isNameUnique(user.getUid())){
+	    // workstation users have a user called as itself
+            if( !user.getRole().equals("workstations") && !this.isNameUnique(user.getUid())){
                 return new Response(this.getSession(),"ERROR", "User name is not unique.");
             }
             // Check if uid contains non allowed characters
@@ -140,19 +141,27 @@ public class UserController extends Controller {
             }
         }
         // Check the user password
-        if( user.getPassword() == "" ) {
+        if( user.getRole().equals("workstations")) {
+		user.setPassword(user.getUid());
+	} else if( user.getPassword() == "" ) {
             user.setPassword(UserUtil.createRandomPassword(9,"ACGqf123#"));
         }
         else
         {
             Response response = this.checkPassword(user.getPassword());
-            if(response != null)
+            if(response != null) {
                 return response;
+            }
         }
         try {
             em.getTransaction().begin();
             em.persist(user);
             em.getTransaction().commit();
+            GroupController groupController = new GroupController(this.session);
+            Group group = groupController.getByName(user.getRole());
+            if( group != null ) {
+            	groupController.addMember(group,user);;
+            }
         } catch (Exception e) {
             logger.error(e.getMessage());
             return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -160,7 +169,7 @@ public class UserController extends Controller {
             em.close();
         }
         this.startPlugin("add_user",user);
-        return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created.");
+        return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.");
     }
 
         
@@ -200,29 +209,21 @@ public class UserController extends Controller {
     
     public Response delete(long userId){
         User user = this.getById(userId);
-        if( this.isProtected(user))
-            return new Response(this.getSession(),"ERROR","This group must not be deleted.");
+        if( this.isProtected(user)) {
+            return new Response(this.getSession(),"ERROR","This user must not be deleted.");
+        }
 
         this.startPlugin("delete_user",user);
-
         EntityManager em = getEntityManager();
-        em.getTransaction().begin();
         List<Device> devices = user.getOwnedDevices();
         boolean restartDHCP = ! devices.isEmpty();
-        // Remove user from logged on table
-        Query query = em.createQuery("DELETE FROM LoggedOn WHERE user_id = :userId");
-        query.setParameter("userId", userId);
-        query.executeUpdate();
-        // Remove user from GroupMember of table
-        query = em.createQuery("DELETE FROM GroupMember WHERE user_id = :userId");
-        query.setParameter("userId", userId);
-        query.executeUpdate();
-        // Let's remove the user
-        em.remove(user);
-        for( Device device : devices ) {
-            em.remove(device);
+        em.getTransaction().begin();
+        if( ! em.contains(user)) {
+        	user = em.merge(user);
         }
+        em.remove(user);
         em.getTransaction().commit();
+        em.getEntityManagerFactory().getCache().evictAll();
         if( restartDHCP ) {
             DHCPConfig dhcpConfig = new DHCPConfig(this.session);
             dhcpConfig.Create();
@@ -233,6 +234,7 @@ public class UserController extends Controller {
     
     public List<Group> getAvailableGroups(long userId){
         EntityManager em = getEntityManager();
+        
         User user = this.getById(userId);
         Query query = em.createNamedQuery("Group.findAll");
         List<Group> allGroups = query.getResultList();
