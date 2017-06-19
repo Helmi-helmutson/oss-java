@@ -15,8 +15,10 @@ import javax.persistence.*;
 public class TestUser implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private TestUserPK id;
+	@Id
+	@SequenceGenerator(name="TESTUSERS_ID_GENERATOR" )
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="TESTUSERS_ID_GENERATOR")
+	private long id;
 
 	//bi-directional many-to-one association to Device
 	@ManyToOne
@@ -41,11 +43,11 @@ public class TestUser implements Serializable {
 	public TestUser() {
 	}
 
-	public TestUserPK getId() {
+	public long getId() {
 		return this.id;
 	}
 
-	public void setId(TestUserPK id) {
+	public void setId(long id) {
 		this.id = id;
 	}
 
