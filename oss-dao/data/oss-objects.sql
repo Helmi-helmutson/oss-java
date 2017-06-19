@@ -394,7 +394,7 @@ CREATE TABLE IF NOT EXISTS Responses (
 	PRIMARY KEY(id)
 );
 
-CREATE TABLE IF NOT EXISTS Software (
+CREATE TABLE IF NOT EXISTS Softwares (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name        VARCHAR(32) NOT NULL,
 	description VARCHAR(64) DEFAULT NULL,
@@ -407,7 +407,7 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
 	version        VARCHAR(32) NOT NULL,
-        FOREIGN KEY(software_id)    REFERENCES Software(id) ON DELETE CASCADE,
+        FOREIGN KEY(software_id)    REFERENCES Softwares(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -426,7 +426,7 @@ CREATE TABLE IF NOT EXISTS SoftwareLicenses (
 	licenseType    VARCHAR(4) DEFAULT 'CMD',
 	count          INTEGER DEFAULT 1,
 	value          VARCHAR(1024) NOT NULL,
-        FOREIGN KEY(software_id)    REFERENCES Software(id)     ON DELETE CASCADE,
+        FOREIGN KEY(software_id)    REFERENCES Softwares(id)     ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
@@ -482,7 +482,7 @@ CREATE TABLE IF NOT EXISTS RoomInCategories (
 CREATE TABLE IF NOT EXISTS SoftwareInCategories (
         software_id        BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(software_id)  REFERENCES Software(id)   ON DELETE CASCADE,
+	FOREIGN KEY(software_id)  REFERENCES Softwares(id)   ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(software_id,category_id)
 );
@@ -490,7 +490,7 @@ CREATE TABLE IF NOT EXISTS SoftwareInCategories (
 CREATE TABLE IF NOT EXISTS SoftwareRemovedFromCategories (
         software_id        BIGINT UNSIGNED NOT NULL,
         category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(software_id)  REFERENCES Software(id)   ON DELETE CASCADE,
+	FOREIGN KEY(software_id)  REFERENCES Softwares(id)   ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(software_id,category_id)
 );
