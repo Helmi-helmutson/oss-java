@@ -4,6 +4,7 @@ package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -534,6 +535,8 @@ public class RoomController extends Controller {
 		StringBuilder error = new StringBuilder();
 		List<String> ipAddress;
 		for(Device device : devices) {
+			//Remove trailing and ending spaces.
+			device.setName(device.getName().trim());
 			ipAddress = this.getAvailableIPAddresses(roomId, 2);
 			if( device.getIp().isEmpty() ){
 				if( ipAddress.isEmpty() ) {
@@ -573,8 +576,16 @@ public class RoomController extends Controller {
 			}
 		}
 		em.close();
+		UserController userController = new UserController(this.session);
 		for(Device device : devices) {
 		    this.startPlugin("add_device", device);
+		    User user = new User();
+		    user.setUid(device.getName());
+		    user.setSureName(device.getName() + "  Workstation-User");
+		    user.setRole("workstations");
+		    //TODO do not ignore response.
+		    Response answer = userController.add(user);
+		    logger.debug(answer.getValue());
 		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		dhcpconfig.Create();
@@ -629,7 +640,7 @@ public class RoomController extends Controller {
 			else
 			{
 				device.setMac(macAddress);
-				device.setName(name + "-" + owner.getUid());
+				device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
 				device.setOwner(owner);
 				device.setIp(ipAddress.get(0).split(" ")[0]);
 				device.setHwconf(null);

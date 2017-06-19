@@ -131,7 +131,8 @@ public class UserController extends Controller {
         else
         {
             // First we check if the parameter are unique.
-            if( ! this.isNameUnique(user.getUid())){
+	    // workstation users have a user called as itself
+            if( !user.getRole().equals("workstations") && !this.isNameUnique(user.getUid())){
                 return new Response(this.getSession(),"ERROR", "User name is not unique.");
             }
             // Check if uid contains non allowed characters
@@ -140,14 +141,17 @@ public class UserController extends Controller {
             }
         }
         // Check the user password
-        if( user.getPassword() == "" ) {
+        if( user.getRole().equals("workstations")) {
+		user.setPassword(user.getUid());
+	} else if( user.getPassword() == "" ) {
             user.setPassword(UserUtil.createRandomPassword(9,"ACGqf123#"));
         }
         else
         {
             Response response = this.checkPassword(user.getPassword());
-            if(response != null)
+            if(response != null) {
                 return response;
+            }
         }
         try {
             em.getTransaction().begin();
@@ -205,8 +209,9 @@ public class UserController extends Controller {
     
     public Response delete(long userId){
         User user = this.getById(userId);
-        if( this.isProtected(user))
-            return new Response(this.getSession(),"ERROR","This group must not be deleted.");
+        if( this.isProtected(user)) {
+            return new Response(this.getSession(),"ERROR","This user must not be deleted.");
+        }
 
         this.startPlugin("delete_user",user);
         EntityManager em = getEntityManager();
