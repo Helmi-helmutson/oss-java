@@ -19,6 +19,8 @@ import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
+
 import de.extis.xpluginlib.PluginHandler;
 
 //import de.openschoolserver.dao.controller.GetJPAInf;
@@ -82,6 +84,8 @@ public class ServerApplication extends Application<ServerConfiguration> {
         environment.jersey().register(new AuthDynamicFeature(tokenAuthorizer));
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(Session.class));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
+          
+        environment.jersey().register(MultiPartFeature.class);
 
         final SystemResource systemResource = new SystemResourceImpl();
         environment.jersey().register(systemResource);
