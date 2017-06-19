@@ -10,6 +10,7 @@ import java.util.List;
  * 
  */
 @Entity
+@Table(name = "Softwares")
 @NamedQueries({
 	@NamedQuery(name="Software.findAll", query="SELECT s FROM Software s"),
 	@NamedQuery(name="Software.findAllId", query="SELECT s.id FROM Software s")
