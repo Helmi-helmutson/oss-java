@@ -1,6 +1,7 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.InputStream;
+
 import java.util.List;
 
 import de.claxss.importlib.ImporterDescription;
@@ -9,6 +10,8 @@ import de.claxss.importlib.ImporterObject;
 import de.openschoolserver.api.resources.ImporterResource;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 public class ImporterResourceImpl implements ImporterResource {
 
