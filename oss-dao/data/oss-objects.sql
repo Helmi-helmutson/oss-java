@@ -98,8 +98,8 @@ CREATE TABLE IF NOT EXISTS Rooms (
         roomControl  VARCHAR(16) NOT NULL,
         rows         INTEGER  DEFAULT 5,
         places       INTEGER  DEFAULT 5,
-        startIP      VARCHAR(16) NOT NULL,
-        netMask      INTEGER  NOT NULL,
+        startIP      VARCHAR(16) DEFAULT NULL,
+        netMask      INTEGER  DEFAULT NULL,
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
         PRIMARY KEY(id)
 );
