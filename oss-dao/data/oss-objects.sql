@@ -95,6 +95,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
         name         VARCHAR(32) NOT NULL,
         description  VARCHAR(64) DEFAULT "",
         roomType     VARCHAR(16) NOT NULL,
+        roomControl  VARCHAR(16) NOT NULL,
         rows         INTEGER  DEFAULT 5,
         places       INTEGER  DEFAULT 5,
         startIP      VARCHAR(16) NOT NULL,
@@ -283,6 +284,10 @@ INSERT INTO Enumerates VALUES(NULL,'groupType','primary');
 INSERT INTO Enumerates VALUES(NULL,'groupType','class');
 INSERT INTO Enumerates VALUES(NULL,'groupType','workgroup');
 INSERT INTO Enumerates VALUES(NULL,'groupType','guest');
+INSERT INTO Enumerates VALUES(NULL,'roomControl','in_room');
+INSERT INTO Enumerates VALUES(NULL,'roomControl','no');
+INSERT INTO Enumerates VALUES(NULL,'roomControl','all_teacher');
+INSERT INTO Enumerates VALUES(NULL,'roomControl','teacher');
 INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Library');

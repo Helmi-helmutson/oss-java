@@ -135,9 +135,11 @@ public class SystemController extends Controller {
         }
         return new Response(this.getSession(),"OK","Enumerate was removed succesfully.");
     }
-    
-    // Functions for manipulating firewall
-    
+
+    ////////////////////////////////////////////////////////
+    // Functions for setting firewall
+    ///////////////////////////////////////////////////////
+
     public Map<String, String> getFirewallIncomingRules() {
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
         Map<String,String> statusMap;
@@ -193,29 +195,29 @@ public class SystemController extends Controller {
         DeviceController deviceController = new DeviceController(this.session);
         
         for( String outRule : fwConfig.getConfigValue("FW_MASQ_NETS").split(" ") ) {
-        	if (outRule.length() > 0) {
-            statusMap = new HashMap<>();
-            String[] rule = outRule.split(",");
-            String[] host = rule[0].split("/");
-            String   dest = rule[1];
-            String   prot = rule.length > 2 ? rule[2] : "all";
-            String   port = rule.length > 3 ? rule[3] : "all";
-            if(host[1].equals("32")) {
-                Device device = deviceController.getByIP(host[0]);
-                statusMap.put("id", Long.toString(device.getId()));
-                statusMap.put("name", device.getName());
-                statusMap.put("type", "host");
-            } else {
-                Room room = roomController.getByIP(host[0]);
-                statusMap.put("id", Long.toString(room.getId()));
-                statusMap.put("name", room.getName());
-                statusMap.put("type", "room" );
+            if (outRule.length() > 0) {
+                statusMap = new HashMap<>();
+                String[] rule = outRule.split(",");
+                String[] host = rule[0].split("/");
+                String   dest = rule[1];
+                String   prot = rule.length > 2 ? rule[2] : "all";
+                String   port = rule.length > 3 ? rule[3] : "all";
+                if(host[1].equals("32")) {
+                    Device device = deviceController.getByIP(host[0]);
+                    statusMap.put("id", Long.toString(device.getId()));
+                    statusMap.put("name", device.getName());
+                    statusMap.put("type", "host");
+                } else {
+                    Room room = roomController.getByIP(host[0]);
+                    statusMap.put("id", Long.toString(room.getId()));
+                    statusMap.put("name", room.getName());
+                    statusMap.put("type", "room" );
+                }
+                statusMap.put("dest", dest);
+                statusMap.put("prot", prot);
+                statusMap.put("port", port);
+                firewallList.add(statusMap);
             }
-            statusMap.put("dest", dest);
-            statusMap.put("prot", prot);
-            statusMap.put("port", port);
-            firewallList.add(statusMap);
-        	}
         }
         return firewallList;
     }
@@ -243,8 +245,13 @@ public class SystemController extends Controller {
             fwMasqNets.add(data.toString());
         }
         fwConfig.setConfigValue("FW_ROUTE","yes");
-        fwConfig.setConfigValue("FW_MASQUERADE","yes");
-        fwConfig.setConfigValue("FW_MASQ_NETS", String.join(" ", fwMasqNets));
+        if( fwMasqNets.size > 0 ) {
+                fwConfig.setConfigValue("FW_MASQUERADE","yes");
+                fwConfig.setConfigValue("FW_MASQ_NETS", String.join(" ", fwMasqNets));
+        } else {
+                fwConfig.setConfigValue("FW_MASQUERADE","yes");
+                fwConfig.setConfigValue("FW_MASQ_NETS", " ");
+        }
         this.systemctl("restart", "SuSEfirewall2");
         return new Response(this.getSession(),"OK","Firewall outgoing access rule  was set succesfully.");
     }
@@ -256,18 +263,18 @@ public class SystemController extends Controller {
         DeviceController deviceController = new DeviceController(this.session);
         
         for( String outRule : fwConfig.getConfigValue("FW_FORWARD_MASQ").split(" ") ) {
-        	if (outRule!=null && outRule.length()>0) {
-	            statusMap = new HashMap<>();
-	            String[] rule = outRule.split(",");
-	            if (rule!=null && rule.length>=4) {
-		            Device device = deviceController.getByIP(rule[1]);
-		            statusMap.put("ext", rule[3]);
-		            statusMap.put("id",  Long.toString(device.getId()) );
-		            statusMap.put("name", device.getName() );
-		            statusMap.put("port", rule[4]);
-		            firewallList.add(statusMap);
-	            }
-        	}
+           if (outRule!=null && outRule.length()>0) {
+               statusMap = new HashMap<>();
+               String[] rule = outRule.split(",");
+               if (rule!=null && rule.length>=4) {
+                   Device device = deviceController.getByIP(rule[1]);
+                   statusMap.put("ext", rule[3]);
+                   statusMap.put("id",  Long.toString(device.getId()) );
+                   statusMap.put("name", device.getName() );
+                   statusMap.put("port", rule[4]);
+                   firewallList.add(statusMap);
+               }
+           }
         }
         return firewallList;
     }
