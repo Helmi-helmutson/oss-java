@@ -112,7 +112,7 @@ public class RoomController extends Controller {
 				return query.getResultList();
 			} else {
 				List<Room> rooms = new ArrayList<Room>();
-				Query query = em.createNamedQuery("User.getMConfig").setParameter("keyword", "adhocRoom").setParameter("user_id",this.session.getUserId());
+				Query query = em.createNamedQuery("User.getMConfig").setParameter("keyword", "AdHocAccess").setParameter("user_id",this.session.getUserId());
         		for(String roomid : (List<String>) query.getResultList() ) {
         			rooms.add(this.getById(Long.parseLong(roomid)));
         		}
@@ -633,7 +633,7 @@ public class RoomController extends Controller {
 		if( ! owner.getRole().contains("sysadmins") ) {
 			//non sysadmin user want to register his workstation
 			Query query = em.createNamedQuery("User.checkMConfig");
-			query.setParameter("user_id", this.getSession().getUserId()).setParameter("keyword", "adhocRoom").setParameter("varlue", roomId);
+			query.setParameter("user_id", this.getSession().getUserId()).setParameter("keyword", "AdHocAccess").setParameter("value", roomId);
 			if( query.getResultList().isEmpty() ) {
 				return new Response(this.getSession(),"ERROR","You have no rights to register devices in this room");
 			}
