@@ -245,12 +245,12 @@ public class SystemController extends Controller {
             fwMasqNets.add(data.toString());
         }
         fwConfig.setConfigValue("FW_ROUTE","yes");
-        if( fwMasqNets.size > 0 ) {
-                fwConfig.setConfigValue("FW_MASQUERADE","yes");
-                fwConfig.setConfigValue("FW_MASQ_NETS", String.join(" ", fwMasqNets));
+        if( fwMasqNets.isEmpty() ) {
+            fwConfig.setConfigValue("FW_MASQUERADE","no");
+            fwConfig.setConfigValue("FW_MASQ_NETS", " ");
         } else {
-                fwConfig.setConfigValue("FW_MASQUERADE","yes");
-                fwConfig.setConfigValue("FW_MASQ_NETS", " ");
+            fwConfig.setConfigValue("FW_MASQUERADE","yes");
+            fwConfig.setConfigValue("FW_MASQ_NETS", String.join(" ", fwMasqNets));
         }
         this.systemctl("restart", "SuSEfirewall2");
         return new Response(this.getSession(),"OK","Firewall outgoing access rule  was set succesfully.");
