@@ -4,6 +4,7 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -133,7 +134,7 @@ public interface SystemResource {
     @POST
     @Path("firewall/incomingRules")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the incoming firewall rules.")
+    @ApiOperation(value = "Sets the incoming firewall rules.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -158,7 +159,7 @@ public interface SystemResource {
     @POST
     @Path("firewall/outgoingRules")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the incoming firewall rules.")
+    @ApiOperation(value = "Sets the incoming firewall rules.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -183,7 +184,7 @@ public interface SystemResource {
     @POST
     @Path("firewall/remoteAccessRules")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the incoming firewall rules.")
+    @ApiOperation(value = "Sets the incoming firewall rules.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
