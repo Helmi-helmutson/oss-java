@@ -428,7 +428,175 @@ public class SoftwareController extends Controller {
 	}
 
 	/*
-	 * Save the software status what shall be installed where.
+	 * Save the software status what shall be installed to host sls files.
+	 */
+	public Response saveSoftwareStateToHosts(){
+		EntityManager em = getEntityManager();
+		RoomController   roomController   = new RoomController(this.session);
+		DeviceController deviceController = new DeviceController(this.session);
+		Map<Device,List<String>>   softwaresToInstall = new HashMap<>();
+		Map<Device,List<Software>> softwaresToRemove  = new HashMap<>();
+		String key;
+
+		List<String>   topSls = new ArrayList<String>();
+		Path SALT_TOP_TEMPL   = Paths.get("/usr/share/oss/templates/top.sls");
+		if( Files.exists(SALT_TOP_TEMPL) ) {
+			try {
+				topSls = Files.readAllLines(SALT_TOP_TEMPL);
+			} catch (java.nio.file.NoSuchFileException e) {
+				logger.error(e.getMessage());
+			} catch( IOException e ) {
+				logger.error(e.getMessage());
+			}
+		} else {
+			topSls.add("base:");
+		}
+
+		//Create the workstations state files
+		for( Device device : deviceController.getAll() ) {
+			List<String>   toInstall = new ArrayList<String>();
+			List<Software> toRemove  = new ArrayList<Software>();
+			for( Category category : device.getCategories() ) {
+				for( Software software : category.getRemovedSoftwares() ) {
+					toRemove.add(software);
+				}
+			}
+			for( Category category : device.getCategories() ) {
+				for( Software software : category.getSoftwares() ) {
+					toRemove.remove(software);
+					for( Software requirement : software.getRequirements() ) {
+						toInstall.add(String.format("%04d-%s",requirement.getWeight(),requirement.getName()));
+					}
+					toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
+				}
+			}
+			softwaresToInstall.put(device, toInstall);
+			softwaresToRemove.put(device, toRemove);
+		}
+
+		//Create the room state files
+		for( Room room : roomController.getAll() ) {
+			List<Software> toRemove  = new ArrayList<Software>();
+			
+			for( Category category : room.getCategories() ) {
+				for( Software software : category.getRemovedSoftwares() ) {
+					toRemove.add(software);
+				}
+			}
+			for( Category category : room.getCategories() ) {
+				for( Software software : category.getSoftwares() ) {
+					toRemove.remove(software);
+					for( Software requirement : software.getRequirements() ) {
+						key = String.format("%04d-%s",requirement.getWeight(),requirement.getName());
+						for( Device device : room.getDevices() ) {
+							if( ! softwaresToInstall.get(device).contains(key) ) {
+								softwaresToInstall.get(device).add(key);
+							}
+						}
+					}
+					key = String.format("%04d-%s",software.getWeight(),software.getName());
+					for( Device device : room.getDevices() ) {
+						if( ! softwaresToInstall.get(device).contains(key) ) {
+							softwaresToInstall.get(device).add(key);
+						}
+					}
+				}
+			}
+			for( Device device : room.getDevices() ) {
+				for( Software software : toRemove ) {
+					if( ! softwaresToRemove.get(device).contains(software) ) {
+						softwaresToRemove.get(device).add(software);
+					}
+				}
+			}
+		}
+
+		//Create the hwconf state files
+		Query query = em.createNamedQuery("HWConf.findAll");
+		for( HWConf hwconf : (List<HWConf>)  query.getResultList() ) {
+			//List of software to be removed
+			List<Software> toRemove  = new ArrayList<Software>();
+			for( Category category : hwconf.getCategories() ) {
+				for( Software software : category.getRemovedSoftwares() ) {
+					toRemove.add(software);
+				}
+			}
+			for( Category category : hwconf.getCategories() ) {
+				for( Software software : category.getSoftwares() ) {
+					toRemove.remove(software);
+					for( Software requirement : software.getRequirements() ) {
+						key = String.format("%04d-%s",requirement.getWeight(),requirement.getName());
+						for( Device device : hwconf.getDevices() ) {
+							if( ! softwaresToInstall.get(device).contains(key) ) {
+								softwaresToInstall.get(device).add(key);
+							}
+						}
+					}
+					key = String.format("%04d-%s",software.getWeight(),software.getName());
+					for( Device device : hwconf.getDevices() ) {
+						if( ! softwaresToInstall.get(device).contains(key) ) {
+							softwaresToInstall.get(device).add(key);
+						}
+					}
+				}
+			}
+			for( Device device : hwconf.getDevices() ) {
+				for( Software software : toRemove ) {
+					if( ! softwaresToRemove.get(device).contains(software) ) {
+						softwaresToRemove.get(device).add(software);
+					}
+				}
+			}
+		}
+
+		//Write the hosts sl files
+		for( Device device : deviceController.getAll() ) {
+			List<String> deviceSls = new ArrayList<String>();
+			//Remove first the softwares.
+			for( Software software : softwaresToRemove.get(device) ) {
+				deviceSls.add(software.getName()+":");
+				deviceSls.add("  - pkg:");
+				deviceSls.add("    - removed:");
+				if( this.checkSoftwareStatusOnDevice(device, software, "installed") ){
+					this.setSoftwareStatusOnDevice(device, software, "", "deinstallation_scheduled");
+				}
+			}
+			softwaresToInstall.get(device).sort((String s1, String s2) -> { return s2.compareTo(s1); });
+			for( String softwareKey :  softwaresToInstall.get(device) ) {
+				String softwareName = softwareKey.substring(4);
+				deviceSls.add(softwareName+":");
+				deviceSls.add("  - pkg:");
+				deviceSls.add("    - installed:");
+				Software software = this.getByNam(softwareName);
+				if(! this.checkSoftwareStatusOnDevice(device, software, "installed")){
+					this.setSoftwareStatusOnDevice(device, software, "", "installation_scheduled");
+				}
+			}
+			if( deviceSls.size() > 0) {
+				Path SALT_ROOM   = Paths.get("/srv/salt/oss_device_" + device.getName() + ".sls");
+				try {
+					Files.write(SALT_ROOM, deviceSls );
+				} catch( IOException e ) { 
+					e.printStackTrace();
+				}
+				topSls.add("  - " + device.getName() + ":");
+				topSls.add("    - oss_device_" + device.getName());
+			}
+		}
+		if( topSls.size() > 0 ) {
+			Path SALT_TOP   = Paths.get("/srv/salt/top.sls");
+			try {
+				Files.write(SALT_TOP, topSls );
+			} catch( IOException e ) { 
+				e.printStackTrace();
+			}
+			this.systemctl("restart", "salt-master");
+		}
+		return new Response(this.getSession(),"OK","SoftwareState was saved succesfully"); 
+	}
+
+	/*
+	 * Save the software status what shall be installed where to host room and hwconf sls files
 	 */
 	public Response saveSoftwareState(){
 		EntityManager em = getEntityManager();

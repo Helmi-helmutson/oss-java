@@ -3,6 +3,9 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 /**
@@ -47,6 +50,21 @@ public class Software implements Serializable {
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="removedSoftwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<Category> removedFromCategories;
+	
+	//bi-directional many-to-many association to Device
+		@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+		@JoinTable(
+				name="SoftwareRequirements",
+				joinColumns={ @JoinColumn(name="software_id")	},
+				inverseJoinColumns={ @JoinColumn(name="requirement_id") }
+		)
+		@JsonIgnore
+		private List<Software> requirements;
+
+		//bi-directional many-to-many association to Device
+		@ManyToMany(mappedBy="requirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+		@JsonIgnore
+		private List<Software> requiredBy;
 
 	public Software() {
 		this.manuell = false;
@@ -98,6 +116,22 @@ public class Software implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+	public List<Software> getRequirements() {
+		return this.requirements;
+	}
+
+	public void setRequirements(List<Software> requirements) {
+		this.requirements = requirements;
+	}
+
+	public List<Software> getRequiredBy() {
+		return this.requiredBy;
+	}
+
+	public void setRequiredBy(List<Software> requiredBy) {
+		this.requiredBy = requiredBy;
 	}
 
 	public List<SoftwareLicense> getSoftwareLicenses() {

@@ -408,6 +408,14 @@ CREATE TABLE IF NOT EXISTS Softwares (
         PRIMARY KEY(id)
 );
 
+CREATE TABLE IF NOT EXISTS SoftwareRequirements (
+        software_id        BIGINT UNSIGNED NOT NULL,
+        requirement_id     BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(software_id)    REFERENCES Softwares(id)  ON DELETE CASCADE,
+	FOREIGN KEY(requirement_id) REFERENCES Softwares(id) ON DELETE CASCADE,
+	PRIMARY KEY(software_id,requirement_id
+);
+
 CREATE TABLE IF NOT EXISTS SoftwareVersions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
