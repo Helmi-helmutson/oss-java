@@ -104,8 +104,9 @@ CREATE TABLE IF NOT EXISTS Rooms (
         PRIMARY KEY(id)
 );
 
-INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','VirtualRoom',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#);
-INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','VirtualRoom',10,10,'#ANON_NETWORK#',#ANON_NETMASK#);
+INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','TechnicalRoom',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#);
+INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','TechnicalRoom',10,10,'#ANON_NETWORK#',#ANON_NETMASK#);
+
 
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -292,16 +293,17 @@ INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Library');
 INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory');
-INSERT INTO Enumerates VALUES(NULL,'roomType','VirtualRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','WlanAccess');
 INSERT INTO Enumerates VALUES(NULL,'roomType','AdHocAccess');
+INSERT INTO Enumerates VALUES(NULL,'roomType','TechnicalRoom');
 INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT');
 INSERT INTO Enumerates VALUES(NULL,'accessType','FW');
 INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
 INSERT INTO Enumerates VALUES(NULL,'licenseType','NONE');
 INSERT INTO Enumerates VALUES(NULL,'licenseType','FILE');
-INSERT INTO Enumerates VALUES(NULL,'licenseType','XML');
 INSERT INTO Enumerates VALUES(NULL,'licenseType','CMD');
+INSERT INTO Enumerates VALUES(NULL,'categoryType','software');
+INSERT INTO Enumerates VALUES(NULL,'categoryType','virtualRoom');
 
 #Some additional config tables
 CREATE TABLE IF NOT EXISTS UserConfig (
@@ -455,6 +457,7 @@ CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name         VARCHAR(32) NOT NULL,
 	description  VARCHAR(64) NOT NULL,
+	categoryType VARCHAR(16) DEFAULT NULL,
         owner_id     BIGINT UNSIGNED DEFAULT NULL,
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
