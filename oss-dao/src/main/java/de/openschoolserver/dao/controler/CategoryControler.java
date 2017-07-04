@@ -1,6 +1,7 @@
-package de.openschoolserver.dao.controller;
+package de.openschoolserver.dao.controler;
 
 import javax.persistence.EntityManager;
+
 
 import javax.persistence.Query;
 
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 import de.openschoolserver.dao.*;
 
 @SuppressWarnings( "unchecked" )
-public class CategoryController extends Controller {
+public class CategoryControler extends Controler {
 	
 	static String[] categoriesIn = { 
 			"DeviceInCategories",
@@ -22,7 +23,7 @@ public class CategoryController extends Controller {
 			"UserInCategories"
 			};
 
-	public CategoryController(Session session) {
+	public CategoryControler(Session session) {
 		super(session);
 	}
 	
@@ -253,5 +254,13 @@ public class CategoryController extends Controller {
 			em.close();
 		}
 		return new Response(this.getSession(),"OK","Category was modified");
+	}
+
+	public List<Category> getCategories(List<Long> categoryIds) {
+		List<Category> categories = new ArrayList<Category>();
+		for( Long id : categoryIds ) {
+			categories.add(this.getById(id));
+		}
+		return categories;
 	}
 }

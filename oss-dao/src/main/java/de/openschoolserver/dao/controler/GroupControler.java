@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controller;
+package de.openschoolserver.dao.controler;
 
 import java.util.ArrayList;
 
@@ -18,11 +18,11 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
 
 @SuppressWarnings( "unchecked" )
-public class GroupController extends Controller {
+public class GroupControler extends Controler {
 
-	Logger logger = LoggerFactory.getLogger(DeviceController.class);
+	Logger logger = LoggerFactory.getLogger(DeviceControler.class);
 
-	public GroupController(Session session) {
+	public GroupControler(Session session) {
 		super(session);
 	}
 
@@ -255,5 +255,13 @@ public class GroupController extends Controller {
 		}
 		this.changeMemberPlugin("removemembers", group, user);
 		return new Response(this.getSession(),"OK","User " + user.getUid() + " was removed from group " + group.getName() );
+	}
+
+	public List<Group> getGroups(List<Long> groupIds) {
+ 		List<Group> groups = new ArrayList<Group>();
+ 		for( Long id : groupIds){
+ 			groups.add(this.getById(id));
+ 		}
+		return groups;
 	}
 }

@@ -28,6 +28,7 @@ import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.User;
 
 import java.util.List;
 
@@ -118,6 +119,21 @@ public interface CategoryResource {
 			@PathParam("search") String search
 			);
 
+	/*
+   	 * POST categories/getCAtegories
+   	 */
+       @POST
+       @Path("getCategories")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Gets a list of category objects to the list of categoryIds.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("category.search")
+       List<Category> getCategories(
+               @ApiParam(hidden = true) @Auth Session session,
+               List<Long> categoryIds
+       );
+       
 	/*
 	 * POST categories/add { hash }
 	 */

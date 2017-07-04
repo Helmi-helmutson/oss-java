@@ -56,9 +56,9 @@ public interface GroupResource {
                @PathParam("groupId") long groupId
        );
 
-       /*
-	 * GET groups/<groupId>/availableMembers
-	 */
+    /*
+	* GET groups/<groupId>/availableMembers
+	*/
     @GET
     @Path("{groupId}/availableMembers")
     @Produces(JSON_UTF8)
@@ -156,6 +156,22 @@ public interface GroupResource {
     );
     
     /*
+   	 * POST groups/getGroups
+   	 */
+       @POST
+       @Path("getGroups")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Gets a list of group objects to the list of groupIds.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 404, message = "Group not found"),
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("group.manage")
+       List<Group> getGroups(
+               @ApiParam(hidden = true) @Auth Session session,
+               List<Long> groupIds
+       );
+        
+    /*
      * DELETE groups/<groupId>
      */
     @DELETE
@@ -179,7 +195,7 @@ public interface GroupResource {
        @POST
        @Path("{groupId}/members")
        @Produces(JSON_UTF8)
-       @ApiOperation(value = "Sets the membe of this group.")
+       @ApiOperation(value = "Sets the member of this group.")
        @ApiResponses(value = {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -200,11 +216,10 @@ public interface GroupResource {
        @DELETE
        @Path("{groupId}/{userId}")
        @Produces(JSON_UTF8)
-       @ApiOperation(value = "Deletes member of a group by userId.")
+       @ApiOperation(value = "Deletes a member of a group by userId.")
        @ApiResponses(value = {
-           @ApiResponse(code = 404, message = "Group not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @RolesAllowed("group.manage")
+       @RolesAllowed("group.search")
        Response removeMember(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
@@ -217,7 +232,7 @@ public interface GroupResource {
        @PUT
        @Path("{groupId}/{userId}")
        @Produces(JSON_UTF8)
-       @ApiOperation(value = "Add member to a group by userId.")
+       @ApiOperation(value = "Add a member to a group by userId.")
        @ApiResponses(value = {
            @ApiResponse(code = 404, message = "Group not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})

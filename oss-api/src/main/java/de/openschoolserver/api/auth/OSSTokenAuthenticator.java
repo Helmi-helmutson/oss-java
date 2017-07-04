@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controller.SessionController;
+import de.openschoolserver.dao.controler.SessionControler;
 
 public class OSSTokenAuthenticator implements Authenticator<String, Session> {
 
@@ -23,8 +23,8 @@ public class OSSTokenAuthenticator implements Authenticator<String, Session> {
 
         logger.debug("Token: " + token);
         
-        final SessionController sessionController = new SessionController();
-        final Session session = sessionController.getByToken(token);
+        final SessionControler sessionControler = new SessionControler();
+        final Session session = sessionControler.getByToken(token);
        
         if (session != null) {
             logger.debug("authentication successful!");

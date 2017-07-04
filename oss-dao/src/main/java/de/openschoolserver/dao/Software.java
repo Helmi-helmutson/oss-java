@@ -52,19 +52,19 @@ public class Software implements Serializable {
 	private List<Category> removedFromCategories;
 	
 	//bi-directional many-to-many association to Device
-		@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-		@JoinTable(
-				name="SoftwareRequirements",
-				joinColumns={ @JoinColumn(name="software_id")	},
-				inverseJoinColumns={ @JoinColumn(name="requirement_id") }
-		)
-		@JsonIgnore
-		private List<Software> requirements;
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinTable(
+			name="SoftwareRequirements",
+			joinColumns={ @JoinColumn(name="software_id")	},
+			inverseJoinColumns={ @JoinColumn(name="requirement_id") }
+	)
+	@JsonIgnore
+	private List<Software> requirements;
 
-		//bi-directional many-to-many association to Device
-		@ManyToMany(mappedBy="requirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-		@JsonIgnore
-		private List<Software> requiredBy;
+	//bi-directional many-to-many association to Device
+	@ManyToMany(mappedBy="requirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
+	private List<Software> requiredBy;
 
 	public Software() {
 		this.manuell = false;

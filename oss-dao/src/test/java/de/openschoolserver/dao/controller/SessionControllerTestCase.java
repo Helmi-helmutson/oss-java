@@ -90,7 +90,7 @@ public class SessionControllerTestCase extends OSSDaoTestCase {
         // assertEquals("localhost:8080/infoline",
         // sessionTeacher1.getIdentity().getID());
 
-        SessionController c2 = new SessionController(sessionTeacher1);
+        SessionControler c2 = new SessionControler(sessionTeacher1);
 
         // validate token
         Session validatedSession = c2.validateToken(sessionTeacher1.getToken());

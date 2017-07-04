@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controller.SessionController;
+import de.openschoolserver.dao.controler.SessionControler;
 
 public class OSSAuthorizer implements Authorizer<Session> {
 
@@ -20,8 +20,8 @@ public class OSSAuthorizer implements Authorizer<Session> {
     public boolean authorize(Session session, String requiredRole) {
 
         logger.info("authorize() Person: " + session.getUser().getUid() + ", required role category: " + requiredRole);
-        final SessionController sessionController = new SessionController();
-        return sessionController.authorize(session, requiredRole);
+        final SessionControler sessionControler = new SessionControler();
+        return sessionControler.authorize(session, requiredRole);
     }
 
 }

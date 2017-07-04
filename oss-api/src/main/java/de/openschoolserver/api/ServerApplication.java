@@ -23,7 +23,7 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import de.extis.xpluginlib.PluginHandler;
 
-//import de.openschoolserver.dao.controller.GetJPAInf;
+//import de.openschoolserver.dao.controler.GetJPAInf;
 //import java.io.IOException;
 //import java.net.ServerSocket;
 

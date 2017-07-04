@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controller;
+package de.openschoolserver.dao.controler;
 import java.util.*;
 
 import java.io.IOException;

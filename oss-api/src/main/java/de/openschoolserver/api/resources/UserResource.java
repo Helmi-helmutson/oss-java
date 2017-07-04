@@ -123,6 +123,21 @@ public interface UserResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("search") String search
     );
+    
+    /*
+   	 * POST user/getUsers
+   	 */
+       @POST
+       @Path("getUsers")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Gets a list of user objects to the list of userIds.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("user.search")
+       List<User> getUsers(
+               @ApiParam(hidden = true) @Auth Session session,
+               List<Long> userIds
+       );
 
     /*
      * POST users/add { hash }

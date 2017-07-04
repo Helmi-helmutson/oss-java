@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controller;
+package de.openschoolserver.dao.controler;
 import java.util.ArrayList;
 
 
@@ -17,7 +17,7 @@ import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 
 @SuppressWarnings( "unchecked" )
-public class CloneToolController extends Controller {
+public class CloneToolController extends Controler {
 
 	Logger logger = LoggerFactory.getLogger(CloneToolController.class);
 
@@ -26,7 +26,7 @@ public class CloneToolController extends Controller {
 	}
 
 	public Long getHWConf(){
-		DeviceController devController = new DeviceController(this.getSession());
+		DeviceControler devController = new DeviceControler(this.getSession());
 		Device device = devController.getByIP(this.getSession().getIP());
 		return device.getHwconf().getId();
 	}

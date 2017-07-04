@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controller;
+package de.openschoolserver.dao.controler;
 
 import org.slf4j.Logger;
 
@@ -17,17 +17,17 @@ import de.extis.core.util.UserUtil;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.controler.DHCPConfig;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
-import de.openschoolserver.dao.controller.DHCPConfig;
 
 @SuppressWarnings( "unchecked" )
-public class UserController extends Controller {
+public class UserControler extends Controler {
 
-    Logger logger = LoggerFactory.getLogger(UserController.class);
+    Logger logger = LoggerFactory.getLogger(UserControler.class);
 
-    public UserController(Session session) {
+    public UserControler(Session session) {
         super(session);
     }
     
@@ -157,10 +157,10 @@ public class UserController extends Controller {
             em.getTransaction().begin();
             em.persist(user);
             em.getTransaction().commit();
-            GroupController groupController = new GroupController(this.session);
-            Group group = groupController.getByName(user.getRole());
+            GroupControler groupControler = new GroupControler(this.session);
+            Group group = groupControler.getByName(user.getRole());
             if( group != null ) {
-            	groupController.addMember(group,user);;
+            	groupControler.addMember(group,user);;
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
@@ -318,4 +318,12 @@ public class UserController extends Controller {
         }
         return new Response(this.getSession(),"OK","The filesystem quotas was synced succesfully");
     }
+
+	public List<User> getUsers(List<Long> userIds) {
+		List<User> users = new ArrayList<User>();
+		for ( Long id : userIds ){
+			users.add(this.getById(id));
+		}
+		return users;
+	}
 }

@@ -91,6 +91,21 @@ public interface DeviceResource {
     );
     
     /*
+   	 * POST devices/getDevices
+   	 */
+       @POST
+       @Path("getDevices")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Gets a list of device objects to the list of deviceIds.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("device.search")
+       List<Device> getDevice(
+               @ApiParam(hidden = true) @Auth Session session,
+               List<Long> deviceIds
+       );
+    
+    /*
      * GET devices/byIP/<IPAddress>
      */
     @GET

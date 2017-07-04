@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controller;
+package de.openschoolserver.dao.controler;
 
 import java.util.ArrayList;
 
@@ -25,11 +25,11 @@ import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.tools.*;
 
 @SuppressWarnings( "unchecked" )
-public class RoomController extends Controller {
+public class RoomControler extends Controler {
 
-	Logger logger = LoggerFactory.getLogger(RoomController.class);
+	Logger logger = LoggerFactory.getLogger(RoomControler.class);
 
-	public RoomController(Session session) {
+	public RoomControler(Session session) {
 		super(session);
 	}
 
@@ -152,13 +152,19 @@ public class RoomController extends Controller {
 		if( !this.isDescriptionUnique(room.getDescription())){
 			return new Response(this.getSession(),"ERROR", "Room description is not unique.");
 		}
-		// If no network was configured we will use net school network.
-		if( room.getNetwork().isEmpty() )
-			room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
 		
-		// If the starIp is not given we have to search the next room IP
-		if( room.getStartIP().isEmpty() )
-			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
+		if( ! room.getRoomType().equals("virtualRoom") ) {
+		// Virtual rooms does not have ip-adresses.
+			// If no network was configured we will use net school network.
+			if( room.getNetwork().isEmpty() ) {
+				room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
+			}
+
+			// If the starIp is not given we have to search the next room IP
+			if( room.getStartIP().isEmpty() ) {
+				room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
+			}
+		}
 
 		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
 		try {
@@ -181,7 +187,7 @@ public class RoomController extends Controller {
 		try {
 
 			em.getTransaction().begin();
-			DeviceController devController = new DeviceController(this.getSession());
+			DeviceControler devController = new DeviceControler(this.getSession());
 			if( this.isProtected(room) )
 				return new Response(this.getSession(),"ERROR","This room must not be deleted.");
 			List<Long> deviceIds = new ArrayList<Long>();
@@ -531,7 +537,7 @@ public class RoomController extends Controller {
 	public Response addDevices(long roomId,List<Device> devices){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(this.session);
+		DeviceControler deviceControler = new DeviceControler(this.session);
 		StringBuilder error = new StringBuilder();
 		List<String> ipAddress;
 		for(Device device : devices) {
@@ -553,7 +559,7 @@ public class RoomController extends Controller {
 				}
 				device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 			}
-			error.append(deviceController.check(device, room));
+			error.append(deviceControler.check(device, room));
 			device.setRoom(room);
 			if(device.getHwconfId() == null){
 				device.setHwconf(room.getHwconf());
@@ -576,7 +582,7 @@ public class RoomController extends Controller {
 			}
 		}
 		em.close();
-		UserController userController = new UserController(this.session);
+		UserControler userControler = new UserControler(this.session);
 		for(Device device : devices) {
 		    this.startPlugin("add_device", device);
 		    User user = new User();
@@ -584,7 +590,7 @@ public class RoomController extends Controller {
 		    user.setSureName(device.getName() + "  Workstation-User");
 		    user.setRole("workstations");
 		    //TODO do not ignore response.
-		    Response answer = userController.add(user);
+		    Response answer = userControler.add(user);
 		    logger.debug(answer.getValue());
 		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
@@ -633,7 +639,7 @@ public class RoomController extends Controller {
 		if( ! owner.getRole().contains("sysadmins") ) {
 			//non sysadmin user want to register his workstation
 			Query query = em.createNamedQuery("User.checkMConfig");
-			query.setParameter("user_id", this.getSession().getUserId()).setParameter("keyword", "AdHocAccess").setParameter("value", roomId);
+			query.setParameter("id", this.getSession().getUserId()).setParameter("keyword", "AdHocAccess").setParameter("value", roomId);
 			if( query.getResultList().isEmpty() ) {
 				return new Response(this.getSession(),"ERROR","You have no rights to register devices in this room");
 			}
@@ -655,8 +661,8 @@ public class RoomController extends Controller {
 			}
 		}
 		//Check if the Device settings are OK
-		DeviceController deviceController = new DeviceController(this.session);
-		String error = deviceController.check(device, room);
+		DeviceControler deviceControler = new DeviceControler(this.session);
+		String error = deviceControler.check(device, room);
 		if( error != "" ) {
 			return new Response(this.getSession(),"ERROR",error);
 		}
@@ -725,5 +731,13 @@ public class RoomController extends Controller {
 		this.startPlugin("modify_room", oldRoom);
 		
 		return new Response(this.getSession(),"OK","The room was modified succesfully.");
+	}
+
+	public List<Room> getRooms(List<Long> roomIds) {
+		List<Room> rooms = new ArrayList<Room>();
+		for (Long id : roomIds ) {
+			rooms.add(this.getById(id));
+		}
+		return rooms;
 	}
 }

@@ -6,8 +6,8 @@ import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.controler.CloneToolController;
 import de.openschoolserver.dao.DeviceConfig;
-import de.openschoolserver.dao.controller.CloneToolController;
 import de.openschoolserver.api.resources.CloneToolResource;
 
 

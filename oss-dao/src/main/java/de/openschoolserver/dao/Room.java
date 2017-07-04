@@ -24,8 +24,10 @@ import java.util.List;
 	@NamedQuery(name="Room.getByIp", query="SELECT r FROM Room r WHERE r.startIP = :ip"),
 	@NamedQuery(name="Room.search", query="SELECT r FROM Room r WHERE r.name LIKE :search OR r.description LIKE :search OR r.roomType LIKE :search"),
 	@NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id"),
-	@NamedQuery(name="Room.getConfig",  query="SELECT c.value FROM RoomConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" ),
-	@NamedQuery(name="Room.getMConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :room_id AND c.keyword = :keyword" )
+	@NamedQuery(name="Room.getConfig",    query="SELECT c.value FROM RoomConfig  c WHERE c.room.id = :id AND c.keyword = :keyword" ),
+	@NamedQuery(name="Room.getMConfig",   query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :id AND c.keyword = :keyword" ),
+	@NamedQuery(name="Room.checkConfig",  query="SELECT c.value FROM RoomConfig  c WHERE c.room.id = :id AND c.keyword = :keyword AND c.value = :value" ),
+	@NamedQuery(name="Room.checMkConfig", query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :id AND c.keyword = :keyword AND c.value = :value" )
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Room implements Serializable {

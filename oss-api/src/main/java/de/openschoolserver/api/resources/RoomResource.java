@@ -19,6 +19,8 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.User;
+
 import java.util.List;
 import java.util.Map;
 
@@ -231,6 +233,22 @@ public interface RoomResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
+    
+    /*
+   	 * POST room/getRooms
+   	 */
+       @POST
+       @Path("getRooms")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Gets a list of room objects to the list of roomIds.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 404, message = "Group not found"),
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("room.search")
+       List<Room> getRooms(
+               @ApiParam(hidden = true) @Auth Session session,
+               List<Long> roomIds
+       );
     
     /*
      * GET rooms/{roomId}/accessList

@@ -7,7 +7,7 @@ import de.openschoolserver.api.resources.CategoryResource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controller.CategoryController;
+import de.openschoolserver.dao.controler.CategoryControler;
 
 public class CategoryResourceImpl implements CategoryResource {
 
@@ -17,62 +17,68 @@ public class CategoryResourceImpl implements CategoryResource {
 
 	@Override
 	public List<Category> getAll(Session session) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.getAll();
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.getAll();
 	}
 
 	@Override
 	public Category getById(Session session, long categoryId) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.getById(categoryId);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.getById(categoryId);
 	}
 
 	@Override
 	public List<Long> getMember(Session session, long categoryId, String memberType) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.getMembers(categoryId,memberType);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.getMembers(categoryId,memberType);
 	}
 
 	@Override
 	public List<Long> getAvailableMember(Session session, long categoryId, String memberType) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.getAvailableMembers(categoryId,memberType);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.getAvailableMembers(categoryId,memberType);
 	}
 
 	@Override
 	public List<Category> search(Session session, String search) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.search(search);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.search(search);
 	}
 
 	@Override
 	public Response add(Session session, Category category) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.add(category);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.add(category);
 	}
 
 	@Override
 	public Response addMember(Session session, long categoryId, String memberType, long memberId) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.addMember(categoryId, memberType, memberId);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.addMember(categoryId, memberType, memberId);
 	}
 	
 	@Override
 	public Response removeMember(Session session, long categoryId, String memberType, long memberId) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.removeMember(memberId, memberType, memberId);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.removeMember(memberId, memberType, memberId);
 	}
 
 	@Override
 	public Response modify(Session session, Category category) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.modify(category);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.modify(category);
 	}
 
 	@Override
 	public Response delete(Session session, long categoryId) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.delete(categoryId);
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.delete(categoryId);
+	}
+
+	@Override
+	public List<Category> getCategories(Session session, List<Long> categoryIds) {
+		final CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.getCategories(categoryIds);
 	}
 
 }

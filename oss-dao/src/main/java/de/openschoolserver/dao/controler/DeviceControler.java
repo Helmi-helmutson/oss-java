@@ -1,5 +1,5 @@
 /* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controller;
+package de.openschoolserver.dao.controler;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -17,11 +17,11 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.*;
 
 @SuppressWarnings( "unchecked" )
-public class DeviceController extends Controller {
+public class DeviceControler extends Controler {
 	
-	Logger logger = LoggerFactory.getLogger(DeviceController.class);
+	Logger logger = LoggerFactory.getLogger(DeviceControler.class);
 
-	public DeviceController(Session session) {
+	public DeviceControler(Session session) {
 		super(session);
 	}
 
@@ -409,8 +409,8 @@ public class DeviceController extends Controller {
 	public Response addLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		EntityManager em = getEntityManager();
-		UserController userController = new UserController(this.session);
-		User user = userController.getByUid(userName);
+		UserControler userControler = new UserControler(this.session);
+		User user = userControler.getByUid(userName);
 		device.getLoggedIn().add(user);
 		user.getLoggedOn().add(device);
 		try {
@@ -430,8 +430,8 @@ public class DeviceController extends Controller {
 	public Response removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		EntityManager em = getEntityManager();
-		UserController userController = new UserController(this.session);
-		User user = userController.getByUid(userName);
+		UserControler userControler = new UserControler(this.session);
+		User user = userControler.getByUid(userName);
 		List<User> loggedInUsers = device.getLoggedIn();
 		loggedInUsers.remove(user);
 		device.setLoggedIn(loggedInUsers);
@@ -489,5 +489,13 @@ public class DeviceController extends Controller {
 		}
 		this.startPlugin("modify_device", oldDevice);
 		return new Response(this.getSession(),"OK", "Device was modified succesfully.");
+	}
+
+	public List<Device> getDevices(List<Long> deviceIds) {
+		List<Device> devices = new ArrayList<Device>();
+		for( Long id : deviceIds) {
+			devices.add(this.getById(id));
+		}
+		return devices;
 	}
 }

@@ -7,50 +7,50 @@ import java.util.Map;
 import de.openschoolserver.api.resources.SystemResource;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controller.SystemController;
+import de.openschoolserver.dao.controler.SystemControler;
 
 public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public List<Map<String, String>> getStatus(Session session) {
-		SystemController systemController = new SystemController(session);
-		return systemController.getStatus();
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.getStatus();
 	}
 
 	@Override
 	public List<String> getEnumerates(Session session, String type) {
-		SystemController systemController = new SystemController(session);
-		return systemController.getEnumerates(type);
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.getEnumerates(type);
 	}
 
 	@Override
 	public Response addEnumerate(Session session, String type, String value) {
-		SystemController systemController = new SystemController(session);
-		return systemController.addEnumerate(type, value);
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.addEnumerate(type, value);
 	}
 
 	@Override
 	public Response removeEnumerate(Session session, String type, String value) {
-		SystemController systemController = new SystemController(session);
-		return systemController.removeEnumerate(type, value);
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.removeEnumerate(type, value);
 	}
 
 	@Override
 	public List<Map<String, String>> getConfig(Session session) {
-		SystemController systemController = new SystemController(session);
-		return systemController.getConfig();
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.getConfig();
 	}
 
 	@Override
 	public String getConfig(Session session, String key) {
-		SystemController systemController = new SystemController(session);
-		return systemController.getConfigValue(key);
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.getConfigValue(key);
 	}
 
 	@Override
 	public Response setConfig(Session session, String key, String value) {
-		SystemController systemController = new SystemController(session);
-		if( systemController.setConfigValue(key, value) )
+		SystemControler systemControler = new SystemControler(session);
+		if( systemControler.setConfigValue(key, value) )
 			return new Response(session,"OK","Global configuration value was set succesfully."); 
 		else
 			return new Response(session,"ERROR","Global configuration value could not be set.");
@@ -58,37 +58,37 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public Map<String, String> getFirewallIncomingRules(Session session) {
-		SystemController systemController = new SystemController(session);
-		return systemController.getFirewallIncomingRules();
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.getFirewallIncomingRules();
 	}
 
 	@Override
 	public Response setFirewallIncomingRules(Session session, Map<String, String> incommingRules) {
-		SystemController systemController = new SystemController(session);
-		return systemController.setFirewallIncomingRules(incommingRules);
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.setFirewallIncomingRules(incommingRules);
 	}
 
 	@Override
 	public List<Map<String, String>> getFirewallOutgoingRules(Session session) {
-		SystemController systemController = new SystemController(session);
-		return systemController.getFirewallOutgoingRules();
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.getFirewallOutgoingRules();
 	}
 
 	@Override
 	public Response setFirewallOutgoingRules(Session session, List<Map<String, String>> outgoingRules) {
-		SystemController systemController = new SystemController(session);
-		return systemController.setFirewallOutgoingRules(outgoingRules);
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.setFirewallOutgoingRules(outgoingRules);
 	}
 
 	@Override
 	public List<Map<String, String>> getFirewallRemoteAccessRules(Session session) {
-		SystemController systemController = new SystemController(session);
-		return systemController.getFirewallRemoteAccessRules();
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.getFirewallRemoteAccessRules();
 	}
 
 	@Override
 	public Response setFirewallRemoteAccessRules(Session session, List<Map<String, String>> remoteAccessRules) {
-		SystemController systemController = new SystemController(session);
-		return systemController.setFirewallRemoteAccessRules(remoteAccessRules);
+		SystemControler systemControler = new SystemControler(session);
+		return systemControler.setFirewallRemoteAccessRules(remoteAccessRules);
 		}
 }
