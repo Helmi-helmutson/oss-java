@@ -245,7 +245,7 @@ public class SystemController extends Controller {
             fwMasqNets.add(data.toString());
         }
         fwConfig.setConfigValue("FW_ROUTE","yes");
-        if( fwMasqNets.size > 0 ) {
+        if( fwMasqNets.size() > 0 ) {
                 fwConfig.setConfigValue("FW_MASQUERADE","yes");
                 fwConfig.setConfigValue("FW_MASQ_NETS", String.join(" ", fwMasqNets));
         } else {

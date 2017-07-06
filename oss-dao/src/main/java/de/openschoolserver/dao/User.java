@@ -1,4 +1,5 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved 
+ * (c) 2017 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
@@ -23,6 +24,8 @@ import javax.persistence.*;
 	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' "),
 	@NamedQuery(name="User.getByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
 	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
+	@NamedQuery(name="User.findByName",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.sureName = :sureName"),
+	@NamedQuery(name="User.findByNameAndRole",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.sureName = :sureName and u.role = :role"),
 	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.sureName LIKE :search"),
 	@NamedQuery(name="User.getConfig",  query="SELECT c.value FROM UserConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" ),
 	@NamedQuery(name="User.getMConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :user_id AND c.keyword = :keyword" ),

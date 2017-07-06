@@ -71,6 +71,7 @@ public class Session implements Principal {
     @Column(name = "token")
     private String token;
     
+    @JsonIgnore
     private transient Object temporaryUploadData;
 	
 	public Object getTemporaryUploadData() {

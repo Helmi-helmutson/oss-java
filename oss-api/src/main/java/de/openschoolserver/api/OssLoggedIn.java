@@ -18,7 +18,7 @@ public class OssLoggedIn {
          Session session = new Session();
          SessionController sessionController = new SessionController(session);
          String token = sessionController.getProperty("de.openschoolserver.api.auth.localhost");
-         session = sessionController.getByToken(token);
+         session = sessionController.validateToken(token);
          final DeviceController deviceController = new DeviceController(session);
          BufferedReader in = new BufferedReader(new  InputStreamReader(System.in));
          while( true ){

@@ -1,4 +1,6 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved 
+ * (c) 2017 EXTIS GmbH - all rights reserved
+ * */
 package de.openschoolserver.dao.controller;
 
 import org.slf4j.Logger;
@@ -84,7 +86,35 @@ public class UserController extends Controller {
             em.close();
         }
     }
-
+    public List<User> findByName(String givenName, String sureName) {
+        EntityManager em = getEntityManager();
+        try {
+            Query query = em.createNamedQuery("User.findByName");
+            query.setParameter("givenName",givenName);
+            query.setParameter("sureName",sureName);
+            return query.getResultList();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            em.close();
+        }
+    }
+    public List<User> findByNameAndRole(String givenName, String sureName, String role) {
+        EntityManager em = getEntityManager();
+        try {
+            Query query = em.createNamedQuery("User.findByNameAndRole");
+            query.setParameter("givenName",givenName);
+            query.setParameter("sureName",sureName);
+            query.setParameter("role",role);
+            return query.getResultList();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ArrayList<>();
+        } finally {
+            em.close();
+        }
+    }
     public List<User> getAll() {
         EntityManager em = getEntityManager();
         try {
