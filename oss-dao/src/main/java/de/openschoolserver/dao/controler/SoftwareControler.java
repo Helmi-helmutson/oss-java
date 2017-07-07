@@ -24,7 +24,7 @@ import de.openschoolserver.dao.*;
 @SuppressWarnings( "unchecked" )
 public class SoftwareControler extends Controler {
 	
-	Logger logger           = LoggerFactory.getLogger(CloneToolController.class);
+	Logger logger           = LoggerFactory.getLogger(CloneToolControler.class);
 	private static String SALT_PACKAGE_DIR = "/srv/salt/packages";
 
 	public SoftwareControler(Session session) {
@@ -468,9 +468,6 @@ public class SoftwareControler extends Controler {
 			for( Category category : device.getCategories() ) {
 				for( Software software : category.getSoftwares() ) {
 					toRemove.remove(software);
-					for( Software requirement : software.getRequirements() ) {
-						toInstall.add(String.format("%04d-%s",requirement.getWeight(),requirement.getName()));
-					}
 					toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
 				}
 			}
@@ -490,14 +487,6 @@ public class SoftwareControler extends Controler {
 			for( Category category : room.getCategories() ) {
 				for( Software software : category.getSoftwares() ) {
 					toRemove.remove(software);
-					for( Software requirement : software.getRequirements() ) {
-						key = String.format("%04d-%s",requirement.getWeight(),requirement.getName());
-						for( Device device : room.getDevices() ) {
-							if( ! softwaresToInstall.get(device).contains(key) ) {
-								softwaresToInstall.get(device).add(key);
-							}
-						}
-					}
 					key = String.format("%04d-%s",software.getWeight(),software.getName());
 					for( Device device : room.getDevices() ) {
 						if( ! softwaresToInstall.get(device).contains(key) ) {
@@ -528,14 +517,6 @@ public class SoftwareControler extends Controler {
 			for( Category category : hwconf.getCategories() ) {
 				for( Software software : category.getSoftwares() ) {
 					toRemove.remove(software);
-					for( Software requirement : software.getRequirements() ) {
-						key = String.format("%04d-%s",requirement.getWeight(),requirement.getName());
-						for( Device device : hwconf.getDevices() ) {
-							if( ! softwaresToInstall.get(device).contains(key) ) {
-								softwaresToInstall.get(device).add(key);
-							}
-						}
-					}
 					key = String.format("%04d-%s",software.getWeight(),software.getName());
 					for( Device device : hwconf.getDevices() ) {
 						if( ! softwaresToInstall.get(device).contains(key) ) {
@@ -566,14 +547,26 @@ public class SoftwareControler extends Controler {
 				}
 			}
 			softwaresToInstall.get(device).sort((String s1, String s2) -> { return s2.compareTo(s1); });
-			for( String softwareKey :  softwaresToInstall.get(device) ) {
-				
+			for( String softwareKey :  softwaresToInstall.get(device) ) {			
 				String softwareName = softwareKey.substring(4);
 				StringBuilder filePath = new StringBuilder(SALT_PACKAGE_DIR);
 				filePath.append(softwareName).append(".sls");
 				File file = new File(filePath.toString());
 				if( file.exists() ) {
-					//TODO
+					Software software = this.getByName(softwareName);
+					for( SoftwareLicense sl : device.getSoftwareLicences() ) {
+						if( sl.getSoftware().equals(software) ) {
+							if( sl.getLicenseType().equals("CMD")) {
+								deviceSls.add(softwareName + "_KEY");
+								deviceSls.add("  grains.present:");
+								deviceSls.add("    - value: " + sl.getValue());
+							} else {
+								//TODO
+							}
+						}
+						deviceSls.add("include:");
+						deviceSls.add(" - " + softwareName);
+					}
 				} else {
 					deviceSls.add(softwareName+":");
 					deviceSls.add("  - pkg:");
@@ -607,202 +600,4 @@ public class SoftwareControler extends Controler {
 		return new Response(this.getSession(),"OK","SoftwareState was saved succesfully"); 
 	}
 
-	/*
-	 * Save the software status what shall be installed where to host room and hwconf sls files
-	 */
-	public Response applySoftwareStateToNodeGroups(){
-		EntityManager em = getEntityManager();
-		RoomControler   roomControler   = new RoomControler(this.session);
-		DeviceControler deviceControler = new DeviceControler(this.session);
-		
-		List<String>   topSls = new ArrayList<String>();
-		Path SALT_TOP_TEMPL   = Paths.get("/usr/share/oss/templates/top.sls");
-		if( Files.exists(SALT_TOP_TEMPL) ) {
-			try {
-				topSls = Files.readAllLines(SALT_TOP_TEMPL);
-			} catch (java.nio.file.NoSuchFileException e) {
-				logger.error(e.getMessage());
-			} catch( IOException e ) {
-				logger.error(e.getMessage());
-			}
-		} else {
-			topSls.add("base:");
-		}
-
-		//Create the workstations state files
-		for( Device device : deviceControler.getAll() ) {
-			//List of software to be removed
-			List<String> softwaresToDeinstall = new ArrayList<String>();
-			for( Category category : device.getCategories() ) {
-				for( Software software : category.getRemovedSoftwares() ) {
-					softwaresToDeinstall.add(software.getName());
-				}
-			}
-			Map<String,String> softwareMap = new HashMap<>();
-			List<String> keys = new ArrayList<String>();
-			for( Category category : device.getCategories() ) {
-				for( Software software : category.getSoftwares() ) {
-					softwaresToDeinstall.remove(software);
-					String key = String.format("%04d-%s",software.getWeight(),software.getName());
-					softwareMap.put(key,software.getName());
-					keys.add(key);
-				}
-			}
-			List<String> deviceSls = new ArrayList<String>();
-			if( !keys.isEmpty() ) {
-				keys.sort((String s1, String s2) -> { return s2.compareTo(s1); });
-				for( String key : keys ){
-					String softwareName = softwareMap.get(key);
-					Software software = this.getByName(softwareName);
-					File file = new File(new StringBuilder(SALT_PACKAGE_DIR).append(softwareName).append(".sls").toString());
-					if( file.exists() ) {
-						//TODO
-					} else {
-						deviceSls.add(softwareName+":");
-						deviceSls.add("  - pkg:");
-						deviceSls.add("    - installed:");					
-					}
-					if(! this.checkSoftwareStatusOnDevice(device, software, "installed")){
-						this.setSoftwareStatusOnDevice(device, software, "", "installation_scheduled");
-					}
-				}
-			}
-			for( String key : softwaresToDeinstall ) {
-				deviceSls.add(key+":");
-				deviceSls.add("  - pkg:");
-				deviceSls.add("    - removed:");
-				Software software = this.getByName(key);
-				if( this.checkSoftwareStatusOnDevice(device, software, "installed") ){
-					this.setSoftwareStatusOnDevice(device, software, "", "deinstallation_scheduled");
-				}
-		    }
-			if( deviceSls.size() > 0) {
-				Path SALT_ROOM   = Paths.get("/srv/salt/oss_device_" + device.getName() + ".sls");
-				try {
-					Files.write(SALT_ROOM, deviceSls );
-				} catch( IOException e ) { 
-					e.printStackTrace();
-				}
-				topSls.add("  - " + device.getName() + ":");
-				topSls.add("    - oss_device_" + device.getName());
-			}
-		}
-
-		//Create the room state files
-		for( Room room : roomControler.getAll() ) {
-			//List of software to be removed
-			List<String> softwaresToDeinstall = new ArrayList<String>();
-			for( Category category : room.getCategories() ) {
-				for( Software software : category.getRemovedSoftwares() ) {
-					softwaresToDeinstall.add(software.getName());
-				}
-			}
-			Map<String,String> softwareMap = new HashMap<>();
-			List<String> keys = new ArrayList<String>();
-			for( Category category : room.getCategories() ) {
-				for( Software software : category.getSoftwares() ) {
-					softwaresToDeinstall.remove(software);
-					String key = String.format("%04d-%s",software.getWeight(),software.getName());
-					softwareMap.put(key,software.getName());
-					keys.add(key);
-				}
-			}
-			List<String> roomSls = new ArrayList<String>();
-			if( !keys.isEmpty() ) {
-				keys.sort((String s1, String s2) -> { return s2.compareTo(s1); });
-				for( String key : keys ){
-					String softwareName = softwareMap.get(key);
-					File file = new File(new StringBuilder(SALT_PACKAGE_DIR).append(softwareName).append(".sls").toString());
-					if( file.exists() ) {
-						//TODO
-					} else {
-						roomSls.add(softwareName+":");
-						roomSls.add("  - pkg:");
-						roomSls.add("    - installed:");					
-					}
-				}
-			}
-			for( String key : softwaresToDeinstall ) {
-				roomSls.add(key+":");
-				roomSls.add("  - pkg:");
-				roomSls.add("    - removed:");
-		    }
-			if( roomSls.size() > 0) {
-				Path SALT_ROOM   = Paths.get("/srv/salt/oss_room_" + room.getName() + ".sls");
-				try {
-					Files.write(SALT_ROOM, roomSls );
-				} catch( IOException e ) { 
-					e.printStackTrace();
-				}
-				topSls.add("  - " + room.getName() + ":");
-				topSls.add("    - match: nodegroups");
-				topSls.add("    - oss_room_" + room.getName());
-			}
-		}
-
-		//Create the hwconf state files
-		Query query = em.createNamedQuery("HWConf.findAll");
-		for( HWConf hwconf : (List<HWConf>)  query.getResultList() ) {
-			//List of software to be removed
-			List<String> softwaresToDeinstall = new ArrayList<String>();
-			for( Category category : hwconf.getCategories() ) {
-				for( Software software : category.getRemovedSoftwares() ) {
-					softwaresToDeinstall.add(software.getName());
-				}
-			}
-			//List of software to be installed
-			Map<String,String> softwareMap = new HashMap<>();
-			List<String> keys = new ArrayList<String>();
-			for( Category category : hwconf.getCategories() ) {
-				for( Software software : category.getSoftwares() ) {
-					softwaresToDeinstall.remove(software);
-					String key = String.format("%04d-%s",software.getWeight(),software.getName());
-					softwareMap.put(key,software.getName());
-					keys.add(key);
-				}
-			}
-			List<String> hwconfSls = new ArrayList<String>();
-			if( !keys.isEmpty() ) {
-				keys.sort((String s1, String s2) -> { return s2.compareTo(s1); });
-				for( String key : keys ){
-					String softwareName = softwareMap.get(key);
-					File file = new File(new StringBuilder(SALT_PACKAGE_DIR).append(softwareName).append(".sls").toString());
-					if( file.exists() ) {
-						//TODO
-					} else {
-						hwconfSls.add(softwareName+":");
-						hwconfSls.add("  - pkg:");
-						hwconfSls.add("    - installed:");					
-					}
-				}
-			}
-			for( String key : softwaresToDeinstall ) {
-					hwconfSls.add(key+":");
-					hwconfSls.add("  - pkg:");
-					hwconfSls.add("    - removed:");
-			}
-			if( hwconfSls.size() > 0) {
-				Path SALT_ROOM   = Paths.get("/srv/salt/oss_hwconf_" + hwconf.getName() + ".sls");
-				try {
-					Files.write(SALT_ROOM, hwconfSls );
-				} catch( IOException e ) { 
-					e.printStackTrace();
-				}
-				topSls.add("  - " + hwconf.getName() + ":");
-				topSls.add("    - match: nodegroups");
-				topSls.add("    - oss_hwconf_" + hwconf.getName());
-			}
-		}
-
-		if( topSls.size() > 0 ) {
-			Path SALT_TOP   = Paths.get("/srv/salt/top.sls");
-			try {
-				Files.write(SALT_TOP, topSls );
-			} catch( IOException e ) { 
-				e.printStackTrace();
-			}
-			this.systemctl("restart", "salt-master");
-		}
-		return new Response(this.getSession(),"OK","SoftwareState was saved succesfully"); 
-	}
 }
