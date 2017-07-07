@@ -111,7 +111,6 @@ public class UserControler extends Controler {
             } else {
                 return new Response(this.getSession(),"ERROR", "You have to define the birthday.");
             }
-                
         }
         // Create uid if not given
         if( user.getUid() == "") {
