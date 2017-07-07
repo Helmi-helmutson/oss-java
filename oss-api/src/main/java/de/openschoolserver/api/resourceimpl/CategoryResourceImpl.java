@@ -60,7 +60,7 @@ public class CategoryResourceImpl implements CategoryResource {
 	@Override
 	public Response removeMember(Session session, long categoryId, String memberType, long memberId) {
 		final CategoryControler categoryControler = new CategoryControler(session);
-		return categoryControler.removeMember(memberId, memberType, memberId);
+		return categoryControler.deleteMember(memberId, memberType, memberId);
 	}
 
 	@Override
