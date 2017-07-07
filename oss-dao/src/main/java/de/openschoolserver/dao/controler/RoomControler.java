@@ -144,7 +144,11 @@ public class RoomControler extends Controler {
 	}
 
 	public Response add(Room room){
+		if( ! room.getRoomType().equals("virtualRoom") ) {
+			return new Response(this.getSession(),"ERROR", "Virtual Rooms can only be created by Education Controler.");
+		}
 		EntityManager em = getEntityManager();
+
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(room.getName())){
 			return new Response(this.getSession(),"ERROR", "Room name is not unique.");
@@ -152,20 +156,18 @@ public class RoomControler extends Controler {
 		if( !this.isDescriptionUnique(room.getDescription())){
 			return new Response(this.getSession(),"ERROR", "Room description is not unique.");
 		}
-		
-		if( ! room.getRoomType().equals("virtualRoom") ) {
-		// Virtual rooms does not have ip-adresses.
-			// If no network was configured we will use net school network.
-			if( room.getNetwork().isEmpty() ) {
-				room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
-			}
 
-			// If the starIp is not given we have to search the next room IP
-			if( room.getStartIP().isEmpty() ) {
-				room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
-			}
+
+		// Virtual rooms does not have ip-adresses.
+		// If no network was configured we will use net school network.
+		if( room.getNetwork().isEmpty() ) {
+			room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
 		}
 
+		// If the starIp is not given we have to search the next room IP
+		if( room.getStartIP().isEmpty() ) {
+			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
+		}
 		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
 		try {
 			em.getTransaction().begin();

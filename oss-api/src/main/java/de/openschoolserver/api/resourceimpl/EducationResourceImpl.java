@@ -2,10 +2,12 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
 
+
 import java.util.Map;
 
 import de.openschoolserver.api.resources.EducationResource;
 import de.openschoolserver.api.resources.Resource;
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
@@ -18,21 +20,21 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public Response createVirtaulRoom(Session session, Map<String, String> virtualRoom) {
+	public Response createVirtaulRoom(Session session, Category virtualRoom) {
 		EducationControler educationControler = new EducationControler(session);
 		return educationControler.createVirtualRoom(virtualRoom);
 	}
 
 	@Override
-	public Response modifyVirtaulRoom(Session session, Map<String, String> virtualRoom) {
-		// TODO Auto-generated method stub
-		return null;
+	public Response modifyVirtaulRoom(Session session, long roomId, Category virtualRoom) {
+		EducationControler educationControler = new EducationControler(session);
+		return educationControler.modifyVirtualRoom(roomId, virtualRoom);
 	}
 
 	@Override
 	public Response deleteVirtaulRoom(Session session, long roomId) {
-		// TODO Auto-generated method stub
-		return null;
+		EducationControler educationControler = new EducationControler(session);
+		return educationControler.deleteVirtualRoom(roomId);
 	}
 
 	@Override
@@ -42,9 +44,9 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Map<String, String>> getRoom(Session session, long roomId) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<List<Long>> getRoom(Session session, long roomId) {
+		EducationControler educationControler = new EducationControler(session);
+		return educationControler.getRoom(roomId);
 	}
 
 	@Override
@@ -101,7 +103,6 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	@Override
 	public List<String> getAvailableDeviceActions(Session session, long deviceId, String action) {
 		// TODO Auto-generated method stub
@@ -112,6 +113,48 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public Response manageDevice(Session session, long deviceId, String action, Map<String, String> actionContent) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public Response addUser(Session session, long roomId, long userId) {
+		EducationControler educationControler = new EducationControler(session);
+		CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.addMember(educationControler.getCategoryToRoom(roomId), "user", userId);
+	}
+
+	@Override
+	public Response addDevice(Session session, long roomId, long deviceId) {
+		EducationControler educationControler = new EducationControler(session);
+		CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.addMember(educationControler.getCategoryToRoom(roomId),"device", deviceId);
+	}
+
+	@Override
+	public Response deleteUser(Session session, long roomId, long userId) {
+		EducationControler educationControler = new EducationControler(session);
+		CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.deleteMember(educationControler.getCategoryToRoom(roomId), "user", userId);	
+	}
+
+	@Override
+	public Response deleteDevice(Session session, long roomId, long deviceId) {
+		EducationControler educationControler = new EducationControler(session);
+		CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.deleteMember(educationControler.getCategoryToRoom(roomId),"device", deviceId);
+	}
+
+	@Override
+	public Response addgroup(Session session, long roomId, long groupId) {
+		EducationControler educationControler = new EducationControler(session);
+		CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.addMember(educationControler.getCategoryToRoom(roomId),"group",groupId);
+	}
+
+	@Override
+	public Response deleteGroup(Session session, long roomId, long groupId) {
+		EducationControler educationControler = new EducationControler(session);
+		CategoryControler categoryControler = new CategoryControler(session);
+		return categoryControler.deleteMember(educationControler.getCategoryToRoom(roomId),"group",groupId);
 	}
 
 }

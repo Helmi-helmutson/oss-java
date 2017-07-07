@@ -2,6 +2,7 @@ package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.RolesAllowed;
@@ -14,6 +15,7 @@ import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.Category;
 
 @Path("education")
 @Api(value = "education")
@@ -29,18 +31,16 @@ public interface EducationResource {
     @POST
     @Path("rooms")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create a new virtual room. The map must contains the name attribute. " +
+    @ApiOperation(value = "Create a new virtual room. A virtual Room is a category with CategoryType virtual room. " +
     					  "The map can contains a description attribute. " +
-    					  "The map must contains either a users or a groups or a devices attribute. " +
-    					  "This provides a comma separated list of object ids. " +
-    					  "{ name => 'MyVirtualRoom' , description => 'My virtual room', users => '12,45,22,34,23'")
+    					  "The map must contains either users or groups or devices. ")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
     Response  createVirtaulRoom(
     		@ApiParam(hidden = true) @Auth Session session,
-    		Map<String, String> virtualRoom
+    		Category virtualRoom
     		);
 
     /*
@@ -49,18 +49,118 @@ public interface EducationResource {
     @POST
     @Path("rooms/{roomId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Midfy a virtual room. The map must contains the name attribute. " +
-    					  "The map can contains a description attribute. " +
-    					  "The map must contains either a users or a groups or a devices attribute. " +
-    					  "This provides a comma separated list of object ids. " +
-    					  "{ name => 'MyVirtualRoom' , description => 'My virtual room', users => '12,45,22,34,23'")
+    @ApiOperation(value = "Modfy a virtual room. Only name and description can be modified here. To modify the member there are some PUT and DELETE calls.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
     Response  modifyVirtaulRoom(
     		@ApiParam(hidden = true) @Auth Session session,
-    		Map<String, String> virtualRoom
+    		@PathParam("roomId") long roomId,
+    		Category virtualRoom
+    		);
+    
+    /*
+     *  PUT education/rooms/{roomId}/users/{userId}
+     */
+    @PUT
+    @Path("rooms/{roomId}/users/{userId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Add a user to a virtual room." )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    Response addUser(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("roomId") long roomId,
+    		@PathParam("userId") long userId
+    		);
+
+    /*
+     *  PUT education/rooms/{roomId}/devices/{deviceId}
+     */
+    @PUT
+    @Path("rooms/{roomId}/users/{userId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Add a device to a virtual room." )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    Response addDevice(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("roomId")   long roomId,
+    		@PathParam("deviceId") long deviceId
+    		);
+
+    /*
+     *  PUT education/rooms/{roomId}/groups/{groupId}
+     */
+    @PUT
+    @Path("rooms/{roomId}/groups/{groupId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Add a group to a virtual room." )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    Response addgroup(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("roomId") long roomId,
+    		@PathParam("groupId") long roupId
+    		);
+
+   
+    /*
+     *  DELETE education/rooms/{roomId}/users/{userId}
+     */
+    @DELETE
+    @Path("rooms/{roomId}/users/{userId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delete a user from a virtual room." )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    Response deleteUser(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("roomId") long roomId,
+    		@PathParam("userId") long userId
+    		);
+
+    /*
+     *  DELETE education/rooms/{roomId}/devices/{deviceId}
+     */
+    @DELETE
+    @Path("rooms/{roomId}/devices/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delete a device from a virtual room." )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    Response deleteDevice(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("roomId")   long roomId,
+    		@PathParam("deviceId") long deviceId
+    		);
+
+    /*
+     *  DELETE education/rooms/{roomId}/groups/{groupId}
+     */
+    @DELETE
+    @Path("rooms/{roomId}/groups/{groupId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delete a device from a virtual room." )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    Response deleteGroup(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("roomId")  long roomId,
+    		@PathParam("groupId") long groupId
     		);
 
     /*
@@ -110,7 +210,7 @@ public interface EducationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-	List<Map<String, String>>  getRoom(
+	List<List<Long>>  getRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("roomId") long roomId
     		);

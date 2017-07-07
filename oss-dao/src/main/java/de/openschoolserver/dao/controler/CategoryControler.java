@@ -13,16 +13,6 @@ import de.openschoolserver.dao.*;
 @SuppressWarnings( "unchecked" )
 public class CategoryControler extends Controler {
 	
-	static String[] categoriesIn = { 
-			"DeviceInCategories",
-			"GroupInCategories",
-			"HWConfInCategories",
-			"RoomInCategories",
-			"SoftwareInCategories",
-			"SoftwareRemovedFromCategories",
-			"UserInCategories"
-			};
-
 	public CategoryControler(Session session) {
 		super(session);
 	}
@@ -113,12 +103,6 @@ public class CategoryControler extends Controler {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			for( String ci : categoriesIn ) {
-				Query query = em.createQuery("DELETE FROM "+ci+" WHERE category_id = :groupId");
-				query.setParameter("categoryId", category.getId());
-				query.executeUpdate();
-				// Let's remove the group
-			}
 			if( !em.contains(category)) {
 				category = em.merge(category);
 			}
@@ -129,6 +113,7 @@ public class CategoryControler extends Controler {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		} finally {
+			
 			em.close();
 		}
 		return new Response(this.getSession(),"OK","Category was deleted");
@@ -216,12 +201,42 @@ public class CategoryControler extends Controler {
 	}
 
 	public Response addMember(Long categoryId, String objectName,Long objectId ) {
-		String table = objectName + "InCategory";
 		EntityManager em = getEntityManager();
+		Category category = this.getById(categoryId);
 		try {
 			em.getTransaction().begin();
-			Query query = em.createQuery("INSERT INTO "+table+" VALUES("+objectId +","+categoryId+ ")");
-			query.executeUpdate();		
+			switch(objectName){
+			case("Device"):
+				Device device = new DeviceControler(this.session).getById(objectId);
+				category.getDevices().add(device);
+				device.getCategories().add(category);
+			break;
+			case("Group"):
+				Group group = new GroupControler(this.session).getById(objectId);
+				category.getGroups().add(group);
+				group.getCategories().add(category);
+			break;
+			case("HWConf"):
+				HWConf hwconf = new CloneToolControler(this.session).getById(objectId);
+				category.getHWConfs().add(hwconf);
+				hwconf.getCategories().add(category);
+			break;
+			case("Room"):
+				Room room = new RoomControler(this.session).getById(objectId);
+				category.getRooms().add(room);
+				room.getCategories().add(category);
+			break;
+			case("Software"):
+				Software software = new SoftwareControler(this.session).getById(objectId);
+				category.getSoftwares().add(software);
+				software.getCategories().add(category);
+			break;
+			case("User"):
+				User user = new UserControler(this.session).getById(objectId);
+				category.getUsers().add(user);
+				user.getCategories().add(category);
+			break;
+			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -232,21 +247,46 @@ public class CategoryControler extends Controler {
 		return new Response(this.getSession(),"OK","Category was modified");
 	}
 	
-	public Response removeMember(Long categoryId, String objectName, Long objectId ) {
-		String table = objectName + "InCategory";
-		String idName = objectName.toLowerCase()+"_id";
+	public Response deleteMember(Long categoryId, String objectName, Long objectId ) {
+		Category category = this.getById(categoryId);
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			Query query = em.createQuery("DELETE FROM "+table+" WHERE " + idName + " = " + objectId + " AND category_id = " + categoryId);
-			query.executeUpdate();
-			em.getTransaction().commit();
-			if( objectName.equals("Software") ) {
-				em.getTransaction().begin();
-				query = em.createQuery("INSER INTO SoftwareRemovedFromCategories Values(" + categoryId + "," + objectId + ")");
-				query.executeUpdate();
-				em.getTransaction().commit();
+			switch(objectName){
+			case("Device"):
+				Device device = new DeviceControler(this.session).getById(objectId);
+				category.getDevices().remove(device);
+				device.getCategories().remove(category);
+			break;
+			case("Group"):
+				Group group = new GroupControler(this.session).getById(objectId);
+				category.getGroups().remove(group);
+				group.getCategories().remove(category);
+			break;
+			case("HWConf"):
+				HWConf hwconf = new CloneToolControler(this.session).getById(objectId);
+				category.getHWConfs().remove(hwconf);
+				hwconf.getCategories().remove(category);
+			break;
+			case("Room"):
+				Room room = new RoomControler(this.session).getById(objectId);
+				category.getRooms().remove(room);
+				room.getCategories().remove(category);
+			break;
+			case("Software"):
+				Software software = new SoftwareControler(this.session).getById(objectId);
+				category.getSoftwares().remove(software);
+				category.getRemovedSoftwares().add(software);
+				software.getCategories().remove(category);
+				software.getRemovedFromCategories().add(category);
+			break;
+			case("User"):
+				User user = new UserControler(this.session).getById(objectId);
+				category.getUsers().remove(user);
+				user.getCategories().remove(category);
+			break;
 			}
+			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new Response(this.getSession(),"ERROR",e.getMessage());

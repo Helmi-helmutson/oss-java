@@ -33,6 +33,8 @@ public class Category implements Serializable {
 	private String description;
 
 	private String name;
+	
+	private String categoryType;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
@@ -111,7 +113,29 @@ public class Category implements Serializable {
 			)
 	@JsonIgnore
 	private List<User> users;
+	
+	@Transient
+	private List<Long> deviceIds;
 
+	@Transient
+	private List<Long> hwConfIds;
+
+	@Transient
+	private List<Long> roomIds;
+
+	@Transient
+	private List<Long> userIds;
+	
+	@Transient
+	private List<Long> groupIds;
+
+	@Transient
+	private List<Long> softwareIds;
+	
+	@Convert(converter=BooleanToStringConverter.class)
+	boolean studentsOnly;
+	
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Category && obj !=null) {
@@ -131,14 +155,6 @@ public class Category implements Serializable {
 		this.id = id;
 	}
 
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public String getName() {
 		return this.name;
 	}
@@ -147,6 +163,23 @@ public class Category implements Serializable {
 		this.name = name;
 	}
 
+	public String getDescription() {
+		return this.description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getCategoryType() {
+		return this.categoryType;
+	}
+
+	public void setCategoryType(String categoryType) {
+		this.categoryType = categoryType;
+	}
+
+	
 	public User getOwner() {
 		return this.owner;
 	}
@@ -163,12 +196,28 @@ public class Category implements Serializable {
 		this.devices = devices;
 	}
 
+	public List<Long> getDeviceIds() {
+		return this.deviceIds;
+	}
+
+	public void setDeviceIds(List<Long> ids) {
+		this.deviceIds = ids;
+	}
+
 	public List<Group> getGroups() {
 		return this.groups;
 	}
 
 	public void setGroups(List<Group> groups) {
 		this.groups = groups;
+	}
+
+	public List<Long> getGroupIds() {
+		return this.groupIds;
+	}
+
+	public void setGroupIds(List<Long> ids) {
+		this.groupIds = ids;
 	}
 
 	public List<HWConf> getHWConfs() {
@@ -179,12 +228,28 @@ public class Category implements Serializable {
 		this.hwconfs = hwconfs;
 	}
 
+	public List<Long> getHWConfIds() {
+		return this.hwConfIds;
+	}
+
+	public void setHWConfIds(List<Long> ids) {
+		this.hwConfIds = ids;
+	}
+
 	public List<Room> getRooms() {
 		return this.rooms;
 	}
 
 	public void setRooms(List<Room> rooms) {
 		this.rooms = rooms;
+	}
+
+	public List<Long> getRoomIds() {
+		return this.roomIds;
+	}
+
+	public void setRoomIds(List<Long> ids) {
+		this.roomIds = ids;
 	}
 
 	public List<Software> getSoftwares() {
@@ -195,6 +260,14 @@ public class Category implements Serializable {
 		this.softwares = softwares;
 	}
 
+	public List<Long> getSoftwareIds() {
+		return this.softwareIds;
+	}
+
+	public void setSoftwareIds(List<Long> ids) {
+		this.softwareIds = ids;
+	}
+
 	public List<Software> getRemovedSoftwares() {
 		return this.removedSoftwares;
 	}
@@ -202,6 +275,7 @@ public class Category implements Serializable {
 	public void setRemovedSoftwares(List<Software> softwares) {
 		this.removedSoftwares = softwares;
 	}
+
 	public List<User> getUsers() {
 		return this.users;
 	}
@@ -209,5 +283,20 @@ public class Category implements Serializable {
 	public void setUsers(List<User> users) {
 		this.users = users;
 	}
+	
+	public List<Long> getUserIds() {
+		return this.userIds;
+	}
 
+	public void setUserIds(List<Long> ids) {
+		this.userIds = ids;
+	}
+	
+	public boolean getStudentsOnly() {
+		return this.studentsOnly;
+	}
+
+	public void setStudentsOnly( boolean studentsOnly) {
+		this.studentsOnly = studentsOnly;
+	}
 }
