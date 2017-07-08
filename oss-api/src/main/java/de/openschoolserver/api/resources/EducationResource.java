@@ -7,7 +7,12 @@ import io.swagger.annotations.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +43,7 @@ public interface EducationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  createVirtaulRoom(
+    Response  createVirtualRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		Category virtualRoom
     		);
@@ -54,7 +59,7 @@ public interface EducationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  modifyVirtaulRoom(
+    Response  modifyVirtualRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("roomId") long roomId,
     		Category virtualRoom
@@ -174,7 +179,7 @@ public interface EducationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  deleteVirtaulRoom(
+    Response  deleteVirtualRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("roomId") long roomId
     		);
@@ -252,7 +257,20 @@ public interface EducationResource {
         	Map<String, String> actionContent
     );
 
-	
+    @POST
+    @Path("education/rooms/{roomId}/upload")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation( value = "Puts data to te member of the virtual rooms" )
+    @ApiResponses(value = {
+	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+    Response uploadFileToRoom(@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("roomId") long roomId,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+            );
+
 	/******************************/
 	/* Functions to handle groups */
 	/******************************/
@@ -305,6 +323,21 @@ public interface EducationResource {
      		@ApiParam(hidden = true) @Auth Session session,
      		@PathParam("groupId") long groupId
      	   );
+     
+     @POST
+     @Path("education/groups/{groupId}/upload")
+     @Produces(JSON_UTF8)
+     @Consumes(MediaType.MULTIPART_FORM_DATA)
+     @ApiOperation( value = "Puts data to te member of the virtual rooms" )
+     @ApiResponses(value = {
+ 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+ 	})
+     Response uploadFileToGroup(@ApiParam(hidden = true) @Auth Session session,
+     		 @PathParam("groupId")  long  groupId,
+             @FormDataParam("file") final InputStream fileInputStream,
+             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+             );
+  
 
     /************************************************************/
     /* Actions on logged in users and virtual rooms and groups. */
@@ -383,6 +416,20 @@ public interface EducationResource {
     		Map<String, String> actionContent
     		);
 
+    @POST
+    @Path("education/users/{userId}/upload")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation( value = "Puts data to te member of the virtual rooms" )
+    @ApiResponses(value = {
+	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+    Response uploadFileToUser(@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("userId")   long  userId,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+            );
+ 
     /************************************************************/
     /* Actions on logged in users and virtual rooms and groups. */
     /************************************************************/
@@ -422,5 +469,19 @@ public interface EducationResource {
             @PathParam("action") String action,
             Map<String, String> actionContent
     );
+    
+    @POST
+    @Path("education/devices/{deviceId}/upload")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation( value = "Puts data to te member of the virtual rooms" )
+    @ApiResponses(value = {
+	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+    Response uploadFileToDevice(@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("deviceId") long deviceId,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+            );
  
 }

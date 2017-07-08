@@ -1,8 +1,13 @@
 package de.openschoolserver.dao.controler;
 
+import java.io.InputStream;
+
 import java.util.*;
 import javax.persistence.EntityManager;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -252,5 +257,29 @@ public class EducationControler extends Controler {
 			}
 		}
 		return loggedOns;
+	}
+
+	public Response uploadFileToRoom(long roomId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Response uploadFileToDevice(long deviceId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Response uploadFileToUser(long userId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Response uploadFileToGroup(long groupId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -1,9 +1,13 @@
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.InputStream;
+
 import java.util.List;
 
 
 import java.util.Map;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.EducationResource;
 import de.openschoolserver.api.resources.Resource;
@@ -20,19 +24,19 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public Response createVirtaulRoom(Session session, Category virtualRoom) {
+	public Response createVirtualRoom(Session session, Category virtualRoom) {
 		EducationControler educationControler = new EducationControler(session);
 		return educationControler.createVirtualRoom(virtualRoom);
 	}
 
 	@Override
-	public Response modifyVirtaulRoom(Session session, long roomId, Category virtualRoom) {
+	public Response modifyVirtualRoom(Session session, long roomId, Category virtualRoom) {
 		EducationControler educationControler = new EducationControler(session);
 		return educationControler.modifyVirtualRoom(roomId, virtualRoom);
 	}
 
 	@Override
-	public Response deleteVirtaulRoom(Session session, long roomId) {
+	public Response deleteVirtualRoom(Session session, long roomId) {
 		EducationControler educationControler = new EducationControler(session);
 		return educationControler.deleteVirtualRoom(roomId);
 	}
@@ -155,6 +159,35 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		EducationControler educationControler = new EducationControler(session);
 		CategoryControler categoryControler = new CategoryControler(session);
 		return categoryControler.deleteMember(educationControler.getCategoryToRoom(roomId),"group",groupId);
+	}
+
+	@Override
+	public Response uploadFileToRoom(Session session, long roomId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		EducationControler educationControler = new EducationControler(session);
+		return educationControler.uploadFileToRoom(roomId,fileInputStream,contentDispositionHeader);
+	}
+
+	@Override
+	public Response uploadFileToUser(Session session, long userId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		EducationControler educationControler = new EducationControler(session);
+		return educationControler.uploadFileToUser(userId,fileInputStream,contentDispositionHeader);
+	}
+
+	@Override
+	public Response uploadFileToDevice(Session session, long deviceId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		EducationControler educationControler = new EducationControler(session);
+		return educationControler.uploadFileToDevice(deviceId,fileInputStream,contentDispositionHeader);
+
+	}
+
+	@Override
+	public Response uploadFileToGroup(Session session, long groupId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		EducationControler educationControler = new EducationControler(session);
+		return educationControler.uploadFileToGroup(groupId,fileInputStream,contentDispositionHeader);
 	}
 
 }

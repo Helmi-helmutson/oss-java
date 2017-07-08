@@ -3,6 +3,7 @@ package de.openschoolserver.api.resources;
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
 
+
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
