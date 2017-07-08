@@ -26,8 +26,8 @@ public class CloneToolControler extends Controler {
 	}
 
 	public Long getHWConf(){
-		DeviceControler devController = new DeviceControler(this.getSession());
-		Device device = devController.getByIP(this.getSession().getIP());
+		DeviceControler devControler = new DeviceControler(this.getSession());
+		Device device = devControler.getByIP(this.getSession().getIP());
 		return device.getHwconf().getId();
 	}
 

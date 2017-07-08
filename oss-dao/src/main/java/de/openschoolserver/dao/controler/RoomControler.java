@@ -189,14 +189,14 @@ public class RoomControler extends Controler {
 		try {
 
 			em.getTransaction().begin();
-			DeviceControler devController = new DeviceControler(this.getSession());
+			DeviceControler devControler = new DeviceControler(this.getSession());
 			if( this.isProtected(room) )
 				return new Response(this.getSession(),"ERROR","This room must not be deleted.");
 			List<Long> deviceIds = new ArrayList<Long>();
 			for( Device device : room.getDevices()) {
 				deviceIds.add(device.getId());
 			}
-			Response response = devController.delete(deviceIds);
+			Response response = devControler.delete(deviceIds);
 			//If an error happened during deleting the devices the room must not be removed.
 			if( response.getCode().equals("ERROR") ) {
 				return response;

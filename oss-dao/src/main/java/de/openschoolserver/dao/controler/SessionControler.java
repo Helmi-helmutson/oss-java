@@ -1,3 +1,4 @@
+/* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2017 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.dao.controler;
 
@@ -17,7 +18,6 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.tools.*;
-
 
 import java.util.List;
 import java.util.Map;
@@ -62,8 +62,9 @@ public class SessionControler extends Controler {
         program[3] = "-U";
         program[4] = username + "%" + password;
         OSSShellTools.exec(program, reply, error, null);
-        if( reply.toString().contains("session setup failed"))
+        if( reply.toString().contains("session setup failed")) {
             return null;
+	}
         //TODO what to do with deviceType
         User user = userControler.getByUid(username);
         if( user == null ) {
@@ -147,8 +148,9 @@ public class SessionControler extends Controler {
             } catch (Exception e) {
                 logger.error(e.getMessage());
             } finally {
-                if ((em != null) && (em.isOpen()))
+                if ((em != null) && (em.isOpen())) {
                     em.close();
+		}
             }
         }
         return data;
@@ -175,8 +177,9 @@ public class SessionControler extends Controler {
             } catch (Exception e) {
                 logger.error(e.getMessage());
             } finally {
-                if ((em != null) && (em.isOpen()))
+                if ((em != null) && (em.isOpen())) {
                     em.close();
+		}
             }
         }
     }
@@ -196,8 +199,9 @@ public class SessionControler extends Controler {
             } catch (Exception e) {
                 logger.error(e.getMessage());
             } finally {
-                if ((em != null) && (em.isOpen()))
+                if ((em != null) && (em.isOpen())) {
                     em.close();
+		}
             }
         }
         return data;
@@ -216,35 +220,41 @@ public class SessionControler extends Controler {
     
     public boolean authorize(Session session, String requiredRole){
         //The simply way
-        if( session.getUser().getRole().contains(requiredRole))
+        if( session.getUser().getRole().contains(requiredRole)) {
             return true;
+	}
         
         EntityManager em = getEntityManager();
         if (em != null) {
             try {
-                Query q = em.createNamedQuery("Acl.checkByRole").setParameter("role", session.getUser().getRole()).setParameter("acl",requiredRole).setMaxResults(1);
+                Query q = em.createNamedQuery("Acl.checkByRole").setParameter("role", session.getUser().getRole())
+				.setParameter("acl",requiredRole).setMaxResults(1);
                 @SuppressWarnings("unchecked")
-                    List<Acl> acls = q.getResultList();
+                List<Acl> acls = q.getResultList();
                 //If there is one result this is allowed by role.
-                if( ! acls.isEmpty() )
+                if( ! acls.isEmpty() ) {
                     return true;
+		}
                 //Is it allowed by the user
                 for( Acl acl : session.getUser().getAcls() ){
-                    if( acl.getAcl().equals(requiredRole))
+                    if( acl.getAcl().equals(requiredRole)) {
                         return true;
+		    }
                 }
                 //Is it allowed by one of the groups of the user
                 for( Group group : session.getUser().getGroups() ) {
                     for( Acl acl : group.getAcls() ) {
-                        if( acl.getAcl().equals(requiredRole))
+                        if( acl.getAcl().equals(requiredRole)) {
                             return true;
+			}
                     }
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage());
             } finally {
-                if ((em != null) && (em.isOpen()))
+                if ((em != null) && (em.isOpen())) {
                     em.close();
+		}
             }
         }
         return false;

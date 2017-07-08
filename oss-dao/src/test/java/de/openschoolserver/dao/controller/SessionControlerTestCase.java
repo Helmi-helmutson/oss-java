@@ -16,7 +16,7 @@ import de.openschoolserver.dao.User;
  *  password: ut_teacher1
  */
 
-public class SessionControllerTestCase extends OSSDaoTestCase {
+public class SessionControlerTestCase extends OSSDaoTestCase {
 
     private static final int INVALID_PERSON_ID = -1;
 
@@ -64,7 +64,7 @@ public class SessionControllerTestCase extends OSSDaoTestCase {
         assertTrue(validatedSession.getId() == validatedSession1.getId());
 
         // try to load person with this token
-        PersonController pc = new PersonController(validatedSession1.getIdentity());
+        PersonControler pc = new PersonControler(validatedSession1.getIdentity());
         Person teacher = pc.getPersonByUserId(teacher1Login);
         assertNotNull(teacher);
 
