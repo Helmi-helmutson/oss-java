@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controler;
+package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
@@ -18,11 +18,11 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
 
 @SuppressWarnings( "unchecked" )
-public class GroupControler extends Controler {
+public class GroupController extends Controller {
 
-	Logger logger = LoggerFactory.getLogger(DeviceControler.class);
+	Logger logger = LoggerFactory.getLogger(DeviceController.class);
 
-	public GroupControler(Session session) {
+	public GroupController(Session session) {
 		super(session);
 	}
 

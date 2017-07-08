@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controler;
+package de.openschoolserver.dao.controller;
 
 import java.io.IOException;
 
@@ -23,7 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SuppressWarnings( "unchecked" )
-public class DHCPConfig extends Controler {
+public class DHCPConfig extends Controller {
 	private static Logger LOG = LoggerFactory.getLogger(DHCPConfig.class);
 	private Path DHCP_CONFIG   = Paths.get("/etc/dhcpd.conf");
 	private Path SALT_GROUPS   = Paths.get("/etc/salt/master.d/groups.conf");

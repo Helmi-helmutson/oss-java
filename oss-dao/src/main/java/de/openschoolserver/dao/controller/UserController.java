@@ -1,6 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved 
- * (c) 2017 EXTIS GmbH - all rights reserved
- * */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.dao.controller;
 
 import org.slf4j.Logger;
@@ -19,17 +17,17 @@ import de.extis.core.util.UserUtil;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.controler.DHCPConfig;
+import de.openschoolserver.dao.controller.DHCPConfig;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Response;
 
 @SuppressWarnings( "unchecked" )
-public class UserControler extends Controler {
+public class UserController extends Controller {
 
-    Logger logger = LoggerFactory.getLogger(UserControler.class);
+    Logger logger = LoggerFactory.getLogger(UserController.class);
 
-    public UserControler(Session session) {
+    public UserController(Session session) {
         super(session);
     }
     
@@ -186,10 +184,10 @@ public class UserControler extends Controler {
             em.getTransaction().begin();
             em.persist(user);
             em.getTransaction().commit();
-            GroupControler groupControler = new GroupControler(this.session);
-            Group group = groupControler.getByName(user.getRole());
+            GroupController groupController = new GroupController(this.session);
+            Group group = groupController.getByName(user.getRole());
             if( group != null ) {
-            	groupControler.addMember(group,user);;
+            	groupController.addMember(group,user);;
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

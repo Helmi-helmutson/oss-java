@@ -1,4 +1,5 @@
-package de.openschoolserver.dao.controler;
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
@@ -22,12 +23,12 @@ import org.slf4j.LoggerFactory;
 import de.openschoolserver.dao.*;
 
 @SuppressWarnings( "unchecked" )
-public class SoftwareControler extends Controler {
+public class SoftwareController extends Controller {
 	
-	Logger logger           = LoggerFactory.getLogger(CloneToolControler.class);
+	Logger logger           = LoggerFactory.getLogger(CloneToolController.class);
 	private static String SALT_PACKAGE_DIR = "/srv/salt/packages";
 
-	public SoftwareControler(Session session) {
+	public SoftwareController(Session session) {
 		super(session);
 	}
 	
@@ -436,8 +437,8 @@ public class SoftwareControler extends Controler {
 	 */
 	public Response applySoftwareStateToHosts(){
 		EntityManager em = getEntityManager();
-		RoomControler   roomControler   = new RoomControler(this.session);
-		DeviceControler deviceControler = new DeviceControler(this.session);
+		RoomController   roomController   = new RoomController(this.session);
+		DeviceController deviceController = new DeviceController(this.session);
 		Map<Device,List<String>>   softwaresToInstall = new HashMap<>();
 		Map<Device,List<Software>> softwaresToRemove  = new HashMap<>();
 		String key;
@@ -457,7 +458,7 @@ public class SoftwareControler extends Controler {
 		}
 
 		//Create the workstations state files
-		for( Device device : deviceControler.getAll() ) {
+		for( Device device : deviceController.getAll() ) {
 			List<String>   toInstall = new ArrayList<String>();
 			List<Software> toRemove  = new ArrayList<Software>();
 			for( Category category : device.getCategories() ) {
@@ -476,7 +477,7 @@ public class SoftwareControler extends Controler {
 		}
 
 		//Create the room state files
-		for( Room room : roomControler.getAll() ) {
+		for( Room room : roomController.getAll() ) {
 			List<Software> toRemove  = new ArrayList<Software>();
 			
 			for( Category category : room.getCategories() ) {
@@ -535,7 +536,7 @@ public class SoftwareControler extends Controler {
 		}
 
 		//Write the hosts sls files
-		for( Device device : deviceControler.getAll() ) {
+		for( Device device : deviceController.getAll() ) {
 			List<String> deviceSls = new ArrayList<String>();
 			//Remove first the softwares.
 			for( Software software : softwaresToRemove.get(device) ) {

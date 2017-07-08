@@ -1,6 +1,8 @@
-package de.openschoolserver.dao.controler;
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+package de.openschoolserver.dao.controller;
 
 import java.io.InputStream;
+
 
 import java.util.*;
 import javax.persistence.EntityManager;
@@ -13,11 +15,11 @@ import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.*;
 
-public class EducationControler extends Controler {
+public class EducationController extends Controller {
 
-	Logger logger = LoggerFactory.getLogger(EducationControler.class);
+	Logger logger = LoggerFactory.getLogger(EducationController.class);
 	
-	public EducationControler(Session session) {
+	public EducationController(Session session) {
 		super(session);
 		// TODO Auto-generated constructor stub
 	}
@@ -51,7 +53,7 @@ public class EducationControler extends Controler {
 	public List<Long> getMyRooms() {
 		List<Long> rooms = new ArrayList<Long>();
 		if( this.session.getRoom().getRoomControl().equals("no_control")){
-			for( Room room : new RoomControler(this.session).getAll() ) {
+			for( Room room : new RoomController(this.session).getAll() ) {
 				switch(room.getRoomControl()) {
 				case "no_control":
 					break;
@@ -115,9 +117,9 @@ public class EducationControler extends Controler {
 			/*
 			 * Add groups to the virtual room
 			 */
-			GroupControler groupControler = new GroupControler(this.session);
+			GroupController groupController = new GroupController(this.session);
 			for( Long id : virtualRoom.getGroupIds()) {
-				Group group = groupControler.getById(id);
+				Group group = groupController.getById(id);
 				virtualRoom.getGroups().add(group);
 				group.getCategories().add(virtualRoom);
 				em.merge(room);
@@ -126,9 +128,9 @@ public class EducationControler extends Controler {
 			/*
 			 * Add users to the virtual room
 			 */
-			UserControler  userControler  = new UserControler(this.session);
+			UserController  userController  = new UserController(this.session);
 			for( Long id : virtualRoom.getUserIds()) {
-				User user = userControler.getById(Long.valueOf(id));
+				User user = userController.getById(Long.valueOf(id));
 				if(virtualRoom.getStudentsOnly() && ! user.getRole().equals("studetns")){
 					continue;
 				}
@@ -140,9 +142,9 @@ public class EducationControler extends Controler {
 			/*
 			 * Add devices to the virtual room
 			 */
-			DeviceControler deviceControler = new DeviceControler(this.session);
+			DeviceController deviceController = new DeviceController(this.session);
 			for( Long id: virtualRoom.getDeviceIds()) {
-				Device device = deviceControler.getById(Long.valueOf(id));
+				Device device = deviceController.getById(Long.valueOf(id));
 				virtualRoom.getDevices().add(device);
 				device.getCategories().add(virtualRoom);
 				em.merge(device);
@@ -181,7 +183,7 @@ public class EducationControler extends Controler {
 		EntityManager   em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			Room room         = new RoomControler(this.session).getById(roomId);
+			Room room         = new RoomController(this.session).getById(roomId);
 			Category category = room.getCategories().get(0);
 			em.merge(room);
 			em.remove(room);
@@ -204,8 +206,8 @@ public class EducationControler extends Controler {
 	public List<List<Long>> getRoom(long roomId) {
 		List<List<Long>> loggedOns = new ArrayList<List<Long>>();
 		List<Long> loggedOn;
-		RoomControler roomControler = new RoomControler(this.session);
-		Room room = roomControler.getById(roomId);
+		RoomController roomController = new RoomController(this.session);
+		Room room = roomController.getById(roomId);
 		User me   = this.session.getUser();
 		if( room.getRoomType().equals("virtualRoom")) {
 			Category category = room.getCategories().get(0);

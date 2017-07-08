@@ -1,5 +1,5 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controler;
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -17,11 +17,11 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.*;
 
 @SuppressWarnings( "unchecked" )
-public class DeviceControler extends Controler {
+public class DeviceController extends Controller {
 	
-	Logger logger = LoggerFactory.getLogger(DeviceControler.class);
+	Logger logger = LoggerFactory.getLogger(DeviceController.class);
 
-	public DeviceControler(Session session) {
+	public DeviceController(Session session) {
 		super(session);
 	}
 
@@ -409,8 +409,8 @@ public class DeviceControler extends Controler {
 	public Response addLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		EntityManager em = getEntityManager();
-		UserControler userControler = new UserControler(this.session);
-		User user = userControler.getByUid(userName);
+		UserController userController = new UserController(this.session);
+		User user = userController.getByUid(userName);
 		device.getLoggedIn().add(user);
 		user.getLoggedOn().add(device);
 		try {
@@ -430,8 +430,8 @@ public class DeviceControler extends Controler {
 	public Response removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		EntityManager em = getEntityManager();
-		UserControler userControler = new UserControler(this.session);
-		User user = userControler.getByUid(userName);
+		UserController userController = new UserController(this.session);
+		User user = userController.getByUid(userName);
 		List<User> loggedInUsers = device.getLoggedIn();
 		loggedInUsers.remove(user);
 		device.setLoggedIn(loggedInUsers);

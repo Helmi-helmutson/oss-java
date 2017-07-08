@@ -2,11 +2,13 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.ByteArrayInputStream;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.text.TabExpander;
@@ -26,8 +28,8 @@ import de.openschoolserver.api.resources.ImporterResource;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.controller.GroupControler;
-import de.openschoolserver.dao.controller.UserControler;
+import de.openschoolserver.dao.controller.GroupController;
+import de.openschoolserver.dao.controller.UserController;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
@@ -63,7 +65,7 @@ public class ImporterResourceImpl implements ImporterResource {
 			}
 			/*
 			 * result = (List<Employee>) session.getTemporaryUploadData();
-			 * EmployeeControler ec = new EmployeeControler(); result =
+			 * EmployeeController ec = new EmployeeController(); result =
 			 * ec.importEmployees(result, session);
 			 */
 
@@ -160,23 +162,23 @@ public class ImporterResourceImpl implements ImporterResource {
 	}
 
 	protected boolean doCompareAndImportUser(Session session, de.claxss.importlib.Person person, ImportOrder o) {
-		final UserControler userControler = new UserControler(session);
+		final UserController userController = new UserController(session);
 		User existingUser = null;
 		/* ========== first step: try to find the user ============ */
 		if (person.getLoginId() != null && person.getLoginId().length() > 0) {
 			// first try to find via uid
-			existingUser = userControler.getByUid(person.getLoginId());
+			existingUser = userController.getByUid(person.getLoginId());
 		}
 		if (existingUser == null) {
 			// user not found via uid, try to find via name
 			List<User> possibleUsers;
 			if (o.getRequestedUserRole() != null && o.getRequestedUserRole().length() > 0) {
-				possibleUsers = userControler.findByNameAndRole(person.getFirstname(), person.getName(),
+				possibleUsers = userController.findByNameAndRole(person.getFirstname(), person.getName(),
 						o.getRequestedUserRole());
 				// try to find a user with a given role via First and LastName
 			} else {
 				// try to find via firstname and lastname
-				possibleUsers = userControler.findByName(person.getFirstname(), person.getName());
+				possibleUsers = userController.findByName(person.getFirstname(), person.getName());
 			}
 			if (possibleUsers != null && possibleUsers.size() > 0) {
 				if (possibleUsers.size() == 1) {
@@ -225,8 +227,8 @@ public class ImporterResourceImpl implements ImporterResource {
 			}
 			if (person.getSchoolClasses() != null && person.getSchoolClasses().size() > 0) {
 				// use new classes
-				List<Group> oldClasses = new ArrayList<Group>();
-				List<Group> newClasses = new ArrayList<Group>();
+				List<Group> oldClasses  = new ArrayList<Group>();
+				List<Group> newClasses  = new ArrayList<Group>();
 				List<Group> keepClasses = new ArrayList<Group>();
 				collectClassesOfUser(existingUser, oldClasses);
 				for (SchoolClass schoolclass : person.getSchoolClasses()) {
@@ -259,7 +261,7 @@ public class ImporterResourceImpl implements ImporterResource {
 				}
 			}
 			if (change && !o.isTestOnly()) {
-				userControler.modify(existingUser);
+				userController.modify(existingUser);
 			}
 		} else {
 			// create the user
@@ -276,7 +278,7 @@ public class ImporterResourceImpl implements ImporterResource {
 			}
 			newUser.setGroups(newClasses);
 			if (!o.isTestOnly()) {
-				userControler.add(newUser);
+				userController.add(newUser);
 			}
 		}
 		//TODO handle old users
@@ -326,8 +328,8 @@ public class ImporterResourceImpl implements ImporterResource {
 	protected boolean doCompareAndImportSchoolClass(Session session, de.claxss.importlib.SchoolClass schoolClass,
 			ImportOrder o) {
 		if (schoolClass != null && schoolClass.getNormalizedName() != null) {
-			final GroupControler groupControler = new GroupControler(session);
-			final Group existingClass = groupControler.getByName(schoolClass.getNormalizedName());
+			final GroupController groupController = new GroupController(session);
+			final Group existingClass = groupController.getByName(schoolClass.getNormalizedName());
 
 			if (existingClass == null) {
 				Group newClass = new Group();
@@ -335,7 +337,7 @@ public class ImporterResourceImpl implements ImporterResource {
 				newClass.setDescription(schoolClass.getLongName());
 				newClass.setGroupType("class");
 				if (!o.isTestOnly()) {
-					groupControler.add(newClass);
+					groupController.add(newClass);
 				}
 
 			}

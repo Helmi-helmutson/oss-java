@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controler;
+package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
@@ -14,7 +14,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.controler.Config;
+import de.openschoolserver.dao.controller.Config;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
@@ -29,14 +29,14 @@ import java.util.Properties;
 import java.util.ArrayList;
 
 @SuppressWarnings( "unchecked" )
-public class Controler extends Config {
+public class Controller extends Config {
 
-        Logger logger = LoggerFactory.getLogger(Controler.class);
+        Logger logger = LoggerFactory.getLogger(Controller.class);
 
 	protected Session session ;
 	private Map<String, String> properties;
 
-	public Controler(Session session) {
+	public Controller(Session session) {
 		super();
 		this.session=session;
 		properties = new HashMap<String, String>();

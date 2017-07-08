@@ -1,6 +1,8 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.InputStream;
+
 
 import java.util.List;
 
@@ -15,7 +17,7 @@ import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controler.*;
+import de.openschoolserver.dao.controller.*;
 
 public class EducationResourceImpl implements Resource, EducationResource {
 
@@ -25,32 +27,32 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public Response createVirtualRoom(Session session, Category virtualRoom) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.createVirtualRoom(virtualRoom);
+		EducationController educationController = new EducationController(session);
+		return educationController.createVirtualRoom(virtualRoom);
 	}
 
 	@Override
 	public Response modifyVirtualRoom(Session session, long roomId, Category virtualRoom) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.modifyVirtualRoom(roomId, virtualRoom);
+		EducationController educationController = new EducationController(session);
+		return educationController.modifyVirtualRoom(roomId, virtualRoom);
 	}
 
 	@Override
 	public Response deleteVirtualRoom(Session session, long roomId) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.deleteVirtualRoom(roomId);
+		EducationController educationController = new EducationController(session);
+		return educationController.deleteVirtualRoom(roomId);
 	}
 
 	@Override
 	public List<Long> getMyRooms(Session session) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.getMyRooms();
+		EducationController educationController = new EducationController(session);
+		return educationController.getMyRooms();
 	}
 
 	@Override
 	public List<List<Long>> getRoom(Session session, long roomId) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.getRoom(roomId);
+		EducationController educationController = new EducationController(session);
+		return educationController.getRoom(roomId);
 	}
 
 	@Override
@@ -121,73 +123,73 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public Response addUser(Session session, long roomId, long userId) {
-		EducationControler educationControler = new EducationControler(session);
-		CategoryControler categoryControler = new CategoryControler(session);
-		return categoryControler.addMember(educationControler.getCategoryToRoom(roomId), "user", userId);
+		EducationController educationController = new EducationController(session);
+		CategoryController categoryController = new CategoryController(session);
+		return categoryController.addMember(educationController.getCategoryToRoom(roomId), "user", userId);
 	}
 
 	@Override
 	public Response addDevice(Session session, long roomId, long deviceId) {
-		EducationControler educationControler = new EducationControler(session);
-		CategoryControler categoryControler = new CategoryControler(session);
-		return categoryControler.addMember(educationControler.getCategoryToRoom(roomId),"device", deviceId);
+		EducationController educationController = new EducationController(session);
+		CategoryController categoryController = new CategoryController(session);
+		return categoryController.addMember(educationController.getCategoryToRoom(roomId),"device", deviceId);
 	}
 
 	@Override
 	public Response deleteUser(Session session, long roomId, long userId) {
-		EducationControler educationControler = new EducationControler(session);
-		CategoryControler categoryControler = new CategoryControler(session);
-		return categoryControler.deleteMember(educationControler.getCategoryToRoom(roomId), "user", userId);	
+		EducationController educationController = new EducationController(session);
+		CategoryController categoryController = new CategoryController(session);
+		return categoryController.deleteMember(educationController.getCategoryToRoom(roomId), "user", userId);	
 	}
 
 	@Override
 	public Response deleteDevice(Session session, long roomId, long deviceId) {
-		EducationControler educationControler = new EducationControler(session);
-		CategoryControler categoryControler = new CategoryControler(session);
-		return categoryControler.deleteMember(educationControler.getCategoryToRoom(roomId),"device", deviceId);
+		EducationController educationController = new EducationController(session);
+		CategoryController categoryController = new CategoryController(session);
+		return categoryController.deleteMember(educationController.getCategoryToRoom(roomId),"device", deviceId);
 	}
 
 	@Override
 	public Response addgroup(Session session, long roomId, long groupId) {
-		EducationControler educationControler = new EducationControler(session);
-		CategoryControler categoryControler = new CategoryControler(session);
-		return categoryControler.addMember(educationControler.getCategoryToRoom(roomId),"group",groupId);
+		EducationController educationController = new EducationController(session);
+		CategoryController categoryController = new CategoryController(session);
+		return categoryController.addMember(educationController.getCategoryToRoom(roomId),"group",groupId);
 	}
 
 	@Override
 	public Response deleteGroup(Session session, long roomId, long groupId) {
-		EducationControler educationControler = new EducationControler(session);
-		CategoryControler categoryControler = new CategoryControler(session);
-		return categoryControler.deleteMember(educationControler.getCategoryToRoom(roomId),"group",groupId);
+		EducationController educationController = new EducationController(session);
+		CategoryController categoryController = new CategoryController(session);
+		return categoryController.deleteMember(educationController.getCategoryToRoom(roomId),"group",groupId);
 	}
 
 	@Override
 	public Response uploadFileToRoom(Session session, long roomId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.uploadFileToRoom(roomId,fileInputStream,contentDispositionHeader);
+		EducationController educationController = new EducationController(session);
+		return educationController.uploadFileToRoom(roomId,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
 	public Response uploadFileToUser(Session session, long userId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.uploadFileToUser(userId,fileInputStream,contentDispositionHeader);
+		EducationController educationController = new EducationController(session);
+		return educationController.uploadFileToUser(userId,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
 	public Response uploadFileToDevice(Session session, long deviceId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.uploadFileToDevice(deviceId,fileInputStream,contentDispositionHeader);
+		EducationController educationController = new EducationController(session);
+		return educationController.uploadFileToDevice(deviceId,fileInputStream,contentDispositionHeader);
 
 	}
 
 	@Override
 	public Response uploadFileToGroup(Session session, long groupId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		EducationControler educationControler = new EducationControler(session);
-		return educationControler.uploadFileToGroup(groupId,fileInputStream,contentDispositionHeader);
+		EducationController educationController = new EducationController(session);
+		return educationController.uploadFileToGroup(groupId,fileInputStream,contentDispositionHeader);
 	}
 
 }

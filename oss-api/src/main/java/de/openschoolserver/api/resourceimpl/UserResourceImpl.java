@@ -9,16 +9,16 @@ import de.openschoolserver.api.resources.UserResource;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.controler.GroupControler;
-import de.openschoolserver.dao.controler.UserControler;
+import de.openschoolserver.dao.controller.GroupController;
+import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.Response;
 
 public class UserResourceImpl implements UserResource {
 
 	@Override
 	public User getById(Session session, long userId) {
-		final UserControler userControler = new UserControler(session);
-		final User user = userControler.getById(userId);
+		final UserController userController = new UserController(session);
+		final User user = userController.getById(userId);
 		 if (user == null) {
 	            throw new WebApplicationException(404);
 	    }
@@ -27,8 +27,8 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<User> getByRole(Session session, String role) {
-		final UserControler userControler = new UserControler(session);
-		final List<User> users = userControler.getByRole(role);
+		final UserController userController = new UserController(session);
+		final List<User> users = userController.getByRole(role);
 		if (users == null) {
             throw new WebApplicationException(404);
 		}
@@ -37,8 +37,8 @@ public class UserResourceImpl implements UserResource {
 	
 	@Override
 	public List<User> getAll(Session session) {
-		final UserControler userControler = new UserControler(session);
-		final List<User> users = userControler.getAll();
+		final UserController userController = new UserController(session);
+		final List<User> users = userController.getAll();
 		if (users == null) {
             throw new WebApplicationException(404);
 		}
@@ -47,32 +47,32 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public Response add(Session session, User user) {
-		final UserControler userControler = new UserControler(session);
-		return userControler.add(user);
+		final UserController userController = new UserController(session);
+		return userController.add(user);
 	}
 
 	@Override
 	public List<Response> add(Session session, List<User> users) {
-		final UserControler userControler = new UserControler(session);
-		return userControler.add(users);
+		final UserController userController = new UserController(session);
+		return userController.add(users);
 	}
 
 	@Override
 	public Response delete(Session session, long userId) {
-		final UserControler userControler = new UserControler(session);
-		return userControler.delete(userId);
+		final UserController userController = new UserController(session);
+		return userController.delete(userId);
 	}
 
 	@Override
 	public Response modify(Session session, User user) {
-		final UserControler userControler = new UserControler(session);
-		return userControler.modify(user);
+		final UserController userController = new UserController(session);
+		return userController.modify(user);
 	}
 
 	@Override
 	public List<User> search(Session session, String search) {
-		final UserControler userControler = new UserControler(session);
-		final List<User> users = userControler.search(search);
+		final UserController userController = new UserController(session);
+		final List<User> users = userController.search(search);
 		if (users == null) {
             throw new WebApplicationException(404);
 		}
@@ -81,8 +81,8 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<Group> getAvailableGroups(Session session, long userId) {
-		final UserControler userControler = new UserControler(session);
-		final List<Group> groups = userControler.getAvailableGroups(userId);
+		final UserController userController = new UserController(session);
+		final List<Group> groups = userController.getAvailableGroups(userId);
 		if (groups == null) {
             throw new WebApplicationException(404);
 		}
@@ -91,8 +91,8 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<Group> groups(Session session, long userId) {
-		final UserControler userControler = new UserControler(session);
-		final List<Group> groups =  userControler.getGroups(userId);
+		final UserController userController = new UserController(session);
+		final List<Group> groups =  userController.getGroups(userId);
 		if (groups == null) {
             throw new WebApplicationException(404);
 		}
@@ -101,32 +101,32 @@ public class UserResourceImpl implements UserResource {
 	
 	@Override
 	public Response setMembers(Session session, long userId, List<Long> groupIds) {
-		final UserControler userControler = new UserControler(session);
-		return userControler.setGroups(userId,groupIds);
+		final UserController userController = new UserController(session);
+		return userController.setGroups(userId,groupIds);
 	}
 	
 	@Override
 	public Response removeMember(Session session, long groupId, long userId) {
-		final GroupControler groupControler = new GroupControler(session);
-		return groupControler.removeMember(groupId,userId);	
+		final GroupController groupController = new GroupController(session);
+		return groupController.removeMember(groupId,userId);	
 	}
 
 	@Override
 	public Response addMember(Session session, long groupId, long userId) {
-		final GroupControler groupControler = new GroupControler(session);
-		return groupControler.addMember(groupId,userId);
+		final GroupController groupController = new GroupController(session);
+		return groupController.addMember(groupId,userId);
 	}
 
 	@Override
 	public Response syncFsQuotas(Session session, List<List<String>> Quotas) {
-		final UserControler userControler = new UserControler(session);
-		return userControler.syncFsQuotas(Quotas);
+		final UserController userController = new UserController(session);
+		return userController.syncFsQuotas(Quotas);
 	}
 
 	@Override
 	public List<User> getUsers(Session session, List<Long> userIds) {
-		final UserControler userControler = new UserControler(session);
-		return userControler.getUsers(userIds);
+		final UserController userController = new UserController(session);
+		return userController.getUsers(userIds);
 	}
 
 	

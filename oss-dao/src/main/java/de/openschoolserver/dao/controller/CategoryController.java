@@ -1,4 +1,5 @@
-package de.openschoolserver.dao.controler;
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
@@ -11,9 +12,9 @@ import java.util.ArrayList;
 import de.openschoolserver.dao.*;
 
 @SuppressWarnings( "unchecked" )
-public class CategoryControler extends Controler {
+public class CategoryController extends Controller {
 	
-	public CategoryControler(Session session) {
+	public CategoryController(Session session) {
 		super(session);
 	}
 	
@@ -207,32 +208,32 @@ public class CategoryControler extends Controler {
 			em.getTransaction().begin();
 			switch(objectName){
 			case("Device"):
-				Device device = new DeviceControler(this.session).getById(objectId);
+				Device device = new DeviceController(this.session).getById(objectId);
 				category.getDevices().add(device);
 				device.getCategories().add(category);
 			break;
 			case("Group"):
-				Group group = new GroupControler(this.session).getById(objectId);
+				Group group = new GroupController(this.session).getById(objectId);
 				category.getGroups().add(group);
 				group.getCategories().add(category);
 			break;
 			case("HWConf"):
-				HWConf hwconf = new CloneToolControler(this.session).getById(objectId);
+				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
 				category.getHWConfs().add(hwconf);
 				hwconf.getCategories().add(category);
 			break;
 			case("Room"):
-				Room room = new RoomControler(this.session).getById(objectId);
+				Room room = new RoomController(this.session).getById(objectId);
 				category.getRooms().add(room);
 				room.getCategories().add(category);
 			break;
 			case("Software"):
-				Software software = new SoftwareControler(this.session).getById(objectId);
+				Software software = new SoftwareController(this.session).getById(objectId);
 				category.getSoftwares().add(software);
 				software.getCategories().add(category);
 			break;
 			case("User"):
-				User user = new UserControler(this.session).getById(objectId);
+				User user = new UserController(this.session).getById(objectId);
 				category.getUsers().add(user);
 				user.getCategories().add(category);
 			break;
@@ -254,34 +255,34 @@ public class CategoryControler extends Controler {
 			em.getTransaction().begin();
 			switch(objectName){
 			case("Device"):
-				Device device = new DeviceControler(this.session).getById(objectId);
+				Device device = new DeviceController(this.session).getById(objectId);
 				category.getDevices().remove(device);
 				device.getCategories().remove(category);
 			break;
 			case("Group"):
-				Group group = new GroupControler(this.session).getById(objectId);
+				Group group = new GroupController(this.session).getById(objectId);
 				category.getGroups().remove(group);
 				group.getCategories().remove(category);
 			break;
 			case("HWConf"):
-				HWConf hwconf = new CloneToolControler(this.session).getById(objectId);
+				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
 				category.getHWConfs().remove(hwconf);
 				hwconf.getCategories().remove(category);
 			break;
 			case("Room"):
-				Room room = new RoomControler(this.session).getById(objectId);
+				Room room = new RoomController(this.session).getById(objectId);
 				category.getRooms().remove(room);
 				room.getCategories().remove(category);
 			break;
 			case("Software"):
-				Software software = new SoftwareControler(this.session).getById(objectId);
+				Software software = new SoftwareController(this.session).getById(objectId);
 				category.getSoftwares().remove(software);
 				category.getRemovedSoftwares().add(software);
 				software.getCategories().remove(category);
 				software.getRemovedFromCategories().add(category);
 			break;
 			case("User"):
-				User user = new UserControler(this.session).getById(objectId);
+				User user = new UserController(this.session).getById(objectId);
 				category.getUsers().remove(user);
 				user.getCategories().remove(category);
 			break;

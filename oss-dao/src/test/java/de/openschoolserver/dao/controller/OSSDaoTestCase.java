@@ -4,13 +4,13 @@ package de.openschoolserver.dao.controller;
 
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.controler.SessionControler;
+import de.openschoolserver.dao.controller.SessionController;
 import junit.framework.TestCase;
 import java.nio.file.Paths;
 
 public class OSSDaoTestCase extends TestCase {
 
-    protected SessionControler c = null;
+    protected SessionController c = null;
 
     protected Session getValidAdminSession() {
     	String user =     "admin";
@@ -27,7 +27,7 @@ public class OSSDaoTestCase extends TestCase {
     
         Session session =  new Session();
         session.setIP("10.0.0.1");
-         c = new SessionControler(session);
+         c = new SessionController(session);
      
     }
 

@@ -1,4 +1,5 @@
-package de.openschoolserver.dao.controler;
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+package de.openschoolserver.dao.controller;
 
 import de.openschoolserver.dao.Session;
 
@@ -12,7 +13,7 @@ import de.openschoolserver.dao.User;
 import java.util.Scanner;
 
 
-public class GetJPAInf extends Controler implements Runnable {
+public class GetJPAInf extends Controller implements Runnable {
 	private Socket client;
 
 	public GetJPAInf(Session session,Socket client) {
@@ -21,7 +22,7 @@ public class GetJPAInf extends Controler implements Runnable {
 	}
 
 	public void run(){
-		final DeviceControler deviceControler = new DeviceControler(session);
+		final DeviceController deviceController = new DeviceController(session);
 		String ip;
 	//	BufferedReader in = null;
 		Scanner in = null;
@@ -40,10 +41,10 @@ public class GetJPAInf extends Controler implements Runnable {
 
 		while(true){
 				ip = in.nextLine();
-				 if( deviceControler.getLoggedInUsersObject(ip).isEmpty() ) {
+				 if( deviceController.getLoggedInUsersObject(ip).isEmpty() ) {
 	                 out.println("ERR user=\"No user logged in " + ip + "\"");
 	             } else {
-	            	 User user = deviceControler.getLoggedInUsersObject(ip).get(0);
+	            	 User user = deviceController.getLoggedInUsersObject(ip).get(0);
 	            	 //TODO check internetDisabled
 	                 out.println("OK user=\"" + user.getUid() + "\"");
 	             }

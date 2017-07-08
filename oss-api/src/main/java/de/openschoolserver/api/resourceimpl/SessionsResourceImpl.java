@@ -6,7 +6,7 @@ import de.openschoolserver.api.resources.SessionsResource;
 
 
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controler.SessionControler;
+import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.Device;
 
 import org.slf4j.Logger;
@@ -33,8 +33,8 @@ public class SessionsResourceImpl implements SessionsResource {
 
         Session session =  new Session();
         session.setIP(req.getRemoteAddr());
-        SessionControler sessionControler = new SessionControler(session);
-        return sessionControler.createSessionWithUser(username, password, device);
+        SessionController sessionController = new SessionController(session);
+        return sessionController.createSessionWithUser(username, password, device);
     }
 
     @Override
@@ -44,12 +44,12 @@ public class SessionsResourceImpl implements SessionsResource {
 
     @Override
     public void deleteSession(Session session, String token) {
-         final SessionControler sessionControler = new SessionControler(session);
+         final SessionController sessionController = new SessionController(session);
          if( session == null || ! session.getToken().equals(token) ) {
         	 logger.info("deletion of session denied " + token);
         	 throw new WebApplicationException(401);
          }
-         sessionControler.deleteSession(session);
+         sessionController.deleteSession(session);
          logger.debug("deleted session " + token);
     }
 
@@ -67,7 +67,7 @@ public class SessionsResourceImpl implements SessionsResource {
 		Device defaultPrinter  = null;
 		List<Device> availablePrinters = null;
 		List<String> data = new ArrayList<String>();
-		final SessionControler sessionControler = new SessionControler(session);
+		final SessionController sessionController = new SessionController(session);
 		switch(key) {
 		  case "defaultPrinter":
 			  if( session.getDevice() != null )
@@ -95,7 +95,7 @@ public class SessionsResourceImpl implements SessionsResource {
 				  return session.getDevice().getName();
 			  break;
 		  case "domainName": 
-			  return sessionControler.getConfigValue("SCHOOL_DOMAIN");
+			  return sessionController.getConfigValue("SCHOOL_DOMAIN");
 		}
 		return "";
 	}

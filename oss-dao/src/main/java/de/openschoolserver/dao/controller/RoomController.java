@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controler;
+package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
 
@@ -25,11 +25,11 @@ import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.tools.*;
 
 @SuppressWarnings( "unchecked" )
-public class RoomControler extends Controler {
+public class RoomController extends Controller {
 
-	Logger logger = LoggerFactory.getLogger(RoomControler.class);
+	Logger logger = LoggerFactory.getLogger(RoomController.class);
 
-	public RoomControler(Session session) {
+	public RoomController(Session session) {
 		super(session);
 	}
 
@@ -145,7 +145,7 @@ public class RoomControler extends Controler {
 
 	public Response add(Room room){
 		if( ! room.getRoomType().equals("virtualRoom") ) {
-			return new Response(this.getSession(),"ERROR", "Virtual Rooms can only be created by Education Controler.");
+			return new Response(this.getSession(),"ERROR", "Virtual Rooms can only be created by Education Controller.");
 		}
 		EntityManager em = getEntityManager();
 
@@ -189,14 +189,14 @@ public class RoomControler extends Controler {
 		try {
 
 			em.getTransaction().begin();
-			DeviceControler devControler = new DeviceControler(this.getSession());
+			DeviceController devController = new DeviceController(this.getSession());
 			if( this.isProtected(room) )
 				return new Response(this.getSession(),"ERROR","This room must not be deleted.");
 			List<Long> deviceIds = new ArrayList<Long>();
 			for( Device device : room.getDevices()) {
 				deviceIds.add(device.getId());
 			}
-			Response response = devControler.delete(deviceIds);
+			Response response = devController.delete(deviceIds);
 			//If an error happened during deleting the devices the room must not be removed.
 			if( response.getCode().equals("ERROR") ) {
 				return response;
@@ -539,7 +539,7 @@ public class RoomControler extends Controler {
 	public Response addDevices(long roomId,List<Device> devices){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
-		DeviceControler deviceControler = new DeviceControler(this.session);
+		DeviceController deviceController = new DeviceController(this.session);
 		StringBuilder error = new StringBuilder();
 		List<String> ipAddress;
 		for(Device device : devices) {
@@ -561,7 +561,7 @@ public class RoomControler extends Controler {
 				}
 				device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 			}
-			error.append(deviceControler.check(device, room));
+			error.append(deviceController.check(device, room));
 			device.setRoom(room);
 			if(device.getHwconfId() == null){
 				device.setHwconf(room.getHwconf());
@@ -584,7 +584,7 @@ public class RoomControler extends Controler {
 			}
 		}
 		em.close();
-		UserControler userControler = new UserControler(this.session);
+		UserController userController = new UserController(this.session);
 		for(Device device : devices) {
 		    this.startPlugin("add_device", device);
 		    User user = new User();
@@ -592,7 +592,7 @@ public class RoomControler extends Controler {
 		    user.setSureName(device.getName() + "  Workstation-User");
 		    user.setRole("workstations");
 		    //TODO do not ignore response.
-		    Response answer = userControler.add(user);
+		    Response answer = userController.add(user);
 		    logger.debug(answer.getValue());
 		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
@@ -663,8 +663,8 @@ public class RoomControler extends Controler {
 			}
 		}
 		//Check if the Device settings are OK
-		DeviceControler deviceControler = new DeviceControler(this.session);
-		String error = deviceControler.check(device, room);
+		DeviceController deviceController = new DeviceController(this.session);
+		String error = deviceController.check(device, room);
 		if( error != "" ) {
 			return new Response(this.getSession(),"ERROR",error);
 		}

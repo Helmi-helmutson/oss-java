@@ -1,5 +1,5 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao.controler;
+package de.openschoolserver.dao.controller;
 
 import de.openschoolserver.dao.Session;
 
@@ -18,11 +18,11 @@ import de.openschoolserver.dao.Room;
 import java.util.*;
 
 @SuppressWarnings( "unchecked" )
-public class SystemControler extends Controler {
+public class SystemController extends Controller {
 
-    Logger logger = LoggerFactory.getLogger(SystemControler.class);
+    Logger logger = LoggerFactory.getLogger(SystemController.class);
     
-    public SystemControler(Session session) {
+    public SystemController(Session session) {
         super(session);
     }
 
@@ -82,8 +82,8 @@ public class SystemControler extends Controler {
         statusList.add(statusMap);
         
         //Software
-        SoftwareControler softwareControler = new SoftwareControler(this.session);
-        statusList.add(softwareControler.statistic());
+        SoftwareController softwareController = new SoftwareController(this.session);
+        statusList.add(softwareController.statistic());
         
         
         return statusList;
@@ -192,8 +192,8 @@ public class SystemControler extends Controler {
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
         List<Map<String, String>> firewallList = new ArrayList<>();
         Map<String,String> statusMap;
-        RoomControler roomControler = new RoomControler(this.session);
-        DeviceControler deviceControler = new DeviceControler(this.session);
+        RoomController roomController = new RoomController(this.session);
+        DeviceController deviceController = new DeviceController(this.session);
         
         for( String outRule : fwConfig.getConfigValue("FW_MASQ_NETS").split(" ") ) {
             if (outRule.length() > 0) {
@@ -204,12 +204,12 @@ public class SystemControler extends Controler {
                 String   prot = rule.length > 2 ? rule[2] : "all";
                 String   port = rule.length > 3 ? rule[3] : "all";
                 if(host[1].equals("32")) {
-                    Device device = deviceControler.getByIP(host[0]);
+                    Device device = deviceController.getByIP(host[0]);
                     statusMap.put("id", Long.toString(device.getId()));
                     statusMap.put("name", device.getName());
                     statusMap.put("type", "host");
                 } else {
-                    Room room = roomControler.getByIP(host[0]);
+                    Room room = roomController.getByIP(host[0]);
                     statusMap.put("id", Long.toString(room.getId()));
                     statusMap.put("name", room.getName());
                     statusMap.put("type", "room" );
@@ -226,17 +226,17 @@ public class SystemControler extends Controler {
     public Response setFirewallOutgoingRules(List<Map<String, String>> firewallList) {
         List<String> fwMasqNets = new ArrayList<String>();
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
-        RoomControler roomControler = new RoomControler(this.session);
-        DeviceControler deviceControler = new DeviceControler(this.session);
+        RoomController roomController = new RoomController(this.session);
+        DeviceController deviceController = new DeviceController(this.session);
         Device device;
         Room   room;
         for( Map<String,String> map : firewallList ) {
             StringBuilder data = new StringBuilder();
             if( map.get("type").equals("room")) {
-                room = roomControler.getById(Long.parseLong(map.get("id")));
+                room = roomController.getById(Long.parseLong(map.get("id")));
                 data.append(room.getNetwork()).append("/").append(String.valueOf(room.getNetMask())).append(",");
             } else {
-                device = deviceControler.getById(Long.parseLong(map.get("id")));
+                device = deviceController.getById(Long.parseLong(map.get("id")));
                 data.append(device.getIp()).append("/32,");
             }
             data.append(map.get("dest"));
@@ -261,14 +261,14 @@ public class SystemControler extends Controler {
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
         List<Map<String, String>> firewallList = new ArrayList<>();
         Map<String,String> statusMap;
-        DeviceControler deviceControler = new DeviceControler(this.session);
+        DeviceController deviceController = new DeviceController(this.session);
         
         for( String outRule : fwConfig.getConfigValue("FW_FORWARD_MASQ").split(" ") ) {
            if (outRule!=null && outRule.length()>0) {
                statusMap = new HashMap<>();
                String[] rule = outRule.split(",");
                if (rule!=null && rule.length>=4) {
-                   Device device = deviceControler.getByIP(rule[1]);
+                   Device device = deviceController.getByIP(rule[1]);
                    statusMap.put("ext", rule[3]);
                    statusMap.put("id",  Long.toString(device.getId()) );
                    statusMap.put("name", device.getName() );
@@ -283,9 +283,9 @@ public class SystemControler extends Controler {
     public Response setFirewallRemoteAccessRules(List<Map<String, String>> firewallList) {
         List<String> fwForwardMasq = new ArrayList<String>();
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
-        DeviceControler deviceControler = new DeviceControler(this.session);
+        DeviceController deviceController = new DeviceController(this.session);
         for( Map<String,String> map : firewallList ) {
-            Device device = deviceControler.getById(Long.parseLong(map.get("id")));
+            Device device = deviceController.getById(Long.parseLong(map.get("id")));
             fwForwardMasq.add("0/0," + device.getIp() + ",tcp," + map.get("ext") + "," + map.get("port") );
         }
         fwConfig.setConfigValue("FW_FORWARD_MASQ", String.join(" ", fwForwardMasq));

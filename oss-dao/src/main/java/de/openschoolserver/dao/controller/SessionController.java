@@ -1,6 +1,6 @@
 /* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2017 EXTIS GmbH - all rights reserved */
-package de.openschoolserver.dao.controler;
+package de.openschoolserver.dao.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +11,8 @@ import javax.persistence.Query;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SessionToken;
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.controler.DeviceControler;
-import de.openschoolserver.dao.controler.UserControler;
+import de.openschoolserver.dao.controller.DeviceController;
+import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
@@ -24,15 +24,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unchecked")
-public class SessionControler extends Controler {
+public class SessionController extends Controller {
 
-    Logger logger = LoggerFactory.getLogger(SessionControler.class); 
+    Logger logger = LoggerFactory.getLogger(SessionController.class); 
 
-    public SessionControler(Session session) {
+    public SessionController(Session session) {
         super(session);
     }
 
-    public SessionControler() {
+    public SessionController() {
         super(null);
     }
 
@@ -50,8 +50,8 @@ public class SessionControler extends Controler {
     }
 
     public Session createSessionWithUser(String username, String password, String deviceType) {
-        UserControler userControler = new UserControler(this.session);
-        DeviceControler deviceControler = new DeviceControler(this.session);
+        UserController userController = new UserController(this.session);
+        DeviceController deviceController = new DeviceController(this.session);
         Room room = null;
         String[]   program = new String[5];
         StringBuffer reply = new StringBuffer();
@@ -66,13 +66,13 @@ public class SessionControler extends Controler {
             return null;
 	}
         //TODO what to do with deviceType
-        User user = userControler.getByUid(username);
+        User user = userController.getByUid(username);
         if( user == null ) {
             return null;
         }
 
         String IP = this.getSession().getIP();
-        Device device = deviceControler.getByIP(IP);
+        Device device = deviceController.getByIP(IP);
         if( device != null ) {
             room = device.getRoom();
         }
