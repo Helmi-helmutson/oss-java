@@ -235,8 +235,7 @@ public interface EducationResource {
     @RolesAllowed({"sysadmins","teachers"})
     List<String> getAvailableRoomActions(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomId") long roomId,
-            @PathParam("action") String action
+            @PathParam("roomId") long roomId
     );
 
     /*
@@ -448,8 +447,7 @@ public interface EducationResource {
     @RolesAllowed({"sysadmins","teachers"})
     List<String> getAvailableDeviceActions(
             @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") long deviceId,
-            @PathParam("action") String action
+            @PathParam("deviceId") long deviceId
     );
 
     /*

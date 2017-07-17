@@ -4,13 +4,12 @@ package de.openschoolserver.api.resourceimpl;
 import java.io.InputStream;
 
 
+
 import java.util.List;
-
-
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-
 import de.openschoolserver.api.resources.EducationResource;
 import de.openschoolserver.api.resources.Resource;
 import de.openschoolserver.dao.Category;
@@ -56,9 +55,9 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<String> getAvailableRoomActions(Session session, long roomId, String action) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<String> getAvailableRoomActions(Session session, long roomId) {
+		EducationController educationController = new EducationController(session);
+		return educationController.getAvailableRoomActions(roomId);
 	}
 
 	@Override
@@ -69,20 +68,20 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public Response createGroup(Session session, Group group) {
-		// TODO Auto-generated method stub
-		return null;
+		EducationController educationController = new EducationController(session);
+		return educationController.createGroup(group);
 	}
 
 	@Override
 	public Response modifyGroup(Session session, long groupId, Group group) {
-		// TODO Auto-generated method stub
-		return null;
+		EducationController educationController = new EducationController(session);
+		return educationController.modifyGroup(groupId, group);
 	}
 
 	@Override
 	public Response removeGroup(Session session, long groupId) {
-		// TODO Auto-generated method stub
-		return null;
+		EducationController educationController = new EducationController(session);
+		return educationController.deleteGroup(groupId);
 	}
 
 	@Override
@@ -99,8 +98,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<String> getAvailableUserActions(Session session, long userId) {
-		// TODO Auto-generated method stub
-		return null;
+		EducationController educationController = new EducationController(session);
+		return educationController.getAvailableUserActions(userId);
 	}
 
 	@Override
@@ -110,9 +109,9 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return null;
 	}
 	@Override
-	public List<String> getAvailableDeviceActions(Session session, long deviceId, String action) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<String> getAvailableDeviceActions(Session session, long deviceId) {
+		EducationController educationController = new EducationController(session);
+		return educationController.getAvailableDeviceActions(deviceId);
 	}
 
 	@Override
@@ -167,21 +166,21 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public Response uploadFileToRoom(Session session, long roomId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EducationController educationController = new EducationController(session);
-		return educationController.uploadFileToRoom(roomId,fileInputStream,contentDispositionHeader);
+		return educationController.uploadFileTo("room",roomId,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
 	public Response uploadFileToUser(Session session, long userId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EducationController educationController = new EducationController(session);
-		return educationController.uploadFileToUser(userId,fileInputStream,contentDispositionHeader);
+		return educationController.uploadFileTo("user",userId,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
 	public Response uploadFileToDevice(Session session, long deviceId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EducationController educationController = new EducationController(session);
-		return educationController.uploadFileToDevice(deviceId,fileInputStream,contentDispositionHeader);
+		return educationController.uploadFileTo("device",deviceId,fileInputStream,contentDispositionHeader);
 
 	}
 
@@ -189,7 +188,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public Response uploadFileToGroup(Session session, long groupId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EducationController educationController = new EducationController(session);
-		return educationController.uploadFileToGroup(groupId,fileInputStream,contentDispositionHeader);
+		return educationController.uploadFileTo("group",groupId,fileInputStream,contentDispositionHeader);
 	}
 
 }

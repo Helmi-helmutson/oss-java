@@ -1,15 +1,23 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.dao.controller;
 
+import java.io.File;
+
+import java.io.IOException;
 import java.io.InputStream;
-
-
+import java.nio.file.Files;
+import java.nio.file.FileSystems;
+import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.attribute.UserPrincipal;
+import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.*;
 import javax.persistence.EntityManager;
+import javax.ws.rs.WebApplicationException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
-import java.io.InputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +26,8 @@ import de.openschoolserver.dao.*;
 public class EducationController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(EducationController.class);
+    static FileAttribute<Set<PosixFilePermission>> privatDirAttribute  = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
+    static FileAttribute<Set<PosixFilePermission>> privatFileAttribute = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));
 	
 	public EducationController(Session session) {
 		super(session);
@@ -261,27 +271,128 @@ public class EducationController extends Controller {
 		return loggedOns;
 	}
 
-	public Response uploadFileToRoom(long roomId, InputStream fileInputStream,
+	public Response uploadFileTo(String what, long objectId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		// TODO Auto-generated method stub
-		return null;
+		String fileName = contentDispositionHeader.getFileName();
+		File file = null;
+		try {
+			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			throw new WebApplicationException(500);
+		}
+		StringBuilder error = new StringBuilder();
+		switch(what) {
+		case "user":
+			User user = new UserController(this.session).getById(objectId);
+			error.append(this.saveFileToUserImport(user, file, fileName));
+			break;
+		case "group":
+			Group group = new GroupController(this.session).getById(objectId);
+			for( User myUser : group.getUsers() ) {
+				error.append(this.saveFileToUserImport(myUser, file, fileName));
+			}
+			break;
+		case "device":
+			Device device = new DeviceController(this.session).getById(objectId);
+			for( User myUser : device.getLoggedIn() ) {
+				error.append(this.saveFileToUserImport(myUser, file, fileName));
+			}
+			break;
+		case "room":
+			UserController userController = new UserController(this.session);
+			for( List<Long> loggedOn : this.getRoom(objectId) ) {
+				User myUser = userController.getById(loggedOn.get(0));
+				error.append(this.saveFileToUserImport(myUser, file, fileName));
+			}
+		}
+		file.delete();
+		return new Response(this.getSession(),"OK", "File was copied succesfully.");
+	}
+	
+	public String saveFileToUserImport(User user, File file, String fileName) {
+		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
+		try {
+			StringBuilder newFileName = new StringBuilder(this.getConfigValue("SCHOOL_HOME_BASE"));
+			newFileName.append("/").append(user.getUid()).append("/") .append("Import").append("/");
+			// Create the directory first.
+			File importDir = new File( newFileName.toString() );
+			Files.createDirectories(importDir.toPath(), privatDirAttribute );
+
+			// Copy temp file to the rigth place
+			newFileName.append(fileName);
+			File newFile = new File( newFileName.toString() );
+			Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			
+			// Set owner
+			UserPrincipal owner = lookupService.lookupPrincipalByName(user.getUid());
+			Files.setOwner(importDir.toPath(), owner);
+			Files.setOwner(newFile.toPath(), owner);
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			return e.getMessage() + System.lineSeparator();
+		}
+		return "";
 	}
 
-	public Response uploadFileToDevice(long deviceId, InputStream fileInputStream,
-			FormDataContentDisposition contentDispositionHeader) {
-		// TODO Auto-generated method stub
-		return null;
+	public Response createGroup(Group group) {
+		GroupController groupController = new GroupController(this.session);
+		group.setGroupType("workgroup");
+		group.setOwner(session.getUser());
+		return groupController.add(group);
 	}
 
-	public Response uploadFileToUser(long userId, InputStream fileInputStream,
-			FormDataContentDisposition contentDispositionHeader) {
-		// TODO Auto-generated method stub
-		return null;
+	public Response modifyGroup(long groupId, Group group) {
+		GroupController groupController = new GroupController(this.session);
+		Group emGroup = groupController.getById(groupId);
+		if( this.session.getUser().equals(emGroup.getOwner())) {
+			return groupController.modify(group);
+		} else {
+			return new Response(this.getSession(),"ERROR", "You are not the owner of this group.");
+		}
 	}
 
-	public Response uploadFileToGroup(long groupId, InputStream fileInputStream,
-			FormDataContentDisposition contentDispositionHeader) {
-		// TODO Auto-generated method stub
-		return null;
+	public Response deleteGroup(long groupId) {
+		GroupController groupController = new GroupController(this.session);
+		Group emGroup = groupController.getById(groupId);
+		if( this.session.getUser().equals(emGroup.getOwner())) {
+			return groupController.delete(groupId);
+		} else {
+			return new Response(this.getSession(),"ERROR", "You are not the owner of this group.");
+		}
+	}
+
+	public List<String> getAvailableRoomActions(long roomId) {
+		Room room = new RoomController(this.session).getById(roomId);
+		List<String> actions = new ArrayList<String>();
+		for( String action : this.getProperty("de.openschoolserver.dao.EducationController.RoomActions").split(",") ) {
+			if(! this.checkMConfig(room, "disabledActions", action )) {
+				actions.add(action);
+			}
+		}
+		return actions;
+	}
+
+	public List<String> getAvailableUserActions(long userId) {
+		User user = new UserController(this.session).getById(userId);
+		List<String> actions = new ArrayList<String>();
+		for( String action : this.getProperty("de.openschoolserver.dao.EducationController.UserActions").split(",") ) {
+			if(! this.checkMConfig(user, "disabledActions", action )) {
+				actions.add(action);
+			}
+		}
+		return actions;
+	}
+
+	public List<String> getAvailableDeviceActions(long deviceId) {
+		Device device = new DeviceController(this.session).getById(deviceId);
+		List<String> actions = new ArrayList<String>();
+		for( String action : this.getProperty("de.openschoolserver.dao.EducationController.DeviceActions").split(",") ) {
+			if(! this.checkMConfig(device, "disabledActions", action )) {
+				actions.add(action);
+			}
+		}
+		return actions;
 	}
 }
