@@ -13,7 +13,6 @@ import javax.persistence.*;
 
 /**
  * The persistent class for the Users database table.
- * 
  */
 @Entity
 @Table(name="Users")
@@ -65,6 +64,11 @@ public class User implements Serializable {
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Device> ownedDevices;
+	
+	//bi-directional many-to-one association to groups
+	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
+	private List<Group> ownedGroups;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
@@ -253,6 +257,14 @@ public class User implements Serializable {
 
 	public void setOwnedDevices(List<Device> ownedDevices) {
 		this.ownedDevices = ownedDevices;
+	}
+
+	public List<Group> getOwnedGroups() {
+		return this.ownedGroups;
+	}
+
+	public void setOwnedGroups(List<Group> ownedGroups) {
+		this.ownedGroups = ownedGroups;
 	}
 
 	public Device addOwnedDevice(Device ownedDevice) {
