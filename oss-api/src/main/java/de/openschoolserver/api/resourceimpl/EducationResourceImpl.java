@@ -62,8 +62,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public Response manageRoom(Session session, long roomId, String action, Map<String, String> actionContent) {
-		// TODO Auto-generated method stub
-		return null;
+		EducationController educationController = new EducationController(session);
+		return educationController.manageRoom(roomId,action,actionContent)
 	}
 
 	@Override
@@ -116,8 +116,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public Response manageDevice(Session session, long deviceId, String action, Map<String, String> actionContent) {
-		// TODO Auto-generated method stub
-		return null;
+		EducationController educationController = new EducationController(session);
+		return educationController.manageDevice(deviceId,action,actionContent);
 	}
 
 	@Override

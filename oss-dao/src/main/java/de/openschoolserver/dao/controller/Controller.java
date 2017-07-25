@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -22,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.*;
+import de.openschoolserver.dao.tools.OSSShellTools;
 
 public class EducationController extends Controller {
 
@@ -394,5 +395,68 @@ public class EducationController extends Controller {
 			}
 		}
 		return actions;
+	}
+
+
+	public Response manageRoom(long roomId, String action, Map<String, String> actionContent) {
+		Response response = null;
+		List<String> errors = new ArrayList<String>();
+		for( List<Long> loggedOn : this.getRoom(roomId) ) {
+			response = this.manageDevice(loggedOn.get(1), action, actionContent);
+			if( response.getCode().equals("ERROR")) {
+				errors.add(response.getValue());
+			}
+		}
+		if( errors.isEmpty() ) {
+			new Response(this.getSession(),"OK", "Device control was made applied.");
+		} else {
+			return new Response(this.getSession(),"ERROR",String.join("<br>", errors));
+		}
+		return null;
+	}
+
+	public Response manageDevice(long deviceId, String action, Map<String, String> actionContent) {
+		Device device = new DeviceController(this.session).getById(deviceId);
+		if(this.session.getDevice().equals(device)) {
+			return new Response(this.getSession(),"ERROR", "Do not control the own client.");
+		}
+		String[] program    = null;
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		switch(action) {
+		case "shutDown":
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "-S";
+			program[2] = device.getIp();
+			program[3] = "system.shutdown";		
+			break;
+		case "reboot":
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "-S";
+			program[2] = device.getIp();
+			program[3] = "system.reboot";
+			break;
+		case "logout":
+			break;
+		case "close":
+			break;
+		case "open":
+			break;
+		case "wol":
+			program = new String[4];
+			program[0] = "/usr/bin/wol";
+			program[1] = "-i";
+			program[2] = device.getIp();
+			program[3] = device.getMac();
+			break;
+		case "controlProxy":
+			break;
+		default:
+				return new Response(this.getSession(),"ERROR", "Unknonw action.");	
+		}
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new Response(this.getSession(),"OK", "Device control was made applied.");
 	}
 }
