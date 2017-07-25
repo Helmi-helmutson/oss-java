@@ -19,6 +19,10 @@ import de.openschoolserver.dao.User;
 public class SessionControllerTestCase extends OSSDaoTestCase {
 
     private static final int INVALID_PERSON_ID = -1;
+    
+    public void SessionControllerTestCase() {
+    	
+    }
 
     public void testEmpty() {
         assertEquals(true, true);  

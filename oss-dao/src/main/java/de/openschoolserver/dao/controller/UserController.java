@@ -258,7 +258,7 @@ public class UserController extends Controller {
         em.close();
         return new Response(this.getSession(),"OK","User was deleted");
     }
-    
+
     public List<Group> getAvailableGroups(long userId){
         EntityManager em = getEntityManager();
         

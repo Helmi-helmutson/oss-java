@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 @SuppressWarnings( "unchecked" )
 public class Controller extends Config {
 
-        Logger logger = LoggerFactory.getLogger(Controller.class);
+    Logger logger = LoggerFactory.getLogger(Controller.class);
 
 	protected Session session ;
 	private Map<String, String> properties;
