@@ -150,7 +150,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public Response addgroup(Session session, long roomId, long groupId) {
+	public Response addGroup(Session session, long roomId, long groupId) {
 		EducationController educationController = new EducationController(session);
 		CategoryController categoryController = new CategoryController(session);
 		return categoryController.addMember(educationController.getCategoryToRoom(roomId),"group",groupId);

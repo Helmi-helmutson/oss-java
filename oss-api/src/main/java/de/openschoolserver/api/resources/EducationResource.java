@@ -111,7 +111,7 @@ public interface EducationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response addgroup(
+    Response addGroup(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("roomId") long roomId,
     		@PathParam("groupId") long roupId
@@ -136,7 +136,7 @@ public interface EducationResource {
     		);
 
     /*
-     *  DELETE education/rooms/{roomId}/devices/{deviceId}
+     *  DELETE education/rooms/{roomId}/    devices/{deviceId}
      */
     @DELETE
     @Path("rooms/{roomId}/devices/{deviceId}")
@@ -158,7 +158,7 @@ public interface EducationResource {
     @DELETE
     @Path("rooms/{roomId}/groups/{groupId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delete a device from a virtual room." )
+    @ApiOperation(value = "Delete a group from a virtual room." )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -222,6 +222,24 @@ public interface EducationResource {
     		);
 
 	/*
+	 * GET education/rooms/{roomId}/control/minutes
+	 */
+	@GET
+	@Path("rooms/{roomId}/control/{minutes}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the control for a room for an amount of time."
+    			)
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+	Response  getRoomControl(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("roomId")  long roomId,
+    		@PathParam("minutes") long minutes
+    		);
+
+	/*
      * GET education/rooms/{roomId}/actions
      */
     @GET
@@ -240,9 +258,9 @@ public interface EducationResource {
     );
 
     /*
-     * PUT education/rooms/{roomId}/{action}
+     * POST education/rooms/{roomId}/{action}
      */
-    @POST
+    @PUT
     @Path("rooms/{roomId}/{action}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Manage a room. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, .")
@@ -259,7 +277,7 @@ public interface EducationResource {
     );
 
     @POST
-    @Path("education/rooms/{roomId}/upload")
+    @Path("rooms/{roomId}/upload")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Puts data to te member of the virtual rooms" )
@@ -397,9 +415,26 @@ public interface EducationResource {
     );
 
     /*
+     * GET education/groups/{groupId}/actions
+     */
+    @GET
+    @Path("groups/{groupId}/actions")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers a list of available actions for a user.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    List<String> getAvailableGroupActions(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("groupId") long groupId
+    );
+
+    /*
      * POST education/users/{userId}/{deviceId}/{action}
      */
-    @POST
+    @PUT
     @Path("users/{userId}/{deviceId}/{action}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Send a action to a user to a device. If the device is -1 the user gets this action on all devices. " +
@@ -455,7 +490,7 @@ public interface EducationResource {
     /*
      * PUT education/devices/{deviceId}/{action}
      */
-    @POST
+    @PUT
     @Path("devices/{deviceId}/{action}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Manage a room. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, .")
