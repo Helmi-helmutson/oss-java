@@ -191,4 +191,16 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return educationController.uploadFileTo("group",groupId,fileInputStream,contentDispositionHeader);
 	}
 
+	@Override
+	public Response getRoomControl(Session session, long roomId, long minutes) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getAvailableGroupActions(Session session, long groupId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

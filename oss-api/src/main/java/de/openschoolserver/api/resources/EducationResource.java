@@ -44,7 +44,7 @@ public interface EducationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  createSamrtRoom(
+    Response  createSmartRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		Category smartRoom
     		);
@@ -60,7 +60,7 @@ public interface EducationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  modifySamrtRoom(
+    Response  modifySmartRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("roomId") long roomId,
     		Category smartRoom
@@ -180,7 +180,7 @@ public interface EducationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  deleteSamrtRoom(
+    Response  deleteSmartRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("roomId") long roomId
     		);
