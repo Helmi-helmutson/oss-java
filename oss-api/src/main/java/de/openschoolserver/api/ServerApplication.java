@@ -114,6 +114,9 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final SoftwareResource softwareResource = new SoftwareResourceImpl();
         environment.jersey().register(softwareResource);
 
+        final EducationResource educationResource = new EducationResourceImpl();
+        environment.jersey().register(educationResource);
+
         final ImporterResource importerResource = new ImporterResourceImpl();
         environment.jersey().register(importerResource);
         PluginHandler.registerPlugins(environment);
