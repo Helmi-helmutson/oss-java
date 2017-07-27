@@ -25,21 +25,21 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public Response createVirtualRoom(Session session, Category virtualRoom) {
+	public Response createSmartRoom(Session session, Category smartRoom) {
 		EducationController educationController = new EducationController(session);
-		return educationController.createVirtualRoom(virtualRoom);
+		return educationController.createSmartRoom(smartRoom);
 	}
 
 	@Override
-	public Response modifyVirtualRoom(Session session, long roomId, Category virtualRoom) {
+	public Response modifySmartRoom(Session session, long roomId, Category smartRoom) {
 		EducationController educationController = new EducationController(session);
-		return educationController.modifyVirtualRoom(roomId, virtualRoom);
+		return educationController.modifySmartRoom(roomId, smartRoom);
 	}
 
 	@Override
-	public Response deleteVirtualRoom(Session session, long roomId) {
+	public Response deleteSmartRoom(Session session, long roomId) {
 		EducationController educationController = new EducationController(session);
-		return educationController.deleteVirtualRoom(roomId);
+		return educationController.deleteSmartRoom(roomId);
 	}
 
 	@Override
@@ -63,7 +63,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public Response manageRoom(Session session, long roomId, String action, Map<String, String> actionContent) {
 		EducationController educationController = new EducationController(session);
-		return educationController.manageRoom(roomId,action,actionContent)
+		return educationController.manageRoom(roomId,action,actionContent);
 	}
 
 	@Override

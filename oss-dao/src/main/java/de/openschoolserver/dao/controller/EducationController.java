@@ -36,7 +36,7 @@ public class EducationController extends Controller {
 	}
 
 	/*
-	 * Return the Category to a virtual room
+	 * Return the Category to a smart room
 	 */
 	
 	public Long getCategoryToRoom(Long roomId){
@@ -51,7 +51,7 @@ public class EducationController extends Controller {
 			em.close();
 		}
 		for( Category category : room.getCategories() ) {
-			if( room.getName().equals(category.getName()) && category.getCategoryType().equals("virtualRoom")) {
+			if( room.getName().equals(category.getName()) && category.getCategoryType().equals("smartRoom")) {
 				return category.getId();
 			}
 		}
@@ -82,7 +82,7 @@ public class EducationController extends Controller {
 		}
 		for( Category category : this.session.getUser().getCategories() ) {
 			for( Room room : category.getRooms() ) {
-				if( room.getRoomType().equals("virtualRoom")) {
+				if( room.getRoomType().equals("smartRoom")) {
 					rooms.add(room.getId());
 				}
 			}
@@ -91,31 +91,31 @@ public class EducationController extends Controller {
 	}
 
 	/*
-	 * Create the a new virtual room from a hash:
+	 * Create the a new smart room from a hash:
 	 * {
-	 *     "name"  : <Virtual room name>,
+	 *     "name"  : <Smart room name>,
 	 *     "description : <Descripton of the room>,
 	 *     "studentsOnly : true/false
 	 * }
 	 */
-	public Response createVirtualRoom(Category virtualRoom) {
+	public Response createSmartRoom(Category smartRoom) {
 		EntityManager   em = getEntityManager();
 		User   owner       = this.session.getUser();
 		/* Define the room */
 		Room     room      = new Room();
-		room.setName(virtualRoom.getName());
-		room.setDescription(virtualRoom.getDescription());
-		room.setRoomType("virtualRoom");
-		room.getCategories().add(virtualRoom);
-		virtualRoom.getRooms().add(room);
-		virtualRoom.setOwner(owner);
-		virtualRoom.setCategoryType("virtualRoom");
-		owner.getCategories().add(virtualRoom);
+		room.setName(smartRoom.getName());
+		room.setDescription(smartRoom.getDescription());
+		room.setRoomType("smartRoom");
+		room.getCategories().add(smartRoom);
+		smartRoom.getRooms().add(room);
+		smartRoom.setOwner(owner);
+		smartRoom.setCategoryType("smartRoom");
+		owner.getCategories().add(smartRoom);
 
 		try {
 			em.getTransaction().begin();
 			em.persist(room);
-			em.persist(virtualRoom);
+			em.persist(smartRoom);
 			em.merge(owner);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -126,40 +126,40 @@ public class EducationController extends Controller {
 		try {
 			em.getTransaction().begin();
 			/*
-			 * Add groups to the virtual room
+			 * Add groups to the smart room
 			 */
 			GroupController groupController = new GroupController(this.session);
-			for( Long id : virtualRoom.getGroupIds()) {
+			for( Long id : smartRoom.getGroupIds()) {
 				Group group = groupController.getById(id);
-				virtualRoom.getGroups().add(group);
-				group.getCategories().add(virtualRoom);
+				smartRoom.getGroups().add(group);
+				group.getCategories().add(smartRoom);
 				em.merge(room);
-				em.merge(virtualRoom);
+				em.merge(smartRoom);
 			}
 			/*
-			 * Add users to the virtual room
+			 * Add users to the smart room
 			 */
 			UserController  userController  = new UserController(this.session);
-			for( Long id : virtualRoom.getUserIds()) {
+			for( Long id : smartRoom.getUserIds()) {
 				User user = userController.getById(Long.valueOf(id));
-				if(virtualRoom.getStudentsOnly() && ! user.getRole().equals("studetns")){
+				if(smartRoom.getStudentsOnly() && ! user.getRole().equals("studetns")){
 					continue;
 				}
-				virtualRoom.getUsers().add(user);
-				user.getCategories().add(virtualRoom);
+				smartRoom.getUsers().add(user);
+				user.getCategories().add(smartRoom);
 				em.merge(user);
-				em.merge(virtualRoom);
+				em.merge(smartRoom);
 			}
 			/*
-			 * Add devices to the virtual room
+			 * Add devices to the smart room
 			 */
 			DeviceController deviceController = new DeviceController(this.session);
-			for( Long id: virtualRoom.getDeviceIds()) {
+			for( Long id: smartRoom.getDeviceIds()) {
 				Device device = deviceController.getById(Long.valueOf(id));
-				virtualRoom.getDevices().add(device);
-				device.getCategories().add(virtualRoom);
+				smartRoom.getDevices().add(device);
+				device.getCategories().add(smartRoom);
 				em.merge(device);
-				em.merge(virtualRoom);
+				em.merge(smartRoom);
 			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -168,17 +168,17 @@ public class EducationController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Virtual Room was created succesfully"); 
+		return new Response(this.getSession(),"OK","Smart Room was created succesfully"); 
 	}
 
-	public Response modifyVirtualRoom(long roomId, Category virtualRoom) {
+	public Response modifySmartRoom(long roomId, Category smartRoom) {
 		EntityManager   em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			Room room = virtualRoom.getRooms().get(0);
-			room.setName(virtualRoom.getName());
-			room.setDescription(virtualRoom.getDescription());
-			em.merge(virtualRoom);
+			Room room = smartRoom.getRooms().get(0);
+			room.setName(smartRoom.getName());
+			room.setDescription(smartRoom.getDescription());
+			em.merge(smartRoom);
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -187,10 +187,10 @@ public class EducationController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Virtual Room was modified succesfully");
+		return new Response(this.getSession(),"OK","Smart Room was modified succesfully");
 	}
 	
-	public Response deleteVirtualRoom(Long roomId) {
+	public Response deleteSmartRoom(Long roomId) {
 		EntityManager   em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -207,12 +207,12 @@ public class EducationController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Virtual Room was deleted succesfully");
+		return new Response(this.getSession(),"OK","Smart Room was deleted succesfully");
 	}
 
 	
 	/*
-	 * Get the list of users which are logged in a room or virtual room
+	 * Get the list of users which are logged in a room or smart room
 	 */
 	public List<List<Long>> getRoom(long roomId) {
 		List<List<Long>> loggedOns = new ArrayList<List<Long>>();
@@ -220,7 +220,7 @@ public class EducationController extends Controller {
 		RoomController roomController = new RoomController(this.session);
 		Room room = roomController.getById(roomId);
 		User me   = this.session.getUser();
-		if( room.getRoomType().equals("virtualRoom")) {
+		if( room.getRoomType().equals("smartRoom")) {
 			Category category = room.getCategories().get(0);
 			for( Group group : category.getGroups() ) {
 				for( User user : group.getUsers() ) {

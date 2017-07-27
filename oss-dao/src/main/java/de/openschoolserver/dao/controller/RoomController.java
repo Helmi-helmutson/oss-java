@@ -144,8 +144,8 @@ public class RoomController extends Controller {
 	}
 
 	public Response add(Room room){
-		if( ! room.getRoomType().equals("virtualRoom") ) {
-			return new Response(this.getSession(),"ERROR", "Virtual Rooms can only be created by Education Controller.");
+		if( room.getRoomType().equals("smartRoom") ) {
+			return new Response(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
 		EntityManager em = getEntityManager();
 
@@ -158,7 +158,6 @@ public class RoomController extends Controller {
 		}
 
 
-		// Virtual rooms does not have ip-adresses.
 		// If no network was configured we will use net school network.
 		if( room.getNetwork().isEmpty() ) {
 			room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));

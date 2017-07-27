@@ -37,16 +37,16 @@ public interface EducationResource {
     @POST
     @Path("rooms")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create a new virtual room. A virtual Room is a category with CategoryType virtual room. " +
+    @ApiOperation(value = "Create a new smart room. A smart Room is a category with CategoryType smart room. " +
     					  "The map can contains a description attribute. " +
     					  "The map must contains either users or groups or devices. ")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  createVirtualRoom(
+    Response  createSamrtRoom(
     		@ApiParam(hidden = true) @Auth Session session,
-    		Category virtualRoom
+    		Category smartRoom
     		);
 
     /*
@@ -55,15 +55,15 @@ public interface EducationResource {
     @POST
     @Path("rooms/{roomId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Modfy a virtual room. Only name and description can be modified here. To modify the member there are some PUT and DELETE calls.")
+    @ApiOperation(value = "Modfy a smart room. Only name and description can be modified here. To modify the member there are some PUT and DELETE calls.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  modifyVirtualRoom(
+    Response  modifySamrtRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("roomId") long roomId,
-    		Category virtualRoom
+    		Category smartRoom
     		);
     
     /*
@@ -72,7 +72,7 @@ public interface EducationResource {
     @PUT
     @Path("rooms/{roomId}/users/{userId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Add a user to a virtual room." )
+    @ApiOperation(value = "Add a user to a smart room." )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -87,9 +87,9 @@ public interface EducationResource {
      *  PUT education/rooms/{roomId}/devices/{deviceId}
      */
     @PUT
-    @Path("rooms/{roomId}/users/{userId}")
+    @Path("rooms/{roomId}/devices/{deviceId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Add a device to a virtual room." )
+    @ApiOperation(value = "Add a device to a smart room." )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -106,7 +106,7 @@ public interface EducationResource {
     @PUT
     @Path("rooms/{roomId}/groups/{groupId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Add a group to a virtual room." )
+    @ApiOperation(value = "Add a group to a smart room." )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -124,7 +124,7 @@ public interface EducationResource {
     @DELETE
     @Path("rooms/{roomId}/users/{userId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delete a user from a virtual room." )
+    @ApiOperation(value = "Delete a user from a smart room." )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -141,7 +141,7 @@ public interface EducationResource {
     @DELETE
     @Path("rooms/{roomId}/devices/{deviceId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delete a device from a virtual room." )
+    @ApiOperation(value = "Delete a device from a smart room." )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -158,7 +158,7 @@ public interface EducationResource {
     @DELETE
     @Path("rooms/{roomId}/groups/{groupId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delete a device from a virtual room." )
+    @ApiOperation(value = "Delete a device from a smart room." )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -175,12 +175,12 @@ public interface EducationResource {
     @DELETE
     @Path("rooms/{roomId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Deletes a new virtual room.")
+    @ApiOperation(value = "Deletes a new smart room.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-    Response  deleteVirtualRoom(
+    Response  deleteSamrtRoom(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("roomId") long roomId
     		);
@@ -207,7 +207,7 @@ public interface EducationResource {
 	@GET
 	@Path("rooms/{roomId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the state of a virtual room. This call delivers a list of map with the logged in users. " +
+    @ApiOperation(value = "Gets the state of a smart room. This call delivers a list of map with the logged in users. " +
     					  "A logged in user map has the format: { deviceId => <deviceId> , userId => <userId> } " +
     					  "The response contains a list of maps with userId and deviceId: " +
     					  "[ { userId => UID1, deviceId => DID1 } ,  { userId => UID2, deviceId => DID2 } ]"
@@ -261,7 +261,7 @@ public interface EducationResource {
     @Path("education/rooms/{roomId}/upload")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Puts data to te member of the virtual rooms" )
+    @ApiOperation( value = "Puts data to te member of the smart rooms" )
     @ApiResponses(value = {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
@@ -328,7 +328,7 @@ public interface EducationResource {
      @Path("education/groups/{groupId}/upload")
      @Produces(JSON_UTF8)
      @Consumes(MediaType.MULTIPART_FORM_DATA)
-     @ApiOperation( value = "Puts data to te member of the virtual rooms" )
+     @ApiOperation( value = "Puts data to te member of the smart rooms" )
      @ApiResponses(value = {
  	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
  	})
@@ -340,7 +340,7 @@ public interface EducationResource {
   
 
     /************************************************************/
-    /* Actions on logged in users and virtual rooms and groups. */
+    /* Actions on logged in users and smart rooms and groups. */
     /************************************************************/
     /*
      * DELETE education/users/{userId}/{deviceId}
@@ -420,7 +420,7 @@ public interface EducationResource {
     @Path("education/users/{userId}/upload")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Puts data to te member of the virtual rooms" )
+    @ApiOperation( value = "Puts data to te member of the smart rooms" )
     @ApiResponses(value = {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
@@ -431,7 +431,7 @@ public interface EducationResource {
             );
  
     /************************************************************/
-    /* Actions on logged in users and virtual rooms and groups. */
+    /* Actions on logged in users and smart rooms and groups. */
     /************************************************************/
      /*
      * GET education/devices/{deviceId}/actions
@@ -473,7 +473,7 @@ public interface EducationResource {
     @Path("education/devices/{deviceId}/upload")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Puts data to te member of the virtual rooms" )
+    @ApiOperation( value = "Puts data to te member of the smart rooms" )
     @ApiResponses(value = {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
