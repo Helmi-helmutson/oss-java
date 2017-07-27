@@ -51,11 +51,17 @@ public class Group implements Serializable {
 	@ManyToMany(mappedBy="groups",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<User> users;
+	
+	//bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User owner;
 
 	public Group() {
 		this.name = "";
 		this.description = "";
 		this.groupType = "";
+		this.owner = null;
 	}
 
 	public long getId() {
@@ -130,4 +136,13 @@ public class Group implements Serializable {
     public void setCategories(List<Category> categories) {
             this.categories = categories;
     }
+    
+    public User getOwner() {
+		return this.owner;
+	}
+
+	public void setOwner(User owner) {
+		this.owner = owner;
+	}
+
 }

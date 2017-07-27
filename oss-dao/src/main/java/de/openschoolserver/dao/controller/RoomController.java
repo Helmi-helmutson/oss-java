@@ -144,8 +144,8 @@ public class RoomController extends Controller {
 	}
 
 	public Response add(Room room){
-		if( ! room.getRoomType().equals("virtualRoom") ) {
-			return new Response(this.getSession(),"ERROR", "Virtual Rooms can only be created by Education Controller.");
+		if( room.getRoomType().equals("smartRoom") ) {
+			return new Response(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
 		EntityManager em = getEntityManager();
 
@@ -158,7 +158,6 @@ public class RoomController extends Controller {
 		}
 
 
-		// Virtual rooms does not have ip-adresses.
 		// If no network was configured we will use net school network.
 		if( room.getNetwork().isEmpty() ) {
 			room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
@@ -218,6 +217,7 @@ public class RoomController extends Controller {
 		this.startPlugin("delete_room", room);
 		return new Response(this.getSession(),"OK", "Room was removed successfully.");
 	}
+	
 
 	/*
 	 * Return the list of the available adresses in the room
@@ -640,18 +640,14 @@ public class RoomController extends Controller {
 		User   owner  = this.getSession().getUser();
 		if( ! owner.getRole().contains("sysadmins") ) {
 			//non sysadmin user want to register his workstation
-			Query query = em.createNamedQuery("User.checkMConfig");
-			query.setParameter("id", this.getSession().getUserId()).setParameter("keyword", "AdHocAccess").setParameter("value", roomId);
-			if( query.getResultList().isEmpty() ) {
-				return new Response(this.getSession(),"ERROR","You have no rights to register devices in this room");
-			}
-			else
-			{
+			if( this.checkMConfig(this.getSession().getUser(),"AdHocAccess",String.valueOf(roomId)) ) {
 				device.setMac(macAddress);
 				device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
 				device.setOwner(owner);
 				device.setIp(ipAddress.get(0).split(" ")[0]);
 				device.setHwconf(null);
+			} else {
+				return new Response(this.getSession(),"ERROR","You have no rights to register devices in this room");
 			}
 		} else {
 			device.setMac(macAddress);

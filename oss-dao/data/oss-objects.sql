@@ -30,15 +30,17 @@ CREATE TABLE IF NOT EXISTS Groups (
         name        VARCHAR(32) NOT NULL,
         description VARCHAR(64) NOT NULL,
         groupType   VARCHAR(16) NOT NULL,
+        owner_id    BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
 
-INSERT INTO Groups VALUES(1,'sysadmins','Sysadmins','primary');
-INSERT INTO Groups VALUES(2,'teachers','Teachers','primary');
-INSERT INTO Groups VALUES(3,'students','Students','primary');
-INSERT INTO Groups VALUES(4,'administration','Administration','primary');
-INSERT INTO Groups VALUES(5,'workstations','Workstations','primary');
-INSERT INTO Groups VALUES(6,'templates','Templates','primary');
+INSERT INTO Groups VALUES(1,'sysadmins','Sysadmins','primary',NULL);
+INSERT INTO Groups VALUES(2,'teachers','Teachers','primary',NULL);
+INSERT INTO Groups VALUES(3,'students','Students','primary',NULL);
+INSERT INTO Groups VALUES(4,'administration','Administration','primary',NULL);
+INSERT INTO Groups VALUES(5,'workstations','Workstations','primary',NULL);
+INSERT INTO Groups VALUES(6,'templates','Templates','primary',NULL);
 
 CREATE TABLE IF NOT EXISTS GroupMember (
         user_id        BIGINT UNSIGNED NOT NULL,
