@@ -1,4 +1,5 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  
+ * (c) 2017 EXTIS GmbH www.extis.de - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
@@ -34,7 +35,7 @@ public class DeviceController extends Controller {
 		try {
 			return em.find(Device.class, deviceId);
 		} catch (Exception e) {
-			logger.error("DeviceId:" + deviceId + " " + e.getMessage());
+			logger.error("DeviceId:" + deviceId + " " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();
@@ -51,7 +52,7 @@ public class DeviceController extends Controller {
 			query.setParameter("deviceType", type);
 			return query.getResultList();
 		} catch (Exception e) {
-			logger.error("DeviceType:" + type + " " + e.getMessage());
+			logger.error("DeviceType:" + type + " " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();
@@ -67,7 +68,7 @@ public class DeviceController extends Controller {
 			Query query = em.createNamedQuery("Device.findAll");
 			return query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getAll " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();
@@ -83,7 +84,7 @@ public class DeviceController extends Controller {
 			Query query = em.createNamedQuery("Device.findAllId");
 			return query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getAllId " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();
@@ -114,7 +115,7 @@ public class DeviceController extends Controller {
 			dhcpconfig.Create();
 			return new Response(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("delete: " + e.getMessage(),e);
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -140,7 +141,7 @@ public class DeviceController extends Controller {
 			dhcpconfig.Create();
 			return new Response(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
-			logger.error("deviceId: " + deviceId + " " + e.getMessage());
+			logger.error("deviceId: " + deviceId + " " + e.getMessage(),e);
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -219,7 +220,7 @@ public class DeviceController extends Controller {
 			}
 			return new Response(this.getSession(),"OK", "Devices were created succesfully.");
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("add " + e.getMessage(),e);
 			return new Response(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -287,7 +288,7 @@ public class DeviceController extends Controller {
 			query.setParameter("search", search + "%");
 			return (List<Device>) query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("search " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();

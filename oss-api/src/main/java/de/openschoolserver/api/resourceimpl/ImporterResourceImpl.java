@@ -1,10 +1,7 @@
 /* (c) 2017 EXTIS GmbH (www.extis.de) - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
-import java.io.ByteArrayInputStream;
-
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -13,7 +10,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Random;
 
-import javax.swing.text.TabExpander;
 import javax.ws.rs.WebApplicationException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -26,14 +22,13 @@ import de.claxss.importlib.ImporterFactory;
 import de.claxss.importlib.ImporterObject;
 import de.claxss.importlib.Person;
 import de.claxss.importlib.SchoolClass;
+import de.claxss.importlib.common.ImporterUtil;
 import de.openschoolserver.api.resources.ImporterResource;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.GroupController;
 import de.openschoolserver.dao.controller.UserController;
-
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 public class ImporterResourceImpl implements ImporterResource {
 	private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ImporterResourceImpl.class);
@@ -48,7 +43,7 @@ public class ImporterResourceImpl implements ImporterResource {
 
 	@Override
 	public ImportOrder processImport(Session session, ImportOrder importOrder) {
-		List<User> result = null;
+
 		if (session.getTemporaryUploadData() != null && session.getTemporaryUploadData() instanceof ImportOrder) {
 			// TODO handle cached file
 			ImportOrder o = (ImportOrder) session.getTemporaryUploadData();
@@ -57,6 +52,7 @@ public class ImporterResourceImpl implements ImporterResource {
 
 				Importer importer = f.getImporterInstance(importOrder.getImporterId());
 				if (importer.startImport(o)) {
+					handleObjects(session, importer, o);
 					o.setPercentCompleted(50);
 					importer.reset();
 					o.setPercentCompleted(100); // TODO change with real
@@ -138,7 +134,7 @@ public class ImporterResourceImpl implements ImporterResource {
 				String objectMsg = object.getObjectMessage();
 				o.setPercentCompleted((100 / importer.getNumberOfObjects()) * ctr);
 				ctr++;
-
+				LOG.debug("found object: " + object.getClass());
 				if (object instanceof de.claxss.importlib.SchoolClass) {
 					if (!doCompareAndImportSchoolClass(session, (de.claxss.importlib.SchoolClass) object, o)) {
 						// appendLog("Import " + object.getObjectMessage() + ":
@@ -163,107 +159,72 @@ public class ImporterResourceImpl implements ImporterResource {
 
 	}
 
-	protected boolean doCompareAndImportUser(Session session, de.claxss.importlib.Person person, ImportOrder o) {
+	protected boolean doCompareAndImportUser(Session session, Person person, ImportOrder o) {
 		final UserController userController = new UserController(session);
-		User existingUser = null;
-		/* ========== first step: try to find the user ============ */
-		if (person.getLoginId() != null && person.getLoginId().length() > 0) {
-			// first try to find via uid
-			existingUser = userController.getByUid(person.getLoginId());
+		final GroupController groupController = new GroupController(session);
+		Person existingUser = null;
+
+		List<Person> oldUserList = buildOldUserlist(userController);
+		List<Person> handledUsers = new ArrayList<Person>();
+		existingUser = ImporterUtil.findUserByUid(oldUserList, person);
+		if (existingUser==null) {
+			LOG.error("user not found by uid: " + person.getFirstname() + " " + person.getName() + " " + person.getLoginId() + " " + person.getBirthday());
 		}
 		if (existingUser == null) {
-			// user not found via uid, try to find via name
-			List<User> possibleUsers;
-			if (o.getRequestedUserRole() != null && o.getRequestedUserRole().length() > 0) {
-				possibleUsers = userController.findByNameAndRole(person.getFirstname(), person.getName(),
-						o.getRequestedUserRole());
-				// try to find a user with a given role via First and LastName
-			} else {
-				// try to find via firstname and lastname
-				possibleUsers = userController.findByName(person.getFirstname(), person.getName());
+			existingUser = ImporterUtil.findUser(o, oldUserList, person);
+		}
+		if (existingUser==null) {
+			LOG.error("user not found: " + person.getFirstname() + " " + person.getName() + " " + person.getLoginId() + " " + person.getBirthday());
+		}
+		/* ========== second step: create or update the user ============ */
+		if (existingUser != null) {
+			handledUsers.add(existingUser);
+			User ossUser = (User) existingUser.getData();
+			// update the user
+			boolean change = false;
+			if (person.getLoginId() != null && !person.getLoginId().equals(ossUser.getUid())) {
+				ossUser.setUid(person.getLoginId());
+				change = true;
 			}
-			if (possibleUsers != null && possibleUsers.size() > 0) {
-				if (possibleUsers.size() == 1) {
-					if ("student".equals(o.getRequestedUserRole())) { // birthday
-																		// has
-																		// to
-																		// mach
-						if (possibleUsers.get(0).getBirthDay().equals(person.getBirthday())) {
-							existingUser = possibleUsers.get(0);
-						}
-					} else {
-						existingUser = possibleUsers.get(0);
+			if (person.getFirstname() != null && !person.getFirstname().equals(ossUser.getGivenName())) {
+				ossUser.setGivenName(person.getFirstname());
+				change = true;
+			}
+			if (person.getName() != null && !person.getName().equals(ossUser.getSureName())) {
+				ossUser.setSureName(person.getName());
+				change = true;
+			}
+			if (person.getBirthday() != null && !person.getBirthday().equals(ossUser.getBirthDay())) {
+				ossUser.setBirthDay(person.getBirthday());
+				change = true;
+			}
+			if (change && !o.isTestOnly()) {
+				userController.modify(ossUser);
+			}
+			if (person.getSchoolClasses() != null && person.getSchoolClasses().size() > 0) {
+				// use new classes
+				List<SchoolClass> removeClasses = new ArrayList<SchoolClass>();
+				List<SchoolClass> newClasses = new ArrayList<SchoolClass>();
+				List<SchoolClass> keepClasses = new ArrayList<SchoolClass>();
+				ImporterUtil.handleSchoolClassesDiff(existingUser, person, removeClasses, newClasses, keepClasses);
+
+				if (!o.isTestOnly()) {
+					for (SchoolClass schoolClass : removeClasses) {
+						groupController.removeMember(((Group) schoolClass.getData()).getId(), ossUser.getId());
 					}
-				} else {
-					// more than one found via name and role is unclear ->
-					// birthday has to mach
-					for (User user : possibleUsers) {
-						if (user.getBirthDay().equals(person.getBirthday())) {
-							existingUser = user;
-							break;
+					for (SchoolClass schoolClass : newClasses) {
+
+						Group group = groupController.getByName(schoolClass.getNormalizedName());
+						if (group != null) {
+
+							groupController.addMember(group.getId(), ossUser.getId());
 						}
 					}
 				}
 
 			}
-		}
-		/* ========== second step: create or update the user ============ */
-		if (existingUser != null) {
-			// update the user
-			boolean change = false;
-			if (person.getLoginId() != null && !person.getLoginId().equals(existingUser.getUid())) {
-				existingUser.setUid(person.getLoginId());
-				change = true;
-			}
-			if (person.getFirstname() != null && !person.getFirstname().equals(existingUser.getGivenName())) {
-				existingUser.setGivenName(person.getFirstname());
-				change = true;
-			}
-			if (person.getName() != null && !person.getName().equals(existingUser.getSureName())) {
-				existingUser.setSureName(person.getName());
-				change = true;
-			}
-			if (person.getBirthday() != null && !person.getBirthday().equals(existingUser.getBirthDay())) {
-				existingUser.setBirthDay(person.getBirthday());
-				change = true;
-			}
-			if (person.getSchoolClasses() != null && person.getSchoolClasses().size() > 0) {
-				// use new classes
-				List<Group> oldClasses  = new ArrayList<Group>();
-				List<Group> newClasses  = new ArrayList<Group>();
-				List<Group> keepClasses = new ArrayList<Group>();
-				collectClassesOfUser(existingUser, oldClasses);
-				for (SchoolClass schoolclass : person.getSchoolClasses()) {
-					Group existing = findClassInList(oldClasses, schoolclass.getNormalizedName());
-					if (existing == null) {
-						Group newClass = createClassFromPerson(newClasses, schoolclass);
-						newClasses.add(newClass);
-					} else {
-						oldClasses.remove(existing);
-						keepClasses.add(existing);
-					}
-				}
-				if (!o.isTestOnly()) {
-					existingUser.getGroups().removeAll(oldClasses); // remove
-																	// classes
-																	// not found
-																	// in the
-																	// import
-				}
-				existingUser.getGroups().addAll(keepClasses); // return the
-																// classes
-																// temporarily
-																// removed from
-																// the list
-				if (!o.isTestOnly()) {
-					existingUser.getGroups().addAll(newClasses); // add the
-																	// newly
-																	// found
-																	// classes
-				}
-			}
 			if (change && !o.isTestOnly()) {
-				userController.modify(existingUser);
+				userController.modify(ossUser);
 			}
 		} else {
 			// create the user
@@ -273,45 +234,60 @@ public class ImporterResourceImpl implements ImporterResource {
 			newUser.setSureName(person.getName());
 			newUser.setRole(o.getRequestedUserRole() != null ? o.getRequestedUserRole() : getOSSRole(person));
 			newUser.setBirthDay(person.getBirthday());
-			List<Group> newClasses = new ArrayList<Group>();
-			for (SchoolClass schoolclass : person.getSchoolClasses()) {
-				Group newClass = createClassFromPerson(newClasses, schoolclass);
-				newClasses.add(newClass);
-			}
-			newUser.setGroups(newClasses);
 			if (!o.isTestOnly()) {
 				userController.add(newUser);
+				newUser = userController.getByUid(person.getLoginId());
 			}
+			if (newUser != null) {
+				if (person.getSchoolClasses() != null) {
+					for (SchoolClass schoolClass : person.getSchoolClasses()) {
+						Group group = groupController.getByName(schoolClass.getNormalizedName());
+						if (group != null) {
+
+							groupController.addMember(group.getId(), newUser.getId());
+						} else {
+							LOG.error("Group not found: " + schoolClass.getNormalizedName());
+						}
+					}
+				}
+			}
+
 		}
-		//TODO handle old users
+		// TODO handle old users
 		return true;
 	}
 
-	private Group createClassFromPerson(List<Group> newClasses, SchoolClass schoolclass) {
-		Group newClass = new Group();
-		newClass.setGroupType("class");
-		newClass.setName(schoolclass.getNormalizedName());
-		newClass.setDescription(schoolclass.getLongName());
-		return newClass;
-	}
+	private List<Person> buildOldUserlist(final UserController userController) {
+		/* get old list */
+		List<User> oldUserlist = null;
+		List<Person> oldUserlistIL = new ArrayList<Person>();
 
-	private Group findClassInList(List<Group> oldClasses, String name) {
-		for (Group group : oldClasses) {
-			if (group.getName().equalsIgnoreCase(name)) {
-				return group;
+		oldUserlist = userController.getAll();
+
+		for (User user : oldUserlist) {
+			Person p = new Person();
+			p.setBirthday(user.getBirthDay());
+			if ("student".equals(user.getRole())) {
+				p.addRole(Person.PersonType.STUDENT);
+			} else if ("teacher".equals(user.getRole())) {
+				p.addRole(Person.PersonType.TEACHER);
 			}
-		}
-		return null;
-	}
-
-	private void collectClassesOfUser(User existingUser, List<Group> oldClasses) {
-		if (existingUser.getGroups() != null) {
-			for (Group group : existingUser.getGroups()) {
+			p.setFirstname(user.getGivenName());
+			p.setName(user.getSureName());
+			p.setLoginId(user.getUid());
+			p.setData(user);
+			for (Group group : user.getGroups()) {
 				if ("class".equals(group.getGroupType())) {
-					oldClasses.add(group);
+					SchoolClass sc = new SchoolClass(group.getName());
+					sc.setNormalizedName(group.getName());
+					sc.setLongName(group.getDescription());
+					sc.setData(group);
+					p.addSchoolClass(sc);
 				}
 			}
+			oldUserlistIL.add(p);
 		}
+		return oldUserlistIL;
 	}
 
 	private String getOSSRole(Person p) {
@@ -329,6 +305,7 @@ public class ImporterResourceImpl implements ImporterResource {
 
 	protected boolean doCompareAndImportSchoolClass(Session session, de.claxss.importlib.SchoolClass schoolClass,
 			ImportOrder o) {
+		LOG.error("importing group: " + schoolClass.getNormalizedName());
 		if (schoolClass != null && schoolClass.getNormalizedName() != null) {
 			final GroupController groupController = new GroupController(session);
 			final Group existingClass = groupController.getByName(schoolClass.getNormalizedName());
@@ -336,7 +313,8 @@ public class ImporterResourceImpl implements ImporterResource {
 			if (existingClass == null) {
 				Group newClass = new Group();
 				newClass.setName(schoolClass.getNormalizedName());
-				newClass.setDescription(schoolClass.getLongName());
+				newClass.setDescription(schoolClass.getLongName() != null ? schoolClass.getLongName()
+						: schoolClass.getNormalizedName());
 				newClass.setGroupType("class");
 				if (!o.isTestOnly()) {
 					groupController.add(newClass);
