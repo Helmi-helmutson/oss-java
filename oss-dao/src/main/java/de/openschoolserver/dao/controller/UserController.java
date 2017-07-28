@@ -127,76 +127,76 @@ public class UserController extends Controller {
     }
 
     public Response add(User user){
-        EntityManager em = getEntityManager();
-        //Check role
-        if( user.getRole() == null )
-            return new Response(this.getSession(),"ERROR", "You have to define the role of the user.");
-        //Check Birthday
-        if( user.getBirthDay() == null ) {
-            if( user.getRole().equals("sysadmins") || user.getRole().equals("templates")) {
-                Date now = new Date(System.currentTimeMillis());
-                user.setBirthDay(now);
-            } else {
-                return new Response(this.getSession(),"ERROR", "You have to define the birthday.");
-            }
-        }
-        // Create uid if not given
-        if( user.getUid() == "") {
-            String userId = UserUtil.createUserId( user.getGivenName(),
-                                                   user.getSureName(),
-                                                   user.getBirthDay(),
-                                                   true,
-                                                   this.getConfigValue("SCHOOL_STRING_CONVERT_TYPE") == "telex", 
-                                                   this.getConfigValue("SCHOOL_LOGIN_SCHEME")
-                                                   );
-            user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId );
-            Integer i = 1;
-            while( !this.isNameUnique(user.getUid()) ) {
-                user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId + i );
-            }
-        }
-        else
-        {
-            // First we check if the parameter are unique.
-	    // workstation users have a user called as itself
-            if( !user.getRole().equals("workstations") && !this.isNameUnique(user.getUid())){
-                return new Response(this.getSession(),"ERROR", "User name is not unique.");
-            }
-            // Check if uid contains non allowed characters
-            if( this.checkNonASCII(user.getUid()) ) {
-                return new Response(this.getSession(),"ERROR", "Uid contains not allowed characters.");
-            }
-        }
-        // Check the user password
-        if( user.getRole().equals("workstations")) {
+	EntityManager em = getEntityManager();
+	//Check role
+	if( user.getRole() == null )
+		return new Response(this.getSession(),"ERROR", "You have to define the role of the user.");
+	//Check Birthday
+	if( user.getBirthDay() == null ) {
+		if( user.getRole().equals("sysadmins") || user.getRole().equals("templates")) {
+			Date now = new Date(System.currentTimeMillis());
+			user.setBirthDay(now);
+		} else {
+			return new Response(this.getSession(),"ERROR", "You have to define the birthday.");
+		}
+	}
+	// Create uid if not given
+	if( user.getUid().isEmpty() ) {
+		String userId = UserUtil.createUserId( user.getGivenName(),
+				user.getSureName(),
+				user.getBirthDay(),
+				true,
+				this.getConfigValue("SCHOOL_STRING_CONVERT_TYPE") == "telex", 
+				this.getConfigValue("SCHOOL_LOGIN_SCHEME")
+				);
+		user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId );
+		Integer i = 1;
+		while( !this.isNameUnique(user.getUid()) ) {
+			user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId + i );
+		}
+	}
+	else
+	{
+		// First we check if the parameter are unique.
+		// workstation users have a user called as itself
+		if( !user.getRole().equals("workstations") && !this.isNameUnique(user.getUid())){
+			return new Response(this.getSession(),"ERROR", "User name is not unique.");
+		}
+		// Check if uid contains non allowed characters
+		if( this.checkNonASCII(user.getUid()) ) {
+			return new Response(this.getSession(),"ERROR", "Uid contains not allowed characters.");
+		}
+	}
+	// Check the user password
+	if( user.getRole().equals("workstations")) {
 		user.setPassword(user.getUid());
-	} else if( user.getPassword() == "" ) {
-            user.setPassword(UserUtil.createRandomPassword(9,"ACGqf123#"));
-        }
-        else
-        {
-            Response response = this.checkPassword(user.getPassword());
-            if(response != null) {
-                return response;
-            }
-        }
-        try {
-            em.getTransaction().begin();
-            em.persist(user);
-            em.getTransaction().commit();
-            GroupController groupController = new GroupController(this.session);
-            Group group = groupController.getByName(user.getRole());
-            if( group != null ) {
-            	groupController.addMember(group,user);;
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            return new Response(this.getSession(),"ERROR", e.getMessage());
-        } finally {
-            em.close();
-        }
-        this.startPlugin("add_user",user);
-        return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.");
+	} else if( user.getPassword().isEmpty() ) {
+		user.setPassword(UserUtil.createRandomPassword(9,"ACGqf123#"));
+	}
+	else
+	{
+		Response response = this.checkPassword(user.getPassword());
+		if(response != null) {
+			return response;
+		}
+	}
+	try {
+		em.getTransaction().begin();
+		em.persist(user);
+		em.getTransaction().commit();
+		GroupController groupController = new GroupController(this.session);
+		Group group = groupController.getByName(user.getRole());
+		if( group != null ) {
+			groupController.addMember(group,user);;
+		}
+	} catch (Exception e) {
+		logger.error(e.getMessage());
+		return new Response(this.getSession(),"ERROR", e.getMessage());
+	} finally {
+		em.close();
+	}
+	this.startPlugin("add_user",user);
+	return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.");
     }
 
         
