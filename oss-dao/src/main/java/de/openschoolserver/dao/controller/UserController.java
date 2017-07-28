@@ -113,6 +113,7 @@ public class UserController extends Controller {
             em.close();
         }
     }
+
     public List<User> getAll() {
         EntityManager em = getEntityManager();
         try {
