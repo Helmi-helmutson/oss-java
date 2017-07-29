@@ -144,7 +144,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	@Override
 	public Response delete(Session session, long deviceId) {
 		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.delete(deviceId);
+		return deviceController.delete(deviceId,true);
 	}
 
 	@Override
