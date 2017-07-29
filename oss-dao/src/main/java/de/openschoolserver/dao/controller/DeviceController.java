@@ -96,6 +96,7 @@ public class DeviceController extends Controller {
 	 */
 	public Response delete(List<Long> deviceIds) {
 		EntityManager em = getEntityManager();
+		UserController userController = new UserController(this.session);
 		try {
 			em.getTransaction().begin();
 			for( Long deviceId : deviceIds) {
@@ -106,8 +107,12 @@ public class DeviceController extends Controller {
 				if( !em.contains(dev)) {
 					dev = em.merge(dev);
 				}
-				em.remove(dev);
+				User user = userController.getByUid(dev.getName());
+				if( user != null ) {
+					userController.delete(user);
+				}
 				this.startPlugin("delete_device", dev);
+				em.remove(dev);
 			}
 			em.getTransaction().commit();
 			em.getEntityManagerFactory().getCache().evictAll();
@@ -125,7 +130,7 @@ public class DeviceController extends Controller {
 	/*
 	 * Deletes a device given by the device Ids.
 	 */
-	public Response delete(Long deviceId) {
+	public Response delete(Long deviceId, boolean atomic) {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -135,10 +140,12 @@ public class DeviceController extends Controller {
 			}
 			em.remove(dev);
 			em.getTransaction().commit();
-			em.getEntityManagerFactory().getCache().evictAll();
-			this.startPlugin("delete_device", dev);
-			DHCPConfig dhcpconfig = new DHCPConfig(this.session);
-			dhcpconfig.Create();
+			if( atomic ) {
+				em.getEntityManagerFactory().getCache().evictAll();
+				this.startPlugin("delete_device", dev);
+				DHCPConfig dhcpconfig = new DHCPConfig(this.session);
+				dhcpconfig.Create();
+			}
 			return new Response(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("deviceId: " + deviceId + " " + e.getMessage(),e);

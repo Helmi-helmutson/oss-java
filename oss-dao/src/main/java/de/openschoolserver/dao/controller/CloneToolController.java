@@ -208,6 +208,9 @@ public class CloneToolController extends Controller {
 		try {
 			em.getTransaction().begin();
 			HWConf hwconf = this.getById(hwconfId);
+	        if( this.isProtected(hwconf)) {
+	            return new Response(this.getSession(),"ERROR","This hardware configuration must not be deleted.");
+	        }
 			if( ! em.contains(hwconf)) {
 				hwconf = em.merge(hwconf);
 			}

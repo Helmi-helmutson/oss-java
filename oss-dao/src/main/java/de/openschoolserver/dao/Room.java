@@ -14,8 +14,10 @@ import java.util.List;
 @Entity
 @Table(name="Rooms")
 @NamedQueries ({
-	@NamedQuery(name="Room.findAll",   query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP'"),
-	@NamedQuery(name="Room.findAllId", query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP'"),
+	@NamedQuery(name="Room.findAll",        query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom'"),
+	@NamedQuery(name="Room.findAllId",      query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom'"),
+	@NamedQuery(name="Room.findAllToUse",   query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP'"),
+	@NamedQuery(name="Room.findAllToUseId", query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP'"),
 	@NamedQuery(name="Room.findAllToRegister", query="SELECT r FROM Room r WHERE r.name != 'ANON_DHCP' AND r.roomType != 'smartRoom'"),
 	@NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
 	@NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
@@ -125,7 +127,8 @@ public class Room implements Serializable {
 	private Long hwconfId;
 
 	public Room() {
-		this.network  = "";
+		this.network      = "";
+		this.roomControl  = "inRoom";
 	}
 
 	public long getId() {

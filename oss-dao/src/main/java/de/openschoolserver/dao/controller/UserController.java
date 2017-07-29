@@ -236,11 +236,13 @@ public class UserController extends Controller {
     }
     
     public Response delete(long userId){
-        User user = this.getById(userId);
+        return this.delete(this.getById(userId));
+    }
+    
+    public Response delete(User user) {
         if( this.isProtected(user)) {
             return new Response(this.getSession(),"ERROR","This user must not be deleted.");
         }
-
         this.startPlugin("delete_user",user);
         EntityManager em = getEntityManager();
         List<Device> devices = user.getOwnedDevices();

@@ -5,6 +5,7 @@ package de.openschoolserver.dao.controller;
 import javax.persistence.EntityManager;
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,14 +14,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.*;
-import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
-import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.Config;
-import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.Response;
-import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import java.io.File;
 import java.io.FileInputStream;
@@ -338,6 +334,15 @@ public class Controller extends Config {
 				Group g = (Group)object;
 				for( String s : properties.get("de.openschoolserver.dao.Group.protected").split(",") ){
 					if( s.equals(g.getName()))
+						return true;
+				}
+			}
+			return false;
+		case "de.openschoolserver.dao.HWConf":
+			if(properties.containsKey("de.openschoolserver.dao.HWConf.protected")){
+				HWConf hw = (HWConf)object;
+				for( String s : properties.get("de.openschoolserver.dao.HWConf.protected").split(",") ){
+					if( s.equals(hw.getName()))
 						return true;
 				}
 			}

@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  */
 @Entity
+@Table(name="AccessInRooms")
 @NamedQueries( {
     @NamedQuery(name="AccessInRoom.findAll",            query="SELECT a FROM AccessInRoom a"),
     @NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom a WHERE a.room = :room"),

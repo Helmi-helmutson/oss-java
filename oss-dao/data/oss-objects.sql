@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS HWConfs (
 );
 INSERT INTO HWConfs VALUES(1,"Server","","Server");
 INSERT INTO HWConfs VALUES(2,"Printer","","Printer");
+INSERT INTO HWConfs VALUES(3,"BYOD","Privat Devices","BYOD");
 
 CREATE TABLE IF NOT EXISTS Partitions (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -134,7 +135,7 @@ INSERT INTO Devices VALUES(3,1,1,NULL,'proxy','#SCHOOL_PROXY#',NULL,'','',0,0);
 INSERT INTO Devices VALUES(4,1,1,NULL,'printserver','#SCHOOL_PRINTSERVER#',NULL,'','',0,0);
 INSERT INTO Devices VALUES(5,1,1,NULL,'backup','#SCHOOL_BACKUP_SERVER#',NULL,'','',0,0);
 
-CREATE TABLE IF NOT EXISTS AccessInRoom (
+CREATE TABLE IF NOT EXISTS AccessInRooms (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id        BIGINT UNSIGNED NOT NULL,
         accessType     VARCHAR(8) NOT NULL,
@@ -271,13 +272,12 @@ CREATE TABLE IF NOT EXISTS Enumerates (
 );
 
 INSERT INTO Enumerates VALUES(NULL,'deviceType','FatClient');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','ManagedMobileDevice');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','MobileDevice');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Printer');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Router');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Server');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','Switch');
 INSERT INTO Enumerates VALUES(NULL,'deviceType','ThinClient');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','BYOD');
 INSERT INTO Enumerates VALUES(NULL,'role','students');
 INSERT INTO Enumerates VALUES(NULL,'role','teachers');
 INSERT INTO Enumerates VALUES(NULL,'role','sysadmins');
@@ -287,9 +287,9 @@ INSERT INTO Enumerates VALUES(NULL,'groupType','primary');
 INSERT INTO Enumerates VALUES(NULL,'groupType','class');
 INSERT INTO Enumerates VALUES(NULL,'groupType','workgroup');
 INSERT INTO Enumerates VALUES(NULL,'groupType','guest');
-INSERT INTO Enumerates VALUES(NULL,'roomControl','in_room');
+INSERT INTO Enumerates VALUES(NULL,'roomControl','inRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomControl','no');
-INSERT INTO Enumerates VALUES(NULL,'roomControl','all_teacher');
+INSERT INTO Enumerates VALUES(NULL,'roomControl','allTeacher');
 INSERT INTO Enumerates VALUES(NULL,'roomControl','teacher');
 INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom');
 INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom');

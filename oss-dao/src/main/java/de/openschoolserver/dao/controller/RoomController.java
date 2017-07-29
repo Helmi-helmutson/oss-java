@@ -81,7 +81,7 @@ public class RoomController extends Controller {
 	public List<Room> getAll() {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Room.findAll"); 
+			Query query = em.createNamedQuery("Room.findAllToUse"); 
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -167,6 +167,11 @@ public class RoomController extends Controller {
 		if( room.getStartIP().isEmpty() ) {
 			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
 		}
+
+		//		Set default control mode
+		if( room.getRoomControl().isEmpty() ) {
+			room.setRoomControl("inRoom");
+		}
 		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
 		try {
 			em.getTransaction().begin();
@@ -189,8 +194,9 @@ public class RoomController extends Controller {
 
 			em.getTransaction().begin();
 			DeviceController devController = new DeviceController(this.getSession());
-			if( this.isProtected(room) )
+			if( this.isProtected(room) ) {
 				return new Response(this.getSession(),"ERROR","This room must not be deleted.");
+			}
 			List<Long> deviceIds = new ArrayList<Long>();
 			for( Device device : room.getDevices()) {
 				deviceIds.add(device.getId());
@@ -586,14 +592,17 @@ public class RoomController extends Controller {
 		em.close();
 		UserController userController = new UserController(this.session);
 		for(Device device : devices) {
-		    this.startPlugin("add_device", device);
-		    User user = new User();
-		    user.setUid(device.getName());
-		    user.setSureName(device.getName() + "  Workstation-User");
-		    user.setRole("workstations");
-		    //TODO do not ignore response.
-		    Response answer = userController.add(user);
-		    logger.debug(answer.getValue());
+			this.startPlugin("add_device", device);
+			// We'll create only for fatClients workstation users
+			if( device.getHwconf().getDeviceType().equals("fatClient")) {
+				User user = new User();
+				user.setUid(device.getName());
+				user.setSureName(device.getName() + "  Workstation-User");
+				user.setRole("workstations");
+				//TODO do not ignore response.
+				Response answer = userController.add(user);
+				logger.debug(answer.getValue());
+			}
 		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		dhcpconfig.Create();
@@ -641,11 +650,14 @@ public class RoomController extends Controller {
 		if( ! owner.getRole().contains("sysadmins") ) {
 			//non sysadmin user want to register his workstation
 			if( this.checkMConfig(this.getSession().getUser(),"AdHocAccess",String.valueOf(roomId)) ) {
+				Query query = em.createNamedQuery("HWConf.getByName");
+		        query.setParameter("name", "BYOD");
+				HWConf hwconf = (HWConf) query.getResultList().get(0);
 				device.setMac(macAddress);
 				device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
 				device.setOwner(owner);
 				device.setIp(ipAddress.get(0).split(" ")[0]);
-				device.setHwconf(null);
+				device.setHwconf(hwconf);
 			} else {
 				return new Response(this.getSession(),"ERROR","You have no rights to register devices in this room");
 			}
