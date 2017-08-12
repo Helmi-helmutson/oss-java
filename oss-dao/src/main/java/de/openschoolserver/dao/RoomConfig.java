@@ -40,6 +40,12 @@ public class RoomConfig implements Serializable {
 	    public RoomConfig() {
 	    }
 
+	    public RoomConfig(Room room, String keyword, String value) {
+	    	this.room    = room;
+	    	this.keyword = keyword;
+	    	this.value   = value;
+	    }
+
         public long getId() {
                 return this.id;
         }

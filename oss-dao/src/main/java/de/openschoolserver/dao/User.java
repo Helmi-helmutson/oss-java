@@ -96,6 +96,11 @@ public class User implements Serializable {
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<Test> tests;
+	
+	//bi-directional many-to-one association to RoomSmartControl
+	@OneToMany(mappedBy="user")
+	@JsonIgnore
+	private List<RoomSmartControl> smartControls;
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="users", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
@@ -440,5 +445,9 @@ public class User implements Serializable {
 
     public void setCategories(List<Category> categories) {
         this.categories = categories;
+    }
+    
+    public List<RoomSmartControl> getSmartControls() {
+    	return this.smartControls;
     }
 }

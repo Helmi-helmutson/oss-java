@@ -193,8 +193,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public Response getRoomControl(Session session, long roomId, long minutes) {
-		// TODO Auto-generated method stub
-		return null;
+		EducationController educationController = new EducationController(session);
+		return educationController.getRoomControl(roomId,minutes);
 	}
 
 	@Override

@@ -313,6 +313,7 @@ CREATE TABLE IF NOT EXISTS UserConfig (
 	user_id      BIGINT UNSIGNED NOT NULL,
 	keyword      VARCHAR(64) NOT NULL,
 	value        VARCHAR(128) NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE CASCADE,
 	PRIMARY KEY(id)
 );
 CREATE UNIQUE INDEX UserConfigIndex on UserConfig(user_id,keyword);
@@ -322,6 +323,7 @@ CREATE TABLE IF NOT EXISTS UserMConfig (
         user_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 CREATE UNIQUE INDEX UserMConfigIndex on UserMConfig(user_id,keyword,value);
@@ -331,6 +333,7 @@ CREATE TABLE IF NOT EXISTS GroupConfig (
         group_id     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        FOREIGN KEY(group_id) REFERENCES   Groups(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 CREATE UNIQUE INDEX GroupConfigIndex on GroupConfig(group_id,keyword);
@@ -340,6 +343,7 @@ CREATE TABLE IF NOT EXISTS GroupMConfig (
         group_id     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        FOREIGN KEY(group_id) REFERENCES   Groups(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 CREATE UNIQUE INDEX GroupMConfigIndex on GroupMConfig(group_id,keyword,value);
@@ -349,6 +353,7 @@ CREATE TABLE IF NOT EXISTS DeviceConfig (
         device_id    BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        FOREIGN KEY(device_id) REFERENCES   Devices(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 CREATE UNIQUE INDEX DeviceConfigIndex on DeviceConfig(device_id,keyword);
@@ -358,6 +363,7 @@ CREATE TABLE IF NOT EXISTS DeviceMConfig (
         device_id    BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        FOREIGN KEY(device_id) REFERENCES   Devices(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 CREATE UNIQUE INDEX DeviceMConfigIndex on DeviceMConfig(device_id,keyword);
@@ -367,6 +373,7 @@ CREATE TABLE IF NOT EXISTS RoomConfig (
         room_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        FOREIGN KEY(room_id) REFERENCES   Rooms(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 CREATE UNIQUE INDEX RoomConfigIndex on RoomConfig(room_id,keyword);
@@ -376,9 +383,21 @@ CREATE TABLE IF NOT EXISTS RoomMConfig (
         room_id      BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        FOREIGN KEY(room_id) REFERENCES   Rooms(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 CREATE UNIQUE INDEX RoomMConfigIndex on RoomMConfig(room_id,keyword,value);
+
+CREATE TABLE IF NOT EXISTS RoomSmartControlls (
+	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        room_id      BIGINT UNSIGNED NOT NULL,
+        user_id      BIGINT UNSIGNED NOT NULL,
+        startTime    DATE NOT NULL,
+        endTime      DATE NOT NULL,
+        FOREIGN KEY(room_id) REFERENCES   Rooms(id)   ON DELETE CASCADE,
+        FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE CASCADE,
+        PRIMARY KEY(id)
+);
 
 CREATE TABLE IF NOT EXISTS Sessions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

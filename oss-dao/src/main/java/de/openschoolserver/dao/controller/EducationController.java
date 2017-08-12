@@ -29,10 +29,11 @@ public class EducationController extends Controller {
 	Logger logger = LoggerFactory.getLogger(EducationController.class);
     static FileAttribute<Set<PosixFilePermission>> privatDirAttribute  = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
     static FileAttribute<Set<PosixFilePermission>> privatFileAttribute = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));
+    //TODO
+    static String OSS_CLIENT_CONTROL_FILE = "OSS_CLIENT_CONTROL_FILE";
 	
 	public EducationController(Session session) {
 		super(session);
-		// TODO Auto-generated constructor stub
 	}
 
 	/*
@@ -402,6 +403,11 @@ public class EducationController extends Controller {
 		Response response = null;
 		List<String> errors = new ArrayList<String>();
 		for( List<Long> loggedOn : this.getRoom(roomId) ) {
+			if(this.session.getDevice().getIp().equals(loggedOn.get(1)) ||
+			   this.session.getDevice().getWlanIp().equals(loggedOn.get(1))
+			  ) {
+				continue;
+			}
 			response = this.manageDevice(loggedOn.get(1), action, actionContent);
 			if( response.getCode().equals("ERROR")) {
 				errors.add(response.getValue());
@@ -420,23 +426,24 @@ public class EducationController extends Controller {
 		if(this.session.getDevice().equals(device)) {
 			return new Response(this.getSession(),"ERROR", "Do not control the own client.");
 		}
+		StringBuilder FQHN = new StringBuilder();
+		FQHN.append(device.getName()).append(".").append(this.getConfigValue("SCHOOL_DOMAIN"));
+		File file;
 		String[] program    = null;
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
 		switch(action) {
 		case "shutDown":
-			program = new String[4];
+			program = new String[3];
 			program[0] = "/usr/bin/salt";
-			program[1] = "-S";
-			program[2] = device.getIp();
-			program[3] = "system.shutdown";		
+			program[1] = FQHN.toString();
+			program[2] = "system.shutdown";		
 			break;
 		case "reboot":
-			program = new String[4];
+			program = new String[3];
 			program[0] = "/usr/bin/salt";
-			program[1] = "-S";
-			program[2] = device.getIp();
-			program[3] = "system.reboot";
+			program[1] = FQHN.toString();
+			program[2] = "system.reboot";
 			break;
 		case "logout":
 			break;
@@ -453,10 +460,56 @@ public class EducationController extends Controller {
 			break;
 		case "controlProxy":
 			break;
+		case "saveFile":
+			List<String>   fileContent =new ArrayList<String>();
+			fileContent.add(actionContent.get("content"));
+			try {
+				file  = File.createTempFile("oss_", ".ossb", new File("/opt/oss-java/tmp/"));
+				Files.write(file.toPath(), fileContent);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				return new Response(this.getSession(),"ERROR", e.getMessage());
+			}
+			program = new String[4];
+			program[0] = "/usr/bin/salt-cp";
+			program[1] = FQHN.toString();
+			program[2] = file.toPath().toString();
+			program[3] = actionContent.get("path");
+			break;
 		default:
 				return new Response(this.getSession(),"ERROR", "Unknonw action.");	
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
-		return new Response(this.getSession(),"OK", "Device control was made applied.");
+		return new Response(this.getSession(),"OK", "Device control was applied.");
+	}
+
+	public Response getRoomControl(long roomId, long minutes) {
+		Map<String, String> actionContent = new HashMap<String,String>();
+		StringBuilder controllers = new StringBuilder();
+		controllers.append(this.getConfigValue("SCHOOL_SERVER")).append(",").append(this.session.getDevice().getIp());
+		if( this.session.getDevice().getWlanIp() != null ) {
+			controllers.append(",").append(this.session.getDevice().getWlanIp());
+		}
+		actionContent.put("path",  OSS_CLIENT_CONTROL_FILE);
+		actionContent.put("content", controllers.toString());
+		
+		Response response = this.manageRoom(roomId, "saveFile", actionContent);
+		if( response.getCode().equals("OK")) {
+			Room room = new RoomController(this.session).getById(roomId);
+			RoomSmartControl roomSmartControl = new RoomSmartControl(roomId,this.session.getUserId(),minutes);
+			EntityManager em = getEntityManager();
+			try {
+				em.getTransaction().begin();
+				em.persist(roomSmartControl);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				return new Response(this.getSession(),"ERROR", e.getMessage());
+			} finally {
+				em.close();
+			}	
+			return new Response(this.getSession(),"OK", "Now you have the control for the selected room.");
+		}
+		return response;
 	}
 }

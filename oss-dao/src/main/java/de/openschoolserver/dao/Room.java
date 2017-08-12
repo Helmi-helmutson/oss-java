@@ -115,6 +115,11 @@ public class Room implements Serializable {
 	@JsonIgnore
 	private List<Test> tests;
 
+	//bi-directional many-to-one association to RoomSmartControl
+	@OneToMany(mappedBy="room")
+	@JsonIgnore
+	private List<RoomSmartControl> smartControls;
+		
 	@Transient
 	private String network;
 
@@ -355,6 +360,10 @@ public class Room implements Serializable {
 
         public void setCategories(List<Category> categories) {
                 this.categories = categories;
+        }
+        
+        public List<RoomSmartControl> getSmartControls() {
+        	return this.smartControls;
         }
 
 }
