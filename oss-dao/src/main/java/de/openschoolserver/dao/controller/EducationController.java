@@ -3,9 +3,12 @@ package de.openschoolserver.dao.controller;
 
 import java.io.File;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.FileSystems;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileAttribute;
@@ -336,6 +339,36 @@ public class EducationController extends Controller {
 			return e.getMessage() + System.lineSeparator();
 		}
 		return "";
+	}
+
+	public Response collectFileFromUser(User user,String project, boolean cleanUpExport, boolean sortInDirs) {
+		String[] program = new String[11];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/sbin/oss_collect_files.sh";
+		program[1] = "-t";
+		program[2] = this.session.getUser().getUid();
+		program[3] = "-f";
+		program[4] = user.getUid();
+		program[5] = "-p";
+		program[6] = project;
+		program[7] = "-c";
+		if( cleanUpExport ) {
+			program[8] = "y";
+		} else {
+			program[8] = "n";
+		}
+		program[9] = "-d";
+		if( sortInDirs ) {
+			program[10] = "y";
+		} else {
+			program[10] = "n";
+		}
+		OSSShellTools.exec(program, reply, stderr, null);
+		if( stderr.toString().isEmpty() ) {
+			return new Response(this.getSession(),"OK", "File was collected from:" + user.getUid() );
+		}
+		return new Response(this.getSession(),"ERROR", stderr.toString());
 	}
 
 	public Response createGroup(Group group) {
