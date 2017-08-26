@@ -10,10 +10,10 @@ public class Config {
 
 	protected Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
 
-	private Map<String,String>   ossConfig;
-	private Map<String,String>   ossConfigPath;
+	private Map<String,String>   config;
+	private Map<String,String>   configPath;
 	private Map<String,Boolean>  readOnly;
-	private List<String>         ossConfigFile;
+	private List<String>         configFile;
 	
 	public Config() {
 		this.InitConfig();
@@ -25,18 +25,18 @@ public class Config {
 	}
 	
 	public void InitConfig() {
-		ossConfig     = new HashMap<>();
+		config     = new HashMap<>();
 		readOnly      = new HashMap<>();
-		ossConfigPath = new HashMap<>();
+		configPath = new HashMap<>();
 		try {
-			ossConfigFile = Files.readAllLines(OSS_CONFIG);
+			configFile = Files.readAllLines(OSS_CONFIG);
 		}
 		catch( IOException e ) { 
 			e.printStackTrace();
 		}
 		Boolean ro = false;
 		String  path = "Backup";
-		for ( String line : ossConfigFile ){
+		for ( String line : configFile ){
 			if( line.startsWith("#") && line.contains("readonly")) {
 				ro = true;
 			}
@@ -57,8 +57,8 @@ public class Config {
 						value = value.substring(0,value.length()-1);
 					}
 					readOnly.put(sline[0], ro);
-					ossConfig.put(sline[0], value);
-					ossConfigPath.put(sline[0],path);
+					config.put(sline[0], value);
+					configPath.put(sline[0],path);
 					ro = false;
 				}
 			}
@@ -70,16 +70,16 @@ public class Config {
 	}
 	
 	public String getConfigValue(String key){
-		return ossConfig.get(key);
+		return config.get(key);
 	}
 	
 	public String getConfigPath(String key){
-		return ossConfigPath.get(key);
+		return configPath.get(key);
 	}
 	
 	public List<String> getConfigPaths() {
  		List<String> paths = new ArrayList<String>();
-		for ( String path : ossConfigPath.values() )
+		for ( String path : configPath.values() )
 		{
 		   if(!paths.contains(path))
 			   paths.add(path);
@@ -89,8 +89,8 @@ public class Config {
 	
 	public List<String> getKeysOfPath(String path) {
 		List<String> keys = new ArrayList<String>();
-		for ( String key : ossConfigPath.keySet() ) {
-			if( ossConfigPath.get(key).startsWith(path) )
+		for ( String key : configPath.keySet() ) {
+			if( configPath.get(key).startsWith(path) )
 			  keys.add(key);
 		}
 		Collections.sort(keys);
@@ -102,9 +102,9 @@ public class Config {
 		if(ro!=null && ro.booleanValue()){
 			return false;
 		}
-		ossConfig.put(key, value);
+		config.put(key, value);
 		List<String> tmpConfig =  new ArrayList<String>();
-		for ( String line : ossConfigFile ){
+		for ( String line : configFile ){
 			if(line.startsWith(key)){
 				tmpConfig.add( key + "=\"" + value + "\"" );  
 			}
@@ -112,7 +112,7 @@ public class Config {
 				tmpConfig.add( line );
 			}
 		}
-		ossConfigFile = tmpConfig;
+		configFile = tmpConfig;
 		try {
 			Files.write(OSS_CONFIG, tmpConfig );
 		}
@@ -125,10 +125,10 @@ public class Config {
 	
 	public List<Map<String,String>> getConfig() {
 		List<Map<String, String>> configs = new ArrayList<>();
-		for( String key : ossConfig.values() ){
+		for( String key : config.values() ){
 			Map<String,String> configMap = new HashMap<>();
 			configMap.put("key",key);
-			configMap.put("path", ossConfigPath.get(key));
+			configMap.put("path", configPath.get(key));
 			configMap.put("readOnly", readOnly.get(key) ? "yes" : "no" );
 			configs.add(configMap);
 		}
