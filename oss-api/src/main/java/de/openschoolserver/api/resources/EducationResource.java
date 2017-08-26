@@ -512,6 +512,7 @@ public interface EducationResource {
     @ApiResponses(value = {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
+    @RolesAllowed({"sysadmins","teachers"})
     Response uploadFileToDevice(@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("deviceId") long deviceId,
             @FormDataParam("file") final InputStream fileInputStream,
