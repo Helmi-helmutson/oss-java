@@ -449,19 +449,27 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
         PRIMARY KEY(id)
 );
 
+# status I  -> installed
+# status M  -> manuell installed
+# status IS -> installation scheduled
+# status MD -> manuell deinstalled
+# status DF -> deinstallation failed
+# status IF -> installation failed
 CREATE TABLE IF NOT EXISTS SoftwareStatus (
         version_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
-	status             VARCHAR(32) NOT NULL,
+	status             VARCHAR(2) NOT NULL,
 	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
 	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
 	PRIMARY KEY(version_id,device_id)
 );
 
+# licenseType C -> command line license
+# licenseType F -> file license in this case the value contains the license file name
 CREATE TABLE IF NOT EXISTS SoftwareLicenses (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
-	licenseType    VARCHAR(4) DEFAULT 'CMD',
+	licenseType    CHAR(1) DEFAULT 'C',
 	count          INTEGER DEFAULT 1,
 	value          VARCHAR(1024) NOT NULL,
         FOREIGN KEY(software_id)    REFERENCES Softwares(id)     ON DELETE CASCADE,
