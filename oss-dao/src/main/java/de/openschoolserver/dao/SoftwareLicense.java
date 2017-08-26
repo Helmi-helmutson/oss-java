@@ -23,10 +23,20 @@ public class SoftwareLicense implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARELICENSES_ID_GENERATOR")
 	private long id;
 
+	/*
+	 * The amount of the devices the license can be used for.
+	 */
 	private int count;
 
-	private String licenseType;
+	/*
+	 * The type of the license. This can be F for licenses saved in files or C for Licenses passed by command name.
+	 */
+	private Character licenseType;
 
+	/*
+	 * By C licenses this is the value of the license.
+	 * By F licenses this is the name of the file in which the license was saved.
+	 */
 	private String value;
 	
 	//bi-directional many-to-many association to Device
@@ -70,11 +80,11 @@ public class SoftwareLicense implements Serializable {
 		this.count = count;
 	}
 
-	public String getLicenseType() {
+	public Character getLicenseType() {
 		return this.licenseType;
 	}
 
-	public void setLicenseType(String licenseType) {
+	public void setLicenseType(Character licenseType) {
 		this.licenseType = licenseType;
 	}
 
