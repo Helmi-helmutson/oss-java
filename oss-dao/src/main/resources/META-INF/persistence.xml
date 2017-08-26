@@ -3,8 +3,7 @@
 	<persistence-unit name="OSS" transaction-type="RESOURCE_LOCAL">
 		<class>de.openschoolserver.dao.Acl</class>
 		<class>de.openschoolserver.dao.Alias</class>
-		<class>de.openschoolserver.dao.Device</class>
-		
+		<class>de.openschoolserver.dao.Device</class>	
 		<class>de.openschoolserver.dao.DeviceConfig</class>
 		<class>de.openschoolserver.dao.DeviceMConfig</class>
 		<class>de.openschoolserver.dao.Enumerate</class>
@@ -14,6 +13,7 @@
 		<class>de.openschoolserver.dao.Room</class>
 		<class>de.openschoolserver.dao.RoomMConfig</class>
 		<class>de.openschoolserver.dao.RoomConfig</class>
+		<class>de.openschoolserver.dao.RoomSmartControl</class>
 		<class>de.openschoolserver.dao.TestFile</class>
 	 	<class>de.openschoolserver.dao.TestUser</class>
 		<class>de.openschoolserver.dao.TestUserPK</class> 
