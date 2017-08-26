@@ -2,36 +2,46 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
-
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.File;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.ws.rs.WebApplicationException;
 
+import org.jdom.*;
+import org.jdom.input.SAXBuilder;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import de.openschoolserver.dao.*;
+import de.openschoolserver.dao.tools.OSSShellTools;
 
 @SuppressWarnings( "unchecked" )
 public class SoftwareController extends Controller {
 	
-	Logger logger           = LoggerFactory.getLogger(CloneToolController.class);
-	private static String SALT_PACKAGE_DIR = "/srv/salt/packages";
+	Logger logger           = LoggerFactory.getLogger(SoftwareController.class);
+	private static String SALT_PACKAGE_DIR = "/srv/salt/packages/";
 
 	public SoftwareController(Session session) {
 		super(session);
 	}
 	
+	/*
+	 * Functions to create and modify softwares
+	 */
 	public Software getById(long softwareId) {
 		EntityManager em = getEntityManager();
 		try {
@@ -72,22 +82,6 @@ public class SoftwareController extends Controller {
 		}
 		return new Response(this.getSession(),"OK","Software was created succesfully");
 	}
-
-	public Response modify(Software software) {
-		EntityManager em = getEntityManager();
-		//TODO it may be too simple
-		try {
-			em.getTransaction().begin();
-			em.merge(software);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
-		} finally {
-			em.close();
-		}
-		return new Response(this.getSession(),"OK","Software was created succesfully");
-	}
 	
 	public Response delete(Long softwareId) {
 		EntityManager em = getEntityManager();
@@ -109,6 +103,186 @@ public class SoftwareController extends Controller {
 		return new Response(this.getSession(),"OK","Software was deleted succesfully");
 	}
 
+	public Response modify(Software software) {
+		EntityManager em = getEntityManager();
+		//TODO it may be too simple
+		try {
+			em.getTransaction().begin();
+			em.merge(software);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Software was created succesfully");
+	}
+
+	public List<Software> getAll() {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Software.findAll");
+		return (List<Software>)query.getResultList();
+	}
+
+	public Software getByName(String name) {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Software.getByName").setParameter("name", name);
+		return (Software) query.getResultList().get(0);
+	}
+	
+	public List<SoftwareVersion> getAllVersion() {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("SoftwareVersion.findAll");
+		return (List<SoftwareVersion>)query.getResultList();
+	}
+	
+	
+	/*
+	 * Functions to interact with the CEPHALIX repository.
+	 */
+
+	public List<Map<String, String>> listDownloadedSoftware() {
+		Map<String,String>        software;
+		List<Map<String, String>> softwares = new ArrayList<>();
+		Map<String,String>        updates   = new HashMap<String,String>();
+		Map<String,String>        updatesDescription  = new HashMap<String,String>();
+		String[] program    = new String[9];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0]= "/usr/bin/zypper";
+		program[1]= "-nx";
+		program[2]= "-D";
+		program[3] = "/srv/salt/repos.d/";
+		program[4] = "lu";
+		program[5] = "-t";
+		program[6] = "package";
+		program[7] = "-r";
+		program[8] = "salt-packages";
+		OSSShellTools.exec(program, reply, stderr, null);
+		try {
+			Document doc = new SAXBuilder().build( reply.toString() );
+			Element rootNode = doc.getRootElement();
+			for( Element node : (List<Element>) rootNode.getChild("update-list").getChildren("update") ) {
+				updates.put(node.getAttributeValue("name").substring(8),node.getAttributeValue("edition"));
+				updatesDescription.put(node.getAttributeValue("name").substring(8), node.getChildText("description"));
+			}
+		} catch(IOException e ) { 
+			logger.error(e.getMessage());
+			throw new WebApplicationException(500);
+		} catch(JDOMException e)  {
+			logger.error(e.getMessage());
+			throw new WebApplicationException(500);
+		}
+		program    = new String[8];
+		program[0] = "/usr/bin/zypper";
+		program[1] = "-nx";
+		program[2] = "-D";
+		program[3] = "/srv/salt/repos.d/";
+		program[4] = "se";
+		program[5] = "-si";
+		program[6] = "-r";
+		program[7] = "salt-packages";
+		OSSShellTools.exec(program, reply, stderr, null);
+		try {
+			Document doc = new SAXBuilder().build( reply.toString() );
+			Element rootNode = doc.getRootElement();
+			for( Element node : (List<Element>) rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable") ) {
+				software = new HashMap<String,String>();
+				software.put("name", node.getAttributeValue("name").substring(8));
+				software.put("description", node.getAttributeValue("kind"));
+				software.put("version", node.getAttributeValue("edition"));
+				if( updates.containsKey(node.getAttributeValue("name").substring(8)) ) {
+					software.put("update",updates.get(node.getAttributeValue("name").substring(8)));
+					software.put("updateDescription",updatesDescription.get(node.getAttributeValue("name").substring(8)));
+				}
+			}
+		} catch(IOException e ) { 
+			logger.error(e.getMessage());
+			throw new WebApplicationException(500);
+		} catch(JDOMException e)  {
+			logger.error(e.getMessage());
+			throw new WebApplicationException(500);
+		}
+		return softwares;
+	}
+
+	public List<Map<String, String>> getAvailableSoftware() {
+		Map<String,String>        software;
+		List<Map<String, String>> softwares = new ArrayList<>();
+		String[] program    = new String[8];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/bin/zypper";
+		program[1] = "-nx";
+		program[2] = "-D";
+		program[3] = "/srv/salt/repos.d/";
+		program[4] = "se";
+		program[5] = "-su";
+		program[6] = "-r";
+		program[7] = "salt-packages";
+		OSSShellTools.exec(program, reply, stderr, null);
+		try {
+			Document doc = new SAXBuilder().build( reply.toString() );
+			Element rootNode = doc.getRootElement();
+			for( Element node : (List<Element>) rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable") ) {
+				software = new HashMap<String,String>();
+				software.put("name", node.getAttributeValue("name").substring(8));
+				software.put("description", node.getAttributeValue("kind"));
+				software.put("version", node.getAttributeValue("edition"));
+			}
+		} catch(IOException e ) { 
+			logger.error(e.getMessage());
+			throw new WebApplicationException(500);
+		} catch(JDOMException e)  {
+			logger.error(reply.toString());
+			logger.error(stderr.toString());
+			logger.error(e.getMessage());
+			throw new WebApplicationException(500);
+		}
+		return softwares;
+	}
+	
+
+	public Response downloadSoftwares(List<String> softwares) {
+		String[] program    = new String[7+ softwares.size()];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/bin/zypper";
+		program[1] = "-nx";
+		program[2] = "-D";
+		program[3] = "/srv/salt/repos.d/";
+		program[4] = "install";
+		program[5] = "-r";
+		program[6] = "salt-packages";
+		for(int i = 0; i < softwares.size(); i++) {
+			program[8+i] = "oss-pkg-" + softwares.get(i);
+		}
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new Response(this.getSession(),"OK","Software were downloaded succesfully");
+	}
+	
+	public Response removeSoftwares(List<String> softwares) {
+		String[] program    = new String[7+ softwares.size()];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/bin/zypper";
+		program[1] = "-nx";
+		program[2] = "-D";
+		program[3] = "/srv/salt/repos.d/";
+		program[4] = "install";
+		program[5] = "-r";
+		program[6] = "salt-packages";
+		for(int i = 0; i < softwares.size(); i++) {
+			program[8+i] = softwares.get(i);
+		}
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new Response(this.getSession(),"OK","Softwares were removed succesfully");		
+	}
+
+	/*
+	 * Functions to deliver installation status
+	 */
 	public Map<String, String> statistic() {
 		Map<String,String> statusMap = new HashMap<>();
 		statusMap.put("name","software");
@@ -139,30 +313,21 @@ public class SoftwareController extends Controller {
         return statusMap;
 	}
 
-	public List<Software> getAll() {
-		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("Software.findAll");
-		return (List<Software>)query.getResultList();
-	}
-
-	public Software getByName(String name) {
-		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("Software.getByName").setParameter("name", name);
-		return (Software) query.getResultList().get(0);
-	}
-	
-	public List<SoftwareVersion> getAllVersion() {
-		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("SoftwareVersion.findAll");
-		return (List<SoftwareVersion>)query.getResultList();
-	}
-	
 	public List<SoftwareStatus> getAllStatus(String installationStatus) {
 		EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS",installationStatus);
         return (List<SoftwareStatus>) query.getResultList();
 	}
-	
+
+	/*
+	 * This is the first step to start the installation 
+	 */
+	public Response createInstallationCategory(Category category) {
+		CategoryController categoryController = new CategoryController(this.session);
+		category.setCategoryType("installation");
+		return categoryController.add(category);
+	}
+
 	public Response addSoftwareToCategory(Long softwareId,Long categoryId){
 		EntityManager em = getEntityManager();
 		try {
@@ -170,11 +335,14 @@ public class SoftwareController extends Controller {
 			Category c = em.find(Category.class, categoryId);
 			s.getCategories().add(c);
 			c.getSoftwares().add(s);
+			s.getRemovedFromCategories().remove(c);
+			c.getRemovedSoftwares().remove(s);
 			em.getTransaction().begin();
 			em.merge(s);
 			em.merge(c);
 			em.getTransaction().commit();
 		} catch (Exception e) {
+			logger.error(e.getMessage());;
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
@@ -182,7 +350,7 @@ public class SoftwareController extends Controller {
 		return new Response(this.getSession(),"OK","SoftwareState was added to category succesfully");
 	}
 	
-	public Response removeSoftwareFromCategory(Long softwareId,Long categoryId){
+	public Response deleteSoftwareFromCategory(Long softwareId,Long categoryId){
 		EntityManager em = getEntityManager();
 		try {
 			Software s = em.find(Software.class, softwareId);
@@ -211,22 +379,95 @@ public class SoftwareController extends Controller {
 	/*
 	 * Add a license to a software
 	 */
-	public Response addLicenseToSoftware(SoftwareLicense softwareLicense, Long softwareId ) {
+	public Response addLicenseToSoftware(SoftwareLicense softwareLicense, Long softwareId,
+			InputStream fileInputStream, 
+			FormDataContentDisposition contentDispositionHeader
+			) 
+	{
 		EntityManager em = getEntityManager();
 		Software software = this.getById(softwareId);
-		try {
-			//TODO save the file.
-			em.getTransaction().begin();
-			software.getSoftwareLicenses().add(softwareLicense);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR",e.getMessage());
-		} finally {
-			em.close();
+		if(softwareLicense.getLicenseType().equals("F") ) {
+			try {
+				em.getTransaction().begin();
+				softwareLicense.setSoftware(software);
+				em.persist(softwareLicense);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				return new Response(this.getSession(),"ERROR",e.getMessage());
+			} finally {
+				em.close();
+			}
+			return this.uploadLicenseFile(softwareLicense.getId(), fileInputStream, contentDispositionHeader);
+		}
+		if(softwareLicense.getLicenseType().equals("C") && fileInputStream == null) {
+			try {
+				em.getTransaction().begin();
+				softwareLicense.setSoftware(software);
+				em.persist(softwareLicense);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				return new Response(this.getSession(),"ERROR",e.getMessage());
+			} finally {
+				em.close();
+			}
+		} else {
+			File file = null;
+			try {
+				file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+				Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+				em.getTransaction().begin();
+				for( String line : Files.readAllLines(file.toPath())) {
+					SoftwareLicense sl = new SoftwareLicense();
+					String[] lic = line.split(";");
+					sl.setLicenseType('C');
+					sl.setValue(lic[0]);
+					sl.setSoftware(software);
+					if( lic.length == 1 ) {
+						sl.setCount(1);
+					} else {
+						sl.setCount(Integer.parseInt(lic[1]));
+					}
+					em.persist(sl);
+				}
+				em.getTransaction().commit();
+				Files.delete(file.toPath());
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				return new Response(this.getSession(),"ERROR", e.getMessage());
+			} finally {
+				em.close();
+			}
 		}
 		return new Response(this.getSession(),"OK","License was added to the software succesfully");
 	}
 	
+	public Response uploadLicenseFile(Long licenseId, InputStream fileInputStream, 
+			FormDataContentDisposition contentDispositionHeader)
+	{
+		EntityManager em = getEntityManager();
+		SoftwareLicense softwareLicense = em.find(SoftwareLicense.class, licenseId);
+		try {
+			String fileName = contentDispositionHeader.getFileName();
+			StringBuilder newFileName = new StringBuilder(SALT_PACKAGE_DIR);
+			newFileName.append(softwareLicense.getSoftware().getName());
+			File newFile = new File( newFileName.toString());
+			Files.createDirectories(newFile.toPath());
+			newFileName.append("/").append(fileName);
+			newFile = new File(newFileName.toString());
+			Files.copy(fileInputStream, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			softwareLicense.setValue(fileName);
+			em.getTransaction().begin();
+			em.merge(softwareLicense);
+			em.getTransaction().commit();
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			throw new WebApplicationException(500);
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Software License File was uploaded succesfully");
+	}
+
 	/*
 	 *  Add Licenses to a HWConf 
 	 */
@@ -254,7 +495,7 @@ public class SoftwareController extends Controller {
  					continue;
  				}
  			}
- 			softwareLicense = this.getNextFreeLicenseId(software);
+ 			softwareLicense = this.getNextFreeLicenseId(software); 
  			if( softwareLicense == null) {
  				failedDevices.add(device.getName());
  			} else {
@@ -457,16 +698,22 @@ public class SoftwareController extends Controller {
 			topSls.add("base:");
 		}
 
-		//Create the workstations state files
+		//Evaluate device categories
 		for( Device device : deviceController.getAll() ) {
 			List<String>   toInstall = new ArrayList<String>();
 			List<Software> toRemove  = new ArrayList<Software>();
 			for( Category category : device.getCategories() ) {
+				if( !category.getCategoryType().equals("installation")) {
+					continue;
+				}
 				for( Software software : category.getRemovedSoftwares() ) {
 					toRemove.add(software);
 				}
 			}
 			for( Category category : device.getCategories() ) {
+				if( !category.getCategoryType().equals("installation")) {
+					continue;
+				}
 				for( Software software : category.getSoftwares() ) {
 					toRemove.remove(software);
 					toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
@@ -476,16 +723,21 @@ public class SoftwareController extends Controller {
 			softwaresToRemove.put(device, toRemove);
 		}
 
-		//Create the room state files
+		//Evaluate room categories
 		for( Room room : roomController.getAll() ) {
 			List<Software> toRemove  = new ArrayList<Software>();
-			
 			for( Category category : room.getCategories() ) {
+				if( !category.getCategoryType().equals("installation")) {
+					continue;
+				}
 				for( Software software : category.getRemovedSoftwares() ) {
 					toRemove.add(software);
 				}
 			}
 			for( Category category : room.getCategories() ) {
+				if( !category.getCategoryType().equals("installation")) {
+					continue;
+				}
 				for( Software software : category.getSoftwares() ) {
 					toRemove.remove(software);
 					key = String.format("%04d-%s",software.getWeight(),software.getName());
@@ -505,18 +757,24 @@ public class SoftwareController extends Controller {
 			}
 		}
 
-		//Create the hwconf state files
+		//Evaluate hwconf categories
 		Query query = em.createNamedQuery("HWConf.findAll");
 		for( HWConf hwconf : (List<HWConf>)  query.getResultList() ) {
 			//List of software to be removed
 			List<Software> toRemove  = new ArrayList<Software>();
 			for( Category category : hwconf.getCategories() ) {
+				if( !category.getCategoryType().equals("installation")) {
+					continue;
+				}
 				for( Software software : category.getRemovedSoftwares() ) {
 					toRemove.add(software);
 				}
 			}
 			for( Category category : hwconf.getCategories() ) {
 				for( Software software : category.getSoftwares() ) {
+					if( !category.getCategoryType().equals("installation")) {
+						continue;
+					}
 					toRemove.remove(software);
 					key = String.format("%04d-%s",software.getWeight(),software.getName());
 					for( Device device : hwconf.getDevices() ) {
@@ -598,7 +856,7 @@ public class SoftwareController extends Controller {
 			}
 			this.systemctl("restart", "salt-master");
 		}
-		return new Response(this.getSession(),"OK","SoftwareState was saved succesfully"); 
+		return new Response(this.getSession(),"OK","Software State was saved succesfully"); 
 	}
 
 }
