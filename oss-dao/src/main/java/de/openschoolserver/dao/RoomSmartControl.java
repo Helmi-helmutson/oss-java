@@ -1,6 +1,7 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -12,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -25,18 +25,24 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  *
  */
 @Entity
-@Table(name="RoomSmartControl")
+@Table(name="RoomSmartControlls")
 @NamedQueries({
-	@NamedQuery(name="SmartControl.findAll", query="SELECT s FROM RoomSmartControl s"),
-	@NamedQuery(name="SmartControl.getAllActive", query="SELECT s FROM RoomSmartControl s WHERE s.endTime < NOW()" ),
-	@NamedQuery(name="SmartControl.getAllActiveInRoom", query="SELECT s FROM RoomSmartControl s WHERE s.endTime < NOW() AND s.room_id = :roomId" ),
-	@NamedQuery(name="SmartControl.getAllActiveOfUser", query="SELECT s FROM RoomSmartControl s WHERE s.endTime < NOW() AND s.user_id = :userId" )
+	@NamedQuery(name="SmartControl.findAll", query="SELECT s FROM RoomSmartControl s") /*,
+	@NamedQuery(name="SmartControl.getAllActive", query="SELECT s FROM RoomSmartControl s WHERE s.endTime < NOW" ),
+	@NamedQuery(name="SmartControl.getAllActiveInRoom", query="SELECT s FROM RoomSmartControl s WHERE s.endTime < NOW AND s.room_id = :roomId" ),
+	@NamedQuery(name="SmartControl.getAllActiveOfUser", query="SELECT s FROM RoomSmartControl s WHERE s.endTime < NOW AND s.user_id = :userId" )*/
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class RoomSmartControl implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
+	@SequenceGenerator(name="ACCESSINROOM_ID_GENERATOR", sequenceName="SEQ")
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ACCESSINROOM_ID_GENERATOR")
 	private long id;
 	
 	//bi-directional many-to-one association to room
