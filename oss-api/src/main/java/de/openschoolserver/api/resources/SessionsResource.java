@@ -88,7 +88,7 @@ public interface SessionsResource {
     @GET
     @Path("{key}")
     @Produces("text/plain")
-    @ApiOperation(value = "Get some session values. Possible keys are: defaultPrinter, availablePrinters, dnsName, domainName.")
+    @ApiOperation(value = "Get some session values. Available keys are: defaultPrinter, availablePrinters, dnsName, domainName.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
