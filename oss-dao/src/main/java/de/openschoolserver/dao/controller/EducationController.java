@@ -285,7 +285,7 @@ public class EducationController extends Controller {
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-			throw new WebApplicationException(500);
+			return new Response(this.getSession(),"ERROR", e.getMessage());
 		}
 		StringBuilder error = new StringBuilder();
 		switch(what) {
