@@ -8,6 +8,7 @@ import java.util.Map;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.File;
 
 import java.nio.file.Files;
@@ -210,26 +211,26 @@ public class SoftwareController extends Controller {
 	public List<Map<String, String>> getAvailableSoftware() {
 		Map<String,String>        software;
 		List<Map<String, String>> softwares = new ArrayList<>();
-		String[] program    = new String[8];
+		String[] program    = new String[6];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
 		program[0] = "/usr/bin/zypper";
-		program[1] = "-nx";
-		program[2] = "-D";
-		program[3] = "/srv/salt/repos.d/";
-		program[4] = "se";
-		program[5] = "-su";
-		program[6] = "-r";
-		program[7] = "salt-packages";
+		program[1] = "-nxD";
+		program[2] = "/srv/salt/repos.d/";
+		program[3] = "se";
+		program[4] = "-sur";
+		program[5] = "salt-packages";
 		OSSShellTools.exec(program, reply, stderr, null);
 		try {
-			Document doc = new SAXBuilder().build( reply.toString() );
+			Document doc = new SAXBuilder().build( new StringReader(reply.toString()) );
 			Element rootNode = doc.getRootElement();
-			for( Element node : (List<Element>) rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable") ) {
+			List<Element> elements = rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable");
+			for( Element node : elements ) {
 				software = new HashMap<String,String>();
 				software.put("name", node.getAttributeValue("name").substring(8));
-				software.put("description", node.getAttributeValue("kind"));
+				/*software.put("description", node.getAttributeValue("kind"));*/
 				software.put("version", node.getAttributeValue("edition"));
+				softwares.add(software);
 			}
 		} catch(IOException e ) { 
 			logger.error(e.getMessage());
@@ -259,7 +260,7 @@ public class SoftwareController extends Controller {
 			program[8+i] = "oss-pkg-" + softwares.get(i);
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
-		return new Response(this.getSession(),"OK","Software were downloaded succesfully");
+		return new Response(this.getSession(),"OK","Download of the softwares was started succesfully");
 	}
 	
 	public Response removeSoftwares(List<String> softwares) {
