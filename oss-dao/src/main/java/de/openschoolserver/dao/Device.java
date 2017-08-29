@@ -53,6 +53,12 @@ public class Device implements Serializable {
 	@Column(name="WLANMAC")
 	private String wlanmac;
 
+	private String serial;
+
+	private String inventary;
+
+	private String locality;
+
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	private List<Category> categories;
@@ -228,6 +234,30 @@ public class Device implements Serializable {
 
 	public void setRow(int row) {
 		this.row = row;
+	}
+
+	public String getSerial() {
+		return this.serial;
+	}
+
+	public void setSerial(String value) {
+		this.serial = value;
+	}
+
+	public String getInventary() {
+		return this.inventary;
+	}
+
+	public void setInventary(String value) {
+		this.inventary = value;
+	}
+
+	public String getLocality() {
+		return this.locality;
+	}
+
+	public void setLocality(String value) {
+		this.locality = value;
 	}
 
 	public List<Device> getAvailablePrinters() {
