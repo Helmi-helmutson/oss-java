@@ -20,7 +20,6 @@ import java.util.List;
 	@NamedQuery(name="Device.getByIP",      query="SELECT d FROM Device d where d.ip = :IP OR d.wlanip = :IP"),
 	@NamedQuery(name="Device.getByMAC",     query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
 	@NamedQuery(name="Device.getByName",    query="SELECT d FROM Device d where d.name = :name"),
-	@NamedQuery(name="Device.getByType",    query="SELECT d FROM Device d where d.type = :type"),
 	@NamedQuery(name="Device.search",       query="SELECT d FROM Device d where d.name LIKE :search OR d.ip LIKE :search OR d.wlanip LIKE :search OR d.mac LIKE :search OR d.wlanmac LIKE :search" ),
 	@NamedQuery(name="Device.getConfig",    query="SELECT c.value FROM DeviceConfig  c WHERE c.device.id = :id AND c.keyword = :keyword" ),
 	@NamedQuery(name="Device.getMConfig",   query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :id AND c.keyword = :keyword" ),

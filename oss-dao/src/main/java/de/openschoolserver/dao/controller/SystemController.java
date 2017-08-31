@@ -84,8 +84,7 @@ public class SystemController extends Controller {
 		if( device.getHwconf() != null ) {
 			deviceType = device.getHwconf().getDeviceType();
 		}
-		int i = Integer.getInteger(statusMap.get(deviceType));
-		i ++;
+		Integer i = Integer.decode(statusMap.get(deviceType)) + 1 ;
 		statusMap.put(deviceType,String.valueOf(i));
         }
         statusList.add(statusMap);
