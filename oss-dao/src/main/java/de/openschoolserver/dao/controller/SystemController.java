@@ -71,13 +71,22 @@ public class SystemController extends Controller {
         }
         statusList.add(statusMap);
         
-        //Rooms
+        //Devices
         statusMap = new HashMap<>();
         statusMap.put("name","devices");
         for( String deviceType : this.getEnumerates("deviceType")) {
-            query = em.createNamedQuery("Device.getByType").setParameter("type",deviceType);
-            count = query.getResultList().size();
-            statusMap.put(deviceType,count.toString());
+            statusMap.put(deviceType,"0");
+        }
+        statusMap.put("non_typed","0");
+        DeviceController deviceController = new DeviceController(this.session);
+        for( Device device: deviceController.getAll() ){
+		String deviceType = "non_typed";
+		if( device.getHwconf() != null ) {
+			deviceType = device.getHwconf().getDeviceType();
+		}
+		int i = Integer.getInteger(statusMap.get(deviceType));
+		i ++;
+		statusMap.put(deviceType,String.valueOf(i));
         }
         statusList.add(statusMap);
         
