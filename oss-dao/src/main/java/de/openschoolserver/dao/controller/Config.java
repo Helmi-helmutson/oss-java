@@ -1,12 +1,15 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.*;
-
 import java.io.IOException;
 import java.nio.file.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Config {
+
+	Logger logger = LoggerFactory.getLogger(Config.class);
 
 	protected Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
 
@@ -26,7 +29,7 @@ public class Config {
 	
 	public void InitConfig() {
 		config     = new HashMap<>();
-		readOnly      = new HashMap<>();
+		readOnly   = new HashMap<>();
 		configPath = new HashMap<>();
 		try {
 			configFile = Files.readAllLines(OSS_CONFIG);
@@ -56,8 +59,8 @@ public class Config {
 					if( value.endsWith("\"") || value.endsWith("'") ){
 						value = value.substring(0,value.length()-1);
 					}
-					readOnly.put(sline[0], ro);
-					config.put(sline[0], value);
+					readOnly.put(sline[0],  ro);
+					config.put(sline[0],    value);
 					configPath.put(sline[0],path);
 					ro = false;
 				}
@@ -125,10 +128,11 @@ public class Config {
 	
 	public List<Map<String,String>> getConfig() {
 		List<Map<String, String>> configs = new ArrayList<>();
-		for( String key : config.values() ){
+		for( String key : config.keySet() ){
 			Map<String,String> configMap = new HashMap<>();
-			configMap.put("key",key);
-			configMap.put("path", configPath.get(key));
+			configMap.put("key",      key);
+			configMap.put("path",     configPath.get(key));
+			configMap.put("value",    config.get(key));
 			configMap.put("readOnly", readOnly.get(key) ? "yes" : "no" );
 			configs.add(configMap);
 		}
