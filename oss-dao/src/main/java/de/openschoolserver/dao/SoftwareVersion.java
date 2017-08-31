@@ -2,6 +2,9 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.List;
 
 
@@ -29,11 +32,14 @@ public class SoftwareVersion implements Serializable {
 
 	//bi-directional many-to-one associatio, cascade=CascadeType.REMOVEn to SoftwareStatus
 	@OneToMany(mappedBy="softwareVersion", cascade=CascadeType.REMOVE)
+	@JsonIgnore
 	private List<SoftwareStatus> softwareStatuses;
 
 	//bi-directional many-to-one association to Software
 	@ManyToOne
+	@JsonIgnore
 	private Software software;
+	
 	@Column(name = "software_id", insertable = false, updatable = false)
     private Long softwareId;
 

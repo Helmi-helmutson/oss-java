@@ -72,6 +72,7 @@ public class Software implements Serializable {
 
 	public Software() {
 		this.manuell = false;
+		this.weight  = 50;
 	}
 
 	@Override
