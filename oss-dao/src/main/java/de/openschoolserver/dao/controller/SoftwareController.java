@@ -70,10 +70,30 @@ public class SoftwareController extends Controller {
 
 	public Response add(Software software) {
 		EntityManager em = getEntityManager();
-		//TODO it may be too simple
+		Software oldSoftware = this.getByName(software.getName());
+		SoftwareVersion softwareVersion = software.getSoftwareVersions().get(0);	
+		if( oldSoftware != null ) {
+			try {
+				oldSoftware.getSoftwareVersions().add(softwareVersion);
+				softwareVersion.setSoftware(oldSoftware);
+				em.getTransaction().begin();
+				em.persist(softwareVersion);
+				em.merge(oldSoftware);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				return new Response(this.getSession(),"ERROR",e.getMessage());
+			} finally {
+				em.close();
+			}
+			return new Response(this.getSession(),"OK","Software was created succesfully");
+		}
+		software.addSoftwareVersion(softwareVersion);
+		softwareVersion.setSoftware(software);
 		try {
 			em.getTransaction().begin();
 			em.persist(software);
+			em.persist(softwareVersion);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -129,6 +149,9 @@ public class SoftwareController extends Controller {
 	public Software getByName(String name) {
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Software.getByName").setParameter("name", name);
+		if( query.getResultList().isEmpty() ) {
+			return null;
+		}
 		return (Software) query.getResultList().get(0);
 	}
 	
@@ -246,18 +269,12 @@ public class SoftwareController extends Controller {
 	
 
 	public Response downloadSoftwares(List<String> softwares) {
-		String[] program    = new String[7+ softwares.size()];
+		String[] program    = new String[1+ softwares.size()];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/bin/zypper";
-		program[1] = "-nx";
-		program[2] = "-D";
-		program[3] = "/srv/salt/repos.d/";
-		program[4] = "install";
-		program[5] = "-r";
-		program[6] = "salt-packages";
+		program[0] = "/usr/sbin/oss_download_packages";
 		for(int i = 0; i < softwares.size(); i++) {
-			program[8+i] = "oss-pkg-" + softwares.get(i);
+			program[1+i] = "oss-pkg-" + softwares.get(i);
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
 		return new Response(this.getSession(),"OK","Download of the softwares was started succesfully");

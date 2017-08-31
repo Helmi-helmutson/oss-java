@@ -15,8 +15,9 @@ import java.util.List;
 @Entity
 @Table(name = "Softwares")
 @NamedQueries({
-	@NamedQuery(name="Software.findAll", query="SELECT s FROM Software s"),
-	@NamedQuery(name="Software.findAllId", query="SELECT s.id FROM Software s")
+	@NamedQuery(name="Software.findAll",   query="SELECT s FROM Software s"),
+	@NamedQuery(name="Software.findAllId", query="SELECT s.id FROM Software s"),
+	@NamedQuery(name="Software.getByName", query="SELECT s FROM Software s WHERE s.name = :name")
 })
 public class Software implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -36,6 +37,7 @@ public class Software implements Serializable {
 	private Integer weight;
 	
 	//bi-directional many-to-one association to SoftwareLicens
+	@JsonIgnore
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	private List<SoftwareLicense> softwareLicenses;
 
@@ -44,10 +46,12 @@ public class Software implements Serializable {
 	private List<SoftwareVersion> softwareVersions;
 	
 	//bi-directional many-to-many association to Category
+	@JsonIgnore
 	@ManyToMany(mappedBy="softwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<Category> categories;
 
 	//bi-directional many-to-many association to Category
+	@JsonIgnore
 	@ManyToMany(mappedBy="removedSoftwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<Category> removedFromCategories;
 	

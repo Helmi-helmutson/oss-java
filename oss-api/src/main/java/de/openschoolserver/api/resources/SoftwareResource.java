@@ -442,6 +442,22 @@ public interface SoftwareResource {
 			);
 	
 	/*
+	 * POST softwares/download/{softwareName}
+	 */
+	@PUT
+	@Path("download/{softwareName}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Downloads softwares from the CEPHALIX repository.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.download")
+	Response downloadOne(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("softwareName") String softwareName
+			);
+	
+	/*
 	 * DELETE softwares/remove ["MsofficeYASfa","fadsfa","asfa"]
 	 */
 	@DELETE

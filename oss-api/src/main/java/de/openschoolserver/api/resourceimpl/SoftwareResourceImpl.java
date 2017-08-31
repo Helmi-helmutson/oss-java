@@ -2,6 +2,7 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -169,7 +170,14 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.downloadSoftwares(softwares);
 	}
-
+	@Override
+	public Response downloadOne(Session session, String softwareName) {
+		List<String> softwares = new ArrayList<String>();
+		softwares.add(softwareName);
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.downloadSoftwares(softwares);
+	}
+	
 	@Override
 	public Response removeSoftwares(Session session, List<String> softwares) {
 		SoftwareController softwareController = new SoftwareController(session);
@@ -181,4 +189,6 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.listDownloadedSoftware();
 	}
+
+	
 }
