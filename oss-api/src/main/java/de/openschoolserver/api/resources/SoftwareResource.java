@@ -451,7 +451,7 @@ public interface SoftwareResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("software.dowload")
+	@RolesAllowed("software.download")
 	Response removeSoftwares(
 			@ApiParam(hidden = true) @Auth Session session,
 			List<String> softwares
