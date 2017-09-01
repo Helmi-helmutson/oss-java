@@ -403,7 +403,7 @@ public class SoftwareController extends Controller {
 	{
 		EntityManager em = getEntityManager();
 		Software software = this.getById(softwareId);
-		if(softwareLicense.getLicenseType().equals("F") ) {
+		if(softwareLicense.getLicenseType().equals('F')) {
 			try {
 				em.getTransaction().begin();
 				softwareLicense.setSoftware(software);
@@ -416,7 +416,7 @@ public class SoftwareController extends Controller {
 			}
 			return this.uploadLicenseFile(softwareLicense.getId(), fileInputStream, contentDispositionHeader);
 		}
-		if(softwareLicense.getLicenseType().equals("C") && fileInputStream == null) {
+		if(softwareLicense.getLicenseType().equals('C') && fileInputStream == null) {
 			try {
 				em.getTransaction().begin();
 				softwareLicense.setSoftware(software);
@@ -671,11 +671,11 @@ public class SoftwareController extends Controller {
 					.setParameter("VERSION", version);
 		}
 		List<SoftwareStatus> lss = query.getResultList();
-		for( SoftwareStatus ss : lss ) {
-			return ss.getStatus();
-		}
 		em.close();
-		return "";
+		if( lss.isEmpty() ) {
+			return "";
+		}
+		return lss.get(0).getStatus();
 	}
 
 	/*
@@ -832,12 +832,12 @@ public class SoftwareController extends Controller {
 					Software software = this.getByName(softwareName);
 					for( SoftwareLicense sl : device.getSoftwareLicences() ) {
 						if( sl.getSoftware().equals(software) ) {
-							if( sl.getLicenseType().equals("CMD")) {
+							if( sl.getLicenseType().equals('C')) {
 								deviceSls.add(softwareName + "_KEY");
 								deviceSls.add("  grains.present:");
 								deviceSls.add("    - value: " + sl.getValue());
 							} else {
-								//TODO
+								//TODO what shall we do with license files
 							}
 						}
 						deviceSls.add("include:");
@@ -947,7 +947,7 @@ public class SoftwareController extends Controller {
 				return new Response(this.getSession(),"ERROR",e.getMessage());
 			}
 		}
-		
+		em.close();
 		return new Response(this.getSession(),"OK","Software State was saved succesfully");
 	}
 
@@ -959,7 +959,40 @@ public class SoftwareController extends Controller {
 	
 	public Response setSoftwareStatusOnDeviceByName(String deviceName, String softwareName, String version, String status) {
 		DeviceController deviceController = new DeviceController(this.session);
-		Device          device          =  deviceController.getByName(deviceName);
+		Device          device            =  deviceController.getByName(deviceName);
 		return this.setSoftwareStatusOnDevice(device, softwareName, version, status);
+	}
+
+	public Response deleteSoftwareStatusFromDevice(Device device, String softwareName, String version ) {
+		EntityManager em = getEntityManager();
+		for(SoftwareStatus st : device.getSofwareStatus() ) {
+			if( st.getSoftwareVersion().getVersion().equals(version) && st.getSoftwareVersion().getSoftware().getName().equals(softwareName) ) {
+				try {
+					em.getTransaction().begin();
+					em.merge(st);
+					em.remove(st);
+					em.getTransaction().commit();
+					return new Response(this.getSession(),"OK","Software State was removed succesfully");
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+					return new Response(this.getSession(),"ERROR",e.getMessage());
+				} finally {
+					em.close();
+				}
+			}
+		}
+		return new Response(this.getSession(),"OK","No Software State exists for this software version on this device.");
+	}
+
+	public Response deleteSoftwareStatusFromDeviceByName(String deviceName, String softwareName, String version) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getByName(deviceName);
+		return this.deleteSoftwareStatusFromDevice(device, softwareName, version);
+	}
+
+	public Response deleteSoftwareStatusFromDeviceById(Long deviceId, String softwareName, String version) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getById(deviceId);
+		return this.deleteSoftwareStatusFromDevice(device, softwareName, version);
 	}
 }

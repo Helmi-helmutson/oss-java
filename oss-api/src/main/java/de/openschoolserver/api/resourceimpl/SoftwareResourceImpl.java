@@ -205,17 +205,17 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public Response deleteSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
+	public Response deleteSoftwareStatusFromDevice(Session session, String deviceName, String softwareName,
 			String version) {
-		// TODO Auto-generated method stub
-		return null;
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.deleteSoftwareStatusFromDeviceByName(deviceName, softwareName, version);
 	}
 
 	@Override
-	public Response deleteSoftwareInstalledOnDeviceById(Session session, Long deviceId, String softwareName,
+	public Response deleteSoftwareStatusFromDeviceById(Session session, Long deviceId, String softwareName,
 			String version) {
-		// TODO Auto-generated method stub
-		return null;
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.deleteSoftwareStatusFromDeviceById(deviceId, softwareName, version);
 	}
 
 	@Override
