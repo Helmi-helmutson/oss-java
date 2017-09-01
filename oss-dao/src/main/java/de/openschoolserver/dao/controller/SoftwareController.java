@@ -82,9 +82,8 @@ public class SoftwareController extends Controller {
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				return new Response(this.getSession(),"ERROR",e.getMessage());
-			} finally {
 				em.close();
+				return new Response(this.getSession(),"ERROR",e.getMessage());
 			}
 			return new Response(this.getSession(),"OK","Software was created succesfully");
 		}
@@ -877,4 +876,90 @@ public class SoftwareController extends Controller {
 		return new Response(this.getSession(),"OK","Software State was saved succesfully"); 
 	}
 
+	public Response setSoftwareStatusOnDevice(Device device, String softwareName, String version, String status) {
+		SoftwareStatus softwareStatus   = null;
+		Software        software        = this.getByName(softwareName);
+		SoftwareVersion softwareVersion = null;
+		EntityManager em = getEntityManager();
+		if( software == null ) {
+			// Software does not exist. It is a manuall installed software.
+			software = new Software();
+			software.setName(softwareName);
+			software.setManuell(true);
+			software.setDescription(softwareName);
+			try {
+				em.getTransaction().begin();
+				em.persist(software);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				em.close();
+				return new Response(this.getSession(),"ERROR",e.getMessage());
+			}		
+		}
+		for( SoftwareVersion sv :  software.getSoftwareVersions() ) {
+			if( sv.getVersion().equals(version)) {
+				softwareVersion = sv;
+				break;
+			}
+		}
+		if( softwareVersion == null ) {
+			softwareVersion = new SoftwareVersion();
+			softwareVersion.setVersion(version);
+			softwareVersion.setSoftware(software);
+			try {
+				em.getTransaction().begin();
+				em.merge(software);
+				em.persist(softwareVersion);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				em.close();
+				return new Response(this.getSession(),"ERROR",e.getMessage());
+			}
+		}
+		for( SoftwareStatus st : device.getSofwareStatus() ) {
+			if( st.getSoftwareVersion().equals(softwareVersion) ) {
+				softwareStatus = st;
+				break;
+			}
+		}
+		if( softwareStatus == null ) {
+			softwareStatus = new SoftwareStatus(device,softwareVersion,status);
+			try {
+				em.getTransaction().begin();
+				em.persist(softwareStatus);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				em.close();
+				return new Response(this.getSession(),"ERROR",e.getMessage());
+			}
+		} else {
+			softwareStatus.setStatus(status);
+			try {
+				em.getTransaction().begin();
+				em.merge(softwareStatus);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				em.close();
+				return new Response(this.getSession(),"ERROR",e.getMessage());
+			}
+		}
+		
+		return new Response(this.getSession(),"OK","Software State was saved succesfully");
+	}
+
+	public Response setSoftwareStatusOnDeviceById(Long deviceId, String softwareName, String version, String status) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getById(deviceId);
+		return this.setSoftwareStatusOnDevice(device, softwareName, version, status);
+	}
+	
+	public Response setSoftwareStatusOnDeviceByName(String deviceName, String softwareName, String version, String status) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getByName(deviceName);
+		return this.setSoftwareStatusOnDevice(device, softwareName, version, status);
+	}
 }

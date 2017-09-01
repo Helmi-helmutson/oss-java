@@ -190,5 +190,47 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		return softwareController.listDownloadedSoftware();
 	}
 
+	@Override
+	public Response setSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
+			String version) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.setSoftwareStatusOnDeviceByName(deviceName, softwareName, version, "I");
+	}
+
+	@Override
+	public Response setSoftwareInstalledOnDeviceById(Session session, Long deviceId, String softwareName,
+			String version) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.setSoftwareStatusOnDeviceById(deviceId, softwareName, version, "I");
+	}
+
+	@Override
+	public Response deleteSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
+			String version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response deleteSoftwareInstelledOnDeviceById(Session session, Long deviceId, String softwareName,
+			String version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Map<String, String>> getSoftwareInstalledOnDevice(Session session, String deviceName,
+			String softwareName, String version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Map<String, String>> getSoftwareInstelledOnDeviceById(Session session, Long deviceId,
+			String softwareName, String version) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	
 }

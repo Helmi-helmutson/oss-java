@@ -462,6 +462,7 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
 # status M  -> manuell installed
 # status IS -> installation scheduled
 # status MD -> manuell deinstalled
+# status DS -> deinstallation scheduled
 # status DF -> deinstallation failed
 # status IF -> installation failed
 CREATE TABLE IF NOT EXISTS SoftwareStatus (

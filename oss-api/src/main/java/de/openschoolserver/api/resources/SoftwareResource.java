@@ -431,7 +431,10 @@ public interface SoftwareResource {
 	@POST
 	@Path("download")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Downloads softwares from the CEPHALIX repository.")
+	@ApiOperation(value = "Downloads softwares from the CEPHALIX repository.",
+	notes = "The call must provide a list of softwares to be downloaded:<br>"
+			+ "[ \"MSWhatever\", \"AnOtherProgram\" ]<br>"
+			+ "The requirements will be solved automaticaly.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -447,7 +450,7 @@ public interface SoftwareResource {
 	@PUT
 	@Path("download/{softwareName}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Downloads softwares from the CEPHALIX repository.")
+	@ApiOperation(value = "Downloads a software from the CEPHALIX repository.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -479,13 +482,14 @@ public interface SoftwareResource {
 	@POST
 	@Path("listDownloadedSoftware")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "List the status of the downloaded software."
-			+ "This call delivers a list of maps of the downloaded software."
-			+ "The maps have following fields:"
-			+ "name : name of the software"
-			+ "versions : the version of the software."
-			+ "update : this field contains the version of the available update."
-			+ "updateDescription : this field contains the desription of the available update.")
+	@ApiOperation(value = "List the status of the downloaded software. ",
+			notes = "This call delivers a list of maps of the downloaded software.<br>"
+			+ "[ {<br>"
+			+ "    name : name of the software,<br>"
+			+ "    versions : the version of the software,<br>"
+			+ "    update : this field contains the version of the available update,<br>"
+			+ "    updateDescription : this field contains the desription of the available update,<br>"
+			+ "} ]")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -493,4 +497,150 @@ public interface SoftwareResource {
 	List<Map<String,String>> listDownloadedSoftware(
 			@ApiParam(hidden = true) @Auth Session session
 			);
+	
+	/*
+	 * PUT softwares/devicesByName/{deviceName}/{softwareName}/{version}
+	 */
+	@PUT
+	@Path("devicesByName/{deviceName}/{softwareName}/{version}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Set a software on a device as installed in a given version.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.install")
+	Response setSoftwareInstalledOnDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@ApiParam(value = "Name of the device",  required = true) @PathParam("deviceName")   String deviceName,
+			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
+			@ApiParam(value = "Software version",    required = true) @PathParam("version")  String version
+			);
+	
+	/*
+	 * PUT softwares/devices/{deviceId}/{softwareName}/{version}
+	 */
+	@PUT
+	@Path("devices/{deviceId}/{softwareName}/{version}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Set a software on a device as installed in a given version.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.install")
+	Response setSoftwareInstalledOnDeviceById(
+			@ApiParam(hidden = true) @Auth Session session,
+			@ApiParam(value = "ID of the device",    required = true) @PathParam("deviceId")   Long deviceId,
+			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
+			@ApiParam(value = "Software version",    required = true) @PathParam("version")  String version
+			);
+	
+	/*
+	 * DELETE softwares/devicesByName/{deviceName}/{softwareName}/{version}
+	 */
+	@DELETE
+	@Path("devicesByName/{deviceName}/{softwareName}/{version}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Set a software on a device as deinstalled in a given version.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.install")
+	Response deleteSoftwareInstalledOnDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@ApiParam(value = "Name of the device",  required = true) @PathParam("deviceName")   String deviceName,
+			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
+			@ApiParam(value = "Software version",    required = true) @PathParam("version")  String version
+			);
+	
+	/*
+	 * DELETE softwares/devices/{deviceId}/{softwareName}/{version}
+	 */
+	@DELETE
+	@Path("devices/{deviceId}/{softwareName}/{version}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Set a software on a device as deinstalled in a given version.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.install")
+	Response deleteSoftwareInstelledOnDeviceById(
+			@ApiParam(hidden = true) @Auth Session session,
+			@ApiParam(value = "ID of the device",    required = true) @PathParam("deviceId")   Long deviceId,
+			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
+			@ApiParam(value = "Software version",    required = true) @PathParam("version")  String version
+			);
+	
+	/*
+	 * GET softwares/devicesByName/{deviceName}/{softwareName}/{version}
+	 */
+	@GET
+	@Path("devicesByName/{deviceName}/{softwareName}/{version}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the state of the installation of software(s) on a device.",
+		      notes = "The parameters softwareName and version are not mandatory. "
+		            + "A call without version delivers the list of all versions of a software on a device. "
+			    + "A call without softwareName and version delivers a list of all softwares in all version on a device. "
+			    + "The delivered list has following format:<br>"
+			    + "[ {<br>"
+			    + "&nbsp;&nbsp;&nbsp;name       : Name of the software<br>"
+			    + "&nbsp;&nbsp;&nbsp;softwareId : Id of the software<br>"
+			    + "&nbsp;&nbsp;&nbsp;version    : Version of the software<br>"
+			    + "&nbsp;&nbsp;&nbsp;status     : Installation status of this version<br>"
+			    + "} ]"
+			    + "There are following installation states:<br>"
+			    + "I  -> installed<br>"
+			    + "IS -> installation scheduled<br>"
+			    + "MD -> manuell deinstalled<br>"
+			    + "DS -> deinstallation scheduled<br>"
+			    + "DF -> deinstallation failed<br>"
+			    + "IF -> installation failed<br>"
+
+		)
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.install")
+	List<Map<String,String>> getSoftwareInstalledOnDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@ApiParam(value = "Name of the device",  required = true)  @PathParam("deviceName")   String deviceName,
+			@ApiParam(value = "Name of the software",required = false) @PathParam("softwareName") String softwareName,
+			@ApiParam(value = "Software version",    required = false) @PathParam("version")  String version
+			);
+	
+	/*
+	 * GET softwares/devices/{deviceId}/{softwareName}/{version}
+	 */
+	@GET
+	@Path("devices/{deviceId}/{softwareName}/{version}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "the state of the installation of software(s) on a device.",
+		      notes = "The parameters softwareName and version are not mandatory. "
+		            + "A call without version delivers the list of all versions of a software on a device. "
+			    + "A call without softwareName and version delivers a list of all softwares in all version on a device. "
+			    + "The delivered list has following format:<br>"
+			    + "[ {<br>"
+			    + "&nbsp;&nbsp;&nbsp;name       : Name of the software<br>"
+			    + "&nbsp;&nbsp;&nbsp;softwareId : Id of the software<br>"
+			    + "&nbsp;&nbsp;&nbsp;version    : Version of the software<br>"
+			    + "&nbsp;&nbsp;&nbsp;status     : Installation status of this version<br>"
+			    + "} ]"
+			    + "There are following installation states:<br>"
+			    + "I  -> installed<br>"
+			    + "IS -> installation scheduled<br>"
+			    + "MD -> manuell deinstalled<br>"
+			    + "DS -> deinstallation scheduled<br>"
+			    + "DF -> deinstallation failed<br>"
+			    + "IF -> installation failed"
+	)
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.install")
+	List<Map<String,String>> getSoftwareInstelledOnDeviceById(
+			@ApiParam(hidden = true) @Auth Session session,
+			@ApiParam(value = "Name of the device",  required = true)  @PathParam("deviceId")   Long deviceId,
+			@ApiParam(value = "Name of the software",required = false) @PathParam("softwareName") String softwareName,
+			@ApiParam(value = "Software version",    required = false) @PathParam("version")  String version
+			);
+	
 }

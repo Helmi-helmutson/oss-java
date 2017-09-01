@@ -47,7 +47,7 @@ public class SoftwareStatus implements Serializable {
 	    
 	public SoftwareStatus() {
 	}
-
+	
 	public SoftwareStatus(Device d, SoftwareVersion sv, String status) {
 		this.device = d;
 		this.softwareVersion = sv;
