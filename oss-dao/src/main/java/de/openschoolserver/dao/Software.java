@@ -30,7 +30,7 @@ public class Software implements Serializable {
 	private String description;
 
 	@Convert(converter=BooleanToStringConverter.class)
-	private Boolean manuell;
+	private Boolean manually;
 
 	private String name;
 
@@ -71,8 +71,8 @@ public class Software implements Serializable {
 	private List<Software> requiredBy;
 
 	public Software() {
-		this.manuell = false;
-		this.weight  = 50;
+		this.manually = false;
+		this.weight   = 50;
 	}
 
 	@Override
@@ -107,12 +107,12 @@ public class Software implements Serializable {
 		this.description = description;
 	}
 
-	public Boolean getManuell() {
-		return this.manuell;
+	public Boolean getManually() {
+		return this.manually;
 	}
 
-	public void setManuell(Boolean manuell) {
-		this.manuell = manuell;
+	public void setManually(Boolean manually) {
+		this.manually = manually;
 	}
 
 	public String getName() {

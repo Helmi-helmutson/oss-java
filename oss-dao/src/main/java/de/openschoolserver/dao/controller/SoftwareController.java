@@ -319,13 +319,13 @@ public class SoftwareController extends Controller {
         count = query.getResultList().size();
         statusMap.put("installation_failed", count.toString());
         
-        query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","installed_manuell");
+        query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","installed_manually");
         count = query.getResultList().size();
-        statusMap.put("installed_manuell", count.toString());
+        statusMap.put("installed_manually", count.toString());
         
-        query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","deinstalled_manuell");
+        query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","deinstalled_manually");
         count = query.getResultList().size();
-        statusMap.put("deinstalled_manuell", count.toString());
+        statusMap.put("deinstalled_manually", count.toString());
         
         return statusMap;
 	}
@@ -885,7 +885,7 @@ public class SoftwareController extends Controller {
 			// Software does not exist. It is a manuall installed software.
 			software = new Software();
 			software.setName(softwareName);
-			software.setManuell(true);
+			software.setManually(true);
 			software.setDescription(softwareName);
 			try {
 				em.getTransaction().begin();
@@ -995,4 +995,43 @@ public class SoftwareController extends Controller {
 		Device          device          =  deviceController.getById(deviceId);
 		return this.deleteSoftwareStatusFromDevice(device, softwareName, version);
 	}
+
+	public String getSoftwareStatusOnDeviceByName(String deviceName, String softwareName,
+			String version) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getByName(deviceName);
+		Software software = this.getByName(softwareName);
+		return this.getSoftwareStatusOnDevice(device, software, version);
+	}
+
+	public String getSoftwareStatusOnDeviceById(Long deviceId, String softwareName, String version) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getById(deviceId);
+		Software software = this.getByName(softwareName);
+		return this.getSoftwareStatusOnDevice(device, software, version);
+	}
+
+	public List<SoftwareStatus> getSoftwareStatusOnDevice(Device device, String softwareName) {
+		List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
+		for( SoftwareStatus st : device.getSofwareStatus() ) {
+			st.softwareName = st.getSoftwareVersion().getSoftware().getName();
+			if( softwareName.equals("*") || st.softwareName.equals(softwareName) ) {
+				st.version      = st.getSoftwareVersion().getVersion();
+				st.manually     = st.getSoftwareVersion().getSoftware().getManually();
+				softwareStatus.add(st);
+			}
+		}
+		return softwareStatus;
+	}
+	public List<SoftwareStatus> getSoftwareStatusOnDeviceByName(String deviceName, String softwareName) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getByName(deviceName);
+		return this.getSoftwareStatusOnDevice(device, softwareName);
+	}
+
+	public List<SoftwareStatus> getSoftwareStatusOnDeviceById(Long deviceId, String softwareName) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getById(deviceId);
+		return this.getSoftwareStatusOnDevice(device, softwareName);	}
+	
 }

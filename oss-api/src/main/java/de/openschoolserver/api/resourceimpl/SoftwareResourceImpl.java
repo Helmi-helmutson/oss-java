@@ -2,6 +2,7 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.InputStream;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.SoftwareLicense;
+import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.controller.SoftwareController;
 import de.openschoolserver.dao.controller.CategoryController;
 
@@ -219,18 +221,29 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public List<Map<String, String>> getSoftwareStatusOnDevice(Session session, String deviceName,
-			String softwareName, String version) {
+	public List<SoftwareStatus> getSoftwareStatusOnDevice(Session session, String deviceName, String softwareName) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.getSoftwareStatusOnDeviceByName(deviceName, softwareName);
+	}
+
+	@Override
+	public List<SoftwareStatus> getSoftwareStatusOnDeviceById(Session session, Long deviceId, String softwareName) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.getSoftwareStatusOnDeviceById(deviceId, softwareName);
+	}
+
+	@Override
+	public String getSoftwareStatusOnDeviceByName(Session session, String DeviceName, String softwareName,
+			String version) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Map<String, String>> getSoftwareStatusOnDeviceById(Session session, Long deviceId,
-			String softwareName, String version) {
+	public String getSoftwareStatusOnDeviceById(Session session, Long deviceId, String softwareName, 
+			String version) {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
 	
 }

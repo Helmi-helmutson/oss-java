@@ -44,7 +44,22 @@ public class SoftwareStatus implements Serializable {
 
 	@Column(name = "device_id", insertable = false, updatable = false)
     private Long deviceId;
-	    
+	
+	@Transient
+	public String deviceName;
+	 
+	@Transient
+	public String softwareName;
+	
+	@Transient
+	public boolean manually;
+	
+	@Transient
+	public Long softwareId;
+	
+	@Transient
+	public String version;
+	
 	public SoftwareStatus() {
 	}
 	
