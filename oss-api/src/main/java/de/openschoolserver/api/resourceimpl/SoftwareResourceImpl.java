@@ -212,21 +212,21 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public Response deleteSoftwareInstelledOnDeviceById(Session session, Long deviceId, String softwareName,
+	public Response deleteSoftwareInstalledOnDeviceById(Session session, Long deviceId, String softwareName,
 			String version) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Map<String, String>> getSoftwareInstalledOnDevice(Session session, String deviceName,
+	public List<Map<String, String>> getSoftwareStatusOnDevice(Session session, String deviceName,
 			String softwareName, String version) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Map<String, String>> getSoftwareInstelledOnDeviceById(Session session, Long deviceId,
+	public List<Map<String, String>> getSoftwareStatusOnDeviceById(Session session, Long deviceId,
 			String softwareName, String version) {
 		// TODO Auto-generated method stub
 		return null;

@@ -563,7 +563,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response deleteSoftwareInstelledOnDeviceById(
+	Response deleteSoftwareInstalledOnDeviceById(
 			@ApiParam(hidden = true) @Auth Session session,
 			@ApiParam(value = "ID of the device",    required = true) @PathParam("deviceId")   Long deviceId,
 			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
@@ -600,7 +600,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	List<Map<String,String>> getSoftwareInstalledOnDevice(
+	List<Map<String,String>> getSoftwareStatusOnDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@ApiParam(value = "Name of the device",  required = true)  @PathParam("deviceName")   String deviceName,
 			@ApiParam(value = "Name of the software",required = false) @PathParam("softwareName") String softwareName,
@@ -636,7 +636,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	List<Map<String,String>> getSoftwareInstelledOnDeviceById(
+	List<Map<String,String>> getSoftwareStatusOnDeviceById(
 			@ApiParam(hidden = true) @Auth Session session,
 			@ApiParam(value = "Name of the device",  required = true)  @PathParam("deviceId")   Long deviceId,
 			@ApiParam(value = "Name of the software",required = false) @PathParam("softwareName") String softwareName,
