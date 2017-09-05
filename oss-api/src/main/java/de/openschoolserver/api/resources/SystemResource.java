@@ -1,10 +1,8 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
-
-
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;

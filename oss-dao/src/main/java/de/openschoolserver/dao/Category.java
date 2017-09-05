@@ -114,6 +114,36 @@ public class Category implements Serializable {
 	@JsonIgnore
 	private List<User> users;
 	
+	//bi-directional many-to-many association to Announcement
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinTable(
+			name="AnnouncementInCategories", 
+			joinColumns={ @JoinColumn(name="category_id") },
+			inverseJoinColumns={ @JoinColumn(name="announcement_id") }
+			)
+	@JsonIgnore
+	private List<Announcement> announcements;
+	
+	//bi-directional many-to-many association to Contact
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinTable(
+			name="ContactInCategories", 
+			joinColumns={ @JoinColumn(name="category_id") },
+			inverseJoinColumns={ @JoinColumn(name="contact_id") }
+			)
+	@JsonIgnore
+	private List<Contact> contacts;
+	
+	//bi-directional many-to-many association to FAQ
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinTable(
+			name="FAQInCategories", 
+			joinColumns={ @JoinColumn(name="category_id") },
+			inverseJoinColumns={ @JoinColumn(name="faq_id") }
+			)
+	@JsonIgnore
+	private List<FAQ> faqs;
+	
 	@Transient
 	private List<Long> deviceIds;
 
@@ -131,6 +161,15 @@ public class Category implements Serializable {
 
 	@Transient
 	private List<Long> softwareIds;
+	
+	@Transient
+	private List<Long> announcementIds;
+	
+	@Transient
+	private List<Long> contactIds;
+	
+	@Transient
+	private List<Long> faqIds;
 	
 	@Convert(converter=BooleanToStringConverter.class)
 	boolean studentsOnly;
@@ -299,4 +338,53 @@ public class Category implements Serializable {
 	public void setStudentsOnly( boolean studentsOnly) {
 		this.studentsOnly = studentsOnly;
 	}
+
+        public List<Announcement> getAnnouncements() {
+                return this.announcements;
+        }
+
+        public void setAnnouncements(List<Announcement> announcements) {
+                this.announcements = announcements;
+        }
+
+	public List<Long> getAnnouncementIds() {
+		return this.announcementIds;
+	}
+
+	public void setAnnouncementIds(List<Long> ids) {
+		this.announcementIds = ids;
+	}
+
+        public List<Contact> getContacts() {
+                return this.contacts;
+        }
+
+        public void setContacts(List<Contact> contacts) {
+                this.contacts = contacts;
+        }
+
+	public List<Long> getContactIds() {
+		return this.contactIds;
+	}
+
+	public void setContactIds(List<Long> ids) {
+		this.contactIds = ids;
+	}
+
+        public List<FAQ> getFaqs() {
+                return this.faqs;
+        }
+
+        public void setFaqs(List<FAQ> faqs) {
+                this.faqs = faqs;
+        }
+
+	public List<Long> getFAQIds() {
+		return this.faqIds;
+	}
+
+	public void setFAQIds(List<Long> ids) {
+		this.faqIds = ids;
+	}
+
 }

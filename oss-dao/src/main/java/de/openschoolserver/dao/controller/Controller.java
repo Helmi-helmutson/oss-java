@@ -299,7 +299,18 @@ public class Controller extends Config {
 		OSSShellTools.exec(program, reply, error, data.toString());
 		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
-	
+
+	protected boolean isSuperuser() {
+		if(properties.containsKey("de.openschoolserver.dao.Session.superusers")){
+			for( String s : properties.get("de.openschoolserver.dao.Session.superusers").split(",") ){
+				if( s.equals(this.session.getUser().getUid())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	protected boolean isProtected(Object object){
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.User":

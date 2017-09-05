@@ -436,7 +436,7 @@ CREATE TABLE IF NOT EXISTS Softwares (
 	name        VARCHAR(32) NOT NULL,
 	description VARCHAR(64) DEFAULT NULL,
 	weight      INTEGER DEFAULT 0,
-	manuell     CHAR(1) DEFAULT 'N',
+	manually    CHAR(1) DEFAULT 'N',
         PRIMARY KEY(id)
 );
 
@@ -459,7 +459,6 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
 );
 
 # status I  -> installed
-# status M  -> manuell installed
 # status IS -> installation scheduled
 # status MD -> manuell deinstalled
 # status DS -> deinstallation scheduled
@@ -494,6 +493,54 @@ CREATE TABLE IF NOT EXISTS LicenseToDevice (
 	PRIMARY KEY(license_id,device_id)
 );
 
+CREATE TABLE IF NOT EXISTS Announcements (
+	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        uuid       VARCHAR(36) DEFAULT NULL,
+        owner_id   BIGINT UNSIGNED DEFAULT NULL,
+        validFrom  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        validUntil DATETIME,
+        keywords   VARCHAR(128) NOT NULL,
+        title      VARCHAR(128) NOT NULL,
+        abstract   BLOB,
+        text       BLOB,
+        issuer     VARCHAR(128),
+        FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
+        PRIMARY KEY  (id)
+);
+
+CREATE TABLE IF NOT EXISTS HaveSeen (
+        user_id            BIGINT UNSIGNED DEFAULT NULL,
+        announcement_id    BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(user_id)           REFERENCES Users(id)         ON DELETE CASCADE,
+	FOREIGN KEY(announcement_id)   REFERENCES Announcements(id) ON DELETE CASCADE,
+	PRIMARY KEY(announcement_id,user_id)
+);
+
+CREATE TABLE IF NOT EXISTS FAQs (
+	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        uuid       VARCHAR(36) DEFAULT NULL,
+        owner_id   BIGINT UNSIGNED DEFAULT NULL,
+        issue      VARCHAR(128) default NULL,
+        title      VARCHAR(128) NOT NULL,
+        abstract   BLOB,
+        text       BLOB,
+        FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE SET NULL,
+        PRIMARY KEY  (id)
+);
+
+CREATE TABLE IF NOT EXISTS Contacts (
+	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        uuid       VARCHAR(36) DEFAULT NULL,
+        owner_id   BIGINT UNSIGNED DEFAULT NULL,
+        issue      VARCHAR(128) default NULL,
+        name       VARCHAR(128) default NULL,
+        phone      VARCHAR(128) default NULL,
+        email      VARCHAR(128) default NULL,
+        title      VARCHAR(128) default NULL,
+        FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE SET NULL,
+        PRIMARY KEY  (id)
+);
+
 CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name         VARCHAR(32) NOT NULL,
@@ -504,6 +551,22 @@ CREATE TABLE IF NOT EXISTS Categories (
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
+
+INSERT INTO Categories Values(1, 'Announcements for all','','announcements','1','N');
+INSERT INTO Categories Values(2, 'Announcements for sysadmins','','announcements','1','N');
+INSERT INTO Categories Values(3, 'Announcements for teachers','','announcements','1','N');
+INSERT INTO Categories Values(4, 'Announcements for students','','announcements','1','N');
+INSERT INTO Categories Values(5, 'Announcements for administration','','announcements','1','N');
+INSERT INTO Categories Values(6, 'Contacts for all','','contacts','1','N');
+INSERT INTO Categories Values(7, 'Contacts for sysadmins','','contacts','1','N');
+INSERT INTO Categories Values(8, 'Contacts for teachers','','contacts','1','N');
+INSERT INTO Categories Values(9, 'Contacts for students','','contacts','1','N');
+INSERT INTO Categories Values(10,'Contacts for administration','','contacts','1','N');
+INSERT INTO Categories Values(11,'FAQs for all','','faqs','1','N');
+INSERT INTO Categories Values(12,'FAQs for sysadmins','','faqs','1','N');
+INSERT INTO Categories Values(13,'FAQs for teachers','','faqs','1','N');
+INSERT INTO Categories Values(14,'FAQs for students','','faqs','1','N');
+INSERT INTO Categories Values(15,'FAQs for administration','','faqs','1','N');
 
 CREATE TABLE IF NOT EXISTS DeviceInCategories (
         device_id          BIGINT UNSIGNED NOT NULL,
@@ -520,6 +583,31 @@ CREATE TABLE IF NOT EXISTS GroupInCategories (
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(group_id,category_id)
 );
+
+INSERT INTO GroupInCategories Values(1,1);
+INSERT INTO GroupInCategories Values(2,1);
+INSERT INTO GroupInCategories Values(3,1);
+INSERT INTO GroupInCategories Values(4,1);
+INSERT INTO GroupInCategories Values(1,6);
+INSERT INTO GroupInCategories Values(2,6);
+INSERT INTO GroupInCategories Values(3,6);
+INSERT INTO GroupInCategories Values(4,6);
+INSERT INTO GroupInCategories Values(1,11);
+INSERT INTO GroupInCategories Values(2,11);
+INSERT INTO GroupInCategories Values(3,11);
+INSERT INTO GroupInCategories Values(4,11);
+INSERT INTO GroupInCategories Values(1,2);
+INSERT INTO GroupInCategories Values(1,7);
+INSERT INTO GroupInCategories Values(1,12);
+INSERT INTO GroupInCategories Values(2,3);
+INSERT INTO GroupInCategories Values(2,8);
+INSERT INTO GroupInCategories Values(2,13);
+INSERT INTO GroupInCategories Values(3,4);
+INSERT INTO GroupInCategories Values(3,9);
+INSERT INTO GroupInCategories Values(3,14);
+INSERT INTO GroupInCategories Values(4,5);
+INSERT INTO GroupInCategories Values(4,10);
+INSERT INTO GroupInCategories Values(4,15);
 
 CREATE TABLE IF NOT EXISTS HWConfInCategories (
         hwconf_id          BIGINT UNSIGNED NOT NULL,
@@ -559,5 +647,29 @@ CREATE TABLE IF NOT EXISTS UserInCategories (
 	FOREIGN KEY(user_id)      REFERENCES Users(id)      ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(user_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS AnnouncementInCategories (
+        announcement_id    BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(announcement_id) REFERENCES Announcements(id) ON DELETE CASCADE,
+	FOREIGN KEY(category_id)     REFERENCES Categories(id)    ON DELETE CASCADE,
+	PRIMARY KEY(announcement_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS FAQInCategories (
+        faq_id    BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(faq_id) REFERENCES FAQs(id) ON DELETE CASCADE,
+	FOREIGN KEY(category_id)     REFERENCES Categories(id)    ON DELETE CASCADE,
+	PRIMARY KEY(faq_id,category_id)
+);
+
+CREATE TABLE IF NOT EXISTS ContactInCategories (
+        contact_id    BIGINT UNSIGNED NOT NULL,
+        category_id        BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(contact_id) REFERENCES Contacts(id) ON DELETE CASCADE,
+	FOREIGN KEY(category_id)     REFERENCES Categories(id)    ON DELETE CASCADE,
+	PRIMARY KEY(contact_id,category_id)
 );
 

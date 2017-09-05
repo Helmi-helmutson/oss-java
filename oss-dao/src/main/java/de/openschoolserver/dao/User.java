@@ -101,6 +101,18 @@ public class User implements Serializable {
 	@OneToMany(mappedBy="user")
 	@JsonIgnore
 	private List<RoomSmartControl> smartControls;
+	
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="owner")
+	private List<FAQ> myFAQs;
+
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<Contact> myContacts;
+
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<Announcement> myAnnouncements;
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="users", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
@@ -127,6 +139,18 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<Group> groups;
 	
+	//bi-directional many-to-many association to Group
+	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
+	@JoinTable(
+			name="HaveSeen",
+			joinColumns={@JoinColumn(name="user_id")},
+			inverseJoinColumns={@JoinColumn(name="announcement_id")}
+			)
+	//@JsonManagedReference
+	@JsonIgnore
+	private List<Announcement> readAnnouncements;
+	
+
 	private Integer fsQuotaUsed;
 	private Integer fsQuota;
 	private Integer msQuotaUsed;
@@ -450,4 +474,35 @@ public class User implements Serializable {
     public List<RoomSmartControl> getSmartControls() {
     	return this.smartControls;
     }
+	public List<Announcement> getReadAnnouncements() {
+		return this.readAnnouncements;
+	}
+
+	public void setReadAnnouncements(List<Announcement> announcements) {
+		this.readAnnouncements = announcements;
+	}
+
+	public List<Announcement> getMyAnnouncements() {
+		return this.myAnnouncements;
+	}
+
+	public void setAnnouncement(List<Announcement> values) {
+		this.myAnnouncements = values;
+	}
+
+	public List<Contact> getMyContacts() {
+		return this.myContacts;
+	}
+
+	public void setMyContacts(List<Contact> values) {
+		this.myContacts = values;
+	}
+
+	public List<FAQ> getMyFAQs() {
+		return this.myFAQs;
+	}
+
+	public void setMyFAQs(List<FAQ> values) {
+		this.myFAQs = values;
+	}
 }

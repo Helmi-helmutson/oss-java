@@ -117,12 +117,15 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final EducationResource educationResource = new EducationResourceImpl();
         environment.jersey().register(educationResource);
 
+        final InformationResource infoResource = new InformationResourceImpl();
+        environment.jersey().register(infoResource);
+
         final ImporterResource importerResource = new ImporterResourceImpl();
         environment.jersey().register(importerResource);
         PluginHandler.registerPlugins(environment);
         
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
-        
+
     }
 }
