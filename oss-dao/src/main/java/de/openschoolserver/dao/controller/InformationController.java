@@ -280,4 +280,19 @@ public class InformationController extends Controller {
 		}
 	}
 
+
+	public List<Category> getInfoCategories(String search) {
+		if( this.isSuperuser() ) {
+			CategoryController categoryController = new CategoryController(this.session);
+			return categoryController.getByType(search);
+		}
+		List<Category> categories = new ArrayList<Category>();
+		for(Category category : this.session.getUser().getCategories() ) {
+			if(category.getCategoryType().equals(search)) {
+				categories.add(category);
+			}
+		}
+		return categories;
+	}
+
 }

@@ -57,6 +57,19 @@ public class CategoryController extends Controller {
 			}
 		}
 
+	public List<Category> getByType(String search) {
+		EntityManager em = getEntityManager();
+			try {
+				Query query = em.createNamedQuery("Category.getByType").setParameter("type", search);
+				return query.getResultList();
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+				return new ArrayList<>();
+			} finally {
+				em.close();
+			}
+		}
+
 	public Response add(Category category){
 		EntityManager em = getEntityManager();
 		

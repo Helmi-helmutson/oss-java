@@ -62,32 +62,53 @@ public class InformationResourceImpl implements InformationResource {
 
 	@Override
 	public Response deleteContact(Session session, Long contactId) {
-		// TODO Auto-generated method stub
-		return null;
+		InformationController infoController = new InformationController(session);
+		return infoController.deleteContact(contactId);
 	}
 
 	@Override
 	public Response deleteFAQ(Session session, Long faqId) {
-		// TODO Auto-generated method stub
-		return null;
+		InformationController infoController = new InformationController(session);
+		return infoController.deleteFAQ(faqId);
 	}
 
 	@Override
 	public List<Category> getAnnouncementCategories(Session session) {
-		// TODO Auto-generated method stub
-		return null;
+		InformationController infoController = new InformationController(session);
+		return infoController.getInfoCategories("announcements");
 	}
 
 	@Override
 	public List<Category> getContactsCategories(Session session) {
-		// TODO Auto-generated method stub
-		return null;
+		InformationController infoController = new InformationController(session);
+		return infoController.getInfoCategories("contacts");
 	}
 
 	@Override
 	public List<Category> getFAQCategories(Session session) {
-		// TODO Auto-generated method stub
-		return null;
+		InformationController infoController = new InformationController(session);
+		return infoController.getInfoCategories("faqs");
+	}
+
+	@Override
+	public Response modifyAnnouncement(Session session, Long announcementId, Announcement announcement) {
+		InformationController infoController = new InformationController(session);
+		announcement.setId(announcementId);
+		return infoController.modifyAnnouncement(announcement);
+	}
+
+	@Override
+	public Response modifyContact(Session session, Long contactId, Contact contact) {
+		InformationController infoController = new InformationController(session);
+		contact.setId(contactId);
+		return infoController.modifyContact(contact);
+	}
+
+	@Override
+	public Response modifyFAQ(Session session, Long faqId, FAQ faq) {
+		InformationController infoController = new InformationController(session);
+		faq.setId(faqId);
+		return infoController.modifyFAQ(faq);
 	}
 
 }

@@ -12,6 +12,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import de.openschoolserver.dao.Announcement;
@@ -107,7 +108,7 @@ public interface InformationResource {
     		@ApiParam(hidden = true) @Auth Session session
     );
 
-	@DELETE
+	@POST
     @Path("announcements/{announcementId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Deletes an announcement.")
@@ -115,9 +116,10 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
-    Response deleteAnnouncement(
+    Response modifyAnnouncement(
     		@ApiParam(hidden = true) @Auth Session session,
-    		Long announcementId
+    		@PathParam("announcementId") Long announcementId,
+    		Announcement announcement
     );
     
 	@POST
@@ -128,9 +130,10 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
-    Response deleteContact(
+    Response modifyContact(
     		@ApiParam(hidden = true) @Auth Session session,
-    		Long contactId
+    		@PathParam("contactId") Long contactId,
+    		Contact contact
     );
     
 	@POST
@@ -141,9 +144,49 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
+    Response modifyFAQ(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("faqId") Long faqId,
+    		FAQ faq
+    );
+
+	@DELETE
+    @Path("announcements/{announcementId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Deletes an announcement.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+	@RolesAllowed("information.delete")
+    Response deleteAnnouncement(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("announcementId") Long announcementId
+    );
+    
+	@DELETE
+    @Path("contacts/{contactId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Deletes a contact.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+	@RolesAllowed("information.delete")
+    Response deleteContact(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("contactId") Long contactId
+    );
+    
+	@DELETE
+    @Path("faqs/{faqId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delets a FAQ.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+	@RolesAllowed("information.delete")
     Response deleteFAQ(
     		@ApiParam(hidden = true) @Auth Session session,
-    		Long faqId
+    		@PathParam("faqId") Long faqId
     );
 
 	@GET

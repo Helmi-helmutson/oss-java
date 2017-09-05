@@ -19,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 	@NamedQuery(name="Category.findAll", query="SELECT c FROM Category c"),
 	@NamedQuery(name="Category.getByName",  query="SELECT c FROM Category c where c.name = :name"),
 	@NamedQuery(name="Category.getByDescription",  query="SELECT c FROM Category c where c.description = :description"),
+	@NamedQuery(name="Category.getByType",  query="SELECT c FROM Category c where c.categoryType = :type"),
 	@NamedQuery(name="Category.search", query="SELECT c FROM Category c WHERE c.name LIKE :search OR c.description = :search")
 })
 
