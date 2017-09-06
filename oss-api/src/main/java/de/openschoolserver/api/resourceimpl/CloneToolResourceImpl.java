@@ -31,7 +31,7 @@ public class CloneToolResourceImpl implements CloneToolResource {
 			return "";
 		}
 		final CloneToolController cloneToolController = new CloneToolController(session);
-		if( cloneToolController.checkMConfig(session.getDevice(),"isMaster","Y" ) ) {
+		if( cloneToolController.checkConfig(session.getDevice(),"isMaster","Y" ) ) {
 			return "true";
 		}
 		return "";
