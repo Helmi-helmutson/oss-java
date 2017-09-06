@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -372,8 +373,8 @@ public class Controller extends Config {
 		 OSSShellTools.exec(program, reply, error, null);
 		 return  error.length() == 0;
 	}
-	
-	public boolean checkMConfig(Object object, String key, String value) {
+
+	public OSSMConfig getMConfigObject(Object object, String key, String value) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.check");
@@ -396,13 +397,23 @@ public class Controller extends Config {
 			 break;
 		}
 		query.setParameter("id", id).setParameter("keyword", key).setParameter("value", value);
-		return ! query.getResultList().isEmpty();
+		if( query.getResultList().isEmpty() ) {
+			return null;
+		}
+		return (OSSMConfig) query.getResultList().get(0);
 	}
 	
-	public boolean checkConfig(Object object, String key, String value) {
+	public boolean checkMConfig(Object object, String key, String value) {
+		if( this.getMConfigObject(object, key, value) == null ) {
+			return false;
+		}
+		return true;
+	}
+
+	public OSSConfig getConfigObject(Object object, String key) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
-		Query query = em.createNamedQuery("OSSConfig.check");
+		Query query = em.createNamedQuery("OSSConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
 			 query.setParameter("type","Group");
@@ -421,8 +432,18 @@ public class Controller extends Config {
 			id    = ((Device) object ).getId();
 			break;
 		}
-		query.setParameter("id", id).setParameter("keyword", key).setParameter("value", value);
-		return ! query.getResultList().isEmpty();
+		query.setParameter("id", id).setParameter("keyword", key);
+		if( query.getResultList().isEmpty() ) {
+			return null;
+		}
+		return (OSSConfig) query.getResultList().get(0);
+	}
+
+	public boolean checkConfig(Object object, String key) {
+		if( this.getConfigObject(object, key) == null ) {
+			return false;
+		}
+		return true;
 	}
 	
 	public List<String> getMConfig(Object object, String key) {
@@ -448,7 +469,11 @@ public class Controller extends Config {
 			break;
 		}
 		query.setParameter("id", id).setParameter("keyword", key);
-		return (List<String>) query.getResultList();
+		ArrayList<String> values = new ArrayList<String>();
+		for(OSSMConfig config : (List<OSSMConfig>) query.getResultList() ) {
+			values.add(config.getValue());
+		}
+		return values;
 	}
 	
 	public String getConfig(Object object, String key) {
@@ -477,6 +502,145 @@ public class Controller extends Config {
 		if( query.getResultList().isEmpty() ) {
 			return null;
 		}
-		return (String) query.getResultList().get(0);
+		OSSConfig config = (OSSConfig) query.getResultList().get(0);
+		return config.getValue();
+	}
+
+	public Response addMConfig(Object object, String key, String value) {
+		if( this.checkMConfig(object, key, value) ){
+			return new Response(this.getSession(),"ERROR","This mconfig value already exists.");
+		}
+		EntityManager em = this.getEntityManager();
+		OSSMConfig mconfig = new OSSMConfig();
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Group":
+			 mconfig.setObjectType("Group");
+			 mconfig.setObjectId(((Group) object ).getId());
+			 break;
+		case "de.openschoolserver.dao.User":
+			mconfig.setObjectType("User");
+			mconfig.setObjectId(((User) object ).getId());
+			 break;
+		case "de.openschoolserver.dao.Room":
+			mconfig.setObjectType("Room");
+			mconfig.setObjectId(((Room) object ).getId());
+			break;
+		case "de.openschoolserver.dao.Device":
+			mconfig.setObjectType("Device");
+			mconfig.setObjectId(((Device) object ).getId());
+			break;
+		}
+		mconfig.setKeyword(key);
+		mconfig.setValue(value);
+		try {
+			em.getTransaction().begin();
+			em.persist(mconfig);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Mconfig was created");
+	}
+
+	public Response addConfig(Object object, String key, String value) {
+		if( this.checkConfig(object, key) ){
+			return new Response(this.getSession(),"ERROR","This config already exists.");
+		}
+		EntityManager em = this.getEntityManager();
+		OSSConfig config = new OSSConfig();
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Group":
+			 config.setObjectType("Group");
+			 config.setObjectId(((Group) object ).getId());
+			 break;
+		case "de.openschoolserver.dao.User":
+			config.setObjectType("User");
+			config.setObjectId(((User) object ).getId());
+			 break;
+		case "de.openschoolserver.dao.Room":
+			config.setObjectType("Room");
+			config.setObjectId(((Room) object ).getId());
+			break;
+		case "de.openschoolserver.dao.Device":
+			config.setObjectType("Device");
+			config.setObjectId(((Device) object ).getId());
+			break;
+		}
+		config.setKeyword(key);
+		config.setValue(value);
+		try {
+			em.getTransaction().begin();
+			em.persist(config);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Config was created");
+	}
+
+	public Response setConfig(Object object, String key, String value) {
+		if( ! this.checkConfig(object, key) ){
+			return this.addConfig(object, key, value);
+		}
+		EntityManager em = this.getEntityManager();
+		OSSConfig config = this.getConfigObject(object, key);
+		config.setValue(value);
+		try {
+			em.getTransaction().begin();
+			em.merge(config);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Config was updated");
+	}
+
+	public Response deleteConfig(Object object, String key) {
+		OSSConfig config = this.getConfigObject(object, key);
+		if( config == null ) {
+			return new Response(this.getSession(),"ERROR","Config does not exists.");
+		}
+		EntityManager em = this.getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.merge(config);
+			em.remove(config);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Config was deleted");
+	}
+
+	public Response deleteMConfig(Object object, String key, String value) {
+		OSSMConfig config = this.getMConfigObject(object, key, value);
+		if( config == null ) {
+			return new Response(this.getSession(),"ERROR","MConfig does not exists.");
+		}
+		EntityManager em = this.getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.merge(config);
+			em.remove(config);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new Response(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new Response(this.getSession(),"OK","Config was deleted");
 	}
 }
