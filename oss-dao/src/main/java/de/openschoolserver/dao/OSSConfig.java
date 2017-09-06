@@ -7,7 +7,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 /**
- * The persistent class for the DeviceConfig database table.
+ * The persistent class for the OSSConfig database table.
  *
  */
 @Entity
