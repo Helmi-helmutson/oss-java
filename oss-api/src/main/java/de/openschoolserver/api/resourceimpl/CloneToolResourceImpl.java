@@ -7,7 +7,6 @@ import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.CloneToolController;
-import de.openschoolserver.dao.DeviceConfig;
 import de.openschoolserver.api.resources.CloneToolResource;
 
 
@@ -28,12 +27,12 @@ public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
 	public String isMaster(Session session) {
-		if( session.getDevice() == null )
+		if( session.getDevice() == null ) {
 			return "";
-		for( DeviceConfig dc : session.getDevice().getDeviceConfigs() )
-		{
-			if( dc.getKeyword().equals("isMaster") && dc.getValue().equals("Y") )
-				return "true";
+		}
+		final CloneToolController cloneToolController = new CloneToolController(session);
+		if( cloneToolController.checkMConfig(session.getDevice(),"isMaster","Y" ) ) {
+			return "true";
 		}
 		return "";
 	}

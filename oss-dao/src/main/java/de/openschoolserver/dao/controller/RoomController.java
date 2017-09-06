@@ -113,11 +113,11 @@ public class RoomController extends Controller {
 				return query.getResultList();
 			} else {
 				List<Room> rooms = new ArrayList<Room>();
-				for(String roomid : this.getMConfig(this.session.getUser(),"AdHocAccess" ) {
+				for(String roomid : this.getMConfig(this.session.getUser(),"AdHocAccess" ) ) {
 					rooms.add(this.getById(Long.parseLong(roomid)));
 				}
 				for(Group group : this.session.getUser().getGroups() ) {
-					for(String roomid : this.getMConfig(group,"AdHocAccess" ) {
+					for(String roomid : this.getMConfig(group,"AdHocAccess" ) ) {
 						rooms.add(this.getById(Long.parseLong(roomid)));
 					}
 				}
