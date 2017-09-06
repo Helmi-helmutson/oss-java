@@ -25,11 +25,7 @@ import javax.persistence.*;
 	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
 	@NamedQuery(name="User.findByName",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.sureName = :sureName"),
 	@NamedQuery(name="User.findByNameAndRole",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.sureName = :sureName and u.role = :role"),
-	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.sureName LIKE :search"),
-	@NamedQuery(name="User.getConfig",    query="SELECT c.value FROM UserConfig  c WHERE c.user.id = :id AND c.keyword = :keyword" ),
-	@NamedQuery(name="User.getMConfig",   query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :id AND c.keyword = :keyword" ),
-	@NamedQuery(name="User.checkConfig",  query="SELECT c.value FROM UserConfig  c WHERE c.user.id = :id AND c.keyword = :keyword AND c.value = :value" ),
-	@NamedQuery(name="User.checMkConfig", query="SELECT c.value FROM UserMConfig c WHERE c.user.id = :id AND c.keyword = :keyword AND c.value = :value" ),
+	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.sureName LIKE :search")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class User implements Serializable {
@@ -73,14 +69,6 @@ public class User implements Serializable {
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Category> ownedCategories;
-
-	//bi-directional many-to-one association to TestFile
-	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
-	private List<UserMConfig> userMConfigs;
-
-	//bi-directional many-to-one association to TestFile
-	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
-	private List<UserConfig> userConfigs;
 
 	//bi-directional many-to-one association to TestFile
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
@@ -382,46 +370,6 @@ public class User implements Serializable {
 
 	public void setGroups(List<Group> groups) {
 		this.groups = groups;
-	}
-
-	public List<UserConfig> getUserConfigs() {
-		return this.userConfigs;
-	}
-
-	public void setUserConfigs(List<UserConfig> userConfigs) {
-		this.userConfigs = userConfigs;
-	}
-
-	public UserConfig addUserConfig(UserConfig userConfig) {
-		getUserConfigs().add(userConfig);
-		userConfig.setUser(this);
-		return userConfig;
-	}
-
-	public UserConfig removeUserConfig(UserConfig userConfig) {
-		getUserConfigs().remove(userConfig);
-		userConfig.setUser(null);
-		return userConfig;
-	}
-
-	public List<UserMConfig> getUserMConfigs() {
-		return this.userMConfigs;
-	}
-
-	public void setUserMConfigs(List<UserMConfig> userMConfigs) {
-		this.userMConfigs = userMConfigs;
-	}
-
-	public UserMConfig addUserMConfig(UserMConfig userMConfig) {
-		getUserMConfigs().add(userMConfig);
-		userMConfig.setUser(this);
-		return userMConfig;
-	}
-
-	public UserMConfig removeUserMConfig(UserMConfig userMConfig) {
-		getUserMConfigs().remove(userMConfig);
-		userMConfig.setUser(null);
-		return userMConfig;
 	}
 
 	public void setPassword(String password) {

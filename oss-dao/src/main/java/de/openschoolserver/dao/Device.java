@@ -21,10 +21,6 @@ import java.util.List;
 	@NamedQuery(name="Device.getByMAC",     query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
 	@NamedQuery(name="Device.getByName",    query="SELECT d FROM Device d where d.name = :name"),
 	@NamedQuery(name="Device.search",       query="SELECT d FROM Device d where d.name LIKE :search OR d.ip LIKE :search OR d.wlanip LIKE :search OR d.mac LIKE :search OR d.wlanmac LIKE :search" ),
-	@NamedQuery(name="Device.getConfig",    query="SELECT c.value FROM DeviceConfig  c WHERE c.device.id = :id AND c.keyword = :keyword" ),
-	@NamedQuery(name="Device.getMConfig",   query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :id AND c.keyword = :keyword" ),
-	@NamedQuery(name="Device.checkConfig",  query="SELECT c.value FROM DeviceConfig  c WHERE c.device.id = :id AND c.keyword = :keyword AND c.value = :value" ),
-	@NamedQuery(name="Device.checkMConfig", query="SELECT c.value FROM DeviceMConfig c WHERE c.device.id = :id AND c.keyword = :keyword AND c.value = :value" )
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Device implements Serializable {
@@ -62,16 +58,6 @@ public class Device implements Serializable {
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	private List<Category> categories;
-
-	//bi-directional many-to-one association to DeviceMConfig
-	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
-	@JsonIgnore
-	private List<DeviceMConfig> deviceMConfigs;
-
-	//bi-directional many-to-one association to DeviceConfig
-	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true )
-	@JsonIgnore
-	private List<DeviceConfig> deviceConfigs;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -363,46 +349,6 @@ public class Device implements Serializable {
 		this.loggedIn = loggedIn;
 	}
 
-
-	public List<DeviceConfig> getDeviceConfigs() {
-		return this.deviceConfigs;
-	}
-
-	public void setDeviceConfigs(List<DeviceConfig> deviceConfigs) {
-		this.deviceConfigs = deviceConfigs;
-	}
-
-	public DeviceConfig addDeviceConfig(DeviceConfig deviceConfig) {
-		getDeviceConfigs().add(deviceConfig);
-		deviceConfig.setDevice(this);
-		return deviceConfig;
-	}
-
-	public DeviceConfig removeDeviceConfig(DeviceConfig deviceConfig) {
-		getDeviceConfigs().remove(deviceConfig);
-		deviceConfig.setDevice(null);
-		return deviceConfig;
-	}
-
-	public List<DeviceMConfig> getDeviceMConfigs() {
-		return this.deviceMConfigs;
-	}
-
-	public void setDeviceMConfigs(List<DeviceMConfig> deviceMConfigs) {
-		this.deviceMConfigs = deviceMConfigs;
-	}
-
-	public DeviceMConfig addDeviceMConfig(DeviceMConfig deviceMConfig) {
-		getDeviceMConfigs().add(deviceMConfig);
-		deviceMConfig.setDevice(this);
-		return deviceMConfig;
-	}
-
-	public DeviceMConfig removeDeviceMConfig(DeviceMConfig deviceMConfig) {
-		getDeviceMConfigs().remove(deviceMConfig);
-		deviceMConfig.setDevice(null);
-		return deviceMConfig;
-	}
 
 	public List<Category> getCategories() {
 	        return this.categories;

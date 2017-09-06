@@ -16,6 +16,7 @@ import java.util.Calendar;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Room;
@@ -112,11 +113,15 @@ public class RoomController extends Controller {
 				return query.getResultList();
 			} else {
 				List<Room> rooms = new ArrayList<Room>();
-				Query query = em.createNamedQuery("User.getMConfig").setParameter("keyword", "AdHocAccess").setParameter("user_id",this.session.getUserId());
-        		for(String roomid : (List<String>) query.getResultList() ) {
-        			rooms.add(this.getById(Long.parseLong(roomid)));
-        		}
-        		return rooms;
+				for(String roomid : this.getMConfig(this.session.getUser(),"AdHocAccess" ) {
+					rooms.add(this.getById(Long.parseLong(roomid)));
+				}
+				for(Group group : this.session.getUser().getGroups() ) {
+					for(String roomid : this.getMConfig(group,"AdHocAccess" ) {
+						rooms.add(this.getById(Long.parseLong(roomid)));
+					}
+				}
+				return rooms;
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -649,9 +654,21 @@ public class RoomController extends Controller {
 		User   owner  = this.getSession().getUser();
 		if( ! owner.getRole().contains("sysadmins") ) {
 			//non sysadmin user want to register his workstation
-			if( this.checkMConfig(this.getSession().getUser(),"AdHocAccess",String.valueOf(roomId)) ) {
+			boolean allowed = false;
+			for( Group group : owner.getGroups() ) {
+				if( this.checkMConfig(group,"AdHocAccess",String.valueOf(roomId)) ) {
+					allowed = true;
+					break;
+				}
+			}
+			if( !allowed ) {
+				if( this.checkMConfig(owner,"AdHocAccess",String.valueOf(roomId)) ) {
+					allowed = true;
+				}
+			}
+			if( allowed ) {
 				Query query = em.createNamedQuery("HWConf.getByName");
-		        query.setParameter("name", "BYOD");
+				query.setParameter("name", "BYOD");
 				HWConf hwconf = (HWConf) query.getResultList().get(0);
 				device.setMac(macAddress);
 				device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));

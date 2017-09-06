@@ -376,18 +376,22 @@ public class Controller extends Config {
 	public boolean checkMConfig(Object object, String key, String value) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
-		Query query = null;
+		Query query = em.createNamedQuery("OSSMConfig.check");
 		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Group":
+			 query.setParameter("type","Group");
+			 id    = ((Group) object ).getId();
+			 break;
 		case "de.openschoolserver.dao.User":
-			 query = em.createNamedQuery("User.getMConfig");
+			 query.setParameter("type","User");
 			 id    = ((User) object ).getId();
 			 break;
 		case "de.openschoolserver.dao.Room":
-			query = em.createNamedQuery("Room.getMConfig");
+			 query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
 			break;
 		case "de.openschoolserver.dao.Device":
-			 query = em.createNamedQuery("Device.getMConfig");
+			 query.setParameter("type","Device");
 			 id    = ((Device) object ).getId();
 			 break;
 		}
@@ -398,20 +402,24 @@ public class Controller extends Config {
 	public boolean checkConfig(Object object, String key, String value) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
-		Query query = null;
+		Query query = em.createNamedQuery("OSSConfig.check");
 		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Group":
+			 query.setParameter("type","Group");
+			 id    = ((Group) object ).getId();
+			 break;
 		case "de.openschoolserver.dao.User":
-			 query = em.createNamedQuery("User.getConfig");
+			 query.setParameter("type","User");
 			 id    = ((User) object ).getId();
 			 break;
 		case "de.openschoolserver.dao.Room":
-			query = em.createNamedQuery("Room.getConfig");
+			query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
 			break;
 		case "de.openschoolserver.dao.Device":
-			 query = em.createNamedQuery("Device.getConfig");
-			 id    = ((Device) object ).getId();
-			 break;
+			query.setParameter("type","Device");
+			id    = ((Device) object ).getId();
+			break;
 		}
 		query.setParameter("id", id).setParameter("keyword", key).setParameter("value", value);
 		return ! query.getResultList().isEmpty();
@@ -420,20 +428,24 @@ public class Controller extends Config {
 	public List<String> getMConfig(Object object, String key) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
-		Query query = null;
+		Query query = em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
-		case "de.openschoolserver.dao.User":
-			 query = em.createNamedQuery("User.getMConfig");
-			 id    = ((User) object ).getId();
+		case "de.openschoolserver.dao.Group":
+			 query.setParameter("type","Group");
+			 id    = ((Group) object ).getId();
 			 break;
+		case "de.openschoolserver.dao.User":
+			query.setParameter("type","User");
+			id    = ((User) object ).getId();
+			break;
 		case "de.openschoolserver.dao.Room":
-			query = em.createNamedQuery("Room.getMConfig");
+			query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
 			break;
 		case "de.openschoolserver.dao.Device":
-			 query = em.createNamedQuery("Device.getMConfig");
-			 id    = ((Device) object ).getId();
-			 break;
+			query.setParameter("type","Device");
+			id    = ((Device) object ).getId();
+			break;
 		}
 		query.setParameter("id", id).setParameter("keyword", key);
 		return (List<String>) query.getResultList();
@@ -442,20 +454,24 @@ public class Controller extends Config {
 	public String getConfig(Object object, String key) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
-		Query query = null;
+		Query query = em.createNamedQuery("OSSConfig.get");
 		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Group":
+			 query.setParameter("type","Group");
+			 id    = ((Group) object ).getId();
+			 break;
 		case "de.openschoolserver.dao.User":
-			 query = em.createNamedQuery("User.getConfig");
+			 query.setParameter("type","User");
 			 id    = ((User) object ).getId();
 			 break;
 		case "de.openschoolserver.dao.Room":
-			query = em.createNamedQuery("Room.getConfig");
+			query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
 			break;
 		case "de.openschoolserver.dao.Device":
-			 query = em.createNamedQuery("Device.getConfig");
-			 id    = ((Device) object ).getId();
-			 break;
+			query.setParameter("type","Device");
+			id    = ((Device) object ).getId();
+			break;
 		}
 		query.setParameter("id", id).setParameter("keyword", key);
 		if( query.getResultList().isEmpty() ) {

@@ -4,23 +4,19 @@
 		<class>de.openschoolserver.dao.Acl</class>
 		<class>de.openschoolserver.dao.Alias</class>
 		<class>de.openschoolserver.dao.Device</class>	
-		<class>de.openschoolserver.dao.DeviceConfig</class>
-		<class>de.openschoolserver.dao.DeviceMConfig</class>
 		<class>de.openschoolserver.dao.Enumerate</class>
 		<class>de.openschoolserver.dao.Group</class>
 		<class>de.openschoolserver.dao.HWConf</class>
 		<class>de.openschoolserver.dao.Partition</class>
 		<class>de.openschoolserver.dao.Room</class>
-		<class>de.openschoolserver.dao.RoomMConfig</class>
-		<class>de.openschoolserver.dao.RoomConfig</class>
 		<class>de.openschoolserver.dao.RoomSmartControl</class>
 		<class>de.openschoolserver.dao.TestFile</class>
 	 	<class>de.openschoolserver.dao.TestUser</class>
 		<class>de.openschoolserver.dao.TestUserPK</class> 
-	    <class>de.openschoolserver.dao.Test</class>
+	        <class>de.openschoolserver.dao.Test</class>
 		<class>de.openschoolserver.dao.User</class>
-		<class>de.openschoolserver.dao.UserConfig</class>
-		<class>de.openschoolserver.dao.UserMConfig</class>
+		<class>de.openschoolserver.dao.OSSConfig</class>
+		<class>de.openschoolserver.dao.OSSMConfig</class>
 		<class>de.openschoolserver.dao.Session</class>
 		<class>de.openschoolserver.dao.BooleanToStringConverter</class>
 		<class>de.openschoolserver.dao.AccessInRoom</class>

@@ -25,11 +25,7 @@ import java.util.List;
 	@NamedQuery(name="Room.getByControl", query="SELECT r FROM Room r WHERE r.roomControl = :control"),
 	@NamedQuery(name="Room.getByIp", query="SELECT r FROM Room r WHERE r.startIP = :ip"),
 	@NamedQuery(name="Room.search", query="SELECT r FROM Room r WHERE r.name LIKE :search OR r.description LIKE :search OR r.roomType LIKE :search AND r.roomType != 'smartRoom'"),
-	@NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id"),
-	@NamedQuery(name="Room.getConfig",      query="SELECT c.value FROM RoomConfig  c WHERE c.room.id = :id AND c.keyword = :keyword" ),
-	@NamedQuery(name="Room.getMConfig",     query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :id AND c.keyword = :keyword" ),
-	@NamedQuery(name="Room.checkConfig",    query="SELECT c.value FROM RoomConfig  c WHERE c.room.id = :id AND c.keyword = :keyword AND c.value = :value" ),
-	@NamedQuery(name="Room.checMkConfig",   query="SELECT c.value FROM RoomMConfig c WHERE c.room.id = :id AND c.keyword = :keyword AND c.value = :value" )
+	@NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Room implements Serializable {
@@ -61,16 +57,6 @@ public class Room implements Serializable {
         //bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="rooms", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<Category> categories;
-
-	//bi-directional many-to-one association to RoomMConfig
-	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
-	@JsonIgnore
-	private List<RoomMConfig> roomMConfigs;
-
-	//bi-directional many-to-one association to RoomConfig
-	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
-	@JsonIgnore
-	private List<RoomConfig> roomConfigs;
 
 	//bi-directional many-to-one association to AccessInRoom
 	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
@@ -312,46 +298,6 @@ public class Room implements Serializable {
 
 	public void setNetwork(String network) {
 		this.network = network;
-	}
-
-	public List<RoomConfig> getRoomConfigs() {
-		return this.roomConfigs;
-	}
-
-	public void setRoomConfigs(List<RoomConfig> roomConfigs) {
-		this.roomConfigs = roomConfigs;
-	}
-
-	public RoomConfig addRoomConfig(RoomConfig roomConfig) {
-		getRoomConfigs().add(roomConfig);
-		roomConfig.setRoom(this);
-		return roomConfig;
-	}
-
-	public RoomConfig removeRoomConfig(RoomConfig roomConfig) {
-		getRoomConfigs().remove(roomConfig);
-		roomConfig.setRoom(null);
-		return roomConfig;
-	}
-
-	public List<RoomMConfig> getRoomMConfigs() {
-		return this.roomMConfigs;
-	}
-
-	public void setRoomMConfigs(List<RoomMConfig> roomMConfigs) {
-		this.roomMConfigs = roomMConfigs;
-	}
-
-	public RoomMConfig addRoomMConfig(RoomMConfig roomMConfig) {
-		getRoomMConfigs().add(roomMConfig);
-		roomMConfig.setRoom(this);
-		return roomMConfig;
-	}
-
-	public RoomMConfig removeRoomMConfig(RoomMConfig roomMConfig) {
-		getRoomMConfigs().remove(roomMConfig);
-		roomMConfig.setRoom(null);
-		return roomMConfig;
 	}
 
         public List<Category> getCategories() {

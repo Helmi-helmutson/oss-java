@@ -317,85 +317,23 @@ INSERT INTO Enumerates VALUES(NULL,'categoryType','software');
 INSERT INTO Enumerates VALUES(NULL,'categoryType','virtualRoom');
 
 #Some additional config tables
-CREATE TABLE IF NOT EXISTS UserConfig (
+CREATE TABLE IF NOT EXISTS OSSConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	user_id      BIGINT UNSIGNED NOT NULL,
-	keyword      VARCHAR(64) NOT NULL,
-	value        VARCHAR(128) NOT NULL,
-        FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE CASCADE,
-	PRIMARY KEY(id)
-);
-CREATE UNIQUE INDEX UserConfigIndex on UserConfig(user_id,keyword);
-
-CREATE TABLE IF NOT EXISTS UserMConfig (
-	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        user_id      BIGINT UNSIGNED NOT NULL,
+	objectType   VARCHAR(12)     NOT NULL,
+        objcetId     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX UserMConfigIndex on UserMConfig(user_id,keyword,value);
 
-CREATE TABLE IF NOT EXISTS GroupConfig (
+CREATE TABLE IF NOT EXISTS OSSMConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        group_id     BIGINT UNSIGNED NOT NULL,
+	objectType   VARCHAR(12)     NOT NULL,
+        objcetId     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
-        FOREIGN KEY(group_id) REFERENCES   Groups(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
-CREATE UNIQUE INDEX GroupConfigIndex on GroupConfig(group_id,keyword);
-
-CREATE TABLE IF NOT EXISTS GroupMConfig (
-	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        group_id     BIGINT UNSIGNED NOT NULL,
-        keyword      VARCHAR(64) NOT NULL,
-        value        VARCHAR(128) NOT NULL,
-        FOREIGN KEY(group_id) REFERENCES   Groups(id)   ON DELETE CASCADE,
-        PRIMARY KEY(id)
-);
-CREATE UNIQUE INDEX GroupMConfigIndex on GroupMConfig(group_id,keyword,value);
-
-CREATE TABLE IF NOT EXISTS DeviceConfig (
-	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        device_id    BIGINT UNSIGNED NOT NULL,
-        keyword      VARCHAR(64) NOT NULL,
-        value        VARCHAR(128) NOT NULL,
-        FOREIGN KEY(device_id) REFERENCES   Devices(id)   ON DELETE CASCADE,
-        PRIMARY KEY(id)
-);
-CREATE UNIQUE INDEX DeviceConfigIndex on DeviceConfig(device_id,keyword);
-
-CREATE TABLE IF NOT EXISTS DeviceMConfig (
-	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        device_id    BIGINT UNSIGNED NOT NULL,
-        keyword      VARCHAR(64) NOT NULL,
-        value        VARCHAR(128) NOT NULL,
-        FOREIGN KEY(device_id) REFERENCES   Devices(id)   ON DELETE CASCADE,
-        PRIMARY KEY(id)
-);
-CREATE UNIQUE INDEX DeviceMConfigIndex on DeviceMConfig(device_id,keyword);
-
-CREATE TABLE IF NOT EXISTS RoomConfig (
-	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        room_id      BIGINT UNSIGNED NOT NULL,
-        keyword      VARCHAR(64) NOT NULL,
-        value        VARCHAR(128) NOT NULL,
-        FOREIGN KEY(room_id) REFERENCES   Rooms(id)   ON DELETE CASCADE,
-        PRIMARY KEY(id)
-);
-CREATE UNIQUE INDEX RoomConfigIndex on RoomConfig(room_id,keyword);
-
-CREATE TABLE IF NOT EXISTS RoomMConfig (
-	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        room_id      BIGINT UNSIGNED NOT NULL,
-        keyword      VARCHAR(64) NOT NULL,
-        value        VARCHAR(128) NOT NULL,
-        FOREIGN KEY(room_id) REFERENCES   Rooms(id)   ON DELETE CASCADE,
-        PRIMARY KEY(id)
-);
-CREATE UNIQUE INDEX RoomMConfigIndex on RoomMConfig(room_id,keyword,value);
 
 CREATE TABLE IF NOT EXISTS RoomSmartControlls (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
