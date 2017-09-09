@@ -13,9 +13,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="OSSMConfig")
 @NamedQueries({
-        @NamedQuery(name="OSSMConfig.getAll", query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId := id"),
-        @NamedQuery(name="OSSMConfig.get",    query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId := id AND c.keyword := key"),
-        @NamedQuery(name="OSSMConfig.check",  query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId := id AND c.keyword := key AND c.value := value")
+        @NamedQuery(name="OSSMConfig.getAllById",  query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId := id"),
+        @NamedQuery(name="OSSMConfig.getAllByKey", query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.keyword  := key"),
+        @NamedQuery(name="OSSMConfig.get",         query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId := id AND c.keyword := key"),
+        @NamedQuery(name="OSSMConfig.check",       query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId := id AND c.keyword := key AND c.value := value")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class OSSMConfig implements Serializable {

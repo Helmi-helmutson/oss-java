@@ -155,7 +155,7 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 
 		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(room.getName())){
+		if( !this.isNameUnique(room.getName())){
 			return new Response(this.getSession(),"ERROR", "Room name is not unique.");
 		}
 		if( !this.isDescriptionUnique(room.getDescription())){
@@ -238,6 +238,11 @@ public class RoomController extends Controller {
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
 		List<String> allIPs  = net.getAvailableIPs(0);
 		List<String> usedIPs = new ArrayList<String>();
+		//TODO it is only for the school network. We need to check for all other subnets
+		String subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
+	    IPv4Net subNetwork = new IPv4Net( subnet );
+	    usedIPs.add(subNetwork.getBase());
+	    usedIPs.add(subNetwork.getLast());
 		for( Device dev : room.getDevices() ){
 			usedIPs.add(dev.getIp());
 			if( dev.getWlanIp() != "" ) {
@@ -254,9 +259,17 @@ public class RoomController extends Controller {
 	public List<String> getAvailableIPAddresses(long roomId, long count){
 		Room room   = this.getById(roomId);
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
+		//TODO it is only for the school network. We need to check for all other subnets
+		String subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
+	    IPv4Net subNetwork = new IPv4Net( subnet );
+	    String firstIP = subNetwork.getBase();
+	    String lastIP  = subNetwork.getLast();
 		List<String> availableIPs = new ArrayList<String>();
 		int i = 0;
 		for( String IP : net.getAvailableIPs(0) ){
+			if( IP.equals(lastIP) || IP.equals(firstIP)) {
+				continue;
+			}
 			String name =  this.isIPUnique(IP);
 			if( name.isEmpty() ){
 				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName().replace("_", "-").toLowerCase(),i));
@@ -667,9 +680,12 @@ public class RoomController extends Controller {
 				}
 			}
 			if( allowed ) {
-				Query query = em.createNamedQuery("HWConf.getByName");
-				query.setParameter("name", "BYOD");
-				HWConf hwconf = (HWConf) query.getResultList().get(0);
+				HWConf hwconf = room.getHwconf();
+				if( hwconf == null ) { 
+					Query query = em.createNamedQuery("HWConf.getByName");
+					query.setParameter("name", "BYOD");
+					hwconf = (HWConf) query.getResultList().get(0);
+				}
 				device.setMac(macAddress);
 				device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
 				device.setOwner(owner);

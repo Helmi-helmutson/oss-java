@@ -31,7 +31,6 @@ public class DeviceController extends Controller {
 	 */
 	public Device getById(long deviceId) {
 		EntityManager em = getEntityManager();
-
 		try {
 			return em.find(Device.class, deviceId);
 		} catch (Exception e) {

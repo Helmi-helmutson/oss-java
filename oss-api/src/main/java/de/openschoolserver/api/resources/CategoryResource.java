@@ -28,7 +28,6 @@ import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.User;
 
 import java.util.List;
 

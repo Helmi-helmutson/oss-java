@@ -301,7 +301,7 @@ public class Controller extends Config {
 		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
 
-	protected boolean isSuperuser() {
+	public boolean isSuperuser() {
 		if(properties.containsKey("de.openschoolserver.dao.Session.superusers")){
 			for( String s : properties.get("de.openschoolserver.dao.Session.superusers").split(",") ){
 				if( s.equals(this.session.getUser().getUid())) {
@@ -445,7 +445,29 @@ public class Controller extends Config {
 		}
 		return true;
 	}
-	
+
+	public List<OSSMConfig> getMConfigs(String type, String key) {
+		ArrayList<OSSMConfig> mconfigs = new ArrayList<OSSMConfig>();
+		EntityManager em = this.getEntityManager();
+		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
+		query.setParameter("type",type).setParameter("keyword",key);
+		for(OSSMConfig config : (List<OSSMConfig>) query.getResultList() ) {
+			mconfigs.add(config);
+		}
+		return mconfigs;
+	}
+
+	public List<OSSConfig> getConfigs(String type, String key) {
+		ArrayList<OSSConfig> mconfigs = new ArrayList<OSSConfig>();
+		EntityManager em = this.getEntityManager();
+		Query query = em.createNamedQuery("OSSConfig.getAllByKey");
+		query.setParameter("type",type).setParameter("keyword",key);
+		for(OSSConfig config : (List<OSSConfig>) query.getResultList() ) {
+			mconfigs.add(config);
+		}
+		return mconfigs;
+	}
+
 	public List<String> getMConfig(Object object, String key) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
