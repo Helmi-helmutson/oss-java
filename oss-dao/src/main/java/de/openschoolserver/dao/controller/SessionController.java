@@ -99,8 +99,13 @@ public class SessionController extends Controller {
                 program[1] = "-n";
                 program[2] = IP;
                 OSSShellTools.exec(program, reply, error, null);
-                String MAC = reply.toString().split("\\n")[1].split("\\s+")[2];
-		this.session.setMac(MAC);
+                String[] lines = reply.toString().split("\\n");
+                if( lines.length >1 ) {
+                	String[] fields = lines[1].split("\\s+");
+                	if( fields.length > 2 ) {
+                		this.session.setMac(fields[2]);
+                	}
+                }
             }
         }
         sessions.put(token, this.session);
