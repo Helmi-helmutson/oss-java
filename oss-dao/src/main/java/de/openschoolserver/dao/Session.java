@@ -105,6 +105,21 @@ public class Session implements Principal {
         return token != null && obj != null && ((Session) obj).getToken() != null
                 && token.equals(((Session) obj).getToken());
     }
+    
+    @Override
+    public String toString() {
+    	StringBuilder data = new StringBuilder();
+    	if( this.deviceId != null ) {
+    		data.append("deviceId: '" + String.valueOf(this.deviceId)).append("' ");
+    	} else {
+    		data.append("deviceId: 'null' ");
+    	}
+    	data.append("userId: '" + String.valueOf(this.userId)).append("' ");
+    	data.append("token: '" + this.token).append("' ");
+    	data.append("mac: '" + this.mac).append("' ");
+    	data.append("role: '" + this.role).append("' ");
+    	return data.toString();
+    }
 
     @Override
     public String getName() {    
