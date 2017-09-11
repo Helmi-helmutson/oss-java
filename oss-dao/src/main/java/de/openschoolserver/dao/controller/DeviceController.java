@@ -3,6 +3,7 @@
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -243,7 +244,7 @@ public class DeviceController extends Controller {
 			query.setParameter("IP", IP);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
-			logger.error("device.getByIP " + IP + " "+ e.getMessage());
+			logger.debug("device.getByIP " + IP + " "+ e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -260,7 +261,7 @@ public class DeviceController extends Controller {
 			query.setParameter("MAC", MAC);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
-			logger.error("MAC " + MAC + " " + e.getMessage());
+			logger.debug("MAC " + MAC + " " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -277,7 +278,7 @@ public class DeviceController extends Controller {
 			query.setParameter("name", name);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
-			logger.error("name " + name  + " " + e.getMessage());
+			logger.debug("name " + name  + " " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -294,7 +295,7 @@ public class DeviceController extends Controller {
 			query.setParameter("search", search + "%");
 			return (List<Device>) query.getResultList();
 		} catch (Exception e) {
-			logger.error("search " + e.getMessage(),e);
+			logger.debug("search " + search + " " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();
