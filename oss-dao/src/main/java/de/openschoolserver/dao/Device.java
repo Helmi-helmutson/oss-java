@@ -57,6 +57,7 @@ public class Device implements Serializable {
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
+	@JsonIgnore
 	private List<Category> categories;
 
 	//bi-directional many-to-many association to Device
