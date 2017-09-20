@@ -51,14 +51,17 @@ public class User implements Serializable {
 
 	//bi-directional many-to-one association to Alias
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Alias> aliases;
 
 	//bi-directional many-to-one association to Alias
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Acl> acls;
 		
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Device> ownedDevices;
 	
 	//bi-directional many-to-one association to groups
@@ -68,6 +71,7 @@ public class User implements Serializable {
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Category> ownedCategories;
 
 	//bi-directional many-to-one association to TestFile
@@ -92,18 +96,22 @@ public class User implements Serializable {
 	
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner")
+	@JsonIgnore
 	private List<FAQ> myFAQs;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Contact> myContacts;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Announcement> myAnnouncements;
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="users", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
+	@JsonIgnore
 	private List<Category> categories;
 		
 	//bi-directional many-to-many association to Device
