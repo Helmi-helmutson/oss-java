@@ -25,11 +25,17 @@ public class SessionsResourceImpl implements SessionsResource {
     @Override
     public Session createSession(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
 
-        if (username == null || password == null ) {
+        if(username == null || password == null ) {
             throw new WebApplicationException(400);
         }
-        if( device == null)
+        if( device == null) {
         	device = "dummy";
+	}
+
+	//Compatibility reason admin -> Administrator
+	if( username == "admin" || username == "administrator" ) {
+	    username = "Administrator";
+	}
 
         Session session =  new Session();
         session.setIP(req.getRemoteAddr());
@@ -58,10 +64,11 @@ public class SessionsResourceImpl implements SessionsResource {
 	@Override
 	public String createToken(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
 		Session session = createSession(ui, username,password, device, req);
-		if( session == null)
+		if( session == null) {
 			return "";
-		else
+		} else {
 			return session.getToken();
+		}
 	}
 	
 	@Override
