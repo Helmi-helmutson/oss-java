@@ -497,6 +497,22 @@ public interface SoftwareResource {
 	@RolesAllowed("software.install")
 	List<Map<String,String>> listDownloadedSoftware(
 			@ApiParam(hidden = true) @Auth Session session
+	);
+
+	/*
+	 * GET softwares/devicesByName/{deviceName}/licences
+	 */
+	@GET
+	@Path("devicesByName/{deviceName}/licences")
+	@Produces("text/plain")
+	@ApiOperation(value = "Set a software on a device as installed in a given version.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.install")
+	String getSoftwareLicencesOnDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@ApiParam(value = "Name of the device",  required = true) @PathParam("deviceName")   String deviceName
 			);
 	
 	/*

@@ -51,6 +51,7 @@ public class SoftwareLicense implements Serializable {
 
 	//bi-directional many-to-one association to Software
 	@ManyToOne
+	@JsonIgnore
 	private Software software;
 
 	@Override

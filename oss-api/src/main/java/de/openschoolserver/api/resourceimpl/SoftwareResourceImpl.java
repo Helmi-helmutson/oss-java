@@ -245,5 +245,11 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String getSoftwareLicencesOnDevice(Session session, String deviceName) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.getSoftwareLicencesOnDevice(deviceName);
+	}
 	
 }

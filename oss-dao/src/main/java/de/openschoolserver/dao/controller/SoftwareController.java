@@ -1032,6 +1032,21 @@ public class SoftwareController extends Controller {
 	public List<SoftwareStatus> getSoftwareStatusOnDeviceById(Long deviceId, String softwareName) {
 		DeviceController deviceController = new DeviceController(this.session);
 		Device          device          =  deviceController.getById(deviceId);
-		return this.getSoftwareStatusOnDevice(device, softwareName);	}
+		return this.getSoftwareStatusOnDevice(device, softwareName);
+	}
+
+	public String getSoftwareLicencesOnDevice(String deviceName) {
+		DeviceController deviceController = new DeviceController(this.session);
+		Device          device          =  deviceController.getByName(deviceName);
+		StringBuilder softwares = new StringBuilder();
+		for( SoftwareLicense license : device.getSoftwareLicences() ) {
+			softwares.append("'LIC_");
+			softwares.append(license.getSoftware().getName());
+			softwares.append("' '");
+			softwares.append(license.getValue());
+			softwares.append("'\\n");
+		}
+		return softwares.toString();
+	}
 	
 }
