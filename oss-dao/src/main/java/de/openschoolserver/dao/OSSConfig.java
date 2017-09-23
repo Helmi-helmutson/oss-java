@@ -14,9 +14,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name="OSSConfig")
 @NamedQueries({
 	    @NamedQuery(name="OSSConfig.getAllById",    query="SELECT c FROM OSSConfig c WHERE c.objectType = :type AND c.objectId = :id"),
-        @NamedQuery(name="OSSConfig.getAllByKey",   query="SELECT c FROM OSSConfig c WHERE c.objectType = :type AND c.keyword  = :key"),
-        @NamedQuery(name="OSSConfig.get",           query="SELECT c FROM OSSConfig c WHERE c.objectType = :type AND c.objectId = :id AND c.keyword = :key"),
-        @NamedQuery(name="OSSConfig.check",         query="SELECT c FROM OSSConfig c WHERE c.objectType = :type AND c.objectId = :id AND c.keyword = :key AND c.value = :value")
+        @NamedQuery(name="OSSConfig.getAllByKey",   query="SELECT c FROM OSSConfig c WHERE c.objectType = :type AND c.keyword  = :keyword"),
+        @NamedQuery(name="OSSConfig.get",           query="SELECT c FROM OSSConfig c WHERE c.objectType = :type AND c.objectId = :id AND c.keyword = :keyword"),
+        @NamedQuery(name="OSSConfig.check",         query="SELECT c FROM OSSConfig c WHERE c.objectType = :type AND c.objectId = :id AND c.keyword = :keyword AND c.value = :value")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class OSSConfig implements Serializable {
