@@ -372,10 +372,10 @@ public interface RoomResource {
     );
     
     /*
-     * PUT rooms/{roomId}/device/{MAC}/{name}
+     * PUT rooms/{roomId}/device/{macAddress}/{name}
      */
     @PUT
-    @Path("{roomId}/device/{MAC}/{name}")
+    @Path("{roomId}/device/{macAddress}/{name}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Create a new device. This api call can be used only for registering own devices.")
     @ApiResponses(value = {
