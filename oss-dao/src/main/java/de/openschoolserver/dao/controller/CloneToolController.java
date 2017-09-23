@@ -26,9 +26,11 @@ public class CloneToolController extends Controller {
 	}
 
 	public Long getHWConf(){
-		DeviceController devController = new DeviceController(this.getSession());
-		Device device = devController.getByIP(this.getSession().getIP());
-		return device.getHwconf().getId();
+		if( this.session.getDevice() != null ) {
+			return this.session.getDevice().getHwconfId();
+		} else {
+			return null;
+		}
 	}
 
 	public HWConf getById(Long hwconfId ) {
@@ -73,15 +75,15 @@ public class CloneToolController extends Controller {
 	public String getConfigurationValue(Long hwconfId, String partition, String key ) {
 		Partition part = this.getPartition(hwconfId, partition);
 		switch (key) {
-		case "Description" :
+		case "DESC" :
 			return part.getDescription();
-		case "Format" :
+		case "FORMAT" :
 			return part.getFormat();
-		case "ITool" :
+		case "ITOOL" :
 			return part.getTool();
-		case "Join" :
+		case "JOIN" :
 			return part.getJoinType();
-		case "Name" :
+		case "NAME" :
 			return part.getName();
 		case "OS" :
 			return part.getOs();
@@ -136,8 +138,10 @@ public class CloneToolController extends Controller {
 		Partition partition = new Partition();
 		partition.setName(name);
 		hwconf.addPartition(partition);
+		partition.setHwconf(hwconf);
 		try {
 			em.getTransaction().begin();
+			em.persist(partition);
 			em.merge(hwconf);
 			em.getTransaction().commit();			
 		} catch (Exception e) {
@@ -170,20 +174,28 @@ public class CloneToolController extends Controller {
 
 	public Response setConfigurationValue(Long hwconfId, String partitionName, String key, String value) {
 		Partition partition = this.getPartition(hwconfId, partitionName);
+		if(partition == null ) {
+			this.addPartitionToHWConf(hwconfId, partitionName);
+			partition = this.getPartition(hwconfId, partitionName);
+			if( partition == null ) {
+				return new Response(this.getSession(),"ERROR", "Can not create partition in HWConf");
+			}
+			logger.debug("Creating partition '" + partitionName + "' in hwconf #" +hwconfId );
+		}
 		switch (key) {
-		case "Description" :
+		case "DESC" :
 			partition.setDescription(value);
 			break;
-		case "Format" :
+		case "FORMAT" :
 			partition.setFormat(value);
 			break;
-		case "ITool" :
+		case "ITOOL" :
 			partition.setTool(value);
 			break;
-		case "Join" :
+		case "JOIN" :
 			partition.setJoinType(value);
 			break;
-		case "Name" :
+		case "NAME" :
 			partition.setName(value);
 			break;
 		case "OS" :
