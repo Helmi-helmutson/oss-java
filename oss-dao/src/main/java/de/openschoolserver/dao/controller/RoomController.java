@@ -702,11 +702,12 @@ public class RoomController extends Controller {
 			} else {
 				device.setName(name);
 			}
+			logger.debug("Sysadmin register:" + device.getMac() +"#" +device.getIp() +"#" +device.getName());
 		}
 		//Check if the Device settings are OK
 		DeviceController deviceController = new DeviceController(this.session);
 		String error = deviceController.check(device, room);
-		if( error != "" ) {
+		if( !error.isEmpty() ) {
 			return new Response(this.getSession(),"ERROR",error);
 		}
 		device.setRoom(room);
@@ -723,8 +724,7 @@ public class RoomController extends Controller {
 		}
 		//Start plugin and create DHCP and salt configuration
 		this.startPlugin("add_device", device);
-		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
-		dhcpconfig.Create();
+		new DHCPConfig(this.session).Create();
 		return new Response(this.getSession(),"OK","Device was created succesfully.");
 	}
 
