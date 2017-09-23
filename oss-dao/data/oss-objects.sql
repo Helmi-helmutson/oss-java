@@ -322,7 +322,7 @@ INSERT INTO Enumerates VALUES(NULL,'categoryType','virtualRoom');
 CREATE TABLE IF NOT EXISTS OSSConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	objectType   VARCHAR(12)     NOT NULL,
-        objcetId     BIGINT UNSIGNED NOT NULL,
+        objectId     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
         PRIMARY KEY(id)
@@ -331,7 +331,7 @@ CREATE TABLE IF NOT EXISTS OSSConfig (
 CREATE TABLE IF NOT EXISTS OSSMConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	objectType   VARCHAR(12)     NOT NULL,
-        objcetId     BIGINT UNSIGNED NOT NULL,
+        objectId     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
         PRIMARY KEY(id)
