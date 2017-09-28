@@ -30,7 +30,7 @@ public class Group implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
-	private long id;
+	private Long id;
 
 	@Column(name = "name", updatable = false)
 	private String name;
@@ -47,6 +47,10 @@ public class Group implements Serializable {
 	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Acl> acls;
 	
+	//bi-directional many-to-one association to Acls
+	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
+	private List<CephalixGroup> cephalixGroups;
+
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
@@ -58,17 +62,18 @@ public class Group implements Serializable {
 	private User owner;
 
 	public Group() {
+		this.id   = null;
 		this.name = "";
 		this.description = "";
 		this.groupType = "";
 		this.owner = null;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -145,4 +150,11 @@ public class Group implements Serializable {
 		this.owner = owner;
 	}
 
+	public List<CephalixGroup> getCephalixGroups() {
+		return this.cephalixGroups;
+	}
+
+	public void setCephalixGroups(List<CephalixGroup> values) {
+		this.cephalixGroups = values;
+	}
 }

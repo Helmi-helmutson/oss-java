@@ -38,7 +38,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(announcement);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "Announcement was created succesfully.");
+			return new Response(this.getSession(),"OK", "Announcement was created succesfully.",announcement.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -54,7 +54,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(contact);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "Contact was created succesfully.");
+			return new Response(this.getSession(),"OK", "Contact was created succesfully.",contact.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return new Response(this.getSession(),"ERROR", e.getMessage());
@@ -70,7 +70,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(faq);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "FAQ was created succesfully.");
+			return new Response(this.getSession(),"OK", "FAQ was created succesfully.",faq.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return new Response(this.getSession(),"ERROR", e.getMessage());

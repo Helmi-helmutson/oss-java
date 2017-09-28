@@ -22,6 +22,11 @@ public class Response implements Serializable {
 	private String code;
 	private String value;
 	
+	/*
+	 * This id will be set to the id of a object which was created or deleted or manipulated if any
+	 */
+	private Long   objectId;
+	
 	@ManyToOne
     Session session;
 
@@ -40,17 +45,33 @@ public class Response implements Serializable {
     }
 
     public Response(Session session,String code, String value){
-            this.session = session;
-            this.code    = code;
-            this.value   = value;
+            this.session  = session;
+            this.code     = code;
+            this.value    = value;
+            this.objectId = null;
     }
    
+    public Response(Session session,String code, String value, Long objectId){
+        this.session  = session;
+        this.code     = code;
+        this.value    = value;
+        this.objectId = objectId;
+    }
+
 	public long getId() {
 		return this.id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public long getObjecId() {
+		return this.objectId;
+	}
+
+	public void setObjectId(long id) {
+		this.objectId = id;
 	}
 
 	public String getCode() {

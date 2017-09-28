@@ -114,7 +114,7 @@ public class GroupController extends Controller {
 			return new Response(this.getSession(),"ERROR",e.getMessage());
 		}
 		this.startPlugin("add_group", group);
-		return new Response(this.getSession(),"OK","Group was created");
+		return new Response(this.getSession(),"OK","Group was created",group.getId());
 	}
 
 	public Response modify(Group group){

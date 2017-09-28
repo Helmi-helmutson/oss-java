@@ -16,11 +16,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="Categories")
 @NamedQueries({
-	@NamedQuery(name="Category.findAll", query="SELECT c FROM Category c"),
-	@NamedQuery(name="Category.getByName",  query="SELECT c FROM Category c where c.name = :name"),
-	@NamedQuery(name="Category.getByDescription",  query="SELECT c FROM Category c where c.description = :description"),
-	@NamedQuery(name="Category.getByType",  query="SELECT c FROM Category c where c.categoryType = :type"),
-	@NamedQuery(name="Category.search", query="SELECT c FROM Category c WHERE c.name LIKE :search OR c.description = :search")
+	@NamedQuery(name="Category.findAll",          query="SELECT c FROM Category c"),
+	@NamedQuery(name="Category.getByUuid",        query="SELECT c FROM Category c where c.uuid = :uuid"),
+	@NamedQuery(name="Category.getByName",        query="SELECT c FROM Category c where c.name = :name"),
+	@NamedQuery(name="Category.getByDescription", query="SELECT c FROM Category c where c.description = :description"),
+	@NamedQuery(name="Category.getByType",        query="SELECT c FROM Category c where c.categoryType = :type"),
+	@NamedQuery(name="Category.search",           query="SELECT c FROM Category c WHERE c.name LIKE :search OR c.description = :search")
 })
 
 public class Category implements Serializable {
@@ -30,6 +31,8 @@ public class Category implements Serializable {
 	@SequenceGenerator(name="CATEGORIES_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CATEGORIES_ID_GENERATOR")
 	private long id;
+
+	private String uuid;
 
 	private String description;
 
@@ -145,6 +148,16 @@ public class Category implements Serializable {
 	@JsonIgnore
 	private List<FAQ> faqs;
 	
+	//bi-directional many-to-many association to FAQ
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinTable(
+				name="CephalixCategory", 
+				joinColumns={ @JoinColumn(name="category_id") },
+				inverseJoinColumns={ @JoinColumn(name="institute_id") }
+				)
+	@JsonIgnore
+	private List<CephalixInstitute> institutes;
+	
 	@Transient
 	private List<Long> deviceIds;
 
@@ -193,6 +206,14 @@ public class Category implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public String getUuid() {
+		return this.uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 
 	public String getName() {
@@ -386,6 +407,14 @@ public class Category implements Serializable {
 
 	public void setFAQIds(List<Long> ids) {
 		this.faqIds = ids;
+	}
+
+	public List<CephalixInstitute> getInstitutes() {
+		return this.institutes;
+	}
+
+	public void setInstitutes(List<CephalixInstitute> institutes) {
+		this.institutes = institutes;
 	}
 
 }

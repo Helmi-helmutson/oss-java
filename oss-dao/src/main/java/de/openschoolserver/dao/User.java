@@ -33,7 +33,7 @@ public class User implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
-	long id;
+	Long id;
 
 	private String givenName;
 
@@ -98,6 +98,11 @@ public class User implements Serializable {
 	@OneToMany(mappedBy="owner")
 	@JsonIgnore
 	private List<FAQ> myFAQs;
+	
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="user")
+	@JsonIgnore
+	private List<CephalixUser> cephalixUsers;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
@@ -135,7 +140,7 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<Group> groups;
 	
-	//bi-directional many-to-many association to Group
+	//bi-directional many-to-many association to Announcements
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
 			name="HaveSeen",
@@ -145,7 +150,6 @@ public class User implements Serializable {
 	//@JsonManagedReference
 	@JsonIgnore
 	private List<Announcement> readAnnouncements;
-	
 
 	private Integer fsQuotaUsed;
 	private Integer fsQuota;
@@ -156,6 +160,7 @@ public class User implements Serializable {
 	private String password ="";
 
 	public User() {
+		this.id  = null;
 		this.uid = "";
 		this.uuid = "";
 		this.sureName = "";
@@ -169,11 +174,11 @@ public class User implements Serializable {
 		this.birthDay = new Date(System.currentTimeMillis());
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -460,5 +465,13 @@ public class User implements Serializable {
 
 	public void setMyFAQs(List<FAQ> values) {
 		this.myFAQs = values;
+	}
+
+	public List<CephalixUser> getCephalixUsers() {
+		return this.cephalixUsers;
+	}
+
+	public void setCephalixUsers(List<CephalixUser> values) {
+		this.cephalixUsers = values;
 	}
 }

@@ -85,7 +85,7 @@ public class SoftwareController extends Controller {
 				em.close();
 				return new Response(this.getSession(),"ERROR",e.getMessage());
 			}
-			return new Response(this.getSession(),"OK","Software was created succesfully");
+			return new Response(this.getSession(),"OK","Software was created succesfully",software.getId());
 		}
 		software.addSoftwareVersion(softwareVersion);
 		softwareVersion.setSoftware(software);

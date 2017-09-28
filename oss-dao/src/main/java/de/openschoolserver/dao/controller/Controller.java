@@ -4,9 +4,6 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
-
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,14 +65,14 @@ public class Controller extends Config {
 		}
 	}
 
-	protected EntityManager getEntityManager() {
+	public EntityManager getEntityManager() {
 		if( session != null)
 			return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
 		else
 			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
-	protected Session getSession() {
+	public Session getSession() {
 		return this.session;
 	}
 
@@ -83,7 +80,7 @@ public class Controller extends Config {
 		return properties.get(property);
 	}
 
-	protected boolean isNameUnique(String name){
+	public boolean isNameUnique(String name){
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("User.getByUid");
 		query.setParameter("uid", name);
@@ -117,7 +114,7 @@ public class Controller extends Config {
 		return true;
 	}
 	
-	protected Response checkPassword(String password) {
+	public Response checkPassword(String password) {
 		List<String> error = new ArrayList<String>();
 		if( password.length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
 			error.add("User password is to short.");
@@ -144,11 +141,11 @@ public class Controller extends Config {
 		return null;
 	}
 
-	protected boolean checkNonASCII(String name) {
+	public boolean checkNonASCII(String name) {
 		return ! Pattern.matches("[a-zA-Z0-9\\.\\-_]+",name);
 	}
 
-	protected boolean checkBadHostName(String name) {
+	public boolean checkBadHostName(String name) {
 		if( !name.matches("[a-zA-Z0-9\\-]+")) {
 			logger.debug("Bad name match '" + name + "'");
 			return true;
@@ -156,7 +153,7 @@ public class Controller extends Config {
 		return name.matches(".*-wlan");
 	}
 
-	protected String isMacUnique(String name){
+	public String isMacUnique(String name){
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("Device.getByMAC");
 		query.setParameter("MAC", name);
@@ -168,7 +165,7 @@ public class Controller extends Config {
 		return "";
 	}
 
-	protected String isIPUnique(String name){
+	public String isIPUnique(String name){
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("Device.getByIP");
 		query.setParameter("IP", name);
@@ -180,7 +177,7 @@ public class Controller extends Config {
 		return "";
 	}
 
-	protected void startPlugin(String pluginName, Object object){
+	public void startPlugin(String pluginName, Object object){
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
 		StringBuffer reply = new StringBuffer();
@@ -263,12 +260,21 @@ public class Controller extends Config {
 				break;
 			}
 			break;
+		case "de.openschoolserver.dao.CephalixInstitute":
+			CephalixInstitute institute = (CephalixInstitute)object;
+			switch(pluginName){
+			case "add_institute":
+			case "modify_institute":
+			case "delete_institue":
+				data.append(institute.toString());
+				break;
+			}
 		}
 		OSSShellTools.exec(program, reply, error, data.toString());
 		logger.debug(pluginName + " : " + data.toString() + " : " + error);
 	}
 	
-	protected void changeMemberPlugin(String type, Group group, List<User> users){
+	public void changeMemberPlugin(String type, Group group, List<User> users){
 		//type can be only add or remove
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
@@ -286,7 +292,7 @@ public class Controller extends Config {
 		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
 	
-	protected void changeMemberPlugin(String type, Group group, User user){
+	public void changeMemberPlugin(String type, Group group, User user){
 		//type can be only add or remove
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
@@ -312,7 +318,7 @@ public class Controller extends Config {
 		return false;
 	}
 
-	protected boolean isProtected(Object object){
+	public boolean isProtected(Object object){
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.User":
 			if(properties.containsKey("de.openschoolserver.dao.User.protected")){
@@ -363,7 +369,7 @@ public class Controller extends Config {
 		return false;
 	}
 	
-	protected boolean systemctl(String action, String service) {
+	public boolean systemctl(String action, String service) {
 		 String[] program = new String[3];
 		 program[0] = "systemctl";
 		 program[1] = action;

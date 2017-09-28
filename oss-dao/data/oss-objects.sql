@@ -112,7 +112,6 @@ CREATE TABLE IF NOT EXISTS Rooms (
 INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','technicalRoom','no_control',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#);
 INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','technicalRoom','no_control',10,10,'#ANON_NETWORK#',#ANON_NETMASK#);
 
-
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id      BIGINT UNSIGNED NOT NULL,
@@ -380,15 +379,6 @@ CREATE TABLE IF NOT EXISTS Softwares (
         PRIMARY KEY(id)
 );
 
-CREATE TABLE IF NOT EXISTS SoftwareRequirements (
-        software_id        BIGINT UNSIGNED NOT NULL,
-        requirement_id     BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(software_id)    REFERENCES Softwares(id)  ON DELETE CASCADE,
-	FOREIGN KEY(requirement_id) REFERENCES Softwares(id) ON DELETE CASCADE,
-	PRIMARY KEY(software_id,requirement_id)
-);
-
-
 
 CREATE TABLE IF NOT EXISTS SoftwareVersions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -483,8 +473,9 @@ CREATE TABLE IF NOT EXISTS Contacts (
 
 CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        uuid         VARCHAR(36) DEFAULT NULL,
 	name         VARCHAR(32) NOT NULL,
-	description  VARCHAR(64) NOT NULL,
+	description  VARCHAR(64) DEFAULT NULL,
 	categoryType VARCHAR(16) DEFAULT NULL,
         owner_id     BIGINT UNSIGNED DEFAULT NULL,
 	studentsOnly CHAR(1) DEFAULT 'N',
@@ -613,3 +604,102 @@ CREATE TABLE IF NOT EXISTS ContactInCategories (
 	PRIMARY KEY(contact_id,category_id)
 );
 
+#TABLES for CEPHALIX
+CREATE TABLE IF NOT EXISTS CephalixInstitutes (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+       cn              VARCHAR(16) NOT NULL,
+       name            VARCHAR(32) NOT NULL,
+       type            VARCHAR(16) NOT NULL,
+       domain          VARCHAR(32) NOT NULL,
+       locality        VARCHAR(32) NOT NULL,
+       state           VARCHAR(32) NOT NULL,
+       adminPW         VARCHAR(16) NOT NULL,
+       cephalixPW      VARCHAR(16) NOT NULL,
+       ipVPN           VARCHAR(16) DEFAULT NULL,
+       ipTrNet         VARCHAR(16) DEFAULT NULL,
+       nmTrNet         VARCHAR(16) DEFAULT NULL,
+       gwTrNet         VARCHAR(16) DEFAULT NULL,
+       network         VARCHAR(16) NOT NULL,
+       netmask         VARCHAR(16) NOT NULL,
+       nmServerNet     VARCHAR(16) NOT NULL,
+       ipAdmin         VARCHAR(16) NOT NULL,
+       ipMail          VARCHAR(16) NOT NULL,
+       ipPrint         VARCHAR(16) NOT NULL,
+       ipProxy         VARCHAR(16) NOT NULL,
+       ipBackup        VARCHAR(16) NOT NULL,
+       anonDhcp        VARCHAR(32) NOT NULL,
+       firstRoom       VARCHAR(16) NOT NULL,
+       PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS CephalixITUsage (
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       device          VARCHAR(32) NOT NULL,
+       counter         BIGINT UNSIGNED NOT NULL,
+       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(institute_id,device)
+);
+
+CREATE TABLE IF NOT EXISTS CephalixITUsageAvarage (
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       device          VARCHAR(32) NOT NULL,
+       counter         BIGINT UNSIGNED NOT NULL,
+       time            timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+       counter0        BIGINT UNSIGNED NOT NULL,
+       time0           timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+       avarage         BIGINT UNSIGNED NOT NULL,
+       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(institute_id,device)
+);
+
+# infoTypes:   A -> Announcement
+#              C -> Contact
+#              F -> FAQ
+CREATE TABLE IF NOT EXISTS CephalixReleases (
+       uuid            VARCHAR(36) NOT NULL,
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       infoType        CHAR(1) NOT NULL,
+       released        CHAR(1) DEFAULT 'N',
+       FOREIGN KEY(institute_id)       REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(institute_id,uuid)
+);
+
+#Table for user created by cephalix on the dedicated server
+CREATE TABLE IF NOT EXISTS CephalixUsers (
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       user_id         BIGINT UNSIGNED NOT NULL,
+       ossUserId       BIGINT UNSIGNED NOT NULL,
+       FOREIGN KEY(institute_id)       REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       FOREIGN KEY(user_id)            REFERENCES User(id) ON DELETE CASCADE,
+       PRIMARY KEY(institute_id,user_id)
+);
+
+#Table for groups created by cephalix on the dedicated server
+CREATE TABLE IF NOT EXISTS CephalixGroups (
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       group_id	       BIGINT UNSIGNED NOT NULL,
+       ossGroupId      BIGINT UNSIGNED NOT NULL,
+       FOREIGN KEY(user_id)            REFERENCES User(id) ON DELETE CASCADE,
+       FOREIGN KEY(institute_id)       REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(institute_id,user_id)
+);
+
+#Table for categories created by cephalix on the dedicated server
+CREATE TABLE IF NOT EXISTS CephalixCategories (
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       category_id     BIGINT UNSIGNED NOT NULL,
+       ossCategoryId   BIGINT UNSIGNED NOT NULL,
+       FOREIGN KEY(institute_id)       REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       FOREIGN KEY(category_id)        REFERENCES Categories(id) ON DELETE CASCADE,
+       PRIMARY KEY(institute_id,category_id)
+);
+
+#CREATE TABLE IF NOT EXISTS CephalixMappings (
+#       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+#       institute_id    BIGINT UNSIGNED NOT NULL,
+#       objectName      VARCHAR(16),
+#       cephalixId      BIGINT UNSIGNED NOT NULL,
+#       ossId           BIGINT UNSIGNED NOT NULL,
+#       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+#       PRIMARY KEY(id)
+#);

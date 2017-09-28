@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -162,7 +164,6 @@ public class RoomController extends Controller {
 			return new Response(this.getSession(),"ERROR", "Room description is not unique.");
 		}
 
-
 		// If no network was configured we will use net school network.
 		if( room.getNetwork().isEmpty() ) {
 			room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
@@ -189,7 +190,7 @@ public class RoomController extends Controller {
 			em.close();
 		}
 		this.startPlugin("add_room", room);
-		return new Response(this.getSession(),"OK", "Room was created succesfully.");
+		return new Response(this.getSession(),"OK", "Room was created succesfully.",room.getId());
 	}
 
 	public Response delete(long roomId){

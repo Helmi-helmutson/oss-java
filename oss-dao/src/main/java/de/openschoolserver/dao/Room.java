@@ -56,6 +56,7 @@ public class Room implements Serializable {
 
         //bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="rooms", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
 	private List<Category> categories;
 
 	//bi-directional many-to-one association to AccessInRoom
@@ -120,6 +121,7 @@ public class Room implements Serializable {
 	public Room() {
 		this.network      = "";
 		this.roomControl  = "inRoom";
+		this.startIP      = "";
 	}
 
 	public long getId() {

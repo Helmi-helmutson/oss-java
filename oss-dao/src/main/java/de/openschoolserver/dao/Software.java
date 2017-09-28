@@ -37,22 +37,23 @@ public class Software implements Serializable {
 	private Integer weight;
 	
 	//bi-directional many-to-one association to SoftwareLicens
-	@JsonIgnore
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
+	@JsonIgnore
 	private List<SoftwareLicense> softwareLicenses;
 
 	//bi-directional many-to-one association to SoftwareVersion
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
+	@JsonIgnore
 	private List<SoftwareVersion> softwareVersions;
 	
 	//bi-directional many-to-many association to Category
-	@JsonIgnore
 	@ManyToMany(mappedBy="softwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
 	private List<Category> categories;
 
 	//bi-directional many-to-many association to Category
-	@JsonIgnore
 	@ManyToMany(mappedBy="removedSoftwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
 	private List<Category> removedFromCategories;
 	
 	//bi-directional many-to-many association to Device

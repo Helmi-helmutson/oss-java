@@ -66,6 +66,22 @@ public interface CategoryResource {
 			);
 
 	/*
+	 * GET categories/byUuid/<categoryUuid>
+	 */
+	@GET
+	@Path("byUuid/{categoryUuid}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Get category by id")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "Category not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("category.search")
+	Category getByUuid(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("categoryUuid") String categoryUuid
+			);
+
+	/*
 	 * GET categories/<categoryId>/<memeberType>
 	 */
 	@GET
@@ -184,7 +200,7 @@ public interface CategoryResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("categoryId") long categoryId,
 			@PathParam("memberType") String memberType,
-			@PathParam("memberId") long memberId
+			@PathParam("memberId")   long memberId
 			);
 
 	/*
@@ -220,6 +236,5 @@ public interface CategoryResource {
 			@PathParam("memberType") String memberType,
 			@PathParam("memberId") long memberId
 			);
-
 
 }

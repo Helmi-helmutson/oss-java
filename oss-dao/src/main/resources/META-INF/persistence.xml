@@ -30,6 +30,15 @@
 		<class>de.openschoolserver.dao.Announcement</class>
 		<class>de.openschoolserver.dao.Contact</class>
 		<class>de.openschoolserver.dao.FAQ</class>
+		<class>de.openschoolserver.dao.CephalixGroup</class>
+		<class>de.openschoolserver.dao.CephalixGroupPK</class>
+		<class>de.openschoolserver.dao.CephalixITUsage</class>
+		<class>de.openschoolserver.dao.CephalixITUsagePK</class>
+		<class>de.openschoolserver.dao.CephalixITUsageAvarage</class>
+		<class>de.openschoolserver.dao.CephalixITUsageAvaragePK</class>
+		<class>de.openschoolserver.dao.CephalixInstitute</class>
+		<class>de.openschoolserver.dao.CephalixReleas</class>
+		<class>de.openschoolserver.dao.CephalixReleasPK</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/OSS"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>

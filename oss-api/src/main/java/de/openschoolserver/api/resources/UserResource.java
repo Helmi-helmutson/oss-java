@@ -24,7 +24,6 @@ import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 @Api(value = "users")
 public interface UserResource {
 
-	
 	/*
 	 * GET users/<userId>
 	 */
