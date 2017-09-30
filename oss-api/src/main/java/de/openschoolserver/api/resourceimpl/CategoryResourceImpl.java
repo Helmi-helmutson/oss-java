@@ -81,10 +81,4 @@ public class CategoryResourceImpl implements CategoryResource {
 		return categoryController.getCategories(categoryIds);
 	}
 
-	@Override
-	public Category getByUuid(Session session, String categoryUuid) {
-		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.getByUuid(categoryUuid);
-	}
-
 }

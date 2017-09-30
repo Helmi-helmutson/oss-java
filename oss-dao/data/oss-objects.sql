@@ -425,7 +425,6 @@ CREATE TABLE IF NOT EXISTS LicenseToDevice (
 
 CREATE TABLE IF NOT EXISTS Announcements (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        uuid       VARCHAR(36) DEFAULT NULL,
         owner_id   BIGINT UNSIGNED DEFAULT NULL,
         validFrom  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         validUntil DATETIME,
@@ -448,7 +447,6 @@ CREATE TABLE IF NOT EXISTS HaveSeen (
 
 CREATE TABLE IF NOT EXISTS FAQs (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        uuid       VARCHAR(36) DEFAULT NULL,
         owner_id   BIGINT UNSIGNED DEFAULT NULL,
         issue      VARCHAR(128) default NULL,
         title      VARCHAR(128) NOT NULL,
@@ -460,7 +458,6 @@ CREATE TABLE IF NOT EXISTS FAQs (
 
 CREATE TABLE IF NOT EXISTS Contacts (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        uuid       VARCHAR(36) DEFAULT NULL,
         owner_id   BIGINT UNSIGNED DEFAULT NULL,
         issue      VARCHAR(128) default NULL,
         name       VARCHAR(128) default NULL,
@@ -473,7 +470,6 @@ CREATE TABLE IF NOT EXISTS Contacts (
 
 CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        uuid         VARCHAR(36) DEFAULT NULL,
 	name         VARCHAR(32) NOT NULL,
 	description  VARCHAR(64) DEFAULT NULL,
 	categoryType VARCHAR(16) DEFAULT NULL,
@@ -633,14 +629,16 @@ CREATE TABLE IF NOT EXISTS CephalixInstitutes (
 );
 
 CREATE TABLE IF NOT EXISTS CephalixITUsage (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
        institute_id    BIGINT UNSIGNED NOT NULL,
        device          VARCHAR(32) NOT NULL,
        counter         BIGINT UNSIGNED NOT NULL,
        FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
-       PRIMARY KEY(institute_id,device)
+       PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS CephalixITUsageAvarage (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
        institute_id    BIGINT UNSIGNED NOT NULL,
        device          VARCHAR(32) NOT NULL,
        counter         BIGINT UNSIGNED NOT NULL,
@@ -649,57 +647,15 @@ CREATE TABLE IF NOT EXISTS CephalixITUsageAvarage (
        time0           timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
        avarage         BIGINT UNSIGNED NOT NULL,
        FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
-       PRIMARY KEY(institute_id,device)
+       PRIMARY KEY(id)
 );
 
-# infoTypes:   A -> Announcement
-#              C -> Contact
-#              F -> FAQ
-CREATE TABLE IF NOT EXISTS CephalixReleases (
-       uuid            VARCHAR(36) NOT NULL,
+CREATE TABLE IF NOT EXISTS CephalixMappings (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
        institute_id    BIGINT UNSIGNED NOT NULL,
-       infoType        CHAR(1) NOT NULL,
-       released        CHAR(1) DEFAULT 'N',
-       FOREIGN KEY(institute_id)       REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
-       PRIMARY KEY(institute_id,uuid)
+       objectName      VARCHAR(16),
+       cephalixId      BIGINT UNSIGNED NOT NULL,
+       ossId           BIGINT UNSIGNED NOT NULL,
+       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(id)
 );
-
-#Table for user created by cephalix on the dedicated server
-CREATE TABLE IF NOT EXISTS CephalixUsers (
-       institute_id    BIGINT UNSIGNED NOT NULL,
-       user_id         BIGINT UNSIGNED NOT NULL,
-       ossUserId       BIGINT UNSIGNED NOT NULL,
-       FOREIGN KEY(institute_id)       REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
-       FOREIGN KEY(user_id)            REFERENCES User(id) ON DELETE CASCADE,
-       PRIMARY KEY(institute_id,user_id)
-);
-
-#Table for groups created by cephalix on the dedicated server
-CREATE TABLE IF NOT EXISTS CephalixGroups (
-       institute_id    BIGINT UNSIGNED NOT NULL,
-       group_id	       BIGINT UNSIGNED NOT NULL,
-       ossGroupId      BIGINT UNSIGNED NOT NULL,
-       FOREIGN KEY(user_id)            REFERENCES User(id) ON DELETE CASCADE,
-       FOREIGN KEY(institute_id)       REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
-       PRIMARY KEY(institute_id,user_id)
-);
-
-#Table for categories created by cephalix on the dedicated server
-CREATE TABLE IF NOT EXISTS CephalixCategories (
-       institute_id    BIGINT UNSIGNED NOT NULL,
-       category_id     BIGINT UNSIGNED NOT NULL,
-       ossCategoryId   BIGINT UNSIGNED NOT NULL,
-       FOREIGN KEY(institute_id)       REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
-       FOREIGN KEY(category_id)        REFERENCES Categories(id) ON DELETE CASCADE,
-       PRIMARY KEY(institute_id,category_id)
-);
-
-#CREATE TABLE IF NOT EXISTS CephalixMappings (
-#       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-#       institute_id    BIGINT UNSIGNED NOT NULL,
-#       objectName      VARCHAR(16),
-#       cephalixId      BIGINT UNSIGNED NOT NULL,
-#       ossId           BIGINT UNSIGNED NOT NULL,
-#       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
-#       PRIMARY KEY(id)
-#);

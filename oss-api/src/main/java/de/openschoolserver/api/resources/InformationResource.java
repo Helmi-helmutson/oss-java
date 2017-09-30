@@ -111,7 +111,7 @@ public interface InformationResource {
 	@POST
     @Path("announcements/{announcementId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Deletes an announcement.")
+    @ApiOperation(value = "Modify an announcement.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -125,7 +125,7 @@ public interface InformationResource {
 	@POST
     @Path("contacts/{contactId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Deletes a contact.")
+    @ApiOperation(value = "Modify a contact.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -139,7 +139,7 @@ public interface InformationResource {
 	@POST
     @Path("faqs/{faqId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delets a FAQ.")
+    @ApiOperation(value = "Modify a FAQ.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })

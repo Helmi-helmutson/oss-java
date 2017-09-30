@@ -100,11 +100,6 @@ public class User implements Serializable {
 	private List<FAQ> myFAQs;
 	
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="user")
-	@JsonIgnore
-	private List<CephalixUser> cephalixUsers;
-
-	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<Contact> myContacts;
@@ -465,13 +460,5 @@ public class User implements Serializable {
 
 	public void setMyFAQs(List<FAQ> values) {
 		this.myFAQs = values;
-	}
-
-	public List<CephalixUser> getCephalixUsers() {
-		return this.cephalixUsers;
-	}
-
-	public void setCephalixUsers(List<CephalixUser> values) {
-		this.cephalixUsers = values;
 	}
 }

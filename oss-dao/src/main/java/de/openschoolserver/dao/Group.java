@@ -46,16 +46,12 @@ public class Group implements Serializable {
 	//bi-directional many-to-one association to Acls
 	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Acl> acls;
-	
-	//bi-directional many-to-one association to Acls
-	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
-	private List<CephalixGroup> cephalixGroups;
 
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<User> users;
-	
+
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
@@ -134,27 +130,19 @@ public class Group implements Serializable {
 		acl.setGroup(null);
 	}
 
-    public List<Category> getCategories() {
-            return this.categories;
-    }
+	public List<Category> getCategories() {
+		return this.categories;
+	}
 
-    public void setCategories(List<Category> categories) {
-            this.categories = categories;
-    }
-    
-    public User getOwner() {
+	public void setCategories(List<Category> categories) {
+		this.categories = categories;
+	}
+
+	public User getOwner() {
 		return this.owner;
 	}
 
 	public void setOwner(User owner) {
 		this.owner = owner;
-	}
-
-	public List<CephalixGroup> getCephalixGroups() {
-		return this.cephalixGroups;
-	}
-
-	public void setCephalixGroups(List<CephalixGroup> values) {
-		this.cephalixGroups = values;
 	}
 }

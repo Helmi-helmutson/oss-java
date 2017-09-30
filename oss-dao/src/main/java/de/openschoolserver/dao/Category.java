@@ -37,7 +37,7 @@ public class Category implements Serializable {
 	private String description;
 
 	private String name;
-	
+
 	private String categoryType;
 
 	//bi-directional many-to-one association to User
@@ -117,7 +117,7 @@ public class Category implements Serializable {
 			)
 	@JsonIgnore
 	private List<User> users;
-	
+
 	//bi-directional many-to-many association to Announcement
 	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
@@ -127,7 +127,7 @@ public class Category implements Serializable {
 			)
 	@JsonIgnore
 	private List<Announcement> announcements;
-	
+
 	//bi-directional many-to-many association to Contact
 	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
@@ -137,7 +137,7 @@ public class Category implements Serializable {
 			)
 	@JsonIgnore
 	private List<Contact> contacts;
-	
+
 	//bi-directional many-to-many association to FAQ
 	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JoinTable(
@@ -147,17 +147,7 @@ public class Category implements Serializable {
 			)
 	@JsonIgnore
 	private List<FAQ> faqs;
-	
-	//bi-directional many-to-many association to FAQ
-	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JoinTable(
-				name="CephalixCategory", 
-				joinColumns={ @JoinColumn(name="category_id") },
-				inverseJoinColumns={ @JoinColumn(name="institute_id") }
-				)
-	@JsonIgnore
-	private List<CephalixInstitute> institutes;
-	
+
 	@Transient
 	private List<Long> deviceIds;
 
@@ -169,26 +159,26 @@ public class Category implements Serializable {
 
 	@Transient
 	private List<Long> userIds;
-	
+
 	@Transient
 	private List<Long> groupIds;
 
 	@Transient
 	private List<Long> softwareIds;
-	
+
 	@Transient
 	private List<Long> announcementIds;
-	
+
 	@Transient
 	private List<Long> contactIds;
-	
+
 	@Transient
 	private List<Long> faqIds;
-	
+
 	@Convert(converter=BooleanToStringConverter.class)
 	boolean studentsOnly;
-	
-	
+
+
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof Category && obj !=null) {
@@ -240,7 +230,7 @@ public class Category implements Serializable {
 		this.categoryType = categoryType;
 	}
 
-	
+
 	public User getOwner() {
 		return this.owner;
 	}
@@ -344,7 +334,7 @@ public class Category implements Serializable {
 	public void setUsers(List<User> users) {
 		this.users = users;
 	}
-	
+
 	public List<Long> getUserIds() {
 		return this.userIds;
 	}
@@ -352,7 +342,7 @@ public class Category implements Serializable {
 	public void setUserIds(List<Long> ids) {
 		this.userIds = ids;
 	}
-	
+
 	public boolean getStudentsOnly() {
 		return this.studentsOnly;
 	}
@@ -361,13 +351,13 @@ public class Category implements Serializable {
 		this.studentsOnly = studentsOnly;
 	}
 
-        public List<Announcement> getAnnouncements() {
-                return this.announcements;
-        }
+	public List<Announcement> getAnnouncements() {
+		return this.announcements;
+	}
 
-        public void setAnnouncements(List<Announcement> announcements) {
-                this.announcements = announcements;
-        }
+	public void setAnnouncements(List<Announcement> announcements) {
+		this.announcements = announcements;
+	}
 
 	public List<Long> getAnnouncementIds() {
 		return this.announcementIds;
@@ -377,13 +367,13 @@ public class Category implements Serializable {
 		this.announcementIds = ids;
 	}
 
-        public List<Contact> getContacts() {
-                return this.contacts;
-        }
+	public List<Contact> getContacts() {
+		return this.contacts;
+	}
 
-        public void setContacts(List<Contact> contacts) {
-                this.contacts = contacts;
-        }
+	public void setContacts(List<Contact> contacts) {
+		this.contacts = contacts;
+	}
 
 	public List<Long> getContactIds() {
 		return this.contactIds;
@@ -393,13 +383,13 @@ public class Category implements Serializable {
 		this.contactIds = ids;
 	}
 
-        public List<FAQ> getFaqs() {
-                return this.faqs;
-        }
+	public List<FAQ> getFaqs() {
+		return this.faqs;
+	}
 
-        public void setFaqs(List<FAQ> faqs) {
-                this.faqs = faqs;
-        }
+	public void setFaqs(List<FAQ> faqs) {
+		this.faqs = faqs;
+	}
 
 	public List<Long> getFAQIds() {
 		return this.faqIds;
@@ -409,12 +399,5 @@ public class Category implements Serializable {
 		this.faqIds = ids;
 	}
 
-	public List<CephalixInstitute> getInstitutes() {
-		return this.institutes;
-	}
-
-	public void setInstitutes(List<CephalixInstitute> institutes) {
-		this.institutes = institutes;
-	}
 
 }
