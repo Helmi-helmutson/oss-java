@@ -3,6 +3,7 @@
 package de.openschoolserver.api.resources;
 
 import io.dropwizard.auth.Auth;
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -15,6 +16,9 @@ import java.util.Map;
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.MissedTranslation;
+import de.openschoolserver.dao.Translation;
+
 
 @Path("system")
 @Api(value = "system")
@@ -69,7 +73,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins")
-    Response removeEnumerate(
+    Response deleteEnumerate(
     		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
             @PathParam("value") String value
@@ -191,5 +195,51 @@ public interface SystemResource {
     		@ApiParam(hidden = true) @Auth Session session,
     		List<Map<String, String>> incomingRules
     		);
-
+    
+    
+    /*
+     * Translations stuff
+     */
+    @GET
+    @Path("translations")
+    @Produces("text/plain")
+    @ApiOperation(value = "Translate a text into a given language")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    String translate(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		MissedTranslation missedTranslataion
+    );
+    
+    @POST
+    @Path("translations")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Add or updates a translation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    Response addTranslation(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		Translation	translation
+    );
+    
+    @GET
+    @Path("missedTranslations/{lang}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of the missed translations to a language")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    List<String> getMissedTranslations(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		String lang
+    );
+    
+    
+    
+    
 }

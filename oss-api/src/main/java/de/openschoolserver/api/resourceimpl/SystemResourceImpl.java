@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import de.openschoolserver.api.resources.SystemResource;
+import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Translation;
 import de.openschoolserver.dao.controller.SystemController;
 
 public class SystemResourceImpl implements SystemResource {
@@ -30,9 +32,9 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public Response removeEnumerate(Session session, String type, String value) {
+	public Response deleteEnumerate(Session session, String type, String value) {
 		SystemController systemController = new SystemController(session);
-		return systemController.removeEnumerate(type, value);
+		return systemController.deleteEnumerate(type, value);
 	}
 
 	@Override
@@ -91,4 +93,19 @@ public class SystemResourceImpl implements SystemResource {
 		SystemController systemController = new SystemController(session);
 		return systemController.setFirewallRemoteAccessRules(remoteAccessRules);
 		}
+
+	@Override
+	public String translate(Session session, MissedTranslation missedTranslataion) {
+		return new SystemController(session).translate(missedTranslataion.getLang(), missedTranslataion.getString());
+	}
+
+	@Override
+	public Response addTranslation(Session session, Translation translation) {
+		return new SystemController(session).addTranslation(translation);
+	}
+
+	@Override
+	public List<String> getMissedTranslations(Session session, String lang) {
+		return new SystemController(session).getMissedTranslations(lang);
+	}
 }
