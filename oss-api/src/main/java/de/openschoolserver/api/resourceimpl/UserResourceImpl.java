@@ -11,7 +11,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.GroupController;
 import de.openschoolserver.dao.controller.UserController;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 
 public class UserResourceImpl implements UserResource {
 
@@ -46,25 +46,25 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public Response add(Session session, User user) {
+	public OssResponse add(Session session, User user) {
 		final UserController userController = new UserController(session);
 		return userController.add(user);
 	}
 
 	@Override
-	public List<Response> add(Session session, List<User> users) {
+	public List<OssResponse> add(Session session, List<User> users) {
 		final UserController userController = new UserController(session);
 		return userController.add(users);
 	}
 
 	@Override
-	public Response delete(Session session, long userId) {
+	public OssResponse delete(Session session, long userId) {
 		final UserController userController = new UserController(session);
 		return userController.delete(userId);
 	}
 
 	@Override
-	public Response modify(Session session, User user) {
+	public OssResponse modify(Session session, User user) {
 		final UserController userController = new UserController(session);
 		return userController.modify(user);
 	}
@@ -100,25 +100,25 @@ public class UserResourceImpl implements UserResource {
 	}
 	
 	@Override
-	public Response setMembers(Session session, long userId, List<Long> groupIds) {
+	public OssResponse setMembers(Session session, long userId, List<Long> groupIds) {
 		final UserController userController = new UserController(session);
 		return userController.setGroups(userId,groupIds);
 	}
 	
 	@Override
-	public Response removeMember(Session session, long groupId, long userId) {
+	public OssResponse removeMember(Session session, long groupId, long userId) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.removeMember(groupId,userId);	
 	}
 
 	@Override
-	public Response addMember(Session session, long groupId, long userId) {
+	public OssResponse addMember(Session session, long groupId, long userId) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.addMember(groupId,userId);
 	}
 
 	@Override
-	public Response syncFsQuotas(Session session, List<List<String>> Quotas) {
+	public OssResponse syncFsQuotas(Session session, List<List<String>> Quotas) {
 		final UserController userController = new UserController(session);
 		return userController.syncFsQuotas(Quotas);
 	}

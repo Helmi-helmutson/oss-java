@@ -5,10 +5,9 @@ import java.util.ArrayList;
 
 
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,7 @@ import javax.persistence.Query;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.HWConf;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
@@ -150,18 +149,18 @@ public class RoomController extends Controller {
 		}
 	}
 
-	public Response add(Room room){
+	public OssResponse add(Room room){
 		if( room.getRoomType().equals("smartRoom") ) {
-			return new Response(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
+			return new OssResponse(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
 		EntityManager em = getEntityManager();
 
 		// First we check if the parameter are unique.
 		if( !this.isNameUnique(room.getName())){
-			return new Response(this.getSession(),"ERROR", "Room name is not unique.");
+			return new OssResponse(this.getSession(),"ERROR", "Room name is not unique.");
 		}
 		if( !this.isDescriptionUnique(room.getDescription())){
-			return new Response(this.getSession(),"ERROR", "Room description is not unique.");
+			return new OssResponse(this.getSession(),"ERROR", "Room description is not unique.");
 		}
 
 		// If no network was configured we will use net school network.
@@ -185,15 +184,15 @@ public class RoomController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.startPlugin("add_room", room);
-		return new Response(this.getSession(),"OK", "Room was created succesfully.",room.getId());
+		return new OssResponse(this.getSession(),"OK", "Room was created succesfully.",room.getId());
 	}
 
-	public Response delete(long roomId){
+	public OssResponse delete(long roomId){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
 		try {
@@ -201,16 +200,16 @@ public class RoomController extends Controller {
 			em.getTransaction().begin();
 			DeviceController devController = new DeviceController(this.getSession());
 			if( this.isProtected(room) ) {
-				return new Response(this.getSession(),"ERROR","This room must not be deleted.");
+				return new OssResponse(this.getSession(),"ERROR","This room must not be deleted.");
 			}
 			List<Long> deviceIds = new ArrayList<Long>();
 			for( Device device : room.getDevices()) {
 				deviceIds.add(device.getId());
 			}
-			Response response = devController.delete(deviceIds);
+			OssResponse ossResponse = devController.delete(deviceIds);
 			//If an error happened during deleting the devices the room must not be removed.
-			if( response.getCode().equals("ERROR") ) {
-				return response;
+			if( ossResponse.getCode().equals("ERROR") ) {
+				return ossResponse;
 			}
 			if( ! em.contains(room)) {
 				room = em.merge(room);
@@ -220,14 +219,14 @@ public class RoomController extends Controller {
 			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		dhcpconfig.Create();
 		this.startPlugin("delete_room", room);
-		return new Response(this.getSession(),"OK", "Room was removed successfully.");
+		return new OssResponse(this.getSession(),"OK", "Room was removed successfully.");
 	}
 	
 
@@ -373,7 +372,7 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the list of accesses in a room
 	 */
-	public Response setAccessList(long roomId,List<AccessInRoom> AccessList){
+	public OssResponse setAccessList(long roomId,List<AccessInRoom> AccessList){
 		Room room = this.getById(roomId);
 		EntityManager em = getEntityManager();
 		try {
@@ -389,11 +388,11 @@ public class RoomController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Acces was created succesfully");
+		return new OssResponse(this.getSession(),"OK","Acces was created succesfully");
 	}
 
 	/*
@@ -457,16 +456,16 @@ public class RoomController extends Controller {
 	/*
 	 * Sets the actual access status in a room 
 	 */
-	public Response setAccessStatus(long roomId, AccessInRoom access) {
+	public OssResponse setAccessStatus(long roomId, AccessInRoom access) {
 		Room room = this.getById(roomId);
 		this.setAccessStatus(room, access);
-		return new Response(this.getSession(),"OK", "Access state in "+room.getName()+" was set succesfully." );
+		return new OssResponse(this.getSession(),"OK", "Access state in "+room.getName()+" was set succesfully." );
 	}
 
 	/*
 	 * Sets the scheduled access status in all rooms
 	 */
-	public Response setScheduledAccess(){
+	public OssResponse setScheduledAccess(){
 		EntityManager em = getEntityManager();
 		Calendar rightNow = Calendar.getInstance();
 		String   actTime  = String.format("%02d:%02d", rightNow.get(Calendar.HOUR_OF_DAY),rightNow.get(Calendar.MINUTE));
@@ -476,7 +475,7 @@ public class RoomController extends Controller {
 			Room room = access.getRoom();
 			this.setAccessStatus(room, access);
 		}
-		return new Response(this.getSession(),"OK", "Scheduled access states where set succesfully." );
+		return new OssResponse(this.getSession(),"OK", "Scheduled access states where set succesfully." );
 	}
 
 	/*
@@ -561,7 +560,7 @@ public class RoomController extends Controller {
 	/*
 	 * Creates new devices in the room
 	 */
-	public Response addDevices(long roomId,List<Device> devices){
+	public OssResponse addDevices(long roomId,List<Device> devices){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
 		DeviceController deviceController = new DeviceController(this.session);
@@ -573,7 +572,7 @@ public class RoomController extends Controller {
 			ipAddress = this.getAvailableIPAddresses(roomId, 2);
 			if( device.getIp().isEmpty() ){
 				if( ipAddress.isEmpty() ) {
-					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+					return new OssResponse(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
 				}
 				if( device.getName().isEmpty() ) {
 				  device.setName(ipAddress.get(0).split(" ")[1]);
@@ -582,7 +581,7 @@ public class RoomController extends Controller {
 			}
 			if( !device.getWlanMac().isEmpty() ){
 				if( ipAddress.size() < 2 ) {
-					return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+					return new OssResponse(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
 				}
 				device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 			}
@@ -596,7 +595,7 @@ public class RoomController extends Controller {
 			room.addDevice(device);
 			if(error.length() > 0){
 				em.close();
-				return new Response(this.getSession(),"ERROR",error.toString());
+				return new OssResponse(this.getSession(),"ERROR",error.toString());
 			}
 			try {
 				em.getTransaction().begin();
@@ -605,7 +604,7 @@ public class RoomController extends Controller {
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 				em.close();
-				return new Response(this.getSession(),"ERROR", e.getMessage());
+				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			}
 		}
 		em.close();
@@ -619,19 +618,19 @@ public class RoomController extends Controller {
 				user.setSureName(device.getName() + "  Workstation-User");
 				user.setRole("workstations");
 				//TODO do not ignore response.
-				Response answer = userController.add(user);
+				OssResponse answer = userController.add(user);
 				logger.debug(answer.getValue());
 			}
 		}
 		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 		dhcpconfig.Create();
-		return new Response(this.getSession(),"OK", "Devices were created succesfully." );
+		return new OssResponse(this.getSession(),"OK", "Devices were created succesfully." );
 	}
 
 	/*
 	 * Deletes devices in the room
 	 */
-	public Response deleteDevices(long roomId,List<Long> deviceIDs){
+	public OssResponse deleteDevices(long roomId,List<Long> deviceIDs){
 		EntityManager em = getEntityManager();
 		Room room = em.find(Room.class, roomId);
 		for(Long deviceId : deviceIDs) {
@@ -645,22 +644,22 @@ public class RoomController extends Controller {
 			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK ", "Devices were deleted succesfully.");
+		return new OssResponse(this.getSession(),"OK ", "Devices were deleted succesfully.");
 	}
 
 	public List<Device> getDevices(long roomId) {
 		return this.getById(roomId).getDevices();
 	}
 
-	public Response addDevice(long roomId, String macAddress, String name) {
+	public OssResponse addDevice(long roomId, String macAddress, String name) {
 		// First we check if there is enough IP-Addresses in this room
 		List<String> ipAddress = this.getAvailableIPAddresses(roomId, 1);
 		if( ipAddress.isEmpty() ){
-			return new Response(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+			return new OssResponse(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
 		} 
 		EntityManager em = getEntityManager();
 		Device device = new Device();
@@ -693,7 +692,7 @@ public class RoomController extends Controller {
 				device.setIp(ipAddress.get(0).split(" ")[0]);
 				device.setHwconf(hwconf);
 			} else {
-				return new Response(this.getSession(),"ERROR","You have no rights to register devices in this room");
+				return new OssResponse(this.getSession(),"ERROR","You have no rights to register devices in this room");
 			}
 		} else {
 			device.setMac(macAddress);
@@ -709,7 +708,7 @@ public class RoomController extends Controller {
 		DeviceController deviceController = new DeviceController(this.session);
 		String error = deviceController.check(device, room);
 		if( !error.isEmpty() ) {
-			return new Response(this.getSession(),"ERROR",error);
+			return new OssResponse(this.getSession(),"ERROR",error);
 		}
 		device.setRoom(room);
 		room.addDevice(device);
@@ -719,14 +718,14 @@ public class RoomController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		//Start plugin and create DHCP and salt configuration
 		this.startPlugin("add_device", device);
 		new DHCPConfig(this.session).Create();
-		return new Response(this.getSession(),"OK","Device was created succesfully.");
+		return new OssResponse(this.getSession(),"OK","Device was created succesfully.");
 	}
 
 	public HWConf getHWConf(long roomId) {
@@ -741,21 +740,21 @@ public class RoomController extends Controller {
 		}
 	}
 
-	public Response setHWConf(long roomId, long hwConfId) {
+	public OssResponse setHWConf(long roomId, long hwConfId) {
 		EntityManager em = getEntityManager();
 		try {
 			Room room = em.find(Room.class, roomId);
 			room.setHwconf(em.find(HWConf.class, hwConfId));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","The hardware configuration of the room was set succesfully.");
+		return new OssResponse(this.getSession(),"OK","The hardware configuration of the room was set succesfully.");
 	}
 	
-	public Response modify(Room room){
+	public OssResponse modify(Room room){
 		EntityManager em = getEntityManager();
 		Room oldRoom = this.getById(room.getId());
 		oldRoom.setDescription(room.getDescription());
@@ -768,13 +767,13 @@ public class RoomController extends Controller {
 			em.merge(oldRoom);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.startPlugin("modify_room", oldRoom);
 		
-		return new Response(this.getSession(),"OK","The room was modified succesfully.");
+		return new OssResponse(this.getSession(),"OK","The room was modified succesfully.");
 	}
 
 	public List<Room> getRooms(List<Long> roomIds) {

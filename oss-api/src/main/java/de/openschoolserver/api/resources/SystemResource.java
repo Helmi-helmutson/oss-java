@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.Translation;
@@ -59,7 +59,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins")
-    Response addEnumerate(
+    OssResponse addEnumerate(
     		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
             @PathParam("value") String value
@@ -73,7 +73,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins")
-    Response deleteEnumerate(
+    OssResponse deleteEnumerate(
     		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
             @PathParam("value") String value
@@ -114,7 +114,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins")
-    Response setConfig(
+    OssResponse setConfig(
     		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("key") String key,
             @PathParam("value") String value
@@ -141,7 +141,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins")
-    Response  setFirewallIncomingRules(
+    OssResponse  setFirewallIncomingRules(
     		@ApiParam(hidden = true) @Auth Session session,
     		Map<String, String> incomingRules
     		);
@@ -166,7 +166,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins")
-    Response  setFirewallOutgoingRules(
+    OssResponse  setFirewallOutgoingRules(
     		@ApiParam(hidden = true) @Auth Session session,
     		List<Map<String, String>> incomingRules
     		);
@@ -191,7 +191,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins")
-    Response  setFirewallRemoteAccessRules(
+    OssResponse  setFirewallRemoteAccessRules(
     		@ApiParam(hidden = true) @Auth Session session,
     		List<Map<String, String>> incomingRules
     		);
@@ -221,7 +221,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins")
-    Response addTranslation(
+    OssResponse addTranslation(
     		@ApiParam(hidden = true) @Auth Session session,
     		Translation	translation
     );
@@ -236,10 +236,62 @@ public interface SystemResource {
     @RolesAllowed("sysadmins")
     List<String> getMissedTranslations(
     		@ApiParam(hidden = true) @Auth Session session,
-    		String lang
+    		@PathParam("lang") String lang
     );
     
+    @PUT
+    @Path("register")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Register the server againts the update server.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("sysadmins")
+    OssResponse register(
+    		@ApiParam(hidden = true) @Auth Session session
+    );
     
+    @GET
+    @Path("packages/{filter}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Searches packages.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("sysadmins")
+    List<Map<String,String>> searchPackages(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("filter") String filter
+    		);
     
-    
+    @POST
+    @Path("packages")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Install packages.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("sysadmins")
+    OssResponse installPackages(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		List<String> packages
+    		);
+
+    @POST
+    @Path("packages/update")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Update packages.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("sysadmins")
+    OssResponse updatePackages(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		List<String> packages
+    		);
+
+
+    @PUT
+    @Path("update")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Install all updates on the system.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("sysadmins")
+    OssResponse updateSyste(
+    		@ApiParam(hidden = true) @Auth Session session
+    		);
 }

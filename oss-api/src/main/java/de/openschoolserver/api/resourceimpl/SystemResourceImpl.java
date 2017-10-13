@@ -6,7 +6,7 @@ import java.util.Map;
 
 import de.openschoolserver.api.resources.SystemResource;
 import de.openschoolserver.dao.MissedTranslation;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Translation;
 import de.openschoolserver.dao.controller.SystemController;
@@ -26,13 +26,13 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public Response addEnumerate(Session session, String type, String value) {
+	public OssResponse addEnumerate(Session session, String type, String value) {
 		SystemController systemController = new SystemController(session);
 		return systemController.addEnumerate(type, value);
 	}
 
 	@Override
-	public Response deleteEnumerate(Session session, String type, String value) {
+	public OssResponse deleteEnumerate(Session session, String type, String value) {
 		SystemController systemController = new SystemController(session);
 		return systemController.deleteEnumerate(type, value);
 	}
@@ -50,12 +50,12 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public Response setConfig(Session session, String key, String value) {
+	public OssResponse setConfig(Session session, String key, String value) {
 		SystemController systemController = new SystemController(session);
 		if( systemController.setConfigValue(key, value) )
-			return new Response(session,"OK","Global configuration value was set succesfully."); 
+			return new OssResponse(session,"OK","Global configuration value was set succesfully."); 
 		else
-			return new Response(session,"ERROR","Global configuration value could not be set.");
+			return new OssResponse(session,"ERROR","Global configuration value could not be set.");
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public Response setFirewallIncomingRules(Session session, Map<String, String> incommingRules) {
+	public OssResponse setFirewallIncomingRules(Session session, Map<String, String> incommingRules) {
 		SystemController systemController = new SystemController(session);
 		return systemController.setFirewallIncomingRules(incommingRules);
 	}
@@ -77,7 +77,7 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public Response setFirewallOutgoingRules(Session session, List<Map<String, String>> outgoingRules) {
+	public OssResponse setFirewallOutgoingRules(Session session, List<Map<String, String>> outgoingRules) {
 		SystemController systemController = new SystemController(session);
 		return systemController.setFirewallOutgoingRules(outgoingRules);
 	}
@@ -89,23 +89,48 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public Response setFirewallRemoteAccessRules(Session session, List<Map<String, String>> remoteAccessRules) {
+	public OssResponse setFirewallRemoteAccessRules(Session session, List<Map<String, String>> remoteAccessRules) {
 		SystemController systemController = new SystemController(session);
 		return systemController.setFirewallRemoteAccessRules(remoteAccessRules);
 		}
 
 	@Override
-	public String translate(Session session, MissedTranslation missedTranslataion) {
-		return new SystemController(session).translate(missedTranslataion.getLang(), missedTranslataion.getString());
+	public String translate(Session session, MissedTranslation missedTranslation) {
+		return new SystemController(session).translate(missedTranslation.getLang(), missedTranslation.getString());
 	}
 
 	@Override
-	public Response addTranslation(Session session, Translation translation) {
+	public OssResponse addTranslation(Session session, Translation translation) {
 		return new SystemController(session).addTranslation(translation);
 	}
 
 	@Override
 	public List<String> getMissedTranslations(Session session, String lang) {
 		return new SystemController(session).getMissedTranslations(lang);
+	}
+
+	@Override
+	public OssResponse register(Session session) {
+		return new SystemController(session).registerSystem();
+	}
+
+	@Override
+	public List<Map<String, String>> searchPackages(Session session, String filter) {
+		return new SystemController(session).searchPackages(filter);
+	}
+
+	@Override
+	public OssResponse installPackages(Session session, List<String> packages) {
+		return new SystemController(session).installPackages(packages);
+	}
+
+	@Override
+	public OssResponse updatePackages(Session session, List<String> packages) {
+		return new SystemController(session).updatePackages(packages);
+	}
+
+	@Override
+	public OssResponse updateSyste(Session session) {
+		return new SystemController(session).updateSystem();
 	}
 }

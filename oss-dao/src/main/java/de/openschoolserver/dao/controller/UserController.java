@@ -20,7 +20,7 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.DHCPConfig;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 
 @SuppressWarnings( "unchecked" )
 public class UserController extends Controller {
@@ -127,18 +127,17 @@ public class UserController extends Controller {
 		}
 	}
 
-	public Response add(User user){
+	public OssResponse add(User user){
 		EntityManager em = getEntityManager();
 		//Check role
 		if( user.getRole() == null )
-			return new Response(this.getSession(),"ERROR", "You have to define the role of the user.");
+			return new OssResponse(this.getSession(),"ERROR", "You have to define the role of the user.");
 		//Check Birthday
 		if( user.getBirthDay() == null ) {
 			if( user.getRole().equals("sysadmins") || user.getRole().equals("templates")) {
-				Date now = new Date(System.currentTimeMillis());
-				user.setBirthDay(now);
+				user.setBirthDay(this.now());
 			} else {
-				return new Response(this.getSession(),"ERROR", "You have to define the birthday.");
+				return new OssResponse(this.getSession(),"ERROR", "You have to define the birthday.");
 			}
 		}
 		// Create uid if not given
@@ -161,11 +160,11 @@ public class UserController extends Controller {
 			// First we check if the parameter are unique.
 			// workstation users have a user called as itself
 			if( !user.getRole().equals("workstations") && !this.isNameUnique(user.getUid())){
-				return new Response(this.getSession(),"ERROR", "User name is not unique.");
+				return new OssResponse(this.getSession(),"ERROR", "User name is not unique.");
 			}
 			// Check if uid contains non allowed characters
 			if( this.checkNonASCII(user.getUid()) ) {
-				return new Response(this.getSession(),"ERROR", "Uid contains not allowed characters.");
+				return new OssResponse(this.getSession(),"ERROR", "Uid contains not allowed characters.");
 			}
 		}
 		// Check the user password
@@ -176,9 +175,9 @@ public class UserController extends Controller {
 		}
 		else
 		{
-			Response response = this.checkPassword(user.getPassword());
-			if(response != null) {
-				return response;
+			OssResponse ossResponse = this.checkPassword(user.getPassword());
+			if(ossResponse != null) {
+				return ossResponse;
 			}
 		}
 		try {
@@ -192,29 +191,29 @@ public class UserController extends Controller {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.startPlugin("add_user",user);
-		return new Response(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.",user.getId());
+		return new OssResponse(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.",user.getId());
 	}
 
 
-	public List<Response> add(List<User> users) {
-		List<Response> results = new ArrayList<Response>();
+	public List<OssResponse> add(List<User> users) {
+		List<OssResponse> results = new ArrayList<OssResponse>();
 		for( User user : users ) {
 			results.add(this.add(user));
 		}
 		return results;
 	}
 
-	public Response modify(User user){
+	public OssResponse modify(User user){
 		User oldUser = this.getById(user.getId());
 		if(!user.getPassword().isEmpty()) {
-			Response response = this.checkPassword(user.getPassword());
-			if(response != null)
-				return response;
+			OssResponse ossResponse = this.checkPassword(user.getPassword());
+			if(ossResponse != null)
+				return ossResponse;
 		}
 		oldUser.setGivenName( user.getGivenName());
 		oldUser.setSureName(user.getSureName());
@@ -227,21 +226,21 @@ public class UserController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.startPlugin("modify_user",oldUser);
-		return new Response(this.getSession(),"OK","User was modified succesfully");
+		return new OssResponse(this.getSession(),"OK","User was modified succesfully");
 	}
 
-	public Response delete(long userId){
+	public OssResponse delete(long userId){
 		return this.delete(this.getById(userId));
 	}
 
-	public Response delete(User user) {
+	public OssResponse delete(User user) {
 		if( this.isProtected(user)) {
-			return new Response(this.getSession(),"ERROR","This user must not be deleted.");
+			return new OssResponse(this.getSession(),"ERROR","This user must not be deleted.");
 		}
 		this.startPlugin("delete_user",user);
 		EntityManager em = getEntityManager();
@@ -259,7 +258,7 @@ public class UserController extends Controller {
 			dhcpConfig.Create();
 		}
 		em.close();
-		return new Response(this.getSession(),"OK","User was deleted");
+		return new OssResponse(this.getSession(),"OK","User was deleted");
 	}
 
 	public List<Group> getAvailableGroups(long userId){
@@ -278,7 +277,7 @@ public class UserController extends Controller {
 		return user.getGroups();
 	}
 
-	public Response setGroups(long userId, List<Long> groupIds) {
+	public OssResponse setGroups(long userId, List<Long> groupIds) {
 		EntityManager em = getEntityManager();
 		List<Group> groupsToRemove = new ArrayList<Group>();
 		List<Group> groupsToAdd    = new ArrayList<Group>();
@@ -312,7 +311,7 @@ public class UserController extends Controller {
 			em.merge(user);
 			em.getTransaction().commit();
 		}catch (Exception e) {
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -322,10 +321,10 @@ public class UserController extends Controller {
 		for( Group group : groupsToRemove ) {
 			this.changeMemberPlugin("removemembers", group, user);
 		}
-		return new Response(this.getSession(),"OK","The groups of the user was set.");
+		return new OssResponse(this.getSession(),"OK","The groups of the user was set.");
 	}
 
-	public Response syncFsQuotas(List<List<String>> quotas) {
+	public OssResponse syncFsQuotas(List<List<String>> quotas) {
 		EntityManager em = getEntityManager();
 		User user;
 		try {
@@ -342,11 +341,11 @@ public class UserController extends Controller {
 			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","The filesystem quotas was synced succesfully");
+		return new OssResponse(this.getSession(),"OK","The filesystem quotas was synced succesfully");
 	}
 
 	public List<User> getUsers(List<Long> userIds) {

@@ -377,7 +377,7 @@ CREATE TABLE IF NOT EXISTS Sessions (
         PRIMARY KEY(id)
  );
 
-CREATE TABLE IF NOT EXISTS Responses (
+CREATE TABLE IF NOT EXISTS OssResponses (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	session_id   BIGINT UNSIGNED NOT NULL,
 	code	VARCHAR(64) NOT NULL,
@@ -411,12 +411,13 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
 # status DF -> deinstallation failed
 # status IF -> installation failed
 CREATE TABLE IF NOT EXISTS SoftwareStatus (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         version_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
 	status             VARCHAR(2) NOT NULL,
 	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
 	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
-	PRIMARY KEY(version_id,device_id)
+	PRIMARY KEY(id)
 );
 
 # licenseType C -> command line license

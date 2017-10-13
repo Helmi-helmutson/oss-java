@@ -59,7 +59,7 @@ public class AdHocLanController extends Controller {
 		return devices;
 	}
 
-	public Response add(Room room) {
+	public OssResponse add(Room room) {
 		EntityManager em = getEntityManager();
 		//Search the BYOD HwConf
 		if( room.getHwconf() == null ) {
@@ -73,7 +73,7 @@ public class AdHocLanController extends Controller {
 		return roomConrtoller.add(room);
 	}
 
-	public Response putObjectIntoRoom(Long roomId, String objectType, Long objectId) {
+	public OssResponse putObjectIntoRoom(Long roomId, String objectType, Long objectId) {
 		switch(objectType) {
 		case("User"):
 			UserController userController = new UserController(session);
@@ -84,7 +84,7 @@ public class AdHocLanController extends Controller {
 			Group group = groupController.getById(objectId);
 			return this.addMConfig(group, "AdHocAccess", String.valueOf(roomId));
 		}
-		return new Response(this.getSession(),"ERROR","Invalid Object Type");
+		return new OssResponse(this.getSession(),"ERROR","Invalid Object Type");
 	}
 }
  

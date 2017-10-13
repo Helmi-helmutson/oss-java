@@ -17,7 +17,7 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 
@@ -108,7 +108,7 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.add")
-    Response add(
+    OssResponse add(
             @ApiParam(hidden = true) @Auth Session session,
             Room room
     );
@@ -124,7 +124,7 @@ public interface RoomResource {
         @ApiResponse(code = 404, message = "Room not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("room.delete")
-    Response delete(
+    OssResponse delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
@@ -158,7 +158,7 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.modify")
-    Response setHwConf(
+    OssResponse setHwConf(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")   long roomId,
             @PathParam("hwConfId") long hwConfId
@@ -279,7 +279,7 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.add")
-    Response setAccessList(
+    OssResponse setAccessList(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             List<AccessInRoom>   accessList
@@ -297,7 +297,7 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.add")
-    Response setScheduledAccess(
+    OssResponse setScheduledAccess(
     		@ApiParam(hidden = true) @Auth Session session
     );
     
@@ -346,7 +346,7 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.manage")
-    Response setAccessStatus(
+    OssResponse setAccessStatus(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             AccessInRoom access
@@ -365,7 +365,7 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.add")
-    Response addDevices(
+    OssResponse addDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             List<Device> devices
@@ -383,7 +383,7 @@ public interface RoomResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    Response addDevice(
+    OssResponse addDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             @PathParam("macAddress") String macAddress,
@@ -418,7 +418,7 @@ public interface RoomResource {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("device.delete")
-    Response deleteDevices(
+    OssResponse deleteDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             List<Long> deviceId
@@ -435,7 +435,7 @@ public interface RoomResource {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("device.delete")
-    Response deleteDevice(
+    OssResponse deleteDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             @PathParam("deviceId") Long deviceId

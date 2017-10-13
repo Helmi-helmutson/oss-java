@@ -7,7 +7,7 @@ import java.util.List;
 import de.openschoolserver.api.resources.AdHocLanResource;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -45,13 +45,13 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
-	public Response add(Session session, Room room) {
+	public OssResponse add(Session session, Room room) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.add(room);
 	}
 
 	@Override
-	public Response putObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
+	public OssResponse putObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.putObjectIntoRoom(roomId,objectType,objectId);
 	}
@@ -62,7 +62,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
-	public Response deleteDevice(Session session, Long deviceId) {
+	public OssResponse deleteDevice(Session session, Long deviceId) {
 		DeviceController deviceController = new DeviceController(session);
 		if( deviceController.isSuperuser() ) {
 			return deviceController.delete(deviceId, true);
@@ -71,13 +71,13 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 			if( device.getOwner().equals(session.getUser()) ) {
 				return deviceController.delete(deviceId, true);
 			} else {
-				return new Response(session,"ERROR", "This is not your device.");
+				return new OssResponse(session,"ERROR", "This is not your device.");
 			}
 		}
 	}
 
 	@Override
-	public Response addDevice(Session session, long roomId, String macAddress, String name) {
+	public OssResponse addDevice(Session session, long roomId, String macAddress, String name) {
 		RoomController roomController = new RoomController(session);
 		return roomController.addDevice(roomId, macAddress, name);
 	}

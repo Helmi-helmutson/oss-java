@@ -35,7 +35,6 @@ dependencies {
     compile "com.google.guava:guava:19.0"
     compile "com.google.code.gson:gson:2.4"
     compile "org.eclipse.persistence:eclipselink:2.6.0"
-    
   
     runtime "mysql:mysql-connector-java:5.1.21"
 

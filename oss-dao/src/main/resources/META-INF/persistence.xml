@@ -20,12 +20,11 @@
 		<class>de.openschoolserver.dao.Session</class>
 		<class>de.openschoolserver.dao.BooleanToStringConverter</class>
 		<class>de.openschoolserver.dao.AccessInRoom</class>
-		<class>de.openschoolserver.dao.Response</class>
+		<class>de.openschoolserver.dao.OssResponse</class>
 		<class>de.openschoolserver.dao.Category</class>
 		<class>de.openschoolserver.dao.Software</class>
 		<class>de.openschoolserver.dao.SoftwareStatus</class>
 		<class>de.openschoolserver.dao.SoftwareLicense</class>
-		<class>de.openschoolserver.dao.SoftwareStatusPK</class>
 		<class>de.openschoolserver.dao.SoftwareVersion</class>
 		<class>de.openschoolserver.dao.Announcement</class>
 		<class>de.openschoolserver.dao.Contact</class>

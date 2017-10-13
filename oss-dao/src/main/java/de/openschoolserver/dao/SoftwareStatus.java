@@ -13,18 +13,21 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="SoftwareStatus")
 @NamedQueries({
-	@NamedQuery(name="SoftwareStatus.findAll", query="SELECT s FROM SoftwareStatus s"),
+	@NamedQuery(name="SoftwareStatus.findAll",		query="SELECT s FROM SoftwareStatus s"),
 	@NamedQuery(name="SoftwareStatus.findByStatus", query="SELECT s FROM SoftwareStatus s WHERE s.status = :STATUS"),
+	@NamedQuery(name="SoftwareStatus.getStatus",    query="SELECT s FROM SoftwareStatus s WHERE s.deviceId = : deviceId AND s.softwareId = :softwareId"),
 	@NamedQuery(name="SoftwareStatus.getAllForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE"),
-	@NamedQuery(name="SoftwareStatus.getForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE AND sv.version = :VERSION"),
+	@NamedQuery(name="SoftwareStatus.getForOne",	query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE AND sv.version = :VERSION"),
 })
 
 public class SoftwareStatus implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private SoftwareStatusPK id;
-
+	@Id
+	@SequenceGenerator(name="SOFTWARESTATUS_ID_GENERATOR" )
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARESTATUS_ID_GENERATOR")
+	private long id;
+	
 	private String status;
 
 	//bi-directional many-to-one association to SoftwareVersion
@@ -68,11 +71,12 @@ public class SoftwareStatus implements Serializable {
 		this.softwareVersion = sv;
 		this.status = status;
 	}
-	public SoftwareStatusPK getId() {
+	
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(SoftwareStatusPK id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -99,5 +103,4 @@ public class SoftwareStatus implements Serializable {
 	public void setDevice(Device device) {
 		this.device = device;
 	}
-
 }

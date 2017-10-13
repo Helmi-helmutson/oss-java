@@ -3,8 +3,10 @@ package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.HWConf;
 
+
+import de.openschoolserver.dao.Clone;
 import de.openschoolserver.dao.Partition;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.CloneToolController;
 import de.openschoolserver.api.resources.CloneToolResource;
@@ -39,8 +41,7 @@ public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
 	public HWConf getById(Session session, Long hwconfId) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		final HWConf hwconf = cloneToolController.getById(hwconfId);
+		final HWConf hwconf = new CloneToolController(session).getById(hwconfId);
 		if (hwconf == null) {
 			throw new WebApplicationException(404);
 		}
@@ -49,83 +50,76 @@ public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
 	public String getPartitions(Session session, Long hwconfId) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.getPartitions(hwconfId);
+		return new CloneToolController(session).getPartitions(hwconfId);
 	}
 	
 	@Override
 	public String getDescription(Session session, Long hwconfId) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.getDescription(hwconfId);
+		return new CloneToolController(session).getDescription(hwconfId);
 	}
 
 	@Override
 	public Partition getPartition(Session session, Long hwconfId, String partition) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.getPartition(hwconfId, partition);
+		return new CloneToolController(session).getPartition(hwconfId, partition);
 	}
 
 	@Override
 	public String getConfigurationValue(Session session, Long hwconfId, String partition, String key) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.getConfigurationValue(hwconfId,partition,key);
+		return new CloneToolController(session).getConfigurationValue(hwconfId,partition,key);
 	}
 
 	@Override
-	public Response addHWConf(Session session, HWConf hwconf) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.addHWConf(hwconf);
+	public OssResponse addHWConf(Session session, HWConf hwconf) {
+		return new CloneToolController(session).addHWConf(hwconf);
 	}
 
 	@Override
-	public Response modifyHWConf(Session session, Long hwconfId, HWConf hwconf) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.modifyHWConf(hwconfId, hwconf);
+	public OssResponse modifyHWConf(Session session, Long hwconfId, HWConf hwconf) {
+		return new CloneToolController(session).modifyHWConf(hwconfId, hwconf);
 	}
 
 	@Override
-	public Response addPartition(Session session, Long hwconfId, Partition partition) {
-		// TODO Auto-generated method stub
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.addPartitionToHWConf(hwconfId, partition);
+	public OssResponse addPartition(Session session, Long hwconfId, Partition partition) {
+		return new CloneToolController(session).addPartitionToHWConf(hwconfId, partition);
 	}
 
 	@Override
-	public Response addPartition(Session session, Long hwconfId, String partitionName) {
-		// TODO Auto-generated method stub
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.addPartitionToHWConf(hwconfId, partitionName );
+	public OssResponse addPartition(Session session, Long hwconfId, String partitionName) {
+		return new CloneToolController(session).addPartitionToHWConf(hwconfId, partitionName );
 	}
 	
 	@Override
-	public Response setConfigurationValue(Session session, Long hwconfId, String partitionName, String key, String value) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.setConfigurationValue(hwconfId,partitionName,key,value);
+	public OssResponse setConfigurationValue(Session session, Long hwconfId, String partitionName, String key, String value) {
+		return new CloneToolController(session).setConfigurationValue(hwconfId,partitionName,key,value);
 	}
 
 	@Override
-	public Response delete(Session session, Long hwconfId) {
-		// TODO Auto-generated method stub
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.delete(hwconfId);
+	public OssResponse delete(Session session, Long hwconfId) {
+		return new CloneToolController(session).delete(hwconfId);
 	}
 
 	@Override
-	public Response deletePartition(Session session, Long hwconfId, String partitionName) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.deletePartition(hwconfId,partitionName);
+	public OssResponse deletePartition(Session session, Long hwconfId, String partitionName) {
+		return new CloneToolController(session).deletePartition(hwconfId,partitionName);
 	}
 
 	@Override
-	public Response deleteConfigurationValue(Session session, Long hwconfId, String partitionName, String key) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.deleteConfigurationValue(hwconfId,partitionName,key);
+	public OssResponse deleteConfigurationValue(Session session, Long hwconfId, String partitionName, String key) {
+		return new CloneToolController(session).deleteConfigurationValue(hwconfId,partitionName,key);
 	}
 
 	@Override
 	public List<HWConf> getAllHWConf(Session session) {
-		// TODO Auto-generated method stub
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		return cloneToolController.getAllHWConf();
+		return new CloneToolController(session).getAllHWConf();
+	}
+
+	@Override
+	public OssResponse startCloning(Session session, Long hwconfId, Clone parameters) {
+		return new CloneToolController(session).startCloning(hwconfId,parameters);
+	}
+
+	@Override
+	public OssResponse stopCloning(Session session, Long hwconfId) {
+		return new CloneToolController(session).stopCloning(hwconfId);
 	}
 }

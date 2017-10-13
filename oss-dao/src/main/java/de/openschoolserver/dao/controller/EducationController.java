@@ -4,11 +4,10 @@ package de.openschoolserver.dao.controller;
 import java.io.File;
 
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.FileSystems;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.FileAttribute;
@@ -18,8 +17,6 @@ import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.*;
 import javax.persistence.EntityManager;
-import javax.ws.rs.WebApplicationException;
-
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +99,7 @@ public class EducationController extends Controller {
 	 *     "studentsOnly : true/false
 	 * }
 	 */
-	public Response createSmartRoom(Category smartRoom) {
+	public OssResponse createSmartRoom(Category smartRoom) {
 		EntityManager   em = getEntityManager();
 		User   owner       = this.session.getUser();
 		/* Define the room */
@@ -125,7 +122,7 @@ public class EducationController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			em.close();
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
 		try {
 			em.getTransaction().begin();
@@ -168,14 +165,14 @@ public class EducationController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Smart Room was created succesfully"); 
+		return new OssResponse(this.getSession(),"OK","Smart Room was created succesfully"); 
 	}
 
-	public Response modifySmartRoom(long roomId, Category smartRoom) {
+	public OssResponse modifySmartRoom(long roomId, Category smartRoom) {
 		EntityManager   em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -187,14 +184,14 @@ public class EducationController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Smart Room was modified succesfully");
+		return new OssResponse(this.getSession(),"OK","Smart Room was modified succesfully");
 	}
 	
-	public Response deleteSmartRoom(Long roomId) {
+	public OssResponse deleteSmartRoom(Long roomId) {
 		EntityManager   em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -207,11 +204,11 @@ public class EducationController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Smart Room was deleted succesfully");
+		return new OssResponse(this.getSession(),"OK","Smart Room was deleted succesfully");
 	}
 
 	
@@ -276,7 +273,7 @@ public class EducationController extends Controller {
 		return loggedOns;
 	}
 
-	public Response uploadFileTo(String what, long objectId, InputStream fileInputStream,
+	public OssResponse uploadFileTo(String what, long objectId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		String fileName = contentDispositionHeader.getFileName();
 		File file = null;
@@ -285,7 +282,7 @@ public class EducationController extends Controller {
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
 		StringBuilder error = new StringBuilder();
 		switch(what) {
@@ -313,7 +310,7 @@ public class EducationController extends Controller {
 			}
 		}
 		file.delete();
-		return new Response(this.getSession(),"OK", "File was copied succesfully.");
+		return new OssResponse(this.getSession(),"OK", "File was copied succesfully.");
 	}
 	
 	public String saveFileToUserImport(User user, File file, String fileName) {
@@ -341,7 +338,7 @@ public class EducationController extends Controller {
 		return "";
 	}
 
-	public Response collectFileFromUser(User user,String project, boolean cleanUpExport, boolean sortInDirs) {
+	public OssResponse collectFileFromUser(User user,String project, boolean cleanUpExport, boolean sortInDirs) {
 		String[] program = new String[11];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
@@ -366,35 +363,35 @@ public class EducationController extends Controller {
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
 		if( stderr.toString().isEmpty() ) {
-			return new Response(this.getSession(),"OK", "File was collected from:" + user.getUid() );
+			return new OssResponse(this.getSession(),"OK", "File was collected from:" + user.getUid() );
 		}
-		return new Response(this.getSession(),"ERROR", stderr.toString());
+		return new OssResponse(this.getSession(),"ERROR", stderr.toString());
 	}
 
-	public Response createGroup(Group group) {
+	public OssResponse createGroup(Group group) {
 		GroupController groupController = new GroupController(this.session);
 		group.setGroupType("workgroup");
 		group.setOwner(session.getUser());
 		return groupController.add(group);
 	}
 
-	public Response modifyGroup(long groupId, Group group) {
+	public OssResponse modifyGroup(long groupId, Group group) {
 		GroupController groupController = new GroupController(this.session);
 		Group emGroup = groupController.getById(groupId);
 		if( this.session.getUser().equals(emGroup.getOwner())) {
 			return groupController.modify(group);
 		} else {
-			return new Response(this.getSession(),"ERROR", "You are not the owner of this group.");
+			return new OssResponse(this.getSession(),"ERROR", "You are not the owner of this group.");
 		}
 	}
 
-	public Response deleteGroup(long groupId) {
+	public OssResponse deleteGroup(long groupId) {
 		GroupController groupController = new GroupController(this.session);
 		Group emGroup = groupController.getById(groupId);
 		if( this.session.getUser().equals(emGroup.getOwner())) {
 			return groupController.delete(groupId);
 		} else {
-			return new Response(this.getSession(),"ERROR", "You are not the owner of this group.");
+			return new OssResponse(this.getSession(),"ERROR", "You are not the owner of this group.");
 		}
 	}
 
@@ -432,8 +429,8 @@ public class EducationController extends Controller {
 	}
 
 
-	public Response manageRoom(long roomId, String action, Map<String, String> actionContent) {
-		Response response = null;
+	public OssResponse manageRoom(long roomId, String action, Map<String, String> actionContent) {
+		OssResponse ossResponse = null;
 		List<String> errors = new ArrayList<String>();
 		for( List<Long> loggedOn : this.getRoom(roomId) ) {
 			if(this.session.getDevice().getIp().equals(loggedOn.get(1)) ||
@@ -441,23 +438,23 @@ public class EducationController extends Controller {
 			  ) {
 				continue;
 			}
-			response = this.manageDevice(loggedOn.get(1), action, actionContent);
-			if( response.getCode().equals("ERROR")) {
-				errors.add(response.getValue());
+			ossResponse = this.manageDevice(loggedOn.get(1), action, actionContent);
+			if( ossResponse.getCode().equals("ERROR")) {
+				errors.add(ossResponse.getValue());
 			}
 		}
 		if( errors.isEmpty() ) {
-			new Response(this.getSession(),"OK", "Device control was made applied.");
+			new OssResponse(this.getSession(),"OK", "Device control was made applied.");
 		} else {
-			return new Response(this.getSession(),"ERROR",String.join("<br>", errors));
+			return new OssResponse(this.getSession(),"ERROR",String.join("<br>", errors));
 		}
 		return null;
 	}
 
-	public Response manageDevice(long deviceId, String action, Map<String, String> actionContent) {
+	public OssResponse manageDevice(long deviceId, String action, Map<String, String> actionContent) {
 		Device device = new DeviceController(this.session).getById(deviceId);
 		if(this.session.getDevice().equals(device)) {
-			return new Response(this.getSession(),"ERROR", "Do not control the own client.");
+			return new OssResponse(this.getSession(),"ERROR", "Do not control the own client.");
 		}
 		StringBuilder FQHN = new StringBuilder();
 		FQHN.append(device.getName()).append(".").append(this.getConfigValue("SCHOOL_DOMAIN"));
@@ -501,7 +498,7 @@ public class EducationController extends Controller {
 				Files.write(file.toPath(), fileContent);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
-				return new Response(this.getSession(),"ERROR", e.getMessage());
+				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			}
 			program = new String[4];
 			program[0] = "/usr/bin/salt-cp";
@@ -510,13 +507,13 @@ public class EducationController extends Controller {
 			program[3] = actionContent.get("path");
 			break;
 		default:
-				return new Response(this.getSession(),"ERROR", "Unknonw action.");	
+				return new OssResponse(this.getSession(),"ERROR", "Unknonw action.");	
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
-		return new Response(this.getSession(),"OK", "Device control was applied.");
+		return new OssResponse(this.getSession(),"OK", "Device control was applied.");
 	}
 
-	public Response getRoomControl(long roomId, long minutes) {
+	public OssResponse getRoomControl(long roomId, long minutes) {
 		Map<String, String> actionContent = new HashMap<String,String>();
 		StringBuilder controllers = new StringBuilder();
 		controllers.append(this.getConfigValue("SCHOOL_SERVER")).append(",").append(this.session.getDevice().getIp());
@@ -526,9 +523,8 @@ public class EducationController extends Controller {
 		actionContent.put("path",  OSS_CLIENT_CONTROL_FILE);
 		actionContent.put("content", controllers.toString());
 		
-		Response response = this.manageRoom(roomId, "saveFile", actionContent);
-		if( response.getCode().equals("OK")) {
-			Room room = new RoomController(this.session).getById(roomId);
+		OssResponse ossResponse = this.manageRoom(roomId, "saveFile", actionContent);
+		if( ossResponse.getCode().equals("OK")) {
 			RoomSmartControl roomSmartControl = new RoomSmartControl(roomId,this.session.getUserId(),minutes);
 			EntityManager em = getEntityManager();
 			try {
@@ -537,12 +533,12 @@ public class EducationController extends Controller {
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
-				return new Response(this.getSession(),"ERROR", e.getMessage());
+				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			} finally {
 				em.close();
 			}	
-			return new Response(this.getSession(),"OK", "Now you have the control for the selected room.");
+			return new OssResponse(this.getSession(),"OK", "Now you have the control for the selected room.");
 		}
-		return response;
+		return ossResponse;
 	}
 }

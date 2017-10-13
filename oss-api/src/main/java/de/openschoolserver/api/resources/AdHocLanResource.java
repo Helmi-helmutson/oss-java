@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -92,7 +92,7 @@ public interface AdHocLanResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.add")
-    Response add(
+    OssResponse add(
             @ApiParam(hidden = true) @Auth Session session,
             Room room
     );
@@ -108,7 +108,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	Response putObjectIntoRoom(
+	OssResponse putObjectIntoRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId,
 			@PathParam("objectType")	String onjectType,
@@ -159,7 +159,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	Response deleteDevice(
+	OssResponse deleteDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("deviceId")     Long deviceId
 			);
@@ -173,7 +173,7 @@ public interface AdHocLanResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    Response addDevice(
+    OssResponse addDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")		long roomId,
             @PathParam("macAddress")	String macAddress,

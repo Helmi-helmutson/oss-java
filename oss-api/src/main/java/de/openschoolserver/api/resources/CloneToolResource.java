@@ -3,6 +3,7 @@ package de.openschoolserver.api.resources;
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
 
+
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -19,9 +20,10 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import de.openschoolserver.dao.Clone;
 import de.openschoolserver.dao.HWConf;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Partition;
-import de.openschoolserver.dao.Response;
 import de.openschoolserver.dao.Session;
 import java.util.List;
 
@@ -171,7 +173,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("device.add")
-	Response addHWConf(
+	OssResponse addHWConf(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        HWConf hwconf
 	);
@@ -187,7 +189,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("device.add")
-	Response modifyHWConf(
+	OssResponse modifyHWConf(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
 		    HWConf hwconf
@@ -205,7 +207,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("device.add")
-	Response addPartition(
+	OssResponse addPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
 	        @PathParam("partitionName") String partitionName
@@ -222,7 +224,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("device.add")
-	Response addPartition(
+	OssResponse addPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
 	        Partition partition
@@ -240,7 +242,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("device.add")
-	Response setConfigurationValue(
+	OssResponse setConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
 	        @PathParam("partitionName") String partitionName,
@@ -259,7 +261,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("device.delete")
-	Response delete(
+	OssResponse delete(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
 	);
@@ -275,7 +277,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("device.add")
-	Response deletePartition(
+	OssResponse deletePartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
 	        @PathParam("partitionName") String partitionName
@@ -293,11 +295,43 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("device.add")
-	Response deleteConfigurationValue(
+	OssResponse deleteConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
 	        @PathParam("partitionName") String partitionName,
 	        @PathParam("key") String key
 	);
+	
+	/*
+	 * 
+	 */
+	@POST
+	@Path("{hwconfId}/cloning")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning." +
+						"This call have to provide a hash with following informations" +
+						" devices    : [ IDs of devices ] " +
+						" partitions : [ IDs of partitions ] " +
+						" multicast  :  true/fals"
+						)
+	@RolesAllowed("device.add")
+	OssResponse startCloning(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("hwconfId") Long hwconfId,
+			Clone parameters
+			);
+
+	/*
+	 * 
+	 */
+	@DELETE
+	@Path("{hwconfId}/cloning")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Removes the boot configuration for the automatical partitioning.")
+	@RolesAllowed("device.add")
+	OssResponse stopCloning(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("hwconfId") Long hwconfId
+			);
 
 }

@@ -2,13 +2,14 @@
 package de.openschoolserver.dao.tools;
 
 import java.io.IOException;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import java.util.UUID;
+
 public class OSSShellTools {
 
-	public static int exec(String program[], StringBuffer reply, StringBuffer error, String request) {
+		public static int exec(String program[], StringBuffer reply, StringBuffer error, String request, boolean log) {
 
 		int procResult = -10000;
 		try {
@@ -66,7 +67,14 @@ public class OSSShellTools {
 		} catch (IOException e) {
 			error.append(e.getMessage());
 		}
+		if( log ) {
+			String uuId = UUID.randomUUID().toString();
+			//TODO we have to implement this
+		}
 		return procResult;
 	}
 
+	public static int exec(String program[], StringBuffer reply, StringBuffer error, String request) {
+		return exec(program,reply,error,request,true);
+	}
 }

@@ -17,7 +17,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name="Categories")
 @NamedQueries({
 	@NamedQuery(name="Category.findAll",          query="SELECT c FROM Category c"),
-	@NamedQuery(name="Category.getByUuid",        query="SELECT c FROM Category c where c.uuid = :uuid"),
 	@NamedQuery(name="Category.getByName",        query="SELECT c FROM Category c where c.name = :name"),
 	@NamedQuery(name="Category.getByDescription", query="SELECT c FROM Category c where c.description = :description"),
 	@NamedQuery(name="Category.getByType",        query="SELECT c FROM Category c where c.categoryType = :type"),
@@ -31,8 +30,6 @@ public class Category implements Serializable {
 	@SequenceGenerator(name="CATEGORIES_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CATEGORIES_ID_GENERATOR")
 	private long id;
-
-	private String uuid;
 
 	private String description;
 
@@ -196,14 +193,6 @@ public class Category implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public String getUuid() {
-		return this.uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	public String getName() {

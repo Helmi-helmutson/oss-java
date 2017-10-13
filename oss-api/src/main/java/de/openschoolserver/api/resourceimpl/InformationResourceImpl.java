@@ -8,7 +8,7 @@ import de.openschoolserver.dao.Announcement;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Contact;
 import de.openschoolserver.dao.FAQ;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.InformationController;
 
@@ -19,19 +19,19 @@ public class InformationResourceImpl implements InformationResource {
 	}
 
 	@Override
-	public Response addAnnouncement(Session session, Announcement announcement) {
+	public OssResponse addAnnouncement(Session session, Announcement announcement) {
 		InformationController infoController = new InformationController(session);
 		return infoController.addAnnouncement(announcement);
 	}
 
 	@Override
-	public Response addContact(Session session, Contact contact) {
+	public OssResponse addContact(Session session, Contact contact) {
 		InformationController infoController = new InformationController(session);
 		return infoController.addContact(contact);
 	}
 
 	@Override
-	public Response addFAQ(Session session, FAQ faq) {
+	public OssResponse addFAQ(Session session, FAQ faq) {
 		InformationController infoController = new InformationController(session);
 		return infoController.addFAQ(faq);
 	}
@@ -55,19 +55,19 @@ public class InformationResourceImpl implements InformationResource {
 	}
 
 	@Override
-	public Response deleteAnnouncement(Session session, Long announcementId) {
+	public OssResponse deleteAnnouncement(Session session, Long announcementId) {
 		InformationController infoController = new InformationController(session);
 		return infoController.deleteAnnouncement(announcementId);
 	}
 
 	@Override
-	public Response deleteContact(Session session, Long contactId) {
+	public OssResponse deleteContact(Session session, Long contactId) {
 		InformationController infoController = new InformationController(session);
 		return infoController.deleteContact(contactId);
 	}
 
 	@Override
-	public Response deleteFAQ(Session session, Long faqId) {
+	public OssResponse deleteFAQ(Session session, Long faqId) {
 		InformationController infoController = new InformationController(session);
 		return infoController.deleteFAQ(faqId);
 	}
@@ -91,21 +91,21 @@ public class InformationResourceImpl implements InformationResource {
 	}
 
 	@Override
-	public Response modifyAnnouncement(Session session, Long announcementId, Announcement announcement) {
+	public OssResponse modifyAnnouncement(Session session, Long announcementId, Announcement announcement) {
 		InformationController infoController = new InformationController(session);
 		announcement.setId(announcementId);
 		return infoController.modifyAnnouncement(announcement);
 	}
 
 	@Override
-	public Response modifyContact(Session session, Long contactId, Contact contact) {
+	public OssResponse modifyContact(Session session, Long contactId, Contact contact) {
 		InformationController infoController = new InformationController(session);
 		contact.setId(contactId);
 		return infoController.modifyContact(contact);
 	}
 
 	@Override
-	public Response modifyFAQ(Session session, Long faqId, FAQ faq) {
+	public OssResponse modifyFAQ(Session session, Long faqId, FAQ faq) {
 		InformationController infoController = new InformationController(session);
 		faq.setId(faqId);
 		return infoController.modifyFAQ(faq);

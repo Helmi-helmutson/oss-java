@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.Category;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 
 import java.util.List;
@@ -146,7 +146,7 @@ public interface CategoryResource {
 	})
 	//@PermitAll
 	@RolesAllowed("category.add")
-	Response add(
+	OssResponse add(
 			@ApiParam(hidden = true) @Auth Session session,
 			Category category
 			);
@@ -164,7 +164,7 @@ public interface CategoryResource {
 	})
 	//@PermitAll
 	@RolesAllowed("category.modify")
-	Response modify(
+	OssResponse modify(
 			@ApiParam(hidden = true) @Auth Session session,
 			Category category
 			);
@@ -180,7 +180,7 @@ public interface CategoryResource {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("category.modify")
-	Response addMember(
+	OssResponse addMember(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("categoryId") long categoryId,
 			@PathParam("memberType") String memberType,
@@ -198,7 +198,7 @@ public interface CategoryResource {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("category.delete")
-	Response delete(
+	OssResponse delete(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("categoryId") long categoryId
 			);
@@ -214,7 +214,7 @@ public interface CategoryResource {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("category.modify")
-	Response removeMember(
+	OssResponse removeMember(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("categoryId") long categoryId,
 			@PathParam("memberType") String memberType,

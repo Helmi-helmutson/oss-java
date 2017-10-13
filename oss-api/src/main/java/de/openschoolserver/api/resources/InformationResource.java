@@ -19,7 +19,7 @@ import de.openschoolserver.dao.Announcement;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Contact;
 import de.openschoolserver.dao.FAQ;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
@@ -41,7 +41,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.add")
-    Response addAnnouncement(
+    OssResponse addAnnouncement(
     		@ApiParam(hidden = true) @Auth Session session,
     		Announcement annoncement
     );
@@ -54,7 +54,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.add")
-    Response addContact(
+    OssResponse addContact(
     		@ApiParam(hidden = true) @Auth Session session,
     		Contact contact
     );
@@ -67,7 +67,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.add")
-    Response addFAQ(
+    OssResponse addFAQ(
     		@ApiParam(hidden = true) @Auth Session session,
     		FAQ faq
     );
@@ -116,7 +116,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
-    Response modifyAnnouncement(
+    OssResponse modifyAnnouncement(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("announcementId") Long announcementId,
     		Announcement announcement
@@ -130,7 +130,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
-    Response modifyContact(
+    OssResponse modifyContact(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("contactId") Long contactId,
     		Contact contact
@@ -144,7 +144,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
-    Response modifyFAQ(
+    OssResponse modifyFAQ(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("faqId") Long faqId,
     		FAQ faq
@@ -158,7 +158,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
-    Response deleteAnnouncement(
+    OssResponse deleteAnnouncement(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("announcementId") Long announcementId
     );
@@ -171,7 +171,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
-    Response deleteContact(
+    OssResponse deleteContact(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("contactId") Long contactId
     );
@@ -184,7 +184,7 @@ public interface InformationResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
 	@RolesAllowed("information.delete")
-    Response deleteFAQ(
+    OssResponse deleteFAQ(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("faqId") Long faqId
     );

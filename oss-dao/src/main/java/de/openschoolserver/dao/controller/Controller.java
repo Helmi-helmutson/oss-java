@@ -52,7 +52,7 @@ public class Controller extends Config {
 			Properties props = new Properties();
 			props.load(fileInput);
 			fileInput.close();
-			Enumeration enuKeys = props.keys();
+			Enumeration<Object> enuKeys = props.keys();
 			while (enuKeys.hasMoreElements()) {
 				String key = (String) enuKeys.nextElement();
 				String value = props.getProperty(key);
@@ -114,7 +114,7 @@ public class Controller extends Config {
 		return true;
 	}
 	
-	public Response checkPassword(String password) {
+	public OssResponse checkPassword(String password) {
 		List<String> error = new ArrayList<String>();
 		if( password.length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
 			error.add("User password is to short.");
@@ -136,7 +136,7 @@ public class Controller extends Config {
 				error.add(reply.toString());
 		}
 		if( error.size() > 0 )
-			return new Response(this.getSession(),"ERROR", String.join(System.lineSeparator(), error));
+			return new OssResponse(this.getSession(),"ERROR", String.join(System.lineSeparator(), error));
 		
 		return null;
 	}
@@ -534,9 +534,9 @@ public class Controller extends Config {
 		return config.getValue();
 	}
 
-	public Response addMConfig(Object object, String key, String value) {
+	public OssResponse addMConfig(Object object, String key, String value) {
 		if( this.checkMConfig(object, key, value) ){
-			return new Response(this.getSession(),"ERROR","This mconfig value already exists.");
+			return new OssResponse(this.getSession(),"ERROR","This mconfig value already exists.");
 		}
 		EntityManager em = this.getEntityManager();
 		OSSMConfig mconfig = new OSSMConfig();
@@ -566,16 +566,16 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Mconfig was created");
+		return new OssResponse(this.getSession(),"OK","Mconfig was created");
 	}
 
-	public Response addConfig(Object object, String key, String value) {
+	public OssResponse addConfig(Object object, String key, String value) {
 		if( this.checkConfig(object, key) ){
-			return new Response(this.getSession(),"ERROR","This config already exists.");
+			return new OssResponse(this.getSession(),"ERROR","This config already exists.");
 		}
 		EntityManager em = this.getEntityManager();
 		OSSConfig config = new OSSConfig();
@@ -605,14 +605,14 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Config was created");
+		return new OssResponse(this.getSession(),"OK","Config was created");
 	}
 
-	public Response setConfig(Object object, String key, String value) {
+	public OssResponse setConfig(Object object, String key, String value) {
 		if( ! this.checkConfig(object, key) ){
 			return this.addConfig(object, key, value);
 		}
@@ -625,17 +625,17 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Config was updated");
+		return new OssResponse(this.getSession(),"OK","Config was updated");
 	}
 
-	public Response deleteConfig(Object object, String key) {
+	public OssResponse deleteConfig(Object object, String key) {
 		OSSConfig config = this.getConfigObject(object, key);
 		if( config == null ) {
-			return new Response(this.getSession(),"ERROR","Config does not exists.");
+			return new OssResponse(this.getSession(),"ERROR","Config does not exists.");
 		}
 		EntityManager em = this.getEntityManager();
 		try {
@@ -645,17 +645,17 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Config was deleted");
+		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}
 
-	public Response deleteMConfig(Object object, String key, String value) {
+	public OssResponse deleteMConfig(Object object, String key, String value) {
 		OSSMConfig config = this.getMConfigObject(object, key, value);
 		if( config == null ) {
-			return new Response(this.getSession(),"ERROR","MConfig does not exists.");
+			return new OssResponse(this.getSession(),"ERROR","MConfig does not exists.");
 		}
 		EntityManager em = this.getEntityManager();
 		try {
@@ -665,10 +665,10 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Config was deleted");
+		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}
 }
