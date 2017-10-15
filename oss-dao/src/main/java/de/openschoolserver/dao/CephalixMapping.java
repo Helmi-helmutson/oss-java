@@ -13,9 +13,9 @@ import java.math.BigInteger;
 @Table(name="CephalixMappings")
 @NamedQueries({
 	@NamedQuery(name="CephalixMapping.findAll",			query="SELECT c FROM CephalixMapping c"),
-	@NamedQuery(name="CephalixMapping.getByCephalixId",	query="SELECT c FROM CephalixMapping c WHERE c instituteId = :instituteId AND objectName = :objectName AND cephalixId = :cephalixId"),
-	@NamedQuery(name="CephalixMapping.getByOssId",		query="SELECT c FROM CephalixMapping c WHERE c instituteId = :instituteId AND objectName = :objectName AND ossId = :ossId"),
-	@NamedQuery(name="CephalixMapping.ofInstitute",		query="SELECT c FROM CephalixMapping c WHERE c instituteId = :instituteId AND objectName = :objectName")
+	@NamedQuery(name="CephalixMapping.getByCephalixId",	query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName AND c.cephalixId = :cephalixId"),
+	@NamedQuery(name="CephalixMapping.getByOssId",		query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName AND c.ossId = :ossId"),
+	@NamedQuery(name="CephalixMapping.ofInstitute",		query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName")
 })
 public class CephalixMapping implements Serializable {
 	private static final long serialVersionUID = 1L;

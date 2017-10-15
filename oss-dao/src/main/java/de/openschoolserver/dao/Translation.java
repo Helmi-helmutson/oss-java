@@ -12,7 +12,7 @@ import javax.persistence.*;
 @Table(name="Translations")
 @NamedQueries({
 	@NamedQuery(name="Translation.findAll", query="SELECT t FROM Translation t"),
-	@NamedQuery(name="Translation.find",	query="SELECT t FROM Translation t WHERER t.lang := lang AND t.string = :string")
+	@NamedQuery(name="Translation.find",	query="SELECT t FROM Translation t WHERER t.lang = :lang AND t.string = :string")
 })
 public class Translation implements Serializable {
 	private static final long serialVersionUID = 1L;

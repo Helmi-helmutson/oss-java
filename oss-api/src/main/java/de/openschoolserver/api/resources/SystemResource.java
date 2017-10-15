@@ -200,7 +200,7 @@ public interface SystemResource {
     /*
      * Translations stuff
      */
-    @GET
+    @POST
     @Path("translations")
     @Produces("text/plain")
     @ApiOperation(value = "Translate a text into a given language")
