@@ -12,8 +12,8 @@ import javax.persistence.*;
 @Table(name="MissedTranslations")
 @NamedQueries({
 	@NamedQuery(name="MissedTranslation.findAll", 	query="SELECT m FROM MissedTranslation m"),
-	@NamedQuery(name="MissedTranslation.findByLang",query="SELECT t FROM MissedTranslation t WHERER t.lang = :lang"),
-	@NamedQuery(name="MissedTranslation.find",		query="SELECT t FROM MissedTranslation t WHERER t.lang = :lang AND t.string = :string")
+	@NamedQuery(name="MissedTranslation.findByLang",query="SELECT t FROM MissedTranslation t WHERE t.lang = :lang"),
+	@NamedQuery(name="MissedTranslation.find",		query="SELECT t FROM MissedTranslation t WHERE t.lang = :lang AND t.string = :string")
 })
 public class MissedTranslation implements Serializable {
 	private static final long serialVersionUID = 1L;
