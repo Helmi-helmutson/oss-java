@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NamedQueries({
 	@NamedQuery(name="SoftwareStatus.findAll",		query="SELECT s FROM SoftwareStatus s"),
 	@NamedQuery(name="SoftwareStatus.findByStatus", query="SELECT s FROM SoftwareStatus s WHERE s.status = :STATUS"),
-	@NamedQuery(name="SoftwareStatus.getStatus",    query="SELECT s FROM SoftwareStatus s WHERE s.deviceId = : deviceId AND s.softwareId = :softwareId"),
+	@NamedQuery(name="SoftwareStatus.getStatus",    query="SELECT s FROM SoftwareStatus s WHERE s.deviceId = :deviceId AND s.softwareId = :softwareId"),
 	@NamedQuery(name="SoftwareStatus.getAllForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE"),
 	@NamedQuery(name="SoftwareStatus.getForOne",	query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE AND sv.version = :VERSION"),
 })
