@@ -36,7 +36,7 @@ public class UserController extends Controller {
 		try {
 			return em.find(User.class, userId);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getByID: " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
@@ -50,7 +50,7 @@ public class UserController extends Controller {
 			query.setParameter("role", role);
 			return query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getByRole: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -62,13 +62,19 @@ public class UserController extends Controller {
 		try {
 			Query query = em.createNamedQuery("User.getByUid");
 			query.setParameter("uid", uid);
-			return (User) query.getResultList().get(0);
+			List<User> result = query.getResultList();
+			if (result!=null && result.size()>0) {
+				return (User) result.get(0);
+			}  else {
+				logger.error("getByUid: uid not found. uid=" + uid );
+			}
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getByUid: uid=" + uid + " " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
 		}
+		return null;
 	}
 
 	public List<User> search(String search) {
@@ -78,7 +84,7 @@ public class UserController extends Controller {
 			query.setParameter("search", search + "%");
 			return query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("search: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -92,7 +98,7 @@ public class UserController extends Controller {
 			query.setParameter("sureName",sureName);
 			return query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("findByName: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -107,7 +113,7 @@ public class UserController extends Controller {
 			query.setParameter("role",role);
 			return query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("findByNameAndRole: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -120,7 +126,7 @@ public class UserController extends Controller {
 			Query query = em.createNamedQuery("User.findAll"); 
 			return query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getAll: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
 			em.close();
@@ -190,7 +196,7 @@ public class UserController extends Controller {
 				groupController.addMember(group,user);;
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("add: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
