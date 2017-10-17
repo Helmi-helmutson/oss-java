@@ -71,7 +71,7 @@ public interface CategoryResource {
 	@GET
 	@Path("{categoryId}/{memberType}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Get the member of a category defined by id. Member type can be Device, Group, HWConf, Room, Sofwtware, User")
+	@ApiOperation(value = "Get the member of a category defined by id. Member type can be Device, Group, HWConf, Room, Sofwtware, User, FAQ, Announcement, Contact")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -89,7 +89,7 @@ public interface CategoryResource {
 	@GET
 	@Path("{categoryId}/available/{memberType}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Get the non member of a category defined by id. Member type can be Device, Group, HWConf, Room, Sofwtware, User")
+	@ApiOperation(value = "Get the non member of a category defined by id. Member type can be Device, Group, HWConf, Room, Sofwtware, User, FAQ, Announcement, Contact")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -175,7 +175,7 @@ public interface CategoryResource {
 	@PUT
 	@Path("{categoryId}/{memberType}/{memberId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Add member to category defined by id. Member type can be Device, Group, HWConf, Room, Sofwtware, User")
+	@ApiOperation(value = "Add member to category defined by id. Member type can be Device, Group, HWConf, Room, Sofwtware, User, Announcement, FAQ or Contact")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -209,7 +209,7 @@ public interface CategoryResource {
 	@DELETE
 	@Path("{categoryId}/{memberType}/{memberId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Remove a member of a category defined by id. Member type can be Device, Group, HWConf, Room, Sofwtware, User")
+	@ApiOperation(value = "Remove a member of a category defined by id. Member type can be Device, Group, HWConf, Room, Sofwtware, User, FAQ, Announcement, Contact")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
