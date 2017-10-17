@@ -1041,10 +1041,11 @@ public class SoftwareController extends Controller {
 	public List<SoftwareStatus> getSoftwareStatusOnDevice(Device device, String softwareName) {
 		List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
 		for( SoftwareStatus st : device.getSofwareStatus() ) {
-			st.softwareName = st.getSoftwareVersion().getSoftware().getName();
-			if( softwareName.equals("*") || st.softwareName.equals(softwareName) ) {
-				st.version      = st.getSoftwareVersion().getVersion();
-				st.manually     = st.getSoftwareVersion().getSoftware().getManually();
+			st.setSoftwareName(st.getSoftwareVersion().getSoftware().getName());
+			st.setDeviceName(device.getName());
+			if( softwareName.equals("*") || st.getSoftwareName().equals(softwareName) ) {
+				st.setVersion(st.getSoftwareVersion().getVersion());
+				st.setManually(st.getSoftwareVersion().getSoftware().getManually());
 				softwareStatus.add(st);
 			}
 		}
