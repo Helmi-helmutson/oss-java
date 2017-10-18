@@ -33,7 +33,6 @@ public class Contact implements Serializable {
 
 	private String title;
 
-	private String uuid;
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany
@@ -100,14 +99,7 @@ public class Contact implements Serializable {
 		this.title = title;
 	}
 
-	public String getUuid() {
-		return this.uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
-	}
-
+	
 	public List<Category> getCategories() {
 		return this.categories;
 	}
