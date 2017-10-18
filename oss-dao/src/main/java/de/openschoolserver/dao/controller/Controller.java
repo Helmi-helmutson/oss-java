@@ -319,6 +319,7 @@ public class Controller extends Config {
 	}
 
 	public boolean isProtected(Object object){
+		if (object!=null) {
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.User":
 			if(properties.containsKey("de.openschoolserver.dao.User.protected")){
@@ -365,8 +366,9 @@ public class Controller extends Config {
 				}
 			}
 			return false;
-		}
+		}}
 		return false;
+		
 	}
 	
 	public boolean systemctl(String action, String service) {
