@@ -259,33 +259,48 @@ public class CategoryController extends Controller {
 			switch(objectName){
 			case("Device"):
 				Device device = new DeviceController(this.session).getById(objectId);
-			category.getDevices().add(device);
-			device.getCategories().add(category);
+				category.getDevices().add(device);
+				device.getCategories().add(category);
 			break;
 			case("Group"):
 				Group group = new GroupController(this.session).getById(objectId);
-			category.getGroups().add(group);
-			group.getCategories().add(category);
+				category.getGroups().add(group);
+				group.getCategories().add(category);
 			break;
 			case("HWConf"):
 				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
-			category.getHWConfs().add(hwconf);
-			hwconf.getCategories().add(category);
+				category.getHWConfs().add(hwconf);
+				hwconf.getCategories().add(category);
 			break;
 			case("Room"):
 				Room room = new RoomController(this.session).getById(objectId);
-			category.getRooms().add(room);
-			room.getCategories().add(category);
+				category.getRooms().add(room);
+				room.getCategories().add(category);
 			break;
 			case("Software"):
 				Software software = new SoftwareController(this.session).getById(objectId);
-			category.getSoftwares().add(software);
-			software.getCategories().add(category);
+				category.getSoftwares().add(software);
+				software.getCategories().add(category);
 			break;
 			case("User"):
 				User user = new UserController(this.session).getById(objectId);
-			category.getUsers().add(user);
-			user.getCategories().add(category);
+				category.getUsers().add(user);
+				user.getCategories().add(category);
+			break;
+			case("FAQ"):
+				FAQ faq = new InformationController(this.session).getFAQById(objectId);
+				category.getFaqs().add(faq);
+				faq.getCategories().add(category);
+			break;
+			case("Announcement"):
+				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
+				category.getAnnouncements().add(info);
+				info.getCategories().add(category);
+			break;
+			case("Contact"):
+				Contact contact = new InformationController(this.session).getContactById(objectId);
+				category.getContacts().add(contact);
+				contact.getCategories().add(category);
 			break;
 			}
 			em.getTransaction().commit();
@@ -306,35 +321,50 @@ public class CategoryController extends Controller {
 			switch(objectName){
 			case("Device"):
 				Device device = new DeviceController(this.session).getById(objectId);
-			category.getDevices().remove(device);
-			device.getCategories().remove(category);
+				category.getDevices().remove(device);
+				device.getCategories().remove(category);
 			break;
 			case("Group"):
 				Group group = new GroupController(this.session).getById(objectId);
-			category.getGroups().remove(group);
-			group.getCategories().remove(category);
+				category.getGroups().remove(group);
+				group.getCategories().remove(category);
 			break;
 			case("HWConf"):
 				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
-			category.getHWConfs().remove(hwconf);
-			hwconf.getCategories().remove(category);
+				category.getHWConfs().remove(hwconf);
+				hwconf.getCategories().remove(category);
 			break;
 			case("Room"):
 				Room room = new RoomController(this.session).getById(objectId);
-			category.getRooms().remove(room);
-			room.getCategories().remove(category);
+				category.getRooms().remove(room);
+				room.getCategories().remove(category);
 			break;
 			case("Software"):
 				Software software = new SoftwareController(this.session).getById(objectId);
-			category.getSoftwares().remove(software);
-			category.getRemovedSoftwares().add(software);
-			software.getCategories().remove(category);
-			software.getRemovedFromCategories().add(category);
+				category.getSoftwares().remove(software);
+				category.getRemovedSoftwares().add(software);
+				software.getCategories().remove(category);
+				software.getRemovedFromCategories().add(category);
 			break;
 			case("User"):
 				User user = new UserController(this.session).getById(objectId);
-			category.getUsers().remove(user);
-			user.getCategories().remove(category);
+				category.getUsers().remove(user);
+				user.getCategories().remove(category);
+			break;
+			case("FAQ"):
+				FAQ faq = new InformationController(this.session).getFAQById(objectId);
+				category.getFaqs().remove(faq);
+				faq.getCategories().remove(category);
+			break;
+			case("Announcement"):
+				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
+				category.getAnnouncements().remove(info);
+				info.getCategories().remove(category);
+			break;
+			case("Contact"):
+				Contact contact = new InformationController(this.session).getContactById(objectId);
+				category.getContacts().remove(contact);
+				contact.getCategories().remove(category);
 			break;
 			}
 			em.getTransaction().commit();
@@ -354,6 +384,4 @@ public class CategoryController extends Controller {
 		}
 		return categories;
 	}
-
-
 }
