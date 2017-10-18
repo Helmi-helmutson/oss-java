@@ -66,11 +66,11 @@ public class OssResponse implements Serializable {
 		this.id = id;
 	}
 
-	public long getObjecId() {
+	public Long getObjecId() {
 		return this.objectId;
 	}
 
-	public void setObjectId(long id) {
+	public void setObjectId(Long id) {
 		this.objectId = id;
 	}
 
