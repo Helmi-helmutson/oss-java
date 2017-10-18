@@ -37,7 +37,6 @@ public class Announcement implements Serializable {
 
 	private String title;
 
-	private String uuid;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date validFrom;
@@ -112,14 +111,6 @@ public class Announcement implements Serializable {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getUuid() {
-		return this.uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	public Date getValidFrom() {
