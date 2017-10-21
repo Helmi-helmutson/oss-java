@@ -16,6 +16,7 @@ import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,9 +38,15 @@ public class JobController extends Controller {
 	}
 	
 	public OssResponse createJob(Job job) {
+		String scheduledTime = "now";
 		if( job.isPromptly() ) {
 			job.setStartTime(new Timestamp(System.currentTimeMillis()));
+		} else {
+			Date date = new Date(job.getStartTime().getTime());
+			SimpleDateFormat fmt = new SimpleDateFormat("HH:mm yyyy-MM-dd");
+			scheduledTime        = fmt.format(date);
 		}
+
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -82,7 +89,7 @@ public class JobController extends Controller {
 		program[0] = "at";
 		program[1] = "-f";
 		program[2] = path.toString();
-		program[3] = "now";
+		program[3] = scheduledTime;
 		OSSShellTools.exec(program, reply, error, null);
 		logger.debug("create job  : " + path.toString() + " : " + job.getCommand());
 		return null;
