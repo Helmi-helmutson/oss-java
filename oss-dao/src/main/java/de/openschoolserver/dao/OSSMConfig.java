@@ -33,6 +33,11 @@ public class OSSMConfig implements Serializable {
         private String keyword;
 
         private String value;
+        
+        //bi-directional many-to-one association to User
+    	@ManyToOne
+    	@JsonIgnore
+    	private User creator;
 
         @Override
         public boolean equals(Object obj) {
@@ -84,5 +89,13 @@ public class OSSMConfig implements Serializable {
         public void setValue(String value) {
                 this.value = value;
         }
+
+		public User getCreator() {
+			return creator;
+		}
+
+		public void setCreator(User creator) {
+			this.creator = creator;
+		}
 
 }

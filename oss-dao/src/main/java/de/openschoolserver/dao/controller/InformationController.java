@@ -161,7 +161,7 @@ public class InformationController extends Controller {
 
 	public OssResponse modifyAnnouncement(Announcement announcement) {
 		EntityManager em = getEntityManager();
-		if( !this.isSuperuser() && !announcement.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(announcement) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this Announcement");
 		}
@@ -180,7 +180,7 @@ public class InformationController extends Controller {
 	
 	public OssResponse modifyContact(Contact contact) {
 		EntityManager em = getEntityManager();
-		if( !this.isSuperuser() && !contact.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(contact) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this contact");
 		}
@@ -199,7 +199,7 @@ public class InformationController extends Controller {
 
 	public OssResponse modifyFAQ(FAQ faq) {
 		EntityManager em = getEntityManager();
-		if( !this.isSuperuser() && !faq.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(faq) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this FAQ ");
 		}
@@ -219,7 +219,7 @@ public class InformationController extends Controller {
 	public OssResponse deleteAnnouncement(Long announcementId) {
 		EntityManager em = getEntityManager();
 		Announcement announcement = this.getAnnouncementById(announcementId);
-		if( !this.isSuperuser() && !announcement.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(announcement) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this Announcement");
 		}
@@ -240,7 +240,7 @@ public class InformationController extends Controller {
 	public OssResponse deleteContact(Long contactId) {
 		EntityManager em = getEntityManager();
 		Contact contact = this.getContactById(contactId);
-		if( !this.isSuperuser() && !contact.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(contact) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this contact");
 		}
@@ -261,7 +261,7 @@ public class InformationController extends Controller {
 	public OssResponse deleteFAQ(Long faqId) {
 		EntityManager em = getEntityManager();
 		FAQ faq = this.getFAQById(faqId);
-		if( !this.isSuperuser() && !faq.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(faq) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this FAQ");
 		}

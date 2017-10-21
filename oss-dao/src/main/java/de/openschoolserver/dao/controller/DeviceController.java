@@ -96,12 +96,18 @@ public class DeviceController extends Controller {
 	public OssResponse delete(List<Long> deviceIds) {
 		EntityManager em = getEntityManager();
 		UserController userController = new UserController(this.session);
+		StringBuilder  error = new StringBuilder();
 		try {
 			em.getTransaction().begin();
 			for( Long deviceId : deviceIds) {
 				Device dev = em.find(Device.class, deviceId);
 				if( this.isProtected(dev) ) {
-					return new OssResponse(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
+					error.append("This device must not be deleted: ").append(dev.getName()).append("\\n");
+					continue;
+				}
+				if( !this.mayModify(dev) ) {
+					error.append("You must not delete this device: ").append(dev.getName()).append("\\n");
+					continue;
 				}
 				if( !em.contains(dev)) {
 					dev = em.merge(dev);
@@ -137,6 +143,10 @@ public class DeviceController extends Controller {
 			if( this.isProtected(dev) ) {
 				return new OssResponse(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
 			}
+			if( !this.mayModify(dev) ) {
+				return new OssResponse(this.getSession(),"ERROR","You must not delete this device: " + dev.getName());
+			}
+			
 			em.remove(dev);
 			em.getTransaction().commit();
 			if( atomic ) {
@@ -220,6 +230,7 @@ public class DeviceController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			for(Device dev: devices){
+				dev.setOwner(session.getUser());
 				em.getTransaction().begin();
 				em.persist(dev);
 				em.getTransaction().commit();
@@ -458,6 +469,9 @@ public class DeviceController extends Controller {
 		Device oldDevice = this.getById(device.getId());
 		List<String> error = new ArrayList<String>();
 		//Check the MAC address
+		if( !this.mayModify(oldDevice) ) {
+			return new OssResponse(this.getSession(),"ERROR","You must not delete this device: " + oldDevice.getName());
+		}
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		String name =  this.isMacUnique(device.getMac());
 		if( name != "" ){

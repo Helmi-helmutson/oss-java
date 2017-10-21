@@ -90,7 +90,7 @@ public class User implements Serializable {
 	private List<Test> tests;
 	
 	//bi-directional many-to-one association to RoomSmartControl
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="owner")
 	@JsonIgnore
 	private List<RoomSmartControl> smartControls;
 	
@@ -150,6 +150,9 @@ public class User implements Serializable {
 	private Integer fsQuota;
 	private Integer msQuotaUsed;
 	private Integer msQuota;
+	
+	@Column(name = "creator_id")
+    private Long creatorId;
 
 	@Transient
 	private String password ="";
@@ -460,5 +463,25 @@ public class User implements Serializable {
 
 	public void setMyFAQs(List<FAQ> values) {
 		this.myFAQs = values;
+	}
+
+	public Long getCreatorId() {
+		return creatorId;
+	}
+
+	public void setCreatorId(Long creatorId) {
+		this.creatorId = creatorId;
+	}
+
+	public void setOwnedCategories(List<Category> ownedCategories) {
+		this.ownedCategories = ownedCategories;
+	}
+
+	public void setSmartControls(List<RoomSmartControl> smartControls) {
+		this.smartControls = smartControls;
+	}
+
+	public void setMyAnnouncements(List<Announcement> myAnnouncements) {
+		this.myAnnouncements = myAnnouncements;
 	}
 }

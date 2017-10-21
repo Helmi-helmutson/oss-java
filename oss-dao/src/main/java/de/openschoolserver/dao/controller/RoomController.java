@@ -178,6 +178,7 @@ public class RoomController extends Controller {
 			room.setRoomControl("inRoom");
 		}
 		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
+		room.setCreator(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(room);
@@ -195,6 +196,9 @@ public class RoomController extends Controller {
 	public OssResponse delete(long roomId){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
+		if( !this.mayModify(room) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
+        }
 		try {
 
 			em.getTransaction().begin();

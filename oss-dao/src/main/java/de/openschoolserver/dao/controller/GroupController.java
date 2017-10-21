@@ -105,6 +105,7 @@ public class GroupController extends Controller {
 		if( ! this.isNameUnique(group.getName())){
 			return new OssResponse(this.getSession(),"ERROR","Group name is not unique.");
 		}
+		group.setOwner(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(group);
@@ -119,6 +120,9 @@ public class GroupController extends Controller {
 
 	public OssResponse modify(Group group){
 		Group oldGroup = this.getById(group.getId());
+		if( !this.mayModify(oldGroup) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
 		oldGroup.setDescription(group.getDescription());
 		EntityManager em = getEntityManager();
 		try {
@@ -138,7 +142,9 @@ public class GroupController extends Controller {
 		if( this.isProtected(group)) {
 			return new OssResponse(this.getSession(),"ERROR","This group must not be deleted.");
 		}
-		
+		if( !this.mayModify(group) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not delete this group.");
+        }
 		this.startPlugin("delete_group", group);
 
 		// Remove group from GroupMember of table
@@ -175,6 +181,10 @@ public class GroupController extends Controller {
 	}
 
 	public OssResponse setMembers(long groupId, List<Long> userIds) {
+		Group group = this.getById(groupId);
+		if( !this.mayModify(group) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
 		EntityManager em = getEntityManager();
 		List<User> usersToRemove = new ArrayList<User>();
 		List<User> usersToAdd    = new ArrayList<User>();
@@ -182,7 +192,6 @@ public class GroupController extends Controller {
 		for( Long userId : userIds ) {
 			users.add(em.find(User.class, userId));
 		}
-		Group group = this.getById(groupId);
 		for( User user : users ){
 			if(! group.getUsers().contains(user)){
 				usersToAdd.add(user);
@@ -220,6 +229,9 @@ public class GroupController extends Controller {
 
 	public OssResponse addMember(Group group, User user) {
 		EntityManager em = getEntityManager();
+		if( !this.mayModify(group) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
 		group.getUsers().add(user);
 		if (user.getGroups()==null) {
 			user.setGroups(new ArrayList<Group>());
@@ -249,6 +261,9 @@ public class GroupController extends Controller {
 	public OssResponse removeMember(long groupId, long userId) {
 		EntityManager em = getEntityManager();
 		Group group = em.find(Group.class, groupId);
+		if( !this.mayModify(group) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
 		User  user  = em.find(User.class, userId);
 		group.getUsers().remove(user);
 		user.getGroups().remove(group);

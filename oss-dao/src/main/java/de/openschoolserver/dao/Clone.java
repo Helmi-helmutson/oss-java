@@ -4,7 +4,7 @@ import java.util.List;
 
 public class Clone {
 	
-	private boolean multipath;
+	private boolean multicast;
 	
 	private List<Long> deviceIds;
 	
@@ -15,15 +15,15 @@ public class Clone {
 	}
 
 	public boolean isMultipath() {
-		return multipath;
+		return this.multicast;
 	}
 
-	public void setMultipath(boolean multipath) {
-		this.multipath = multipath;
+	public void setMultipath(boolean multicast) {
+		this.multicast = multicast;
 	}
 
 	public List<Long> getDeviceIds() {
-		return deviceIds;
+		return this.deviceIds;
 	}
 
 	public void setDeviceIds(List<Long> deviceIds) {
@@ -31,7 +31,7 @@ public class Clone {
 	}
 
 	public List<Long> getPartitionIds() {
-		return partitionIds;
+		return this.partitionIds;
 	}
 
 	public void setPartitionIds(List<Long> partitionIds) {

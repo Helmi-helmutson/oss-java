@@ -12,10 +12,11 @@ import java.math.BigInteger;
 @Entity
 @Table(name="CephalixMappings")
 @NamedQueries({
-	@NamedQuery(name="CephalixMapping.findAll",			query="SELECT c FROM CephalixMapping c"),
-	@NamedQuery(name="CephalixMapping.getByCephalixId",	query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName AND c.cephalixId = :cephalixId"),
-	@NamedQuery(name="CephalixMapping.getByOssId",		query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName AND c.ossId = :ossId"),
-	@NamedQuery(name="CephalixMapping.ofInstitute",		query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName")
+	@NamedQuery(name="CephalixMapping.findAll",              query="SELECT c FROM CephalixMapping c"),
+	@NamedQuery(name="CephalixMapping.getByCephalixId",      query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName AND c.cephalixId = :cephalixId"),
+	@NamedQuery(name="CephalixMapping.getByOssId",	         query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName AND c.ossId = :ossId"),
+	@NamedQuery(name="CephalixMapping.ofInstitute",          query="SELECT c FROM CephalixMapping c WHERE c.instituteId = :instituteId AND c.objectName = :objectName"),
+	@NamedQuery(name="CephalixMapping.getInstituesOfObject", query="SELECT c FROM CephalixMapping c WHERE c.objectName = :objectName AND c.cephalixId = :cephalixId ")
 })
 public class CephalixMapping implements Serializable {
 	private static final long serialVersionUID = 1L;

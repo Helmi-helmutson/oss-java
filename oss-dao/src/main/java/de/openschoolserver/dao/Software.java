@@ -70,6 +70,11 @@ public class Software implements Serializable {
 	@ManyToMany(mappedBy="requirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<Software> requiredBy;
+	
+    //bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User creator;
 
 	public Software() {
 		this.manually = false;
@@ -199,5 +204,13 @@ public class Software implements Serializable {
     public void setRemovedFromCategories(List<Category> categories) {
         this.removedFromCategories = categories;
     }
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
 
 }

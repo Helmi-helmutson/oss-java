@@ -35,6 +35,7 @@
 		<class>de.openschoolserver.dao.CephalixMapping</class>
 		<class>de.openschoolserver.dao.Translation</class>
 		<class>de.openschoolserver.dao.MissedTranslation</class>
+		<class>de.openschoolserver.dao.Job</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/OSS"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>

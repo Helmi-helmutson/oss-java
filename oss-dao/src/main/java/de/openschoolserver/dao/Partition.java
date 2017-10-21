@@ -2,7 +2,6 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -43,6 +42,11 @@ public class Partition implements Serializable {
 	@ManyToOne
 	@JsonIgnore
 	private HWConf hwconf;
+	
+    //bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User creator;
 
 	public Partition() {
 	}
@@ -122,6 +126,14 @@ public class Partition implements Serializable {
 
 	public void setHwconf(HWConf hwconf) {
 		this.hwconf = hwconf;
+	}
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
 	}
 
 }

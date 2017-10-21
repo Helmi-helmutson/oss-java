@@ -97,6 +97,7 @@ public class CloneToolController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
 		}
 		try {
+			hwconf.setCreator(this.session.getUser());
 			em.getTransaction().begin();
 			em.persist(hwconf);
 			em.getTransaction().commit();
@@ -136,6 +137,7 @@ public class CloneToolController extends Controller {
 		HWConf hwconf = this.getById(hwconfId);
 		Partition partition = new Partition();
 		partition.setName(name);
+		partition.setCreator(this.session.getUser());
 		hwconf.addPartition(partition);
 		partition.setHwconf(hwconf);
 		try {
@@ -155,6 +157,7 @@ public class CloneToolController extends Controller {
 	public OssResponse addPartitionToHWConf(Long hwconfId, Partition partition ) {
 		EntityManager em = getEntityManager();
 		HWConf hwconf = this.getById(hwconfId);
+		partition.setCreator(this.session.getUser());
 		hwconf.addPartition(partition);
 		// First we check if the parameter are unique.
 		try {
@@ -222,6 +225,9 @@ public class CloneToolController extends Controller {
 	        if( this.isProtected(hwconf)) {
 	            return new OssResponse(this.getSession(),"ERROR","This hardware configuration must not be deleted.");
 	        }
+	        if( !this.mayModify(hwconf) ) {
+	        	return new OssResponse(this.getSession(),"ERROR","You must not delete this hardware configuration.");
+	        }
 			if( ! em.contains(hwconf)) {
 				hwconf = em.merge(hwconf);
 			}
@@ -240,6 +246,9 @@ public class CloneToolController extends Controller {
 	public OssResponse deletePartition(Long hwconfId, String partitionName) {
 		HWConf hwconf = this.getById(hwconfId);
 		Partition partition = this.getPartition(hwconfId, partitionName);
+		if( !this.mayModify(partition) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not delete this partition.");
+        }
 		hwconf.removePartition(partition);
 		EntityManager em = getEntityManager();
 		try {

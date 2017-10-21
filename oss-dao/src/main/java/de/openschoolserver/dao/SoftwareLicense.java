@@ -53,6 +53,11 @@ public class SoftwareLicense implements Serializable {
 	@ManyToOne
 	@JsonIgnore
 	private Software software;
+	
+	//bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User creator;
 
 	@Override
 	public boolean equals(Object obj) {
@@ -120,5 +125,17 @@ public class SoftwareLicense implements Serializable {
 	
 	public void removeDevice(Device device) {
 		this.devices.remove(device);
+	}
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
+
+	public void setDevices(List<Device> devices) {
+		this.devices = devices;
 	}
 }

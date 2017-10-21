@@ -4,6 +4,7 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -315,6 +316,87 @@ public class Controller extends Config {
 				}
 			}
 		}
+		return false;
+	}
+
+	public boolean mayModify(Object object) {
+		if( this.session.getUser().getId() == 0 ) {
+			return true;
+		}
+		
+		Long ownerId = null;
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Acl":
+			Acl Acl = (Acl)object;
+			ownerId = Acl.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.Announcement":
+			Announcement an = (Announcement)object;
+			ownerId = an.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.Contact":
+			Contact con = (Contact)object;
+			ownerId = con.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.FAQ":
+			FAQ faq = (FAQ)object;
+			ownerId = faq.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.Device":
+			Device Device = (Device)object;
+			ownerId = Device.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.Group":
+			Group group = (Group)object;
+			ownerId = group.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.HWConf":
+			HWConf HWConf = (HWConf)object;
+			ownerId = HWConf.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.OSSConfig":
+			OSSConfig ossConfig = (OSSConfig)object;
+			ownerId = ossConfig.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.OSSMConfig":
+			OSSMConfig ossMConfig = (OSSMConfig)object;
+			ownerId = ossMConfig.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.Room":
+			Room room = (Room)object;
+			ownerId = room.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.RoomSmartControl":
+			RoomSmartControl rsc  = (RoomSmartControl)object;
+			ownerId = rsc.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.Partition":
+			Partition partition = (Partition)object;
+			ownerId = partition.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.Software":
+			Software software = (Software)object;
+			ownerId = software.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.SoftwareLicence":
+			SoftwareLicense softwareLicense = (SoftwareLicense)object;
+			ownerId = softwareLicense.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.User":
+			User user = (User)object;
+			ownerId = user.getCreatorId();
+			break;
+		}
+		if( this.isSuperuser() && ownerId != 6 ) {
+			//Super User must not delete the objects of CEPHALIX
+			//TODO 6 need be evaluated eventually
+			return true;
+		}
+		if( this.session.getUser().getId() == ownerId ) {
+				return true;
+		}
+				
+		//TODO some other acls based on object
 		return false;
 	}
 

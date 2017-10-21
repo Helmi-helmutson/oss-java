@@ -90,6 +90,7 @@ public class SoftwareController extends Controller {
 		}
 		software.addSoftwareVersion(softwareVersion);
 		softwareVersion.setSoftware(software);
+		software.setCreator(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(software);
@@ -107,6 +108,9 @@ public class SoftwareController extends Controller {
 	public OssResponse delete(Long softwareId) {
 		EntityManager em = getEntityManager();
 		Software software = this.getById(softwareId);
+		if( !this.mayModify(software) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not delete this software.");
+        }
 		try {
 			em.getTransaction().begin();
 			if( !em.contains(software)) {
@@ -413,6 +417,7 @@ public class SoftwareController extends Controller {
 	{
 		EntityManager em = getEntityManager();
 		Software software = this.getById(softwareId);
+		softwareLicense.setCreator(this.session.getUser());
 		if(softwareLicense.getLicenseType().equals('F')) {
 			try {
 				em.getTransaction().begin();

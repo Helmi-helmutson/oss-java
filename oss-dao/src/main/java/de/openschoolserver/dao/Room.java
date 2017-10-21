@@ -117,6 +117,11 @@ public class Room implements Serializable {
 
 	@Column(name="hwconf_id", insertable=false, updatable=false)
 	private Long hwconfId;
+	
+    //bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User creator;
 
 	public Room() {
 		this.network      = "";
@@ -313,5 +318,25 @@ public class Room implements Serializable {
         public List<RoomSmartControl> getSmartControls() {
         	return this.smartControls;
         }
+
+		public User getCreator() {
+			return creator;
+		}
+
+		public void setCreator(User creator) {
+			this.creator = creator;
+		}
+
+		public void setAccessInRooms(List<AccessInRoom> accessInRooms) {
+			this.accessInRooms = accessInRooms;
+		}
+
+		public void setSmartControls(List<RoomSmartControl> smartControls) {
+			this.smartControls = smartControls;
+		}
+
+		public void setHwconfId(Long hwconfId) {
+			this.hwconfId = hwconfId;
+		}
 
 }
