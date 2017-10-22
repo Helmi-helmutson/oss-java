@@ -148,7 +148,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public List<Device> getDevice(Session session, List<Long> deviceIds) {
+	public List<Device> getDevices(Session session, List<Long> deviceIds) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.getDevices(deviceIds);
 	}

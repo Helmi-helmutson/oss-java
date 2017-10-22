@@ -2,13 +2,13 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import java.util.ArrayList;
 import de.openschoolserver.dao.*;
 
+@SuppressWarnings("unchecked")
 public class AdHocLanController extends Controller {
 
 	public AdHocLanController(Session session) {
@@ -16,47 +16,62 @@ public class AdHocLanController extends Controller {
 		// TODO Auto-generated constructor stub
 	}
 
+
+	/*
+	 * Returns a list of object Ids which habe AdHocAccess in
+	 */
 	public List<Long> getObjectIdsOfRoom(Long roomId, String objectType) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Long> objectIds = new ArrayList<Long>();
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("OSSMConfig.getAllObject").setParameter("keyword", "AdHocAccess");
+		query.setParameter("objectType", objectType).setParameter("value", String.valueOf(roomId));
+		for( OSSMConfig mConfig: (List<OSSMConfig>) query.getResultList() ) {
+			objectIds.add(mConfig.getObjectId());
+		}
+		return objectIds;
 	}
 
-	public List<User> getUsers() {
-		UserController userController = new UserController(session);
-		ArrayList<User> users = new ArrayList<User>();
+	public List<Long> getUsers() {
+		ArrayList<Long> userIds = new ArrayList<Long>();
 		for(OSSMConfig mconfig : this.getMConfigs("User", "AdHocAccess")) {
-			users.add(userController.getById(mconfig.getObjectId()));
+			userIds.add(mconfig.getObjectId());
 		}
-		return users;
+		return userIds;
 	}
 	
-	public List<Group> getGroups() {
-		GroupController groupController = new GroupController(session);
-		ArrayList<Group> groups = new ArrayList<Group>();
+	public List<Long> getGroups() {
+		ArrayList<Long> groupIds = new ArrayList<Long>();
 		for(OSSMConfig mconfig : this.getMConfigs("Group", "AdHocAccess")) {
-			groups.add(groupController.getById(mconfig.getObjectId()));
+			groupIds.add(mconfig.getObjectId());
 		}
-		return groups;
+		return groupIds;
 	}
 
-	public List<Room> getRooms() {
-		RoomController roomController = new RoomController(session);
-		ArrayList<Room> rooms = new ArrayList<Room>();
+	public List<Long> getRooms() {
+		ArrayList<Long> roomIds = new ArrayList<Long>();
 		if( this.isSuperuser() ) {
-			for(OSSMConfig mconfig : this.getMConfigs("Room", "AdHocAccess")) {
-				rooms.add(roomController.getById(mconfig.getObjectId()));
+			for( Room room : new RoomController(this.session).getAll() ) {
+				if( room.getRoomType().equals("AdHocAccess")) {
+					roomIds.add(room.getId());
+				}
 			}
 		} else {
-			for( String value : this.getMConfig(this.session.getUser(),"AdHocAccess" )) {
-				rooms.add(roomController.getById(Long.parseLong(value)));
+			for( String value : this.getMConfigs(this.session.getUser(),"AdHocAccess" )) {
+				Long id = Long.parseLong(value);
+				if( !roomIds.contains(id)) {
+					roomIds.add(id);
+				}
+			}
+			for( Group group : this.session.getUser().getGroups() ) {
+				for( String value : this.getMConfigs(group,"AdHocAccess" )) {
+					Long id = Long.parseLong(value);
+					if( !roomIds.contains(id)) {
+						roomIds.add(id);
+					}
+				}	
 			}
 		}
-		return rooms;
-	}
-
-	public List<Device> getDevices() {
-		ArrayList<Device> devices = new ArrayList<Device>();
-		return devices;
+		return roomIds;
 	}
 
 	public OssResponse add(Room room) {

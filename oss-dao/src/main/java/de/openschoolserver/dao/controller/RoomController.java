@@ -106,20 +106,33 @@ public class RoomController extends Controller {
 		}
 	}
 
+	/*
+	 * Return a list the rooms in which the session user can register devices
+	 * 
+	 * @return For super user all rooms will be returned
+	 *         For normal user the list his AdHocAccess rooms of those of his groups 
+	 */
 	public List<Room> getAllToRegister() {
 		EntityManager em = getEntityManager();
+		Room room  = null;
 		try {
-			if( this.getSession().getUser().getRole().contains("sysadmins") ) {
+			if( this.isSuperuser() ) {
 				Query query = em.createNamedQuery("Room.findAllToRegister"); 
 				return query.getResultList();
 			} else {
 				List<Room> rooms = new ArrayList<Room>();
-				for(String roomid : this.getMConfig(this.session.getUser(),"AdHocAccess" ) ) {
-					rooms.add(this.getById(Long.parseLong(roomid)));
+				for(String roomid : this.getMConfigs(this.session.getUser(),"AdHocAccess" ) ) {
+					room = this.getById(Long.parseLong(roomid));
+					if( !rooms.contains(room)) {
+						rooms.add(room);
+					}
 				}
 				for(Group group : this.session.getUser().getGroups() ) {
-					for(String roomid : this.getMConfig(group,"AdHocAccess" ) ) {
-						rooms.add(this.getById(Long.parseLong(roomid)));
+					for(String roomid : this.getMConfigs(group,"AdHocAccess" ) ) {
+						room = this.getById(Long.parseLong(roomid));
+						if( !rooms.contains(room)) {
+							rooms.add(room);
+						}
 					}
 				}
 				return rooms;
@@ -568,48 +581,52 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
 		DeviceController deviceController = new DeviceController(this.session);
-		StringBuilder error = new StringBuilder();
 		List<String> ipAddress;
-		for(Device device : devices) {
-			//Remove trailing and ending spaces.
-			device.setName(device.getName().trim());
-			ipAddress = this.getAvailableIPAddresses(roomId, 2);
-			if( device.getIp().isEmpty() ){
-				if( ipAddress.isEmpty() ) {
-					return new OssResponse(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+		try {
+			em.getTransaction().begin();
+			for(Device device : devices) {
+				//Remove trailing and ending spaces.
+				device.setName(device.getName().trim());
+				ipAddress = this.getAvailableIPAddresses(roomId, 2);
+				if( device.getIp().isEmpty() ){
+					if( ipAddress.isEmpty() ) {
+						em.getTransaction().rollback();
+						return new OssResponse(this.getSession(),"ERROR",device.getMac() + " " + "There are no more free ip addresses in this room.");
+					}
+					if( device.getName().isEmpty() ) {
+						device.setName(ipAddress.get(0).split(" ")[1]);
+					}
+					device.setIp(ipAddress.get(0).split(" ")[0]);
 				}
-				if( device.getName().isEmpty() ) {
-				  device.setName(ipAddress.get(0).split(" ")[1]);
+				if( !device.getWlanMac().isEmpty() ){
+					if( ipAddress.size() < 2 ) {
+						em.getTransaction().rollback();
+						return new OssResponse(this.getSession(),"ERROR",device.getWlanMac() + " " + "There are no more free ip addresses in this room.");
+					}
+					device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 				}
-				device.setIp(ipAddress.get(0).split(" ")[0]);
-			}
-			if( !device.getWlanMac().isEmpty() ){
-				if( ipAddress.size() < 2 ) {
-					return new OssResponse(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
+				String error = deviceController.check(device, room);
+				if( ! error.isEmpty() ) {
+					em.getTransaction().rollback();
+					return new OssResponse(this.getSession(),"ERROR",device.getMac() + " " + error);
 				}
-				device.setWlanIp(ipAddress.get(1).split(" ")[0]);
-			}
-			error.append(deviceController.check(device, room));
-			device.setRoom(room);
-			if(device.getHwconfId() == null){
-				device.setHwconf(room.getHwconf());
-			} else {
-				device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
-			}
-			room.addDevice(device);
-			if(error.length() > 0){
-				em.close();
-				return new OssResponse(this.getSession(),"ERROR",error.toString());
-			}
-			try {
-				em.getTransaction().begin();
+				device.setRoom(room);
+				device.setOwner(this.session.getUser());
+				if(device.getHwconfId() == null){
+					device.setHwconf(room.getHwconf());
+				} else {
+					device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
+				}
+				room.addDevice(device);
 				em.merge(room);
-				em.getTransaction().commit();
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				em.close();
-				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			}
+			em.getTransaction().commit();
+
+		} catch (Exception e) { 
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
 		}
 		em.close();
 		UserController userController = new UserController(this.session);
@@ -639,6 +656,9 @@ public class RoomController extends Controller {
 		Room room = em.find(Room.class, roomId);
 		for(Long deviceId : deviceIDs) {
 			Device device = em.find(Device.class, deviceId);
+			if( !this.mayModify(device) ) {
+				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
+			}
 			room.removeDevice(device);
 		}
 		try {
@@ -692,7 +712,6 @@ public class RoomController extends Controller {
 				}
 				device.setMac(macAddress);
 				device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
-				device.setOwner(owner);
 				device.setIp(ipAddress.get(0).split(" ")[0]);
 				device.setHwconf(hwconf);
 			} else {
@@ -714,6 +733,7 @@ public class RoomController extends Controller {
 		if( !error.isEmpty() ) {
 			return new OssResponse(this.getSession(),"ERROR",error);
 		}
+		device.setOwner(owner);
 		device.setRoom(room);
 		room.addDevice(device);
 		try {

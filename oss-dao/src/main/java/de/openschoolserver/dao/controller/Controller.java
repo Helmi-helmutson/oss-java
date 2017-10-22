@@ -536,29 +536,31 @@ public class Controller extends Config {
 		return true;
 	}
 
-	public List<OSSMConfig> getMConfigs(String type, String key) {
-		ArrayList<OSSMConfig> mconfigs = new ArrayList<OSSMConfig>();
-		EntityManager em = this.getEntityManager();
-		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
-		query.setParameter("type",type).setParameter("keyword",key);
-		for(OSSMConfig config : (List<OSSMConfig>) query.getResultList() ) {
-			mconfigs.add(config);
-		}
-		return mconfigs;
-	}
-
-	public List<OSSConfig> getConfigs(String type, String key) {
-		ArrayList<OSSConfig> mconfigs = new ArrayList<OSSConfig>();
+	public OSSConfig getConfig(String type, String key) {
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
-		for(OSSConfig config : (List<OSSConfig>) query.getResultList() ) {
-			mconfigs.add(config);
+		if( query.getResultList().isEmpty() ) {
+			return null;
 		}
-		return mconfigs;
+		return (OSSConfig)  query.getResultList().get(0);
 	}
 
-	public List<String> getMConfig(Object object, String key) {
+	public List<OSSMConfig> getMConfigs(String key) {
+		EntityManager em = this.getEntityManager();
+		Query query = em.createNamedQuery("OSSMConfig.getAllForKey");
+		query.setParameter("keyword",key);
+		return (List<OSSMConfig>) query.getResultList();
+	}
+
+	public List<OSSMConfig> getMConfigs(String type, String key) {
+		EntityManager em = this.getEntityManager();
+		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
+		query.setParameter("type",type).setParameter("keyword",key);
+		return  (List<OSSMConfig>) query.getResultList();
+	}
+
+	public List<String> getMConfigs(Object object, String key) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.get");

@@ -61,7 +61,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	List<User> getUsers(
+	List<Long> getUsers(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 	
@@ -71,12 +71,12 @@ public interface AdHocLanResource {
 	@GET
 	@Path("groups")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets all defined AdHocLan Devices.")
+	@ApiOperation(value = "Gets all Groups which have AdHocLan access.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	List<Group> getGroups(
+	List<Long> getGroups(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 	
@@ -97,6 +97,24 @@ public interface AdHocLanResource {
             Room room
     );
     
+
+    /*
+     * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
+     */
+    @PUT
+	@Path("rooms/{roomId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Add a new group or user to a giwen AdHocLan room")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.search")
+	OssResponse turnOn(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")		Long roomId
+			);
+
+
     /*
      * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
      */
@@ -124,12 +142,12 @@ public interface AdHocLanResource {
 	@GET
 	@Path("rooms")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets all defined AdHocLan which a user may use. Superuser get the list of all AdHocLan rooms.")
+	@ApiOperation(value = "Gets all defined AdHocLan Rooms which a user may use. Superuser get the list of all AdHocLan rooms.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	List<Room> getRooms(
+	List<Long> getRooms(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
@@ -144,7 +162,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	List<Device> getDevices(
+	List<Long> getDevices(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
