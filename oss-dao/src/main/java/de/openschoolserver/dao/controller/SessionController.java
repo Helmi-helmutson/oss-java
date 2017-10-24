@@ -83,7 +83,8 @@ public class SessionController extends Controller {
 		this.session.setRole(user.getRole());
 		this.session.setUser(user);
 		if( room != null ) {
-			this.session.setRoomId(room.getId()); 
+			this.session.setRoomId(room.getId());
+			this.session.setRoom(room);
 		}
 		if( device != null ) {
 			this.session.setDeviceId(device.getId());
@@ -144,7 +145,7 @@ public class SessionController extends Controller {
 		}
 	}
 
-	private Session find(int id) {
+	private Session find(Long id) {
 		Session data = null;
 		EntityManager em = getEntityManager();
 		if (em != null) {

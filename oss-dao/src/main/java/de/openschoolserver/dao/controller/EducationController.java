@@ -64,7 +64,7 @@ public class EducationController extends Controller {
 	 */
 	public List<Long> getMyRooms() {
 		List<Long> rooms = new ArrayList<Long>();
-		if( this.session.getRoom().getRoomControl().equals("no_control")){
+		if( this.session.getRoom() != null && this.session.getRoom().getRoomControl().equals("no_control")){
 			for( Room room : new RoomController(this.session).getAll() ) {
 				switch(room.getRoomControl()) {
 				case "no_control":
