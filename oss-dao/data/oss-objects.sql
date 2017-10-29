@@ -32,18 +32,18 @@ CREATE TABLE IF NOT EXISTS Users (
 	fsQuotaUsed  INTEGER DEFAULT 0,
 	msQuota	     INTEGER DEFAULT 0,
 	msQuotaUsed  INTEGER DEFAULT 0,
-	initialPassword  VARCHAR(32) DEFAULT NULL,
+	initialPassword  VARCHAR(32) DEFAULT '',
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
 
-INSERT INTO Users VALUES(1,'Administrator','','sysadmins','Administrator','Main',NOW(),0,0,0,0,NULL,NULL);
-INSERT INTO Users VALUES(2,'tteachers','','teachers','for teachers','Default profile',NOW(),0,0,0,0,NULL,1);
-INSERT INTO Users VALUES(3,'tstudents','','students','for students','Default profile',NOW(),0,0,0,0,NULL,1);
-INSERT INTO Users VALUES(4,'tadministration','','administrations','for administration','Default profile',NOW(),0,0,0,0,NULL,1);
-INSERT INTO Users VALUES(5,'tworkstations','','workstations','for workstations','Default profile',NOW(),0,0,0,0,NULL,1);
-INSERT INTO Users VALUES(6,'cephalix','','sysadmins','Administrator','Internal',NOW(),0,0,0,0,NULL,1);
+INSERT INTO Users VALUES(1,'Administrator','','sysadmins','Administrator','Main',NOW(),0,0,0,0,'',NULL);
+INSERT INTO Users VALUES(2,'tteachers','','teachers','for teachers','Default profile',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(3,'tstudents','','students','for students','Default profile',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(4,'tadministration','','administrations','for administration','Default profile',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(5,'tworkstations','','workstations','for workstations','Default profile',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(6,'cephalix','','sysadmins','Administrator','Internal',NOW(),0,0,0,0,'',1);
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
