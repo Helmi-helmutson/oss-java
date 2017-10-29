@@ -102,7 +102,7 @@ public class SoftwareController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Software was created succesfully");
+		return new OssResponse(this.getSession(),"OK","Software was created succesfully",software.getId());
 	}
 	
 	public OssResponse delete(Long softwareId) {

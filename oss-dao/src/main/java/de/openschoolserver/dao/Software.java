@@ -43,7 +43,6 @@ public class Software implements Serializable {
 
 	//bi-directional many-to-one association to SoftwareVersion
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
-	@JsonIgnore
 	private List<SoftwareVersion> softwareVersions;
 	
 	//bi-directional many-to-many association to Category
