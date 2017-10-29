@@ -313,9 +313,7 @@ public class ImportHandler {
 			newUser.setBirthDay(person.getBirthday());
 			if (person.getPassword()!=null && person.getPassword().length()>0) {
 			  newUser.setPassword(person.getPassword());
-			} else if (o.getNewUserPassword()!=null && o.getNewUserPassword().length()>0) {
-				 newUser.setPassword(o.getNewUserPassword());
-			}
+			} 
 			if (!o.isTestOnly()) {
 				OssResponse res = userController.add(newUser);
 

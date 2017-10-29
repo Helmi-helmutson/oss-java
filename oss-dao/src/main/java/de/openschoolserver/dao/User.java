@@ -152,7 +152,10 @@ public class User implements Serializable {
 	private Integer msQuota;
 	
 	@Column(name = "creator_id")
-    private Long creatorId;
+        private Long creatorId;
+
+	@JsonIgnore
+        private String initialPassword;
 
 	@Transient
 	private String password ="";
@@ -483,5 +486,13 @@ public class User implements Serializable {
 
 	public void setMyAnnouncements(List<Announcement> myAnnouncements) {
 		this.myAnnouncements = myAnnouncements;
+	}
+
+	public String getInitialPassword() {
+		return initialPassword;
+	}
+
+	public void setInitialPassword(String initialPassword) {
+		this.initialPassword = initialPassword;
 	}
 }

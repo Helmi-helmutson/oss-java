@@ -186,6 +186,8 @@ public class UserController extends Controller {
 				return ossResponse;
 			}
 		}
+		//Make backup from password. password field is transient!
+		user.setInitialPassword(user.getPassword());
 		try {
 			em.getTransaction().begin();
 			em.persist(user);
