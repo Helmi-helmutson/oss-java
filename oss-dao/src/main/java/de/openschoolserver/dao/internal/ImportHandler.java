@@ -88,7 +88,7 @@ public class ImportHandler {
 			if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
 				filepath = "/tmp/userimport." + now;
 			} else {
-				filepath = "/home/groups/SYSADMINS/userimport." + now;
+				filepath = "/home/groups/sysadmins/userimport." + now;
 			}
 
 			File dir = new File(filepath);
