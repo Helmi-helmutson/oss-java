@@ -311,7 +311,13 @@ public class Controller extends Config {
 	public boolean isSuperuser() {
 		if(properties.containsKey("de.openschoolserver.dao.Session.superusers")){
 			for( String s : properties.get("de.openschoolserver.dao.Session.superusers").split(",") ){
-				if( s.equals(this.session.getUser().getUid())) {
+				if( s.startsWith("@") ) {
+					for( Group g: this.session.getUser().getGroups() ) {
+						if( g.getName().equals(s.substring(1))) {
+							return true;
+						}
+					}
+				} else if( s.equals(this.session.getUser().getUid())) {
 					return true;
 				}
 			}
