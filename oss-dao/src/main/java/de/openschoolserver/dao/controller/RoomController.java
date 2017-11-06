@@ -628,7 +628,6 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
-		em.close();
 		UserController userController = new UserController(this.session);
 		for(Device device : devices) {
 			this.startPlugin("add_device", device);
