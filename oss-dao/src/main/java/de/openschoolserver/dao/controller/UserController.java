@@ -36,7 +36,7 @@ public class UserController extends Controller {
 		try {
 			return em.find(User.class, userId);
 		} catch (Exception e) {
-			logger.error("getByID: " + e.getMessage());
+			logger.debug("getByID: " + e.getMessage());
 			return null;
 		} finally {
 			em.close();
