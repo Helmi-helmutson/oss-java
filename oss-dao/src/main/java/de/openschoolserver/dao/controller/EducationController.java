@@ -64,16 +64,17 @@ public class EducationController extends Controller {
 	 */
 	public List<Long> getMyRooms() {
 		List<Long> rooms = new ArrayList<Long>();
-		if( this.session.getRoom() != null && this.session.getRoom().getRoomControl().equals("no_control")){
+		if( this.session.getRoom() == null || this.session.getRoom().getRoomControl().equals("no")){
 			for( Room room : new RoomController(this.session).getAll() ) {
 				switch(room.getRoomControl()) {
-				case "no_control":
+				case "no":
+				case "inRoom":
 					break;
-				case "all_teacher_control":
+				case "allTeachers":
 					rooms.add(room.getId());
 					break;
-				case "teacher_control":
-					if( this.checkMConfig(room, "teacher_control", Long.toString((this.session.getUserId())))) {
+				case "teachers":
+					if( this.checkMConfig(room, "teachers", Long.toString((this.session.getUserId())))) {
 						rooms.add(room.getId());
 					}
 				}

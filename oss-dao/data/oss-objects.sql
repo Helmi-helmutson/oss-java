@@ -134,8 +134,8 @@ CREATE TABLE IF NOT EXISTS Rooms (
         PRIMARY KEY(id)
 );
 
-INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','technicalRoom','no_control',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#,6);
-INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','technicalRoom','no_control',10,10,'#ANON_NETWORK#',#ANON_NETMASK#,6);
+INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','technicalRoom','no',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#,6);
+INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','technicalRoom','no',10,10,'#ANON_NETWORK#',#ANON_NETMASK#,6);
 
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -331,8 +331,8 @@ INSERT INTO Enumerates VALUES(NULL,'groupType','workgroup',1);
 INSERT INTO Enumerates VALUES(NULL,'groupType','guest',1);
 INSERT INTO Enumerates VALUES(NULL,'roomControl','inRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomControl','no',1);
-INSERT INTO Enumerates VALUES(NULL,'roomControl','allTeacher',1);
-INSERT INTO Enumerates VALUES(NULL,'roomControl','teacher',1);
+INSERT INTO Enumerates VALUES(NULL,'roomControl','allTeachers',1);
+INSERT INTO Enumerates VALUES(NULL,'roomControl','teachers',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','Library',1);
