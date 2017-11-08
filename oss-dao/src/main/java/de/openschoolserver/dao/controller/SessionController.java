@@ -129,10 +129,12 @@ public class SessionController extends Controller {
 				Device device = obj.getDevice();
 				if( device != null ) {
 					User user = obj.getUser();
-					user.getLoggedOn().add(device);
-					device.getLoggedIn().add(user);
-					em.merge(device);
-					em.merge(user);
+					if( ! user.getLoggedOn().contains(device) ) {
+						user.getLoggedOn().add(device);
+						device.getLoggedIn().add(user);
+						em.merge(device);
+						em.merge(user);
+					}
 				}
 				em.flush();
 				em.refresh(obj);
