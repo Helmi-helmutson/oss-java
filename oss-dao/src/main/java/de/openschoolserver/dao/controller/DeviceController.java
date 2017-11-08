@@ -3,7 +3,6 @@
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,7 +11,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -94,15 +93,21 @@ public class DeviceController extends Controller {
 	/*
 	 * Deletes a list of device given by the device Ids.
 	 */
-	public Response delete(List<Long> deviceIds) {
+	public OssResponse delete(List<Long> deviceIds) {
 		EntityManager em = getEntityManager();
 		UserController userController = new UserController(this.session);
+		StringBuilder  error = new StringBuilder();
 		try {
 			em.getTransaction().begin();
 			for( Long deviceId : deviceIds) {
 				Device dev = em.find(Device.class, deviceId);
 				if( this.isProtected(dev) ) {
-					return new Response(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
+					error.append("This device must not be deleted: ").append(dev.getName()).append("\\n");
+					continue;
+				}
+				if( !this.mayModify(dev) ) {
+					error.append("You must not delete this device: ").append(dev.getName()).append("\\n");
+					continue;
 				}
 				if( !em.contains(dev)) {
 					dev = em.merge(dev);
@@ -118,10 +123,10 @@ public class DeviceController extends Controller {
 			em.getEntityManagerFactory().getCache().evictAll();
 			DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 			dhcpconfig.Create();
-			return new Response(this.getSession(),"OK", "Devices were deleted succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("delete: " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -130,14 +135,18 @@ public class DeviceController extends Controller {
 	/*
 	 * Deletes a device given by the device Ids.
 	 */
-	public Response delete(Long deviceId, boolean atomic) {
+	public OssResponse delete(Long deviceId, boolean atomic) {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			Device dev = em.find(Device.class, deviceId);
 			if( this.isProtected(dev) ) {
-				return new Response(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
+				return new OssResponse(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
 			}
+			if( !this.mayModify(dev) ) {
+				return new OssResponse(this.getSession(),"ERROR","You must not delete this device: " + dev.getName());
+			}
+			
 			em.remove(dev);
 			em.getTransaction().commit();
 			if( atomic ) {
@@ -146,10 +155,10 @@ public class DeviceController extends Controller {
 				DHCPConfig dhcpconfig = new DHCPConfig(this.session);
 				dhcpconfig.Create();
 			}
-			return new Response(this.getSession(),"OK", "Device was deleted succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("deviceId: " + deviceId + " " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -217,18 +226,19 @@ public class DeviceController extends Controller {
 	/*
 	 * Creates devices
 	 */
-	public Response add(List<Device> devices) {
+	public OssResponse add(List<Device> devices) {
 		EntityManager em = getEntityManager();
 		try {
 			for(Device dev: devices){
+				dev.setOwner(session.getUser());
 				em.getTransaction().begin();
 				em.persist(dev);
 				em.getTransaction().commit();
 			}
-			return new Response(this.getSession(),"OK", "Devices were created succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Devices were created succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -375,7 +385,7 @@ public class DeviceController extends Controller {
 		return users;
 	}
 
-	public Response setDefaultPrinter(long deviceId, long defaultPrinterId) {
+	public OssResponse setDefaultPrinter(long deviceId, long defaultPrinterId) {
 		// TODO Auto-generated method stub
 		Device device         = this.getById(deviceId);
 		Device defaultPrinter = this.getById(defaultPrinterId);
@@ -386,14 +396,14 @@ public class DeviceController extends Controller {
 			em.merge(device);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK", "Default printer was set succesfully.");
+		return new OssResponse(this.getSession(),"OK", "Default printer was set succesfully.");
 	}
 
-	public Response setAvailablePrinters(long deviceId, List<Long> availablePrinterIds) {
+	public OssResponse setAvailablePrinters(long deviceId, List<Long> availablePrinterIds) {
 		// TODO Auto-generated method stub
 		Device device         = this.getById(deviceId);
 		List<Device> availablePrinters = new ArrayList<Device>();
@@ -407,14 +417,14 @@ public class DeviceController extends Controller {
 			em.merge(device);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK", "Available printers were set succesfully.");
+		return new OssResponse(this.getSession(),"OK", "Available printers were set succesfully.");
 	}
 
-	public Response addLoggedInUser(String IP, String userName) {
+	public OssResponse addLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		EntityManager em = getEntityManager();
 		UserController userController = new UserController(this.session);
@@ -428,14 +438,14 @@ public class DeviceController extends Controller {
 			em.flush();
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK", "Logged in user was added succesfully:" + device.getName() + ";" + IP + ";" + userName);
+		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:" + device.getName() + ";" + IP + ";" + userName);
 	}
 
-	public Response removeLoggedInUser(String IP, String userName) {
+	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		EntityManager em = getEntityManager();
 		UserController userController = new UserController(this.session);
@@ -448,17 +458,20 @@ public class DeviceController extends Controller {
 			em.merge(device);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK", "Logged in user was removed succesfully:" + device.getName() + ";" + IP + ";" + userName);
+		return new OssResponse(this.getSession(),"OK", "Logged in user was removed succesfully:" + device.getName() + ";" + IP + ";" + userName);
 	}
 	
-	public Response modify(Device device) {
+	public OssResponse modify(Device device) {
 		Device oldDevice = this.getById(device.getId());
 		List<String> error = new ArrayList<String>();
 		//Check the MAC address
+		if( !this.mayModify(oldDevice) ) {
+			return new OssResponse(this.getSession(),"ERROR","You must not delete this device: " + oldDevice.getName());
+		}
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		String name =  this.isMacUnique(device.getMac());
 		if( name != "" ){
@@ -479,7 +492,7 @@ public class DeviceController extends Controller {
 			}
 		}
 		if(!error.isEmpty()){
-			return new Response(this.getSession(),"ERROR",String.join(System.lineSeparator(),error));
+			return new OssResponse(this.getSession(),"ERROR",String.join(System.lineSeparator(),error));
 		}
 		EntityManager em = getEntityManager();
 		try {
@@ -491,12 +504,12 @@ public class DeviceController extends Controller {
 			em.merge(oldDevice);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.startPlugin("modify_device", oldDevice);
-		return new Response(this.getSession(),"OK", "Device was modified succesfully.");
+		return new OssResponse(this.getSession(),"OK", "Device was modified succesfully.");
 	}
 
 	public List<Device> getDevices(List<Long> deviceIds) {

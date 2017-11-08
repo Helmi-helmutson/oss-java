@@ -13,18 +13,20 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="SoftwareStatus")
 @NamedQueries({
-	@NamedQuery(name="SoftwareStatus.findAll", query="SELECT s FROM SoftwareStatus s"),
+	@NamedQuery(name="SoftwareStatus.findAll",		query="SELECT s FROM SoftwareStatus s"),
 	@NamedQuery(name="SoftwareStatus.findByStatus", query="SELECT s FROM SoftwareStatus s WHERE s.status = :STATUS"),
 	@NamedQuery(name="SoftwareStatus.getAllForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE"),
-	@NamedQuery(name="SoftwareStatus.getForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE AND sv.version = :VERSION"),
+	@NamedQuery(name="SoftwareStatus.getForOne",	query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE AND sv.version = :VERSION"),
 })
 
 public class SoftwareStatus implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	@EmbeddedId
-	private SoftwareStatusPK id;
-
+	@Id
+	@SequenceGenerator(name="SOFTWARESTATUS_ID_GENERATOR" )
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARESTATUS_ID_GENERATOR")
+	private long id;
+	
 	private String status;
 
 	//bi-directional many-to-one association to SoftwareVersion
@@ -46,19 +48,19 @@ public class SoftwareStatus implements Serializable {
     private Long deviceId;
 	
 	@Transient
-	public String deviceName;
+	private String deviceName;
 	 
 	@Transient
-	public String softwareName;
+	private String softwareName;
 	
 	@Transient
-	public boolean manually;
+	private boolean manually;
 	
 	@Transient
-	public Long softwareId;
+	private Long softwareId;
 	
 	@Transient
-	public String version;
+	private String version;
 	
 	public SoftwareStatus() {
 	}
@@ -68,11 +70,12 @@ public class SoftwareStatus implements Serializable {
 		this.softwareVersion = sv;
 		this.status = status;
 	}
-	public SoftwareStatusPK getId() {
+	
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(SoftwareStatusPK id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -100,4 +103,43 @@ public class SoftwareStatus implements Serializable {
 		this.device = device;
 	}
 
+	public Long getVersionId() {
+		return versionId;
+	}
+
+	public void setVersionId(Long versionId) {
+		this.versionId = versionId;
+	}
+
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
+	}
+
+	public String getSoftwareName() {
+		return softwareName;
+	}
+
+	public void setSoftwareName(String softwareName) {
+		this.softwareName = softwareName;
+	}
+
+	public boolean isManually() {
+		return manually;
+	}
+
+	public void setManually(boolean manually) {
+		this.manually = manually;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String version) {
+		this.version = version;
+	}
 }

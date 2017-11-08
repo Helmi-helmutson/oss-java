@@ -68,6 +68,9 @@ public class Config {
 		}
 	}
 
+	public Date now() {
+		return new Date(System.currentTimeMillis());
+	}
 	public Boolean isConfgiReadOnly(String key){
 		return readOnly.get(key);
 	}

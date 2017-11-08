@@ -20,20 +20,26 @@
 		<class>de.openschoolserver.dao.Session</class>
 		<class>de.openschoolserver.dao.BooleanToStringConverter</class>
 		<class>de.openschoolserver.dao.AccessInRoom</class>
-		<class>de.openschoolserver.dao.Response</class>
+		<class>de.openschoolserver.dao.OssResponse</class>
 		<class>de.openschoolserver.dao.Category</class>
 		<class>de.openschoolserver.dao.Software</class>
 		<class>de.openschoolserver.dao.SoftwareStatus</class>
 		<class>de.openschoolserver.dao.SoftwareLicense</class>
-		<class>de.openschoolserver.dao.SoftwareStatusPK</class>
 		<class>de.openschoolserver.dao.SoftwareVersion</class>
 		<class>de.openschoolserver.dao.Announcement</class>
 		<class>de.openschoolserver.dao.Contact</class>
 		<class>de.openschoolserver.dao.FAQ</class>
+		<class>de.openschoolserver.dao.CephalixITUsage</class>
+		<class>de.openschoolserver.dao.CephalixITUsageAvarage</class>
+		<class>de.openschoolserver.dao.CephalixInstitute</class>
+		<class>de.openschoolserver.dao.CephalixMapping</class>
+		<class>de.openschoolserver.dao.Translation</class>
+		<class>de.openschoolserver.dao.MissedTranslation</class>
+		<class>de.openschoolserver.dao.Job</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/OSS"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>
-			<property name="javax.persistence.jdbc.password" value="5wo70OcX10"/>
+			<property name="javax.persistence.jdbc.password" value="cheXGjIPoJ"/>
 			<property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver"/>
 		</properties>
 	</persistence-unit>

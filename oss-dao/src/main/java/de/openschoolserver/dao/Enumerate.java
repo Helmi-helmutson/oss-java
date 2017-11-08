@@ -38,6 +38,11 @@ public class Enumerate implements Serializable {
 
 	public Enumerate() {
 	}
+	
+	public Enumerate(String type, String value) {
+		this.name	= type;
+		this.value	= value;
+	}
 
 	public long getId() {
 		return this.id;

@@ -2,22 +2,18 @@
 package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
-
-
 import javax.persistence.Query;
-
 import java.util.List;
 import java.util.ArrayList;
-
 import de.openschoolserver.dao.*;
 
 @SuppressWarnings( "unchecked" )
 public class CategoryController extends Controller {
-	
+
 	public CategoryController(Session session) {
 		super(session);
 	}
-	
+
 	public List<Category> getAll() {
 		EntityManager em = getEntityManager();
 		try {
@@ -30,7 +26,7 @@ public class CategoryController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	public Category getById(long categoryId) {
 		EntityManager em = getEntityManager();
 		try {
@@ -42,47 +38,60 @@ public class CategoryController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	public List<Category> search(String search) {
 		EntityManager em = getEntityManager();
-			try {
-				Query query = em.createNamedQuery("Category.search");
-				query.setParameter("search", search + "%");
-				return query.getResultList();
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				return new ArrayList<>();
-			} finally {
-				em.close();
-			}
+		try {
+			Query query = em.createNamedQuery("Category.search");
+			query.setParameter("search", search + "%");
+			return query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new ArrayList<>();
+		} finally {
+			em.close();
 		}
+	}
 
 	public List<Category> getByType(String search) {
 		EntityManager em = getEntityManager();
-			try {
-				Query query = em.createNamedQuery("Category.getByType").setParameter("type", search);
-				return query.getResultList();
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				return new ArrayList<>();
-			} finally {
-				em.close();
-			}
+		try {
+			Query query = em.createNamedQuery("Category.getByType").setParameter("type", search);
+			return query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new ArrayList<>();
+		} finally {
+			em.close();
 		}
+	}
 
-	public Response add(Category category){
+	public Category getByName(String name) {
 		EntityManager em = getEntityManager();
-		
+		try {
+			Query query = em.createNamedQuery("Category.getByName").setParameter("name", name);
+			return (Category) query.getSingleResult();
+		} catch (Exception e) {
+			logger.debug(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	public OssResponse add(Category category){
+		EntityManager em = getEntityManager();
+
 		try {
 			// First we check if the parameter are unique.
 			Query query = em.createNamedQuery("Category.getByName").setParameter("name",category.getName());
 			if( !query.getResultList().isEmpty() ){
-				return new Response(this.getSession(),"ERROR","Category name is not unique.");
+				return new OssResponse(this.getSession(),"ERROR","Category name is not unique.");
 			}
 			if( !category.getDescription().isEmpty() ) {
 				query = em.createNamedQuery("Category.getByDescription").setParameter("description",category.getDescription());
 				if( !query.getResultList().isEmpty() ){
-					return new Response(this.getSession(),"ERROR","Category description is not unique.");
+					return new OssResponse(this.getSession(),"ERROR","Category description is not unique.");
 				}
 			}
 			em.getTransaction().begin();
@@ -90,12 +99,12 @@ public class CategoryController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		}
-		return new Response(this.getSession(),"OK","Category was created");
+		return new OssResponse(this.getSession(),"OK","Category was created",category.getId());
 	}
-	
-	public Response modify(Category category){
+
+	public OssResponse modify(Category category){
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -103,15 +112,15 @@ public class CategoryController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		}
-		return new Response(this.getSession(),"OK","Category was modified");
+		return new OssResponse(this.getSession(),"OK","Category was modified");
 	}
-	
-	public Response delete(Long categoryId){
+
+	public OssResponse delete(Long categoryId){
 		Category category = this.getById(categoryId);
 		if( this.isProtected(category)) {
-			return new Response(this.getSession(),"ERROR","This category must not be deleted.");
+			return new OssResponse(this.getSession(),"ERROR","This category must not be deleted.");
 		}
 		// Remove group from GroupMember of table
 		EntityManager em = getEntityManager();
@@ -125,14 +134,14 @@ public class CategoryController extends Controller {
 			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			
+
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Category was deleted");
+		return new OssResponse(this.getSession(),"OK","Category was deleted");
 	}
-	
+
 	public List<Long> getAvailableMembers(Long categoryId, String objectName ) {
 		Category c = this.getById(categoryId);
 		List<Long> objectIds = new ArrayList<Long>();
@@ -142,40 +151,54 @@ public class CategoryController extends Controller {
 			objectIds.add(l);
 		}
 		switch(objectName){
-			case("Device"):
-				for(Device d : c.getDevices()) {
-					objectIds.remove(d.getId());
-				}
-			break;
-			case("Group"):
-				for(Group g : c.getGroups()) {
-					objectIds.remove(g.getId());
-				}
-			break;
-			case("HWConf"):
-				for(HWConf h : c.getHWConfs()) {
-					objectIds.remove(h.getId());
-				}
-			break;
-			case("Room"):
-				for(Room r: c.getRooms()) {
-					objectIds.remove(r.getId());
-				}
-			break;
-			case("Software"):
-				for(Software s: c.getSoftwares()) {
-					objectIds.remove(s.getId());
-				}
-			break;
-			case("User"):
-				for(User u: c.getUsers()) {
-					objectIds.remove(u.getId());
-				}
-			break;
+		case("Device"):
+			for(Device d : c.getDevices()) {
+				objectIds.remove(d.getId());
+			}
+		break;
+		case("Group"):
+			for(Group g : c.getGroups()) {
+				objectIds.remove(g.getId());
+			}
+		break;
+		case("HWConf"):
+			for(HWConf h : c.getHWConfs()) {
+				objectIds.remove(h.getId());
+			}
+		break;
+		case("Room"):
+			for(Room r: c.getRooms()) {
+				objectIds.remove(r.getId());
+			}
+		break;
+		case("Software"):
+			for(Software s: c.getSoftwares()) {
+				objectIds.remove(s.getId());
+			}
+		break;
+		case("User"):
+			for(User u: c.getUsers()) {
+				objectIds.remove(u.getId());
+			}
+		break;
+		case("FAQ"):
+			for(FAQ f: c.getFaqs() ) {
+				objectIds.remove(f.getId());
+			}
+		break;
+		case("Announcement"):
+			for(Announcement a: c.getAnnouncements() ) {
+				objectIds.remove(a.getId());
+			}
+		break;
+		case("Contact"):
+			for(Contact cont: c.getContacts()) {
+				objectIds.remove(cont.getId());
+			}
 		}
 		return objectIds;
 	}
-	
+
 	public List<Long> getMembers(Long categoryId, String objectName ) {
 		Category c = this.getById(categoryId);
 		List<Long> objectIds = new ArrayList<Long>();
@@ -210,11 +233,25 @@ public class CategoryController extends Controller {
 				objectIds.add(u.getId());
 			}
 		break;
+		case("FAQ"):
+			for(FAQ f: c.getFaqs() ) {
+				objectIds.add(f.getId());
+			}
+		break;
+		case("Announcement"):
+			for(Announcement a: c.getAnnouncements() ) {
+				objectIds.add(a.getId());
+			}
+		break;
+		case("Contact"):
+			for(Contact cont: c.getContacts()) {
+				objectIds.add(cont.getId());
+			}
 		}
 		return objectIds;
 	}
 
-	public Response addMember(Long categoryId, String objectName,Long objectId ) {
+	public OssResponse addMember(Long categoryId, String objectName,Long objectId ) {
 		EntityManager em = getEntityManager();
 		Category category = this.getById(categoryId);
 		try {
@@ -250,18 +287,33 @@ public class CategoryController extends Controller {
 				category.getUsers().add(user);
 				user.getCategories().add(category);
 			break;
+			case("FAQ"):
+				FAQ faq = new InformationController(this.session).getFAQById(objectId);
+				category.getFaqs().add(faq);
+				faq.getCategories().add(category);
+			break;
+			case("Announcement"):
+				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
+				category.getAnnouncements().add(info);
+				info.getCategories().add(category);
+			break;
+			case("Contact"):
+				Contact contact = new InformationController(this.session).getContactById(objectId);
+				category.getContacts().add(contact);
+				contact.getCategories().add(category);
+			break;
 			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Category was modified");
+		return new OssResponse(this.getSession(),"OK","Category was modified");
 	}
-	
-	public Response deleteMember(Long categoryId, String objectName, Long objectId ) {
+
+	public OssResponse deleteMember(Long categoryId, String objectName, Long objectId ) {
 		Category category = this.getById(categoryId);
 		EntityManager em = getEntityManager();
 		try {
@@ -299,15 +351,30 @@ public class CategoryController extends Controller {
 				category.getUsers().remove(user);
 				user.getCategories().remove(category);
 			break;
+			case("FAQ"):
+				FAQ faq = new InformationController(this.session).getFAQById(objectId);
+				category.getFaqs().remove(faq);
+				faq.getCategories().remove(category);
+			break;
+			case("Announcement"):
+				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
+				category.getAnnouncements().remove(info);
+				info.getCategories().remove(category);
+			break;
+			case("Contact"):
+				Contact contact = new InformationController(this.session).getContactById(objectId);
+				category.getContacts().remove(contact);
+				contact.getCategories().remove(category);
+			break;
 			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Category was modified");
+		return new OssResponse(this.getSession(),"OK","Category was modified");
 	}
 
 	public List<Category> getCategories(List<Long> categoryIds) {

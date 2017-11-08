@@ -14,7 +14,7 @@ import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Contact;
 import de.openschoolserver.dao.FAQ;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 
@@ -31,49 +31,49 @@ public class InformationController extends Controller {
 		super(session);
 	}
 
-	public Response addAnnouncement(Announcement announcement) {
+	public OssResponse addAnnouncement(Announcement announcement) {
 		EntityManager em = getEntityManager();
 		announcement.setOwner(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(announcement);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "Announcement was created succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Announcement was created succesfully.",announcement.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 	}
 
-	public Response addContact(Contact contact) {
+	public OssResponse addContact(Contact contact) {
 		EntityManager em = getEntityManager();
 		contact.setOwner(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(contact);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "Contact was created succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Contact was created succesfully.",contact.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 	}
 
-	public Response addFAQ(FAQ faq) {
+	public OssResponse addFAQ(FAQ faq) {
 		EntityManager em = getEntityManager();
 		faq.setOwner(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(faq);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "FAQ was created succesfully.");
+			return new OssResponse(this.getSession(),"OK", "FAQ was created succesfully.",faq.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -81,13 +81,12 @@ public class InformationController extends Controller {
 
 	public List<Announcement> getAnnouncements() {
 		List<Announcement> announcements = new ArrayList<Announcement>();
-		Date now = new Date(System.currentTimeMillis());
 		User user = this.session.getUser();
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
 				for(Announcement announcement : category.getAnnouncements() ) {
-					if( announcement.getValidFrom().after(now) &&
-						announcement.getValidUntil().before(now) &&
+					if( announcement.getValidFrom().after(this.now()) &&
+						announcement.getValidUntil().before(this.now()) &&
 						! user.getReadAnnouncements().contains(announcement) ) 
 					{
 						announcements.add(announcement);
@@ -160,121 +159,121 @@ public class InformationController extends Controller {
 		}
 	}
 
-	public Response modifyAnnouncement(Announcement announcement) {
+	public OssResponse modifyAnnouncement(Announcement announcement) {
 		EntityManager em = getEntityManager();
-		if( !this.isSuperuser() && !announcement.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(announcement) )
 		{
-			return new Response(this.getSession(),"ERROR", "You have no rights to modify this Announcement");
+			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this Announcement");
 		}
 		try {
 			em.getTransaction().begin();
 			em.merge(announcement);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "Announcement was modified succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Announcement was modified succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 	}
 	
-	public Response modifyContact(Contact contact) {
+	public OssResponse modifyContact(Contact contact) {
 		EntityManager em = getEntityManager();
-		if( !this.isSuperuser() && !contact.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(contact) )
 		{
-			return new Response(this.getSession(),"ERROR", "You have no rights to modify this contact");
+			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this contact");
 		}
 		try {
 			em.getTransaction().begin();
 			em.merge(contact);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "Contact was modified succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Contact was modified succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 	}
 
-	public Response modifyFAQ(FAQ faq) {
+	public OssResponse modifyFAQ(FAQ faq) {
 		EntityManager em = getEntityManager();
-		if( !this.isSuperuser() && !faq.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(faq) )
 		{
-			return new Response(this.getSession(),"ERROR", "You have no rights to modify this FAQ ");
+			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this FAQ ");
 		}
 		try {
 			em.getTransaction().begin();
 			em.merge(faq);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "FAQ was modified succesfully.");
+			return new OssResponse(this.getSession(),"OK", "FAQ was modified succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 	}
 
-	public Response deleteAnnouncement(Long announcementId) {
+	public OssResponse deleteAnnouncement(Long announcementId) {
 		EntityManager em = getEntityManager();
 		Announcement announcement = this.getAnnouncementById(announcementId);
-		if( !this.isSuperuser() && !announcement.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(announcement) )
 		{
-			return new Response(this.getSession(),"ERROR", "You have no rights to delete this Announcement");
+			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this Announcement");
 		}
 		try {
 			em.getTransaction().begin();
 			em.merge(announcement);
 			em.remove(announcement);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "Announcement was deleted succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Announcement was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 	}
 
-	public Response deleteContact(Long contactId) {
+	public OssResponse deleteContact(Long contactId) {
 		EntityManager em = getEntityManager();
 		Contact contact = this.getContactById(contactId);
-		if( !this.isSuperuser() && !contact.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(contact) )
 		{
-			return new Response(this.getSession(),"ERROR", "You have no rights to delete this contact");
+			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this contact");
 		}
 		try {
 			em.getTransaction().begin();
 			em.merge(contact);
 			em.remove(contact);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "Contact was deleted succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Contact was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
 	}
 
-	public Response deleteFAQ(Long faqId) {
+	public OssResponse deleteFAQ(Long faqId) {
 		EntityManager em = getEntityManager();
 		FAQ faq = this.getFAQById(faqId);
-		if( !this.isSuperuser() && !faq.getOwner().equals(this.session.getUser()) )
+		if( !this.mayModify(faq) )
 		{
-			return new Response(this.getSession(),"ERROR", "You have no rights to delete this FAQ");
+			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this FAQ");
 		}
 		try {
 			em.getTransaction().begin();
 			em.merge(faq);
 			em.remove(faq);
 			em.getTransaction().commit();
-			return new Response(this.getSession(),"OK", "FAQ was deleted succesfully.");
+			return new OssResponse(this.getSession(),"OK", "FAQ was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}

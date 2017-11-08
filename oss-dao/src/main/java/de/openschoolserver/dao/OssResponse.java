@@ -10,8 +10,8 @@ import javax.persistence.*;
  */
 @Entity
 @Table(name="Responses")
-@NamedQuery(name="Response.findAll", query="SELECT r FROM Response r")
-public class Response implements Serializable {
+@NamedQuery(name="OssResponse.findAll", query="SELECT r FROM OssResponse r")
+public class OssResponse implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -22,6 +22,11 @@ public class Response implements Serializable {
 	private String code;
 	private String value;
 	
+	/*
+	 * This id will be set to the id of a object which was created or deleted or manipulated if any
+	 */
+	private Long   objectId;
+	
 	@ManyToOne
     Session session;
 
@@ -30,27 +35,43 @@ public class Response implements Serializable {
 	
     @Override
     public boolean equals(Object obj) {
-            if (obj instanceof Response && obj !=null) {
-                    return getId() == ((Response)obj).getId();
+            if (obj instanceof OssResponse && obj !=null) {
+                    return getId() == ((OssResponse)obj).getId();
             }
             return super.equals(obj);
     }
 
-    public Response() {
+    public OssResponse() {
     }
 
-    public Response(Session session,String code, String value){
-            this.session = session;
-            this.code    = code;
-            this.value   = value;
+    public OssResponse(Session session,String code, String value){
+            this.session  = session;
+            this.code     = code;
+            this.value    = value;
+            this.objectId = null;
     }
    
+    public OssResponse(Session session,String code, String value, Long objectId){
+        this.session  = session;
+        this.code     = code;
+        this.value    = value;
+        this.objectId = objectId;
+    }
+
 	public long getId() {
 		return this.id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
+	}
+
+	public Long getObjecId() {
+		return this.objectId;
+	}
+
+	public void setObjectId(Long id) {
+		this.objectId = id;
 	}
 
 	public String getCode() {

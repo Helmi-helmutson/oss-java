@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -61,7 +61,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	List<User> getUsers(
+	List<Long> getUsers(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 	
@@ -71,12 +71,12 @@ public interface AdHocLanResource {
 	@GET
 	@Path("groups")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets all defined AdHocLan Devices.")
+	@ApiOperation(value = "Gets all Groups which have AdHocLan access.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	List<Group> getGroups(
+	List<Long> getGroups(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 	
@@ -92,11 +92,29 @@ public interface AdHocLanResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.add")
-    Response add(
+    OssResponse add(
             @ApiParam(hidden = true) @Auth Session session,
             Room room
     );
     
+
+    /*
+     * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
+     */
+    @PUT
+	@Path("rooms/{roomId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Add a new group or user to a giwen AdHocLan room")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.search")
+	OssResponse turnOn(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")		Long roomId
+			);
+
+
     /*
      * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
      */
@@ -108,7 +126,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	Response putObjectIntoRoom(
+	OssResponse putObjectIntoRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId,
 			@PathParam("objectType")	String onjectType,
@@ -124,7 +142,7 @@ public interface AdHocLanResource {
 	@GET
 	@Path("rooms")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets all defined AdHocLan which a user may use. Superuser get the list of all AdHocLan rooms.")
+	@ApiOperation(value = "Gets all defined AdHocLan Rooms which a user may use. Superuser get the list of all AdHocLan rooms.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -144,7 +162,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	List<Device> getDevices(
+	List<Long> getDevices(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
@@ -159,7 +177,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	Response deleteDevice(
+	OssResponse deleteDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("deviceId")     Long deviceId
 			);
@@ -173,7 +191,7 @@ public interface AdHocLanResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    Response addDevice(
+    OssResponse addDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")		long roomId,
             @PathParam("macAddress")	String macAddress,

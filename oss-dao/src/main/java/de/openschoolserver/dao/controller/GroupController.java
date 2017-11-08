@@ -16,7 +16,7 @@ import javax.persistence.Query;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 
 @SuppressWarnings( "unchecked" )
 public class GroupController extends Controller {
@@ -99,26 +99,30 @@ public class GroupController extends Controller {
 		}
 	}
 
-	public Response add(Group group){
+	public OssResponse add(Group group){
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(group.getName())){
-			return new Response(this.getSession(),"ERROR","Group name is not unique.");
+			return new OssResponse(this.getSession(),"ERROR","Group name is not unique.");
 		}
+		group.setOwner(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		}
 		this.startPlugin("add_group", group);
-		return new Response(this.getSession(),"OK","Group was created");
+		return new OssResponse(this.getSession(),"OK","Group was created",group.getId());
 	}
 
-	public Response modify(Group group){
+	public OssResponse modify(Group group){
 		Group oldGroup = this.getById(group.getId());
+		if( !this.mayModify(oldGroup) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
 		oldGroup.setDescription(group.getDescription());
 		EntityManager em = getEntityManager();
 		try {
@@ -127,18 +131,20 @@ public class GroupController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		}
 		this.startPlugin("modify_group", oldGroup);
-		return new Response(this.getSession(),"OK","Group was modified");
+		return new OssResponse(this.getSession(),"OK","Group was modified");
 	}
 
-	public Response delete(long groupId){
+	public OssResponse delete(long groupId){
 		Group group = this.getById(groupId);
 		if( this.isProtected(group)) {
-			return new Response(this.getSession(),"ERROR","This group must not be deleted.");
+			return new OssResponse(this.getSession(),"ERROR","This group must not be deleted.");
 		}
-		
+		if( !this.mayModify(group) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not delete this group.");
+        }
 		this.startPlugin("delete_group", group);
 
 		// Remove group from GroupMember of table
@@ -153,11 +159,11 @@ public class GroupController extends Controller {
 			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Group was deleted");
+		return new OssResponse(this.getSession(),"OK","Group was deleted");
 	}
 
 	public List<User> getAvailableMember(long groupId){
@@ -174,7 +180,11 @@ public class GroupController extends Controller {
 		return group.getUsers();
 	}
 
-	public Response setMembers(long groupId, List<Long> userIds) {
+	public OssResponse setMembers(long groupId, List<Long> userIds) {
+		Group group = this.getById(groupId);
+		if( !this.mayModify(group) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
 		EntityManager em = getEntityManager();
 		List<User> usersToRemove = new ArrayList<User>();
 		List<User> usersToAdd    = new ArrayList<User>();
@@ -182,7 +192,6 @@ public class GroupController extends Controller {
 		for( Long userId : userIds ) {
 			users.add(em.find(User.class, userId));
 		}
-		Group group = this.getById(groupId);
 		for( User user : users ){
 			if(! group.getUsers().contains(user)){
 				usersToAdd.add(user);
@@ -208,18 +217,21 @@ public class GroupController extends Controller {
 			em.merge(group);
 			em.getTransaction().commit();
 		}catch (Exception e) {
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.changeMemberPlugin("addmembers", group, usersToAdd);
 		this.changeMemberPlugin("removemembers", group, usersToRemove);
-		return new Response(this.getSession(),"OK","The members of group was set.");
+		return new OssResponse(this.getSession(),"OK","The members of group was set.");
 	}
 
 
-	public Response addMember(Group group, User user) {
+	public OssResponse addMember(Group group, User user) {
 		EntityManager em = getEntityManager();
+		if( !this.mayModify(group) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
 		group.getUsers().add(user);
 		if (user.getGroups()==null) {
 			user.setGroups(new ArrayList<Group>());
@@ -231,24 +243,27 @@ public class GroupController extends Controller {
 			em.merge(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.changeMemberPlugin("addmembers", group, user);
-		return new Response(this.getSession(),"OK","User " + user.getUid() + " was added to group " + group.getName() );
+		return new OssResponse(this.getSession(),"OK","User " + user.getUid() + " was added to group " + group.getName() );
 	}
 
-	public Response addMember(long groupId, long userId) {
+	public OssResponse addMember(long groupId, long userId) {
 		EntityManager em = getEntityManager();
 		Group group = em.find(Group.class, groupId);
 		User  user  = em.find(User.class, userId);
 		return this.addMember(group, user);
 	}
 
-	public Response removeMember(long groupId, long userId) {
+	public OssResponse removeMember(long groupId, long userId) {
 		EntityManager em = getEntityManager();
 		Group group = em.find(Group.class, groupId);
+		if( !this.mayModify(group) ) {
+        	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
 		User  user  = em.find(User.class, userId);
 		group.getUsers().remove(user);
 		user.getGroups().remove(group);
@@ -258,12 +273,12 @@ public class GroupController extends Controller {
 			em.merge(group);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.changeMemberPlugin("removemembers", group, user);
-		return new Response(this.getSession(),"OK","User " + user.getUid() + " was removed from group " + group.getName() );
+		return new OssResponse(this.getSession(),"OK","User " + user.getUid() + " was removed from group " + group.getName() );
 	}
 
 	public List<Group> getGroups(List<Long> groupIds) {

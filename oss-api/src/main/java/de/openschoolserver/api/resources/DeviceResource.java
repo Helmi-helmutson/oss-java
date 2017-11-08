@@ -15,7 +15,7 @@ import javax.ws.rs.*;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 
 import java.util.List;
 
@@ -99,8 +99,8 @@ public interface DeviceResource {
        @ApiOperation(value = "Gets a list of device objects to the list of deviceIds.")
        @ApiResponses(value = {
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @RolesAllowed("device.search")
-       List<Device> getDevice(
+       @PermitAll
+       List<Device> getDevices(
                @ApiParam(hidden = true) @Auth Session session,
                List<Long> deviceIds
        );
@@ -180,7 +180,7 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.manage")
-    Response setDefaultPrinter(
+    OssResponse setDefaultPrinter(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId,
             @PathParam("defaulPrinterId") long defaultPrinterId
@@ -213,7 +213,7 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.manage")
-    Response setAvailablePrinters(
+    OssResponse setAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId,
             List<Long> availablePrinters
@@ -246,7 +246,7 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.manage")
-    Response addLoggedInUser(
+    OssResponse addLoggedInUser(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP,
             @PathParam("userName") String userName
@@ -263,7 +263,7 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.manage")
-    Response removeLoggedInUser(
+    OssResponse removeLoggedInUser(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP,
             @PathParam("userName") String userName
@@ -311,7 +311,7 @@ public interface DeviceResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.modify")
-    Response modify(
+    OssResponse modify(
     		@ApiParam(hidden = true) @Auth Session session,
             Device device
     );
@@ -327,7 +327,7 @@ public interface DeviceResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.modify")
-    Response delete(
+    OssResponse delete(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("deviceId") long deviceId
     );

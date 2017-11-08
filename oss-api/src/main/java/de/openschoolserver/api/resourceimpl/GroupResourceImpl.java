@@ -9,7 +9,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.GroupController;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 
 public class GroupResourceImpl implements GroupResource {
 
@@ -50,37 +50,37 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public Response add(Session session, Group group) {
+	public OssResponse add(Session session, Group group) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.add(group);
 	}
 
 	@Override
-	public Response modify(Session session, Group group) {
+	public OssResponse modify(Session session, Group group) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.modify(group);
 	}
 
 	@Override
-	public Response delete(Session session, long groupId) {
+	public OssResponse delete(Session session, long groupId) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.delete(groupId);
 	}
 
 	@Override
-	public Response setMembers(Session session, long groupId, List<Long> users) {
+	public OssResponse setMembers(Session session, long groupId, List<Long> users) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.setMembers(groupId,users);
 	}
 
 	@Override
-	public Response removeMember(Session session, long groupId, long userId) {
+	public OssResponse removeMember(Session session, long groupId, long userId) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.removeMember(groupId,userId);	
 	}
 
 	@Override
-	public Response addMember(Session session, long groupId, long userId) {
+	public OssResponse addMember(Session session, long groupId, long userId) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.addMember(groupId,userId);
 	}

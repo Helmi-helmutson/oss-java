@@ -14,7 +14,7 @@ import javax.ws.rs.*;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 
 import java.util.List;
 
@@ -133,7 +133,7 @@ public interface GroupResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("group.add")
-    Response add(
+    OssResponse add(
             @ApiParam(hidden = true) @Auth Session session,
             Group group
     );
@@ -150,7 +150,7 @@ public interface GroupResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("group.modify")
-    Response modify(
+    OssResponse modify(
             @ApiParam(hidden = true) @Auth Session session,
             Group group
     );
@@ -182,7 +182,7 @@ public interface GroupResource {
         @ApiResponse(code = 404, message = "Group not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("group.delete")
-    Response delete(
+    OssResponse delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId
     );
@@ -200,7 +200,7 @@ public interface GroupResource {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
        @RolesAllowed("group.manage")
-       Response setMembers(
+       OssResponse setMembers(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
                List<Long> users
@@ -220,7 +220,7 @@ public interface GroupResource {
        @ApiResponses(value = {
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
        @RolesAllowed("group.search")
-       Response removeMember(
+       OssResponse removeMember(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
                @PathParam("userId") long userId
@@ -237,7 +237,7 @@ public interface GroupResource {
            @ApiResponse(code = 404, message = "Group not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
        @RolesAllowed("group.manage")
-       Response addMember(
+       OssResponse addMember(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
                @PathParam("userId") long userId

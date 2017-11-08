@@ -37,7 +37,6 @@ public class Announcement implements Serializable {
 
 	private String title;
 
-	private String uuid;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date validFrom;
@@ -46,8 +45,7 @@ public class Announcement implements Serializable {
 	private Date validUntil;
 
 	//bi-directional many-to-many association to User
-	@ManyToMany(cascade={CascadeType.REMOVE})
-	@JoinColumn(name="id")
+	@ManyToMany(mappedBy="readAnnouncements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	private List<User> haveSeenUsers;
 
 	//bi-directional many-to-many association to Category
@@ -113,14 +111,6 @@ public class Announcement implements Serializable {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getUuid() {
-		return this.uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	public Date getValidFrom() {

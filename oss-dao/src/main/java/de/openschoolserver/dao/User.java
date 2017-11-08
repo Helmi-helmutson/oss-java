@@ -33,7 +33,7 @@ public class User implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
-	long id;
+	Long id;
 
 	private String givenName;
 
@@ -51,14 +51,17 @@ public class User implements Serializable {
 
 	//bi-directional many-to-one association to Alias
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Alias> aliases;
 
 	//bi-directional many-to-one association to Alias
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Acl> acls;
 		
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Device> ownedDevices;
 	
 	//bi-directional many-to-one association to groups
@@ -68,6 +71,7 @@ public class User implements Serializable {
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Category> ownedCategories;
 
 	//bi-directional many-to-one association to TestFile
@@ -86,24 +90,28 @@ public class User implements Serializable {
 	private List<Test> tests;
 	
 	//bi-directional many-to-one association to RoomSmartControl
-	@OneToMany(mappedBy="user")
+	@OneToMany(mappedBy="owner")
 	@JsonIgnore
 	private List<RoomSmartControl> smartControls;
 	
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner")
+	@JsonIgnore
 	private List<FAQ> myFAQs;
-
+	
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Contact> myContacts;
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
 	private List<Announcement> myAnnouncements;
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="users", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
+	@JsonIgnore
 	private List<Category> categories;
 		
 	//bi-directional many-to-many association to Device
@@ -127,7 +135,7 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<Group> groups;
 	
-	//bi-directional many-to-many association to Group
+	//bi-directional many-to-many association to Announcements
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
 			name="HaveSeen",
@@ -137,17 +145,23 @@ public class User implements Serializable {
 	//@JsonManagedReference
 	@JsonIgnore
 	private List<Announcement> readAnnouncements;
-	
 
 	private Integer fsQuotaUsed;
 	private Integer fsQuota;
 	private Integer msQuotaUsed;
 	private Integer msQuota;
+	
+	@Column(name = "creator_id")
+        private Long creatorId;
+
+	@JsonIgnore
+        private String initialPassword;
 
 	@Transient
 	private String password ="";
 
 	public User() {
+		this.id  = null;
 		this.uid = "";
 		this.uuid = "";
 		this.sureName = "";
@@ -161,11 +175,11 @@ public class User implements Serializable {
 		this.birthDay = new Date(System.currentTimeMillis());
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -452,5 +466,33 @@ public class User implements Serializable {
 
 	public void setMyFAQs(List<FAQ> values) {
 		this.myFAQs = values;
+	}
+
+	public Long getCreatorId() {
+		return creatorId;
+	}
+
+	public void setCreatorId(Long creatorId) {
+		this.creatorId = creatorId;
+	}
+
+	public void setOwnedCategories(List<Category> ownedCategories) {
+		this.ownedCategories = ownedCategories;
+	}
+
+	public void setSmartControls(List<RoomSmartControl> smartControls) {
+		this.smartControls = smartControls;
+	}
+
+	public void setMyAnnouncements(List<Announcement> myAnnouncements) {
+		this.myAnnouncements = myAnnouncements;
+	}
+
+	public String getInitialPassword() {
+		return initialPassword;
+	}
+
+	public void setInitialPassword(String initialPassword) {
+		this.initialPassword = initialPassword;
 	}
 }

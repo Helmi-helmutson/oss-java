@@ -8,7 +8,7 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.RoomController;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.api.resources.RoomResource;
 
 
@@ -42,14 +42,14 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
     @Override
-    public Response delete(Session session, long roomId) {
+    public OssResponse delete(Session session, long roomId) {
         // TODO Auto-generated method stub
     	final RoomController roomController = new RoomController(session);
     	return roomController.delete(roomId);
     }
 
     @Override
-    public Response add(Session session, Room room) {
+    public OssResponse add(Session session, Room room) {
     	final RoomController roomController = new RoomController(session);
     	return roomController.add(room);
     }
@@ -107,14 +107,14 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public Response setAccessList(Session session, long roomId, List<AccessInRoom> accessList) {
+	public OssResponse setAccessList(Session session, long roomId, List<AccessInRoom> accessList) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		return roomController.setAccessList(roomId, accessList);
 	}
 
 	@Override
-	public Response setScheduledAccess(Session session) {
+	public OssResponse setScheduledAccess(Session session) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		return roomController.setScheduledAccess();
@@ -137,34 +137,34 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public Response setAccessStatus(Session session, long roomId, AccessInRoom access) {
+	public OssResponse setAccessStatus(Session session, long roomId, AccessInRoom access) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		return roomController.setAccessStatus(roomId, access);
 	}
 	
 	@Override
-	public Response addDevices(Session session, long roomId, List<Device> devices) {
+	public OssResponse addDevices(Session session, long roomId, List<Device> devices) {
 		final RoomController roomController = new RoomController(session);
-		Response response = roomController.addDevices(roomId,devices);
-		return response;
+		OssResponse ossResponse = roomController.addDevices(roomId,devices);
+		return ossResponse;
 	}
 
 	@Override
-	public Response addDevice(Session session, long roomId, String macAddress, String name) {
+	public OssResponse addDevice(Session session, long roomId, String macAddress, String name) {
 		final RoomController roomController = new RoomController(session);
 		return roomController.addDevice(roomId,macAddress,name);
 	}
 	
 	@Override
-	public Response deleteDevices(Session session, long roomId, List<Long> deviceIds) {
+	public OssResponse deleteDevices(Session session, long roomId, List<Long> deviceIds) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		return roomController.deleteDevices(roomId,deviceIds);
 	}
 	
 	@Override
-	public Response deleteDevice(Session session, long roomId, Long deviceId) {
+	public OssResponse deleteDevice(Session session, long roomId, Long deviceId) {
 		final RoomController roomController = new RoomController(session);
 		List<Long> deviceIds = new ArrayList<Long>();
 		deviceIds.add(deviceId);
@@ -184,7 +184,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public Response setHwConf(Session session, long roomId, long hwConfId) {
+	public OssResponse setHwConf(Session session, long roomId, long hwConfId) {
 		final RoomController roomController = new RoomController(session);
 		return roomController.setHWConf(roomId,hwConfId);
 	}

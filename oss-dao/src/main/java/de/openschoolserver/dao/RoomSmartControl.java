@@ -56,12 +56,12 @@ public class RoomSmartControl implements Serializable {
 	
     //bi-directional many-to-one association to room
     @Column(name = "user_id")
-    private Long userId;
+    private Long ownerId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     @JsonIgnore
-    private User user;
+    private User owner;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "startTime")
@@ -82,8 +82,8 @@ public class RoomSmartControl implements Serializable {
 	public RoomSmartControl() {
 	}
 	
-    public RoomSmartControl(Long roomId, Long userId, Long duration) {
-		this.userId = userId;
+    public RoomSmartControl(Long roomId, Long ownerId, Long duration) {
+		this.ownerId = ownerId;
 		this.roomId = roomId;
 		this.startTime = new Date();
 		this.endTime   = new Date( System.currentTimeMillis( ) + duration * 60 * 1000 );
@@ -105,12 +105,12 @@ public class RoomSmartControl implements Serializable {
 		this.roomId = roomId;
 	}
 
-	public User getUser() {
-		return this.user;
+	public User getOwner() {
+		return this.owner;
 	}
 
-	public void setUserId(long userId) {
-		this.userId = userId;
+	public void setUserId(long ownerId) {
+		this.ownerId = ownerId;
 	}
 	
 	public Date getStartTime() {

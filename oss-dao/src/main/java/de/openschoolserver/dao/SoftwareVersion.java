@@ -16,7 +16,7 @@ import java.util.List;
 @Table(name = "SoftwareVersions")
 @NamedQueries({
 	@NamedQuery(name="SoftwareVersion.findAll",       query="SELECT s FROM SoftwareVersion s"),
-	@NamedQuery(name="SoftwareVersion.get", query="SELECT s FROM SoftwareVersion s WHERE s.softwareId = :SOFTWARE and s.version = :VERSION"),
+	@NamedQuery(name="SoftwareVersion.get",			  query="SELECT s FROM SoftwareVersion s WHERE s.softwareId = :SOFTWARE and s.version = :VERSION"),
 	@NamedQuery(name="SoftwareVersion.getBySoftware", query="SELECT s FROM SoftwareVersion s WHERE s.softwareId = :SOFTWARE"),
 	
 })
@@ -30,7 +30,7 @@ public class SoftwareVersion implements Serializable {
 
 	private String version;
 
-	//bi-directional many-to-one associatio, cascade=CascadeType.REMOVEn to SoftwareStatus
+	//bi-directional many-to-one association, cascade=CascadeType.REMOVEn to SoftwareStatus
 	@OneToMany(mappedBy="softwareVersion", cascade=CascadeType.REMOVE)
 	@JsonIgnore
 	private List<SoftwareStatus> softwareStatuses;

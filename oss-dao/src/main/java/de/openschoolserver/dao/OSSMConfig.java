@@ -13,10 +13,12 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Entity
 @Table(name="OSSMConfig")
 @NamedQueries({
+		@NamedQuery(name="OSSMConfig.getAllForKey",query="SELECT c FROM OSSMConfig c WHERE c.keyword = :keyword"),
         @NamedQuery(name="OSSMConfig.getAllById",  query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId = :id"),
-        @NamedQuery(name="OSSMConfig.getAllByKey", query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.keyword  = :key"),
-        @NamedQuery(name="OSSMConfig.get",         query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId = :id AND c.keyword = :key"),
-        @NamedQuery(name="OSSMConfig.check",       query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId = :id AND c.keyword = :key AND c.value = :value")
+        @NamedQuery(name="OSSMConfig.getAllByKey", query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.keyword  = :keyword"),
+        @NamedQuery(name="OSSMConfig.get",         query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId = :id AND c.keyword = :keyword"),
+        @NamedQuery(name="OSSMConfig.getAllObject",query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.keyword = :keyword AND c.value = :value"),
+        @NamedQuery(name="OSSMConfig.check",       query="SELECT c FROM OSSMConfig c WHERE c.objectType = :type AND c.objectId = :id AND c.keyword = :keyword AND c.value = :value")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class OSSMConfig implements Serializable {
@@ -28,11 +30,16 @@ public class OSSMConfig implements Serializable {
 
         private String objectType;
 
-        private Long  objectId;
+        private Long   objectId;
 
         private String keyword;
 
         private String value;
+        
+        //bi-directional many-to-one association to User
+    	@ManyToOne
+    	@JsonIgnore
+    	private User creator;
 
         @Override
         public boolean equals(Object obj) {
@@ -43,7 +50,7 @@ public class OSSMConfig implements Serializable {
         }
 
         public OSSMConfig() {
-	}
+        }
 
         public long getId() {
                 return this.id;
@@ -84,5 +91,13 @@ public class OSSMConfig implements Serializable {
         public void setValue(String value) {
                 this.value = value;
         }
+
+		public User getCreator() {
+			return creator;
+		}
+
+		public void setCreator(User creator) {
+			this.creator = creator;
+		}
 
 }

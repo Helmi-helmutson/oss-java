@@ -5,8 +5,6 @@ package de.openschoolserver.dao.controller;
 import javax.persistence.EntityManager;
 
 
-
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +53,7 @@ public class Controller extends Config {
 			Properties props = new Properties();
 			props.load(fileInput);
 			fileInput.close();
-			Enumeration enuKeys = props.keys();
+			Enumeration<Object> enuKeys = props.keys();
 			while (enuKeys.hasMoreElements()) {
 				String key = (String) enuKeys.nextElement();
 				String value = props.getProperty(key);
@@ -68,14 +66,14 @@ public class Controller extends Config {
 		}
 	}
 
-	protected EntityManager getEntityManager() {
+	public EntityManager getEntityManager() {
 		if( session != null)
 			return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
 		else
 			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
-	protected Session getSession() {
+	public Session getSession() {
 		return this.session;
 	}
 
@@ -83,7 +81,7 @@ public class Controller extends Config {
 		return properties.get(property);
 	}
 
-	protected boolean isNameUnique(String name){
+	public boolean isNameUnique(String name){
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("User.getByUid");
 		query.setParameter("uid", name);
@@ -117,7 +115,7 @@ public class Controller extends Config {
 		return true;
 	}
 	
-	protected Response checkPassword(String password) {
+	public OssResponse checkPassword(String password) {
 		List<String> error = new ArrayList<String>();
 		if( password.length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
 			error.add("User password is to short.");
@@ -139,16 +137,16 @@ public class Controller extends Config {
 				error.add(reply.toString());
 		}
 		if( error.size() > 0 )
-			return new Response(this.getSession(),"ERROR", String.join(System.lineSeparator(), error));
+			return new OssResponse(this.getSession(),"ERROR", String.join(System.lineSeparator(), error));
 		
 		return null;
 	}
 
-	protected boolean checkNonASCII(String name) {
+	public boolean checkNonASCII(String name) {
 		return ! Pattern.matches("[a-zA-Z0-9\\.\\-_]+",name);
 	}
 
-	protected boolean checkBadHostName(String name) {
+	public boolean checkBadHostName(String name) {
 		if( !name.matches("[a-zA-Z0-9\\-]+")) {
 			logger.debug("Bad name match '" + name + "'");
 			return true;
@@ -156,7 +154,7 @@ public class Controller extends Config {
 		return name.matches(".*-wlan");
 	}
 
-	protected String isMacUnique(String name){
+	public String isMacUnique(String name){
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("Device.getByMAC");
 		query.setParameter("MAC", name);
@@ -168,7 +166,7 @@ public class Controller extends Config {
 		return "";
 	}
 
-	protected String isIPUnique(String name){
+	public String isIPUnique(String name){
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("Device.getByIP");
 		query.setParameter("IP", name);
@@ -180,7 +178,7 @@ public class Controller extends Config {
 		return "";
 	}
 
-	protected void startPlugin(String pluginName, Object object){
+	public void startPlugin(String pluginName, Object object){
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
 		StringBuffer reply = new StringBuffer();
@@ -263,12 +261,21 @@ public class Controller extends Config {
 				break;
 			}
 			break;
+		case "de.openschoolserver.dao.CephalixInstitute":
+			CephalixInstitute institute = (CephalixInstitute)object;
+			switch(pluginName){
+			case "add_institute":
+			case "modify_institute":
+			case "delete_institue":
+				data.append(institute.toString());
+				break;
+			}
 		}
 		OSSShellTools.exec(program, reply, error, data.toString());
 		logger.debug(pluginName + " : " + data.toString() + " : " + error);
 	}
 	
-	protected void changeMemberPlugin(String type, Group group, List<User> users){
+	public void changeMemberPlugin(String type, Group group, List<User> users){
 		//type can be only add or remove
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
@@ -286,7 +293,7 @@ public class Controller extends Config {
 		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
 	
-	protected void changeMemberPlugin(String type, Group group, User user){
+	public void changeMemberPlugin(String type, Group group, User user){
 		//type can be only add or remove
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
@@ -304,7 +311,13 @@ public class Controller extends Config {
 	public boolean isSuperuser() {
 		if(properties.containsKey("de.openschoolserver.dao.Session.superusers")){
 			for( String s : properties.get("de.openschoolserver.dao.Session.superusers").split(",") ){
-				if( s.equals(this.session.getUser().getUid())) {
+				if( s.startsWith("@") ) {
+					for( Group g: this.session.getUser().getGroups() ) {
+						if( g.getName().equals(s.substring(1))) {
+							return true;
+						}
+					}
+				} else if( s.equals(this.session.getUser().getUid())) {
 					return true;
 				}
 			}
@@ -312,7 +325,89 @@ public class Controller extends Config {
 		return false;
 	}
 
-	protected boolean isProtected(Object object){
+	public boolean mayModify(Object object) {
+		if( this.session.getUser().getId() == 0 ) {
+			return true;
+		}
+		
+		Long ownerId = null;
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Acl":
+			Acl Acl = (Acl)object;
+			ownerId = Acl.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.Announcement":
+			Announcement an = (Announcement)object;
+			ownerId = an.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.Contact":
+			Contact con = (Contact)object;
+			ownerId = con.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.FAQ":
+			FAQ faq = (FAQ)object;
+			ownerId = faq.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.Device":
+			Device Device = (Device)object;
+			ownerId = Device.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.Group":
+			Group group = (Group)object;
+			ownerId = group.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.HWConf":
+			HWConf HWConf = (HWConf)object;
+			ownerId = HWConf.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.OSSConfig":
+			OSSConfig ossConfig = (OSSConfig)object;
+			ownerId = ossConfig.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.OSSMConfig":
+			OSSMConfig ossMConfig = (OSSMConfig)object;
+			ownerId = ossMConfig.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.Room":
+			Room room = (Room)object;
+			ownerId = room.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.RoomSmartControl":
+			RoomSmartControl rsc  = (RoomSmartControl)object;
+			ownerId = rsc.getOwner().getId();
+			break;
+		case "de.openschoolserver.dao.Partition":
+			Partition partition = (Partition)object;
+			ownerId = partition.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.Software":
+			Software software = (Software)object;
+			ownerId = software.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.SoftwareLicence":
+			SoftwareLicense softwareLicense = (SoftwareLicense)object;
+			ownerId = softwareLicense.getCreator().getId();
+			break;
+		case "de.openschoolserver.dao.User":
+			User user = (User)object;
+			ownerId = user.getCreatorId();
+			break;
+		}
+		if( this.isSuperuser() && ownerId != 6 ) {
+			//Super User must not delete the objects of CEPHALIX
+			//TODO 6 need be evaluated eventually
+			return true;
+		}
+		if( this.session.getUser().getId() == ownerId ) {
+				return true;
+		}
+				
+		//TODO some other acls based on object
+		return false;
+	}
+
+	public boolean isProtected(Object object){
+		if (object!=null) {
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.User":
 			if(properties.containsKey("de.openschoolserver.dao.User.protected")){
@@ -359,11 +454,12 @@ public class Controller extends Config {
 				}
 			}
 			return false;
-		}
+		}}
 		return false;
+		
 	}
 	
-	protected boolean systemctl(String action, String service) {
+	public boolean systemctl(String action, String service) {
 		 String[] program = new String[3];
 		 program[0] = "systemctl";
 		 program[1] = action;
@@ -446,29 +542,31 @@ public class Controller extends Config {
 		return true;
 	}
 
-	public List<OSSMConfig> getMConfigs(String type, String key) {
-		ArrayList<OSSMConfig> mconfigs = new ArrayList<OSSMConfig>();
-		EntityManager em = this.getEntityManager();
-		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
-		query.setParameter("type",type).setParameter("keyword",key);
-		for(OSSMConfig config : (List<OSSMConfig>) query.getResultList() ) {
-			mconfigs.add(config);
-		}
-		return mconfigs;
-	}
-
-	public List<OSSConfig> getConfigs(String type, String key) {
-		ArrayList<OSSConfig> mconfigs = new ArrayList<OSSConfig>();
+	public OSSConfig getConfig(String type, String key) {
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
-		for(OSSConfig config : (List<OSSConfig>) query.getResultList() ) {
-			mconfigs.add(config);
+		if( query.getResultList().isEmpty() ) {
+			return null;
 		}
-		return mconfigs;
+		return (OSSConfig)  query.getResultList().get(0);
 	}
 
-	public List<String> getMConfig(Object object, String key) {
+	public List<OSSMConfig> getMConfigs(String key) {
+		EntityManager em = this.getEntityManager();
+		Query query = em.createNamedQuery("OSSMConfig.getAllForKey");
+		query.setParameter("keyword",key);
+		return (List<OSSMConfig>) query.getResultList();
+	}
+
+	public List<OSSMConfig> getMConfigs(String type, String key) {
+		EntityManager em = this.getEntityManager();
+		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
+		query.setParameter("type",type).setParameter("keyword",key);
+		return  (List<OSSMConfig>) query.getResultList();
+	}
+
+	public List<String> getMConfigs(Object object, String key) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.get");
@@ -528,9 +626,9 @@ public class Controller extends Config {
 		return config.getValue();
 	}
 
-	public Response addMConfig(Object object, String key, String value) {
+	public OssResponse addMConfig(Object object, String key, String value) {
 		if( this.checkMConfig(object, key, value) ){
-			return new Response(this.getSession(),"ERROR","This mconfig value already exists.");
+			return new OssResponse(this.getSession(),"ERROR","This mconfig value already exists.");
 		}
 		EntityManager em = this.getEntityManager();
 		OSSMConfig mconfig = new OSSMConfig();
@@ -560,16 +658,16 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Mconfig was created");
+		return new OssResponse(this.getSession(),"OK","Mconfig was created");
 	}
 
-	public Response addConfig(Object object, String key, String value) {
+	public OssResponse addConfig(Object object, String key, String value) {
 		if( this.checkConfig(object, key) ){
-			return new Response(this.getSession(),"ERROR","This config already exists.");
+			return new OssResponse(this.getSession(),"ERROR","This config already exists.");
 		}
 		EntityManager em = this.getEntityManager();
 		OSSConfig config = new OSSConfig();
@@ -599,14 +697,14 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Config was created");
+		return new OssResponse(this.getSession(),"OK","Config was created");
 	}
 
-	public Response setConfig(Object object, String key, String value) {
+	public OssResponse setConfig(Object object, String key, String value) {
 		if( ! this.checkConfig(object, key) ){
 			return this.addConfig(object, key, value);
 		}
@@ -619,17 +717,17 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Config was updated");
+		return new OssResponse(this.getSession(),"OK","Config was updated");
 	}
 
-	public Response deleteConfig(Object object, String key) {
+	public OssResponse deleteConfig(Object object, String key) {
 		OSSConfig config = this.getConfigObject(object, key);
 		if( config == null ) {
-			return new Response(this.getSession(),"ERROR","Config does not exists.");
+			return new OssResponse(this.getSession(),"ERROR","Config does not exists.");
 		}
 		EntityManager em = this.getEntityManager();
 		try {
@@ -639,17 +737,17 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Config was deleted");
+		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}
 
-	public Response deleteMConfig(Object object, String key, String value) {
+	public OssResponse deleteMConfig(Object object, String key, String value) {
 		OSSMConfig config = this.getMConfigObject(object, key, value);
 		if( config == null ) {
-			return new Response(this.getSession(),"ERROR","MConfig does not exists.");
+			return new OssResponse(this.getSession(),"ERROR","MConfig does not exists.");
 		}
 		EntityManager em = this.getEntityManager();
 		try {
@@ -659,10 +757,10 @@ public class Controller extends Config {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new Response(this.getSession(),"ERROR",e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new Response(this.getSession(),"OK","Config was deleted");
+		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}
 }

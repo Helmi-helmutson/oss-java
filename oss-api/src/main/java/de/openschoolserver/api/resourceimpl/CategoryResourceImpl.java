@@ -5,7 +5,7 @@ import java.util.List;
 
 import de.openschoolserver.api.resources.CategoryResource;
 import de.openschoolserver.dao.Category;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.CategoryController;
 
@@ -46,31 +46,31 @@ public class CategoryResourceImpl implements CategoryResource {
 	}
 
 	@Override
-	public Response add(Session session, Category category) {
+	public OssResponse add(Session session, Category category) {
 		final CategoryController categoryController = new CategoryController(session);
 		return categoryController.add(category);
 	}
 
 	@Override
-	public Response addMember(Session session, long categoryId, String memberType, long memberId) {
+	public OssResponse addMember(Session session, long categoryId, String memberType, long memberId) {
 		final CategoryController categoryController = new CategoryController(session);
 		return categoryController.addMember(categoryId, memberType, memberId);
 	}
 	
 	@Override
-	public Response removeMember(Session session, long categoryId, String memberType, long memberId) {
+	public OssResponse removeMember(Session session, long categoryId, String memberType, long memberId) {
 		final CategoryController categoryController = new CategoryController(session);
 		return categoryController.deleteMember(memberId, memberType, memberId);
 	}
 
 	@Override
-	public Response modify(Session session, Category category) {
+	public OssResponse modify(Session session, Category category) {
 		final CategoryController categoryController = new CategoryController(session);
 		return categoryController.modify(category);
 	}
 
 	@Override
-	public Response delete(Session session, long categoryId) {
+	public OssResponse delete(Session session, long categoryId) {
 		final CategoryController categoryController = new CategoryController(session);
 		return categoryController.delete(categoryId);
 	}

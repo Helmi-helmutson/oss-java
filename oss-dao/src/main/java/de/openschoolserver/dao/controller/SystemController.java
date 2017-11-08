@@ -3,18 +3,25 @@ package de.openschoolserver.dao.controller;
 
 import de.openschoolserver.dao.Session;
 
+import de.openschoolserver.dao.tools.OSSShellTools;
 
+import javax.json.Json;
+import org.apache.http.client.fluent.*;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.ws.rs.WebApplicationException;
 
-import de.openschoolserver.dao.Enumerate;
-import de.openschoolserver.dao.Response;
-import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.Room;
+import de.openschoolserver.dao.*;
+
+import java.io.IOException;
+import java.text.DateFormat;
 import java.util.*;
 
 @SuppressWarnings( "unchecked" )
@@ -25,7 +32,141 @@ public class SystemController extends Controller {
     public SystemController(Session session) {
         super(session);
     }
+    
+    /*
+     * Translate a sting in a required language.
+     * If the translation does not exists the string will be written into the missed translations table.
+     * 
+     * @param	lang	Two letter description of the required language
+     * @param	key		The text to be translated
+     * @return			The translated text if there was found a translation or the original text
+     * @see				AddTranslation
+     */
+    public String translate(String lang, String key) {
+    	EntityManager em = getEntityManager();
+    	Query query = em.createNamedQuery("Translation.find").setParameter("lang", lang.toUpperCase()).setParameter("string", key);
+    	try {
+    		Translation trans = (Translation) query.getSingleResult();
+    		return trans.getValue();
+    	}  catch (Exception e) {
+    		MissedTranslation trans = null;
+    		query = em.createNamedQuery("MissedTranslation.find").setParameter("lang", lang.toUpperCase()).setParameter("string", key);
+    		try {
+        		trans = (MissedTranslation) query.getSingleResult();
+        	}  catch (Exception f) {
+        		trans = new MissedTranslation(lang.toUpperCase(),key);
+        		try {
+        			em.getTransaction().begin();
+            		em.persist(trans);
+            		em.getTransaction().commit();
+        		}  catch (Exception g) {
+        			logger.error(g.getMessage());
+        		}
+        	}
+    		return key;
+    	} finally {
+    		em.close();
+    	}
+    }
 
+    /*
+     * Add or a translated text to the Translations table. 
+     * If the translation already exists this will be updated.
+     * If there are an entry in MissedTranslations table this will be removed.
+     * 
+     * @param	translation 	Two letter description of the language of the translation.
+     * 							The text to be translated. Must not be longer then 256 characters
+     * 							The translated text. Must not be longer then 256 characters
+     * @return			The result of the DB operations
+     * @see				Translate 
+     * @see				GetMissedTranslations
+     */
+    public OssResponse addTranslation(Translation translation) {
+    	EntityManager em = getEntityManager();
+    	translation.setLang(translation.getLang().toUpperCase());
+    	Query query = em.createNamedQuery("Translation.find")
+    			.setParameter("lang", translation.getLang())
+    			.setParameter("string", translation.getString());
+    	String	responseText = "Translation was created";
+    	if( query.getResultList().isEmpty()) {
+    		try {
+    			em.getTransaction().begin();
+    			em.persist(translation);
+    			em.getTransaction().commit();
+    			responseText = "Translation was updated";
+    		}  catch (Exception b) {
+    			em.close();
+    			logger.error(b.getMessage());
+    			return new OssResponse(this.session,"ERROR", b.getMessage());
+    		}
+    	} else {
+    		try {
+    			em.getTransaction().begin();
+    			em.merge(translation);
+    			em.getTransaction().commit();
+    		}  catch (Exception e) {
+    			em.close();
+    			logger.error(e.getMessage());
+    			return new OssResponse(this.session,"ERROR", e.getMessage());
+    		}
+    	}
+
+    	/* Delete missed translation */
+    	query = em.createNamedQuery("MissedTranslation.find")
+    			.setParameter("lang", translation.getLang())
+    			.setParameter("string", translation.getString());
+    	try {
+    		MissedTranslation missedTrans = (MissedTranslation) query.getSingleResult();
+    		em.getTransaction().begin();
+    		em.remove(missedTrans);
+    		em.getTransaction().commit();
+    	} catch (Exception e) {	
+    	} finally {
+    		em.close();
+    	}
+    	return new OssResponse(this.session,"OK",responseText);
+    }
+
+    /*
+     * Delivers a list of the missed translations to a language.
+     * 
+     * @param	lang	Two letter description of the language of the translation.
+     * @return			The list of the missed translations
+     * @see				Translate
+     * @see				AddTranslation
+     */
+    public List<String> getMissedTranslations(String lang){
+    	List<String> missed = new ArrayList<String>();
+    	EntityManager em = getEntityManager();
+    	Query query = em.createNamedQuery("MissedTranslation.findAll").setParameter("lang", lang.toUpperCase());
+    	for(MissedTranslation missedTrans : (List<MissedTranslation>) query.getResultList() ) {
+    		missed.add(missedTrans.getString());
+    	}
+    	return missed;
+    }
+
+
+    /*
+     * Delivers a list of the status of the system
+     * 
+     * @return		List of status hashes:
+     * 				[
+     * 					{
+     * 						"name"			: "groups"
+     * 						"primary"		: 5,
+     * 						"class"			: 40,
+     * 						"workgroups"	: 122
+     * 					},
+     * 					{
+     * 						"name"			: "users",
+     * 						"students"		: 590,
+     * 						"students-loggedOn"	205,
+     * 						...
+     * 					}
+     * 					....
+     * 				]
+     * 
+     */
     public List<Map<String, String>> getStatus() {
         //Initialize of some variable
         List<Map<String, String>> statusList = new ArrayList<>();
@@ -97,6 +238,13 @@ public class SystemController extends Controller {
         return statusList;
     }
     
+    /*
+     * Returns the list of the member of an enumerate.
+     * 
+     * @param		type	Name of the enumerates: roomType, groupType, deviceType ...
+     * @return				The list of the member of the enumerate
+     * @see					addEnumerate
+     */
     public List<String> getEnumerates(String type ) {
         EntityManager em = getEntityManager();
         try {
@@ -114,35 +262,57 @@ public class SystemController extends Controller {
         }
     }
     
-    public Response addEnumerate(String type, String value) {
+    /*
+     * Add a new enumerate
+     * 
+     * @param		type	Name of the enumerates: roomType, groupType, deviceType ...
+     * @param		value	The new value
+     * @see					getEnumerates
+     * @see					deleteEnumerate
+     */
+    public OssResponse addEnumerate(String type, String value) {
         EntityManager em = getEntityManager();
-        Enumerate en = new Enumerate();
-        en.setName(type);
-        en.setValue(value);
+        Query	query = em.createNamedQuery("Enumerate.get").setParameter("name", value).setParameter("value", value);
+        if( ! query.getResultList().isEmpty() ) {
+        		return new OssResponse(this.getSession(),"ERROR","Entry alread does exists");
+        }
+        Enumerate en = new Enumerate(type,value);
         try {
+        	em.getTransaction().begin();
             em.persist(en);
+            em.getTransaction().commit();
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return new Response(this.getSession(),"ERROR", e.getMessage());
+            return new OssResponse(this.getSession(),"ERROR", e.getMessage());
         } finally {
             em.close();
         }
-        return new Response(this.getSession(),"OK","Enumerate was created succesfully.");
+        return new OssResponse(this.getSession(),"OK","Enumerate was created succesfully.");
     }
     
-    public Response removeEnumerate(String type, String value) {
+    /*
+     * Deletes an existing enumerate
+     * 
+     * @param		type	Name of the enumerates: roomType, groupType, deviceType ...
+     * @param		value	The new value
+     * @see					getEnumerates
+     * @see					addEnumerate
+     */
+    public OssResponse deleteEnumerate(String type, String value) {
         EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("Enumerate.getByType").setParameter("type", type).setParameter("value", value);
         try {
             Enumerate en = (Enumerate) query.getSingleResult();
+            em.getTransaction().begin();
             em.remove(en);
+            em.getTransaction().commit();
         } catch (Exception e) {
             logger.error(e.getMessage());
-            return new Response(this.getSession(),"ERROR", e.getMessage());
+            return new OssResponse(this.getSession(),"ERROR", e.getMessage());
         } finally {
             em.close();
         }
-        return new Response(this.getSession(),"OK","Enumerate was removed succesfully.");
+        return new OssResponse(this.getSession(),"OK","Enumerate was removed succesfully.");
     }
 
     ////////////////////////////////////////////////////////
@@ -180,7 +350,7 @@ public class SystemController extends Controller {
         return statusMap;
     }
     
-    public Response setFirewallIncomingRules(Map<String, String> firewallExt) {
+    public OssResponse setFirewallIncomingRules(Map<String, String> firewallExt) {
         List<String> fwServicesExtTcp = new ArrayList<String>();
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
         if( firewallExt.get("ssh").equals("true") )
@@ -193,7 +363,7 @@ public class SystemController extends Controller {
             fwServicesExtTcp.add(firewallExt.get("other"));
         fwConfig.setConfigValue("FW_SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
         this.systemctl("restart", "SuSEfirewall2");
-        return new Response(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
+        return new OssResponse(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
     }
     
     public List<Map<String, String>> getFirewallOutgoingRules() {
@@ -231,7 +401,7 @@ public class SystemController extends Controller {
         return firewallList;
     }
     
-    public Response setFirewallOutgoingRules(List<Map<String, String>> firewallList) {
+    public OssResponse setFirewallOutgoingRules(List<Map<String, String>> firewallList) {
         List<String> fwMasqNets = new ArrayList<String>();
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
         RoomController roomController = new RoomController(this.session);
@@ -262,7 +432,7 @@ public class SystemController extends Controller {
             fwConfig.setConfigValue("FW_MASQ_NETS", String.join(" ", fwMasqNets));
         }
         this.systemctl("restart", "SuSEfirewall2");
-        return new Response(this.getSession(),"OK","Firewall outgoing access rule  was set succesfully.");
+        return new OssResponse(this.getSession(),"OK","Firewall outgoing access rule  was set succesfully.");
     }
     
     public List<Map<String, String>> getFirewallRemoteAccessRules() {
@@ -288,7 +458,7 @@ public class SystemController extends Controller {
         return firewallList;
     }
     
-    public Response setFirewallRemoteAccessRules(List<Map<String, String>> firewallList) {
+    public OssResponse setFirewallRemoteAccessRules(List<Map<String, String>> firewallList) {
         List<String> fwForwardMasq = new ArrayList<String>();
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
         DeviceController deviceController = new DeviceController(this.session);
@@ -298,6 +468,132 @@ public class SystemController extends Controller {
         }
         fwConfig.setConfigValue("FW_FORWARD_MASQ", String.join(" ", fwForwardMasq));
         this.systemctl("restart", "SuSEfirewall2");
-        return new Response(this.getSession(),"OK","Firewall remote access rule  was set succesfully.");
+        return new OssResponse(this.getSession(),"OK","Firewall remote access rule  was set succesfully.");
+    }
+    
+    /*
+     * Functions for package management of the system
+     */
+    
+    public Date getValidityOfRegcode() {
+		StringBuilder url = new StringBuilder();
+		url.append("https://").append("UPDATE_SERVER").append("/api/validateRegcode/").append(this.getConfigValue("REG_CODE"));
+		DateFormat dateFormat = DateFormat.getDateInstance();
+		try {
+			String resp = Request.Get(url.toString()).toString();
+			return dateFormat.parse(resp);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
+    }
+    
+    public boolean validateRegcode() {
+    	Date valid = this.getValidityOfRegcode();
+    	if( valid == null ) {
+    		return false;
+    	}
+    	return valid.after(this.now());
+    }
+    
+    public OssResponse registerSystem() {
+    	if( ! this.validateRegcode() ) {
+    		return new OssResponse(this.getSession(),"ERROR","Registration Code is invalid.");
+    	}
+		String[] program   = new String[1];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/share/oss/tools/register.sh";
+		OSSShellTools.exec(program, reply, error, null);
+		if( error.toString().startsWith("OK")) {
+			return new OssResponse(this.getSession(),"OK","System was registered succesfully.");
+		} else {
+			return new OssResponse(this.getSession(),"ERROR",error.toString());
+		}
+    }
+    
+    public List<Map<String,String>> searchPackages(String filter) {
+    	List<Map<String,String>> packages = new ArrayList<Map<String,String>>();
+    	Map<String,String> software = null;
+    	String[] program   = new String[3];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "zypper";
+		program[1] = "-x";
+		program[2] = filter;
+		OSSShellTools.exec(program, reply, error, null);
+		try {
+			Document doc = new SAXBuilder().build( reply.toString() );
+			Element rootNode = doc.getRootElement();
+			for( Element node : (List<Element>) rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable") ) {
+				if( !node.getAttribute("kind").equals("package")) {
+					continue;
+				}
+				software = new HashMap<String,String>();
+				software.put("name",    node.getAttributeValue("name"));
+				software.put("summary", node.getAttributeValue("summary"));
+				software.put("status",  node.getAttributeValue("status"));
+				packages.add(software);
+			}
+		} catch(IOException e ) { 
+			logger.error(e.getMessage());
+			throw new WebApplicationException(500);
+		} catch(JDOMException e)  {
+			logger.error(e.getMessage());
+			throw new WebApplicationException(500);
+		}
+		return packages;
+    }
+    
+    public OssResponse installPackages(List<String> packages) {
+    	String[] program   = new String[3 + packages.size()];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "zypper";
+		program[1] = "-n";
+		program[2] = "install";
+		int i = 3;
+		for(String prog : packages) {
+			program[i] = prog;
+			i++;
+		}
+		if( OSSShellTools.exec(program, reply, error, null) == 0 ) {
+			return new OssResponse(this.getSession(),"OK","Packages were installed succesfully.");
+		} else {
+			return new OssResponse(this.getSession(),"ERROR",error.toString());	
+		}
+    }
+
+    public OssResponse updatePackages(List<String> packages) {
+    	String[] program   = new String[3 + packages.size()];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "zypper";
+		program[1] = "-n";
+		program[2] = "update";
+		int i = 3;
+		for(String prog : packages) {
+			program[i] = prog;
+			i++;
+		}
+		if( OSSShellTools.exec(program, reply, error, null) == 0 ) {
+			return new OssResponse(this.getSession(),"OK","Packages were updated succesfully.");
+		} else {
+			return new OssResponse(this.getSession(),"ERROR",error.toString());	
+		}
+    }
+    
+    public OssResponse updateSystem() {
+    	String[] program   = new String[3];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "zypper";
+		program[1] = "-n";
+		program[2] = "update";
+		if( OSSShellTools.exec(program, reply, error, null) == 0 ) {
+			return new OssResponse(this.getSession(),"OK","System was updated succesfully.");
+		} else {
+			return new OssResponse(this.getSession(),"ERROR",error.toString());	
+		}
     }
 }

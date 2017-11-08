@@ -8,7 +8,7 @@ import javax.ws.rs.WebApplicationException;
 
 import de.openschoolserver.api.resources.DeviceResource;
 import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DHCPConfig;
 import de.openschoolserver.dao.controller.DeviceController;
@@ -100,25 +100,25 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public Response setDefaultPrinter(Session session, long deviceId, long defaultPrinterId) {
+	public OssResponse setDefaultPrinter(Session session, long deviceId, long defaultPrinterId) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.setDefaultPrinter(deviceId,defaultPrinterId);
 	}
 
 	@Override
-	public Response setAvailablePrinters(Session session, long deviceId, List<Long> availablePrinters) {
+	public OssResponse setAvailablePrinters(Session session, long deviceId, List<Long> availablePrinters) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.setAvailablePrinters(deviceId,availablePrinters);
 	}
 
 	@Override
-	public Response addLoggedInUser(Session session, String IP, String userName) {
+	public OssResponse addLoggedInUser(Session session, String IP, String userName) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.addLoggedInUser(IP, userName);
 	}
 
 	@Override
-	public Response removeLoggedInUser(Session session, String IP, String userName) {
+	public OssResponse removeLoggedInUser(Session session, String IP, String userName) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.removeLoggedInUser(IP, userName);
 	}
@@ -136,19 +136,19 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public Response modify(Session session, Device device) {
+	public OssResponse modify(Session session, Device device) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.modify(device);
 	}
 
 	@Override
-	public Response delete(Session session, long deviceId) {
+	public OssResponse delete(Session session, long deviceId) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.delete(deviceId,true);
 	}
 
 	@Override
-	public List<Device> getDevice(Session session, List<Long> deviceIds) {
+	public List<Device> getDevices(Session session, List<Long> deviceIds) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.getDevices(deviceIds);
 	}

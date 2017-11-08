@@ -11,7 +11,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.SoftwareResource;
 import de.openschoolserver.dao.Category;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.SoftwareLicense;
@@ -43,96 +43,96 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public Response add(Session session, Software software) {
+	public OssResponse add(Session session, Software software) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.add(software);
 	}
 
 	@Override
-	public Response modify(Session session, Software software) {
+	public OssResponse modify(Session session, Software software) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.modify(software);
 	}
 
 	@Override
-	public Response delete(Session session, long softwareId) {
+	public OssResponse delete(Session session, long softwareId) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.delete(softwareId);
 	}
 
 	@Override
-	public Response apply(Session session) {
+	public OssResponse apply(Session session) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.applySoftwareStateToHosts();
 	}
 
 	@Override
-	public Response addLicenseToSoftware(Session session, long softwareId, SoftwareLicense softwareLicense,
+	public OssResponse addLicenseToSoftware(Session session, long softwareId, SoftwareLicense softwareLicense,
 			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.addLicenseToSoftware(softwareLicense, softwareId, fileInputStream, contentDispositionHeader);
 	}
 
 	@Override
-	public Response createInstallation(Session session, Category category) {
+	public Long createInstallation(Session session, Category category) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.createInstallationCategory(category);
 	}
 
 	@Override
-	public Response addSoftwareToInstalation(Session session, long installationId, long softwareId) {
+	public OssResponse addSoftwareToInstalation(Session session, long installationId, long softwareId) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.addSoftwareToCategory(softwareId,installationId);
 	}
 
 	@Override
-	public Response addDeviceToInstalation(Session session, long installationId, long deviceId) {
+	public OssResponse addDeviceToInstalation(Session session, long installationId, long deviceId) {
 		CategoryController categoryController = new CategoryController(session);
 		return categoryController.addMember(installationId, "Device", deviceId);
 	}
 
 	@Override
-	public Response addRoomToInstalation(Session session, long installationId, long roomId) {
+	public OssResponse addRoomToInstalation(Session session, long installationId, long roomId) {
 		CategoryController categoryController = new CategoryController(session);
 		return categoryController.addMember(installationId, "Room", roomId);
 	}
 
 	@Override
-	public Response addHWConfToInstalation(Session session, long installationId, long hwconfId) {
+	public OssResponse addHWConfToInstalation(Session session, long installationId, long hwconfId) {
 		CategoryController categoryController = new CategoryController(session);
 		return categoryController.addMember(installationId, "HWConf", hwconfId);
 	}
 
 	@Override
-	public Response deleteInstalation(Session session, long installationId) {
+	public OssResponse deleteInstalation(Session session, long installationId) {
 		CategoryController categoryController = new CategoryController(session);
-		Response response = categoryController.delete(installationId);
-		if( response.getCode().equals("OK") ) {
-			response = this.apply(session);
+		OssResponse ossResponse = categoryController.delete(installationId);
+		if( ossResponse.getCode().equals("OK") ) {
+			ossResponse = this.apply(session);
 		}
-		return response;
+		return ossResponse;
 	}
 
 	@Override
-	public Response deleteSoftwareFromInstalation(Session session, long installationId, long softwareId) {
+	public OssResponse deleteSoftwareFromInstalation(Session session, long installationId, long softwareId) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.deleteSoftwareFromCategory(softwareId,installationId);
 	}
 
 	@Override
-	public Response deleteDeviceFromInstalation(Session session, long installationId, long deviceId) {
+	public OssResponse deleteDeviceFromInstalation(Session session, long installationId, long deviceId) {
 		CategoryController categoryController = new CategoryController(session);
 		return categoryController.deleteMember(installationId, "Device", deviceId);
 	}
 
 	@Override
-	public Response deleteRoomFromInstalation(Session session, long installationId, long roomId) {
+	public OssResponse deleteRoomFromInstalation(Session session, long installationId, long roomId) {
 		CategoryController categoryController = new CategoryController(session);
 		return categoryController.deleteMember(installationId, "Room", roomId);
 	}
 
 	@Override
-	public Response deleteHWConfFromInstalation(Session session, long installationId, long hwconfId) {
+	public OssResponse deleteHWConfFromInstalation(Session session, long installationId, long hwconfId) {
 		CategoryController categoryController = new CategoryController(session);
 		return categoryController.addMember(installationId, "HWCconf", hwconfId);
 	}
@@ -168,12 +168,12 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public Response download(Session session, List<String> softwares) {
+	public OssResponse download(Session session, List<String> softwares) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.downloadSoftwares(softwares);
 	}
 	@Override
-	public Response downloadOne(Session session, String softwareName) {
+	public OssResponse downloadOne(Session session, String softwareName) {
 		List<String> softwares = new ArrayList<String>();
 		softwares.add(softwareName);
 		SoftwareController softwareController = new SoftwareController(session);
@@ -181,7 +181,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 	
 	@Override
-	public Response removeSoftwares(Session session, List<String> softwares) {
+	public OssResponse removeSoftwares(Session session, List<String> softwares) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.removeSoftwares(softwares);
 	}
@@ -193,28 +193,28 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public Response setSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
+	public OssResponse setSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
 			String version) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.setSoftwareStatusOnDeviceByName(deviceName, softwareName, version, "I");
 	}
 
 	@Override
-	public Response setSoftwareInstalledOnDeviceById(Session session, Long deviceId, String softwareName,
+	public OssResponse setSoftwareInstalledOnDeviceById(Session session, Long deviceId, String softwareName,
 			String version) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.setSoftwareStatusOnDeviceById(deviceId, softwareName, version, "I");
 	}
 
 	@Override
-	public Response deleteSoftwareStatusFromDevice(Session session, String deviceName, String softwareName,
+	public OssResponse deleteSoftwareStatusFromDevice(Session session, String deviceName, String softwareName,
 			String version) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.deleteSoftwareStatusFromDeviceByName(deviceName, softwareName, version);
 	}
 
 	@Override
-	public Response deleteSoftwareStatusFromDeviceById(Session session, Long deviceId, String softwareName,
+	public OssResponse deleteSoftwareStatusFromDeviceById(Session session, Long deviceId, String softwareName,
 			String version) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.deleteSoftwareStatusFromDeviceById(deviceId, softwareName, version);
@@ -244,6 +244,12 @@ public class SoftwareResourceImpl implements SoftwareResource {
 			String version) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public String getSoftwareLicencesOnDevice(Session session, String deviceName) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.getSoftwareLicencesOnDevice(deviceName);
 	}
 	
 }

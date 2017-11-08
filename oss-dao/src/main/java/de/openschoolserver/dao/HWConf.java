@@ -39,7 +39,6 @@ public class HWConf implements Serializable {
 
 	//bi-directional many-to-one association to Partition
 	@OneToMany(mappedBy="hwconf", cascade={ CascadeType.REMOVE,CascadeType.PERSIST })
-	@JsonIgnore
 	private List<Partition> partitions;
 
 	//bi-directional many-to-one association to Room
@@ -51,6 +50,11 @@ public class HWConf implements Serializable {
 	@ManyToMany(mappedBy="hwconfs",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<Category> categories;
+	
+    //bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User creator;
 
     @Override
     public boolean equals(Object obj) {
@@ -168,5 +172,13 @@ public class HWConf implements Serializable {
     public void setCategories(List<Category> categories) {
         this.categories = categories;
     }
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
 
 }

@@ -30,7 +30,7 @@ public class Group implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
-	private long id;
+	private Long id;
 
 	@Column(name = "name", updatable = false)
 	private String name;
@@ -46,29 +46,30 @@ public class Group implements Serializable {
 	//bi-directional many-to-one association to Acls
 	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
 	private List<Acl> acls;
-	
+
 	//bi-directional many-to-many association to User
 	@ManyToMany(mappedBy="groups",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<User> users;
-	
+
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
 	private User owner;
 
 	public Group() {
+		this.id   = null;
 		this.name = "";
 		this.description = "";
 		this.groupType = "";
 		this.owner = null;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -129,20 +130,19 @@ public class Group implements Serializable {
 		acl.setGroup(null);
 	}
 
-    public List<Category> getCategories() {
-            return this.categories;
-    }
+	public List<Category> getCategories() {
+		return this.categories;
+	}
 
-    public void setCategories(List<Category> categories) {
-            this.categories = categories;
-    }
-    
-    public User getOwner() {
+	public void setCategories(List<Category> categories) {
+		this.categories = categories;
+	}
+
+	public User getOwner() {
 		return this.owner;
 	}
 
 	public void setOwner(User owner) {
 		this.owner = owner;
 	}
-
 }

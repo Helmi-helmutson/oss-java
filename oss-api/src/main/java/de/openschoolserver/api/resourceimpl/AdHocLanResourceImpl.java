@@ -1,13 +1,14 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
 import de.openschoolserver.api.resources.AdHocLanResource;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -27,13 +28,13 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
-	public List<User> getUsers(Session session) {
+	public List<Long> getUsers(Session session) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.getUsers();
 	}
 
 	@Override
-	public List<Group> getGroups(Session session) {
+	public List<Long> getGroups(Session session) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.getGroups();
 	}
@@ -45,41 +46,52 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
-	public Response add(Session session, Room room) {
+	public OssResponse add(Session session, Room room) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.add(room);
 	}
 
 	@Override
-	public Response putObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
+	public OssResponse putObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.putObjectIntoRoom(roomId,objectType,objectId);
 	}
 
 	@Override
-	public List<Device> getDevices(Session session) {
-		return session.getUser().getOwnedDevices();
+	public List<Long> getDevices(Session session) {
+		List<Long> deviceIds = new ArrayList<Long>();
+		for( Device dev :  session.getUser().getOwnedDevices() ) {
+			deviceIds.add(dev.getId());
+		}
+		return deviceIds;
 	}
 
 	@Override
-	public Response deleteDevice(Session session, Long deviceId) {
+	public OssResponse deleteDevice(Session session, Long deviceId) {
 		DeviceController deviceController = new DeviceController(session);
 		if( deviceController.isSuperuser() ) {
 			return deviceController.delete(deviceId, true);
 		} else {
 			Device device = deviceController.getById(deviceId);
-			if( device.getOwner().equals(session.getUser()) ) {
+			if( deviceController.mayModify(device) ) {
 				return deviceController.delete(deviceId, true);
 			} else {
-				return new Response(session,"ERROR", "This is not your device.");
+				return new OssResponse(session,"ERROR", "This is not your device.");
 			}
 		}
 	}
 
 	@Override
-	public Response addDevice(Session session, long roomId, String macAddress, String name) {
+	public OssResponse addDevice(Session session, long roomId, String macAddress, String name) {
+		return new RoomController(session).addDevice(roomId, macAddress, name);
+	}
+
+	@Override
+	public OssResponse turnOn(Session session, Long roomId) {
 		RoomController roomController = new RoomController(session);
-		return roomController.addDevice(roomId, macAddress, name);
+		Room room = roomController.getById(roomId);
+		room.setRoomType("AdHocAccess");
+		return roomController.modify(room);
 	}
 
 }

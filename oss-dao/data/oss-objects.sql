@@ -4,6 +4,22 @@
 CREATE DATABASE OSS;
 USE OSS;
 
+
+CREATE TABLE IF NOT EXISTS Translations(
+        id      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	lang	VARCHAR(2)   NOT NULL DEFAULT 'DE',
+	string  VARCHAR(256) NOT NULL,
+        value   VARCHAR(256),
+	PRIMARY KEY  (id)
+);
+
+CREATE TABLE IF NOT EXISTS MissedTranslations(
+        id      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+	lang	VARCHAR(2)   NOT NULL DEFAULT 'DE',
+	string  VARCHAR(250) NOT NULL,
+	PRIMARY KEY  (id)
+);
+
 CREATE TABLE IF NOT EXISTS Users (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         uid          VARCHAR(32) NOT NULL,
@@ -16,14 +32,18 @@ CREATE TABLE IF NOT EXISTS Users (
 	fsQuotaUsed  INTEGER DEFAULT 0,
 	msQuota	     INTEGER DEFAULT 0,
 	msQuotaUsed  INTEGER DEFAULT 0,
+	initialPassword  VARCHAR(32) DEFAULT '',
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
 
-INSERT INTO Users VALUES(1,'admin','','sysadmins','Administrator','Main',NOW(),0,0,0,0);
-INSERT INTO Users VALUES(2,'tteachers','','teachers','for teachers','Default profile',NOW(),0,0,0,0);
-INSERT INTO Users VALUES(3,'tstudents','','students','for students','Default profile',NOW(),0,0,0,0);
-INSERT INTO Users VALUES(4,'tadministration','','administrations','for administration','Default profile',NOW(),0,0,0,0);
-INSERT INTO Users VALUES(5,'tworkstations','','workstations','for workstations','Default profile',NOW(),0,0,0,0);
+INSERT INTO Users VALUES(1,'Administrator','','sysadmins','Administrator','Main',NOW(),0,0,0,0,'',NULL);
+INSERT INTO Users VALUES(2,'tteachers','','teachers','for teachers','Default profile',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(3,'tstudents','','students','for students','Default profile',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(4,'tadministration','','administration','for administration','Default profile',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(5,'tworkstations','','workstations','for workstations','Default profile',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(6,'cephalix','','sysadmins','Administrator','Internal',NOW(),0,0,0,0,'',1);
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -35,12 +55,12 @@ CREATE TABLE IF NOT EXISTS Groups (
         PRIMARY KEY(id)
 );
 
-INSERT INTO Groups VALUES(1,'sysadmins','Sysadmins','primary',NULL);
-INSERT INTO Groups VALUES(2,'teachers','Teachers','primary',NULL);
-INSERT INTO Groups VALUES(3,'students','Students','primary',NULL);
-INSERT INTO Groups VALUES(4,'administration','Administration','primary',NULL);
-INSERT INTO Groups VALUES(5,'workstations','Workstations','primary',NULL);
-INSERT INTO Groups VALUES(6,'templates','Templates','primary',NULL);
+INSERT INTO Groups VALUES(1,'sysadmins','Sysadmins','primary',1);
+INSERT INTO Groups VALUES(2,'teachers','Teachers','primary',1);
+INSERT INTO Groups VALUES(3,'students','Students','primary',1);
+INSERT INTO Groups VALUES(4,'administration','Administration','primary',1);
+INSERT INTO Groups VALUES(5,'workstations','Workstations','primary',1);
+INSERT INTO Groups VALUES(6,'templates','Templates','primary',1);
 
 CREATE TABLE IF NOT EXISTS GroupMember (
         user_id        BIGINT UNSIGNED NOT NULL,
@@ -59,6 +79,7 @@ INSERT INTO GroupMember VALUES(2,2);
 INSERT INTO GroupMember VALUES(3,3);
 INSERT INTO GroupMember VALUES(4,4);
 INSERT INTO GroupMember VALUES(5,5);
+INSERT INTO GroupMember VALUES(6,1);
 
 CREATE TABLE IF NOT EXISTS Aliases (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -73,11 +94,13 @@ CREATE TABLE IF NOT EXISTS HWConfs (
         name          VARCHAR(32) NOT NULL,
         description   VARCHAR(64) DEFAULT "",
         deviceType    VARCHAR(16) NOT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
-INSERT INTO HWConfs VALUES(1,"Server","","Server");
-INSERT INTO HWConfs VALUES(2,"Printer","","Printer");
-INSERT INTO HWConfs VALUES(3,"BYOD","Privat Devices","BYOD");
+INSERT INTO HWConfs VALUES(1,"Server","","Server",1);
+INSERT INTO HWConfs VALUES(2,"Printer","","Printer",1);
+INSERT INTO HWConfs VALUES(3,"BYOD","Privat Devices","BYOD",1);
 
 CREATE TABLE IF NOT EXISTS Partitions (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -88,6 +111,8 @@ CREATE TABLE IF NOT EXISTS Partitions (
         joinType     VARCHAR(16) DEFAULT NULL,
         tool         VARCHAR(16) DEFAULT NULL,
         format       VARCHAR(16) DEFAULT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
@@ -103,13 +128,14 @@ CREATE TABLE IF NOT EXISTS Rooms (
         places       INTEGER  DEFAULT 5,
         startIP      VARCHAR(16) DEFAULT NULL,
         netMask      INTEGER  DEFAULT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
         PRIMARY KEY(id)
 );
 
-INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','technicalRoom','no_control',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#);
-INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','technicalRoom','no_control',10,10,'#ANON_NETWORK#',#ANON_NETMASK#);
-
+INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','technicalRoom','no',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#,6);
+INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','technicalRoom','no',10,10,'#ANON_NETWORK#',#ANON_NETMASK#,6);
 
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -126,6 +152,7 @@ CREATE TABLE IF NOT EXISTS Devices (
 	serial       VARCHAR(16) DEFAULT '',
 	inventary    VARCHAR(16) DEFAULT '',
 	locality     VARCHAR(16) DEFAULT '',
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
         FOREIGN KEY(room_id)   REFERENCES Rooms(id)   ON DELETE RESTRICT,
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
         FOREIGN KEY(owner_id)  REFERENCES Users(id)   ON DELETE CASCADE,
@@ -159,6 +186,8 @@ CREATE TABLE IF NOT EXISTS AccessInRooms (
         printing        CHAR(1) DEFAULT 'Y',
         portal          CHAR(1) DEFAULT 'Y',
 	action          VARCHAR(32) DEFAULT '',
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(room_id) REFERENCES Rooms(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
@@ -199,40 +228,42 @@ CREATE TABLE IF NOT EXISTS Acls (
         group_id     BIGINT UNSIGNED DEFAULT NULL,
         role         VARCHAR(16) DEFAULT NULL,
         acl          VARCHAR(32) NOT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(user_id)  REFERENCES Users(id)  ON DELETE CASCADE,
         FOREIGN KEY(group_id) REFERENCES Groups(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.add');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.modify');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.search');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.add');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.delete');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.manage');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.search');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.add');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.delete');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.manage');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.modify');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.search');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.add');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.delete');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.manage');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.modify');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.search');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','sysadmins');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.add');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.delete');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.download');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.install');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.modify');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.search');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.add');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.delete');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.manage');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.modify');
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.search');
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.add',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.modify',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.add',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.delete',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.manage',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.add',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.delete',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.manage',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.modify',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.add',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.delete',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.manage',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.modify',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','sysadmins',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.add',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.delete',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.download',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.install',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.modify',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.add',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.delete',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.manage',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.modify',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.search',6);
 
 CREATE TABLE IF NOT EXISTS  Tests (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -279,61 +310,67 @@ CREATE TABLE IF NOT EXISTS Enumerates (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name         VARCHAR(32)  NOT NULL,
         value        VARCHAR(32)  NOT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
 
-INSERT INTO Enumerates VALUES(NULL,'deviceType','FatClient');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','Printer');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','Router');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','Server');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','Switch');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','ThinClient');
-INSERT INTO Enumerates VALUES(NULL,'deviceType','BYOD');
-INSERT INTO Enumerates VALUES(NULL,'role','students');
-INSERT INTO Enumerates VALUES(NULL,'role','teachers');
-INSERT INTO Enumerates VALUES(NULL,'role','sysadmins');
-INSERT INTO Enumerates VALUES(NULL,'role','administration');
-INSERT INTO Enumerates VALUES(NULL,'role','workstations');
-INSERT INTO Enumerates VALUES(NULL,'groupType','primary');
-INSERT INTO Enumerates VALUES(NULL,'groupType','class');
-INSERT INTO Enumerates VALUES(NULL,'groupType','workgroup');
-INSERT INTO Enumerates VALUES(NULL,'groupType','guest');
-INSERT INTO Enumerates VALUES(NULL,'roomControl','inRoom');
-INSERT INTO Enumerates VALUES(NULL,'roomControl','no');
-INSERT INTO Enumerates VALUES(NULL,'roomControl','allTeacher');
-INSERT INTO Enumerates VALUES(NULL,'roomControl','teacher');
-INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom');
-INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom');
-INSERT INTO Enumerates VALUES(NULL,'roomType','Library');
-INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory');
-INSERT INTO Enumerates VALUES(NULL,'roomType','WlanAccess');
-INSERT INTO Enumerates VALUES(NULL,'roomType','AdHocAccess');
-INSERT INTO Enumerates VALUES(NULL,'roomType','TechnicalRoom');
-INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT');
-INSERT INTO Enumerates VALUES(NULL,'accessType','FW');
-INSERT INTO Enumerates VALUES(NULL,'accessType','ACT');
-INSERT INTO Enumerates VALUES(NULL,'licenseType','NONE');
-INSERT INTO Enumerates VALUES(NULL,'licenseType','FILE');
-INSERT INTO Enumerates VALUES(NULL,'licenseType','CMD');
-INSERT INTO Enumerates VALUES(NULL,'categoryType','software');
-INSERT INTO Enumerates VALUES(NULL,'categoryType','virtualRoom');
+INSERT INTO Enumerates VALUES(NULL,'deviceType','FatClient',1);
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Printer',1);
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Router',1);
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Server',1);
+INSERT INTO Enumerates VALUES(NULL,'deviceType','Switch',1);
+INSERT INTO Enumerates VALUES(NULL,'deviceType','ThinClient',1);
+INSERT INTO Enumerates VALUES(NULL,'deviceType','BYOD',1);
+INSERT INTO Enumerates VALUES(NULL,'role','students',1);
+INSERT INTO Enumerates VALUES(NULL,'role','teachers',1);
+INSERT INTO Enumerates VALUES(NULL,'role','sysadmins',1);
+INSERT INTO Enumerates VALUES(NULL,'role','administration',1);
+INSERT INTO Enumerates VALUES(NULL,'role','workstations',1);
+INSERT INTO Enumerates VALUES(NULL,'groupType','primary',1);
+INSERT INTO Enumerates VALUES(NULL,'groupType','class',1);
+INSERT INTO Enumerates VALUES(NULL,'groupType','workgroup',1);
+INSERT INTO Enumerates VALUES(NULL,'groupType','guest',1);
+INSERT INTO Enumerates VALUES(NULL,'roomControl','inRoom',1);
+INSERT INTO Enumerates VALUES(NULL,'roomControl','no',1);
+INSERT INTO Enumerates VALUES(NULL,'roomControl','allTeachers',1);
+INSERT INTO Enumerates VALUES(NULL,'roomControl','teachers',1);
+INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom',1);
+INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom',1);
+INSERT INTO Enumerates VALUES(NULL,'roomType','Library',1);
+INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory',1);
+INSERT INTO Enumerates VALUES(NULL,'roomType','WlanAccess',1);
+INSERT INTO Enumerates VALUES(NULL,'roomType','AdHocAccess',1);
+INSERT INTO Enumerates VALUES(NULL,'roomType','TechnicalRoom',1);
+INSERT INTO Enumerates VALUES(NULL,'accessType','DEFAULT',1);
+INSERT INTO Enumerates VALUES(NULL,'accessType','FW',1);
+INSERT INTO Enumerates VALUES(NULL,'accessType','ACT',1);
+INSERT INTO Enumerates VALUES(NULL,'licenseType','NONE',1);
+INSERT INTO Enumerates VALUES(NULL,'licenseType','FILE',1);
+INSERT INTO Enumerates VALUES(NULL,'licenseType','CMD',1);
+INSERT INTO Enumerates VALUES(NULL,'categoryType','software',1);
+INSERT INTO Enumerates VALUES(NULL,'categoryType','virtualRoom',1);
 
 #Some additional config tables
 CREATE TABLE IF NOT EXISTS OSSConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	objectType   VARCHAR(12)     NOT NULL,
-        objcetId     BIGINT UNSIGNED NOT NULL,
+        objectId     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
 
 CREATE TABLE IF NOT EXISTS OSSMConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	objectType   VARCHAR(12)     NOT NULL,
-        objcetId     BIGINT UNSIGNED NOT NULL,
+        objectId     BIGINT UNSIGNED NOT NULL,
         keyword      VARCHAR(64) NOT NULL,
         value        VARCHAR(128) NOT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
 
@@ -362,7 +399,7 @@ CREATE TABLE IF NOT EXISTS Sessions (
         PRIMARY KEY(id)
  );
 
-CREATE TABLE IF NOT EXISTS Responses (
+CREATE TABLE IF NOT EXISTS OssResponses (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	session_id   BIGINT UNSIGNED NOT NULL,
 	code	VARCHAR(64) NOT NULL,
@@ -377,17 +414,10 @@ CREATE TABLE IF NOT EXISTS Softwares (
 	description VARCHAR(64) DEFAULT NULL,
 	weight      INTEGER DEFAULT 0,
 	manually    CHAR(1) DEFAULT 'N',
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 );
-
-CREATE TABLE IF NOT EXISTS SoftwareRequirements (
-        software_id        BIGINT UNSIGNED NOT NULL,
-        requirement_id     BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(software_id)    REFERENCES Softwares(id)  ON DELETE CASCADE,
-	FOREIGN KEY(requirement_id) REFERENCES Softwares(id) ON DELETE CASCADE,
-	PRIMARY KEY(software_id,requirement_id)
-);
-
 
 
 CREATE TABLE IF NOT EXISTS SoftwareVersions (
@@ -405,12 +435,13 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
 # status DF -> deinstallation failed
 # status IF -> installation failed
 CREATE TABLE IF NOT EXISTS SoftwareStatus (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         version_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
 	status             VARCHAR(2) NOT NULL,
 	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
 	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
-	PRIMARY KEY(version_id,device_id)
+	PRIMARY KEY(id)
 );
 
 # licenseType C -> command line license
@@ -421,6 +452,8 @@ CREATE TABLE IF NOT EXISTS SoftwareLicenses (
 	licenseType    CHAR(1) DEFAULT 'C',
 	count          INTEGER DEFAULT 1,
 	value          VARCHAR(1024) NOT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(software_id)    REFERENCES Softwares(id)     ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
@@ -435,7 +468,6 @@ CREATE TABLE IF NOT EXISTS LicenseToDevice (
 
 CREATE TABLE IF NOT EXISTS Announcements (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        uuid       VARCHAR(36) DEFAULT NULL,
         owner_id   BIGINT UNSIGNED DEFAULT NULL,
         validFrom  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         validUntil DATETIME,
@@ -458,7 +490,6 @@ CREATE TABLE IF NOT EXISTS HaveSeen (
 
 CREATE TABLE IF NOT EXISTS FAQs (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        uuid       VARCHAR(36) DEFAULT NULL,
         owner_id   BIGINT UNSIGNED DEFAULT NULL,
         issue      VARCHAR(128) default NULL,
         title      VARCHAR(128) NOT NULL,
@@ -470,7 +501,6 @@ CREATE TABLE IF NOT EXISTS FAQs (
 
 CREATE TABLE IF NOT EXISTS Contacts (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        uuid       VARCHAR(36) DEFAULT NULL,
         owner_id   BIGINT UNSIGNED DEFAULT NULL,
         issue      VARCHAR(128) default NULL,
         name       VARCHAR(128) default NULL,
@@ -484,7 +514,7 @@ CREATE TABLE IF NOT EXISTS Contacts (
 CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	name         VARCHAR(32) NOT NULL,
-	description  VARCHAR(64) NOT NULL,
+	description  VARCHAR(64) DEFAULT NULL,
 	categoryType VARCHAR(16) DEFAULT NULL,
         owner_id     BIGINT UNSIGNED DEFAULT NULL,
 	studentsOnly CHAR(1) DEFAULT 'N',
@@ -611,5 +641,74 @@ CREATE TABLE IF NOT EXISTS ContactInCategories (
 	FOREIGN KEY(contact_id) REFERENCES Contacts(id) ON DELETE CASCADE,
 	FOREIGN KEY(category_id)     REFERENCES Categories(id)    ON DELETE CASCADE,
 	PRIMARY KEY(contact_id,category_id)
+);
+
+#TABLES for CEPHALIX
+CREATE TABLE IF NOT EXISTS CephalixInstitutes (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+       cn              VARCHAR(16) NOT NULL,
+       name            VARCHAR(32) NOT NULL,
+       type            VARCHAR(16) NOT NULL,
+       domain          VARCHAR(32) NOT NULL,
+       locality        VARCHAR(32) NOT NULL,
+       state           VARCHAR(32) NOT NULL,
+       adminPW         VARCHAR(16) NOT NULL,
+       cephalixPW      VARCHAR(16) NOT NULL,
+       ipVPN           VARCHAR(16) DEFAULT NULL,
+       ipTrNet         VARCHAR(16) DEFAULT NULL,
+       nmTrNet         VARCHAR(16) DEFAULT NULL,
+       gwTrNet         VARCHAR(16) DEFAULT NULL,
+       network         VARCHAR(16) NOT NULL,
+       netmask         VARCHAR(16) NOT NULL,
+       nmServerNet     VARCHAR(16) NOT NULL,
+       ipAdmin         VARCHAR(16) NOT NULL,
+       ipMail          VARCHAR(16) NOT NULL,
+       ipPrint         VARCHAR(16) NOT NULL,
+       ipProxy         VARCHAR(16) NOT NULL,
+       ipBackup        VARCHAR(16) NOT NULL,
+       anonDhcp        VARCHAR(32) NOT NULL,
+       firstRoom       VARCHAR(16) NOT NULL,
+       PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS CephalixITUsage (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       device          VARCHAR(32) NOT NULL,
+       counter         BIGINT UNSIGNED NOT NULL,
+       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS CephalixITUsageAvarage (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       device          VARCHAR(32) NOT NULL,
+       counter         BIGINT UNSIGNED NOT NULL,
+       time            timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+       counter0        BIGINT UNSIGNED NOT NULL,
+       time0           timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+       avarage         BIGINT UNSIGNED NOT NULL,
+       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS CephalixMappings (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+       institute_id    BIGINT UNSIGNED NOT NULL,
+       objectName      VARCHAR(16)     NOT NULL,
+       cephalixId      BIGINT UNSIGNED NOT NULL,
+       ossId           BIGINT UNSIGNED DEFAULT NULL,
+       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS Jobs (
+       id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+       institute_id    BIGINT UNSIGNED DEFAULT NULL,
+       description     VARCHAR(128)    NOT NULL,
+       startTime       timestamp       NOT NULL DEFAULT '0000-00-00 00:00:00',
+       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       PRIMARY KEY(id)
 );
 

@@ -33,7 +33,7 @@ import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.SoftwareLicense;
 import de.openschoolserver.dao.SoftwareStatus;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 
 import java.io.InputStream;
@@ -105,7 +105,7 @@ public interface SoftwareResource {
 	})
 	//@PermitAll
 	@RolesAllowed("software.add")
-	Response add(
+	OssResponse add(
 			@ApiParam(hidden = true) @Auth Session session,
 			Software Software
 			);
@@ -122,7 +122,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("software.modify")
-	Response modify(
+	OssResponse modify(
 			@ApiParam(hidden = true) @Auth Session session,
 			Software software
 			);
@@ -138,7 +138,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.delete")
-	Response delete(
+	OssResponse delete(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("softwareId") long softwareId
 			);
@@ -154,7 +154,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.modify")
-	Response apply(
+	OssResponse apply(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 	
@@ -171,7 +171,7 @@ public interface SoftwareResource {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
     @RolesAllowed("software.modify")
-    Response addLicenseToSoftware(
+    OssResponse addLicenseToSoftware(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("softwareId") long softwareId,
     		SoftwareLicense softwareLicense,
@@ -190,7 +190,7 @@ public interface SoftwareResource {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("software.install")
-	Response createInstallation(
+	Long createInstallation(
 			@ApiParam(hidden = true) @Auth Session session,
 			Category category
 			);
@@ -206,7 +206,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response addSoftwareToInstalation(
+	OssResponse addSoftwareToInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId,
 			@PathParam("softwareId")     long softwareId
@@ -222,7 +222,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response addDeviceToInstalation(
+	OssResponse addDeviceToInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId,
 			@PathParam("deviceId")       long deviceId
@@ -239,7 +239,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response addRoomToInstalation(
+	OssResponse addRoomToInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId,
 			@PathParam("roomId")         long roomId
@@ -256,7 +256,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response addHWConfToInstalation(
+	OssResponse addHWConfToInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId,
 			@PathParam("hwconfId")       long hwconfId
@@ -273,7 +273,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response deleteInstalation(
+	OssResponse deleteInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId
 			);
@@ -289,7 +289,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response deleteSoftwareFromInstalation(
+	OssResponse deleteSoftwareFromInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId,
 			@PathParam("softwareId")     long softwareId
@@ -307,7 +307,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response deleteDeviceFromInstalation(
+	OssResponse deleteDeviceFromInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId,
 			@PathParam("deviceId")       long deviceId
@@ -324,7 +324,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response deleteRoomFromInstalation(
+	OssResponse deleteRoomFromInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId,
 			@PathParam("roomId")         long roomId
@@ -341,7 +341,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "Software not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response deleteHWConfFromInstalation(
+	OssResponse deleteHWConfFromInstalation(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId,
 			@PathParam("hwconfId")       long hwconfId
@@ -440,7 +440,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.download")
-	Response download(
+	OssResponse download(
 			@ApiParam(hidden = true) @Auth Session session,
 			List<String> softwares
 			);
@@ -456,7 +456,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.download")
-	Response downloadOne(
+	OssResponse downloadOne(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("softwareName") String softwareName
 			);
@@ -472,7 +472,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.download")
-	Response removeSoftwares(
+	OssResponse removeSoftwares(
 			@ApiParam(hidden = true) @Auth Session session,
 			List<String> softwares
 			);
@@ -497,6 +497,22 @@ public interface SoftwareResource {
 	@RolesAllowed("software.install")
 	List<Map<String,String>> listDownloadedSoftware(
 			@ApiParam(hidden = true) @Auth Session session
+	);
+
+	/*
+	 * GET softwares/devicesByName/{deviceName}/licences
+	 */
+	@GET
+	@Path("devicesByName/{deviceName}/licences")
+	@Produces("text/plain")
+	@ApiOperation(value = "Set a software on a device as installed in a given version.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("software.install")
+	String getSoftwareLicencesOnDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@ApiParam(value = "Name of the device",  required = true) @PathParam("deviceName")   String deviceName
 			);
 	
 	/*
@@ -510,7 +526,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response setSoftwareInstalledOnDevice(
+	OssResponse setSoftwareInstalledOnDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@ApiParam(value = "Name of the device",  required = true) @PathParam("deviceName")   String deviceName,
 			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
@@ -528,7 +544,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response setSoftwareInstalledOnDeviceById(
+	OssResponse setSoftwareInstalledOnDeviceById(
 			@ApiParam(hidden = true) @Auth Session session,
 			@ApiParam(value = "ID of the device",    required = true) @PathParam("deviceId")   Long deviceId,
 			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
@@ -546,7 +562,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response deleteSoftwareStatusFromDevice(
+	OssResponse deleteSoftwareStatusFromDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@ApiParam(value = "Name of the device",  required = true) @PathParam("deviceName")   String deviceName,
 			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
@@ -564,7 +580,7 @@ public interface SoftwareResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("software.install")
-	Response deleteSoftwareStatusFromDeviceById(
+	OssResponse deleteSoftwareStatusFromDeviceById(
 			@ApiParam(hidden = true) @Auth Session session,
 			@ApiParam(value = "ID of the device",    required = true) @PathParam("deviceId")   Long deviceId,
 			@ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,

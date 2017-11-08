@@ -13,7 +13,7 @@ import javax.ws.rs.*;
 
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Response;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 
 import java.util.List;
@@ -24,7 +24,6 @@ import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 @Api(value = "users")
 public interface UserResource {
 
-	
 	/*
 	 * GET users/<userId>
 	 */
@@ -152,7 +151,7 @@ public interface UserResource {
     })
     //@PermitAll
     @RolesAllowed("user.add")
-    Response add(
+    OssResponse add(
             @ApiParam(hidden = true) @Auth Session session,
             User user
     );
@@ -170,7 +169,7 @@ public interface UserResource {
     })
     //@PermitAll
     @RolesAllowed("user.add")
-    List<Response> add(
+    List<OssResponse> add(
             @ApiParam(hidden = true) @Auth Session session,
             List<User> users
     );
@@ -188,7 +187,7 @@ public interface UserResource {
     })
     //@PermitAll
     @RolesAllowed("user.modify")
-    Response modify(
+    OssResponse modify(
             @ApiParam(hidden = true) @Auth Session session,
             User user
     );
@@ -204,7 +203,7 @@ public interface UserResource {
         @ApiResponse(code = 404, message = "User not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("user.delete")
-    Response delete(
+    OssResponse delete(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId
     );
@@ -220,7 +219,7 @@ public interface UserResource {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
        @RolesAllowed("user.manage")
-       Response setMembers(
+       OssResponse setMembers(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("userId") long userId,
                List<Long> groups
@@ -238,7 +237,7 @@ public interface UserResource {
         @ApiResponse(code = 404, message = "User not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("user.manage")
-    Response removeMember(
+    OssResponse removeMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId,
             @PathParam("userId") long userId
@@ -255,7 +254,7 @@ public interface UserResource {
         @ApiResponse(code = 404, message = "User not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("user.manage")
-    Response addMember(
+    OssResponse addMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId,
             @PathParam("userId") long userId
@@ -272,7 +271,7 @@ public interface UserResource {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("user.manage")
-    Response syncFsQuotas(
+    OssResponse syncFsQuotas(
                 @ApiParam(hidden = true) @Auth Session session,
                 List<List<String>> Quotas
     );

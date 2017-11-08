@@ -37,8 +37,8 @@ public class Software implements Serializable {
 	private Integer weight;
 	
 	//bi-directional many-to-one association to SoftwareLicens
-	@JsonIgnore
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
+	@JsonIgnore
 	private List<SoftwareLicense> softwareLicenses;
 
 	//bi-directional many-to-one association to SoftwareVersion
@@ -46,13 +46,13 @@ public class Software implements Serializable {
 	private List<SoftwareVersion> softwareVersions;
 	
 	//bi-directional many-to-many association to Category
-	@JsonIgnore
 	@ManyToMany(mappedBy="softwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
 	private List<Category> categories;
 
 	//bi-directional many-to-many association to Category
-	@JsonIgnore
 	@ManyToMany(mappedBy="removedSoftwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
 	private List<Category> removedFromCategories;
 	
 	//bi-directional many-to-many association to Device
@@ -69,6 +69,11 @@ public class Software implements Serializable {
 	@ManyToMany(mappedBy="requirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<Software> requiredBy;
+	
+    //bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User creator;
 
 	public Software() {
 		this.manually = false;
@@ -198,5 +203,13 @@ public class Software implements Serializable {
     public void setRemovedFromCategories(List<Category> categories) {
         this.removedFromCategories = categories;
     }
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
 
 }
