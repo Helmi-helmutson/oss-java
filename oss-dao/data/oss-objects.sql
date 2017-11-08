@@ -361,6 +361,7 @@ INSERT INTO Enumerates VALUES(NULL,'licenseType','FILE',1);
 INSERT INTO Enumerates VALUES(NULL,'licenseType','CMD',1);
 INSERT INTO Enumerates VALUES(NULL,'categoryType','software',1);
 INSERT INTO Enumerates VALUES(NULL,'categoryType','virtualRoom',1);
+INSERT INTO Enumerates VALUES(NULL,'network','#SCHOOL_NETWORK#/#SCHOOL_NETMASK#',1);
 
 #Some additional config tables
 CREATE TABLE IF NOT EXISTS OSSConfig (
