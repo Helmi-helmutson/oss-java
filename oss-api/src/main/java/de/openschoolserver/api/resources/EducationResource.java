@@ -27,31 +27,31 @@ import de.openschoolserver.dao.Category;
 @Api(value = "education")
 public interface EducationResource {
 
-	/******************************/
-	/* Functions to handle rooms  */
-	/******************************/
-	
+    /******************************/
+    /* Functions to handle rooms  */
+    /******************************/
+    
     /*
-	 * POST education/rooms
-	 */
+     * POST education/rooms
+     */
     @POST
     @Path("rooms")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Create a new smart room. A smart Room is a category with CategoryType smart room. " +
-    					  "The map can contains a description attribute. " +
-    					  "The map must contains either users or groups or devices. ")
+                          "The map can contains a description attribute. " +
+                          "The map must contains either users or groups or devices. ")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse  createSmartRoom(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		Category smartRoom
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            Category smartRoom
+            );
 
     /*
-	 * POST education/rooms/{roomId}
-	 */
+     * POST education/rooms/{roomId}
+     */
     @POST
     @Path("rooms/{roomId}")
     @Produces(JSON_UTF8)
@@ -61,10 +61,10 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse  modifySmartRoom(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") long roomId,
-    		Category smartRoom
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            Category smartRoom
+            );
     
     /*
      *  PUT education/rooms/{roomId}/users/{userId}
@@ -78,10 +78,10 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse addUser(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") long roomId,
-    		@PathParam("userId") long userId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("userId") long userId
+            );
 
     /*
      *  PUT education/rooms/{roomId}/devices/{deviceId}
@@ -95,10 +95,10 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse addDevice(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId")   long roomId,
-    		@PathParam("deviceId") long deviceId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId")   long roomId,
+            @PathParam("deviceId") long deviceId
+            );
 
     /*
      *  PUT education/rooms/{roomId}/groups/{groupId}
@@ -112,10 +112,10 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse addGroup(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") long roomId,
-    		@PathParam("groupId") long roupId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("groupId") long roupId
+            );
 
    
     /*
@@ -130,10 +130,10 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse deleteUser(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") long roomId,
-    		@PathParam("userId") long userId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("userId") long userId
+            );
 
     /*
      *  DELETE education/rooms/{roomId}/    devices/{deviceId}
@@ -147,10 +147,10 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse deleteDevice(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId")   long roomId,
-    		@PathParam("deviceId") long deviceId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId")   long roomId,
+            @PathParam("deviceId") long deviceId
+            );
 
     /*
      *  DELETE education/rooms/{roomId}/groups/{groupId}
@@ -164,14 +164,14 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse deleteGroup(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId")  long roomId,
-    		@PathParam("groupId") long groupId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId")  long roomId,
+            @PathParam("groupId") long groupId
+            );
 
     /*
-	 * DELETE education/rooms/{roomId}
-	 */
+     * DELETE education/rooms/{roomId}
+     */
     @DELETE
     @Path("rooms/{roomId}")
     @Produces(JSON_UTF8)
@@ -181,65 +181,65 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse  deleteSmartRoom(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") long roomId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+            );
 
     
     /*
-	 *  GET education/rooms
-	 */
-	@GET
-	@Path("rooms")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the list of ids of the rooms the session user may control.")
-	@ApiResponses(value = {
-	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-	})
-	@RolesAllowed({"sysadmins","teachers"})
-	List<Long> getMyRooms(
-			@ApiParam(hidden = true) @Auth Session session
-	);
-	
-	/*
-	 * GET education/rooms/{roomId}
-	 */
-	@GET
-	@Path("rooms/{roomId}")
+     *  GET education/rooms
+     */
+    @GET
+    @Path("rooms")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of ids of the rooms the session user may control.")
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    List<Long> getMyRooms(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+    
+    /*
+     * GET education/rooms/{roomId}
+     */
+    @GET
+    @Path("rooms/{roomId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Gets the state of a smart room. This call delivers a list of map with the logged in users. " +
-    					  "A logged in user map has the format: { deviceId => <deviceId> , userId => <userId> } " +
-    					  "The response contains a list of maps with userId and deviceId: " +
-    					  "[ { userId => UID1, deviceId => DID1 } ,  { userId => UID2, deviceId => DID2 } ]"
-    			)
+                          "A logged in user map has the format: { deviceId => <deviceId> , userId => <userId> } " +
+                          "The response contains a list of maps with userId and deviceId: " +
+                          "[ { userId => UID1, deviceId => DID1 } ,  { userId => UID2, deviceId => DID2 } ]"
+                )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-	List<List<Long>>  getRoom(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") long roomId
-    		);
+    List<List<Long>>  getRoom(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+            );
 
-	/*
-	 * GET education/rooms/{roomId}/control/minutes
-	 */
-	@GET
-	@Path("rooms/{roomId}/control/{minutes}")
+    /*
+     * GET education/rooms/{roomId}/control/minutes
+     */
+    @GET
+    @Path("rooms/{roomId}/control/{minutes}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the control for a room for an amount of time."
-    			)
+                )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
-	OssResponse  getRoomControl(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId")  long roomId,
-    		@PathParam("minutes") long minutes
-    		);
+    OssResponse  getRoomControl(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId")  long roomId,
+            @PathParam("minutes") long minutes
+            );
 
-	/*
+    /*
      * GET education/rooms/{roomId}/actions
      */
     @GET
@@ -272,7 +272,7 @@ public interface EducationResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
             @PathParam("action") String action,
-        	Map<String, String> actionContent
+            Map<String, String> actionContent
     );
 
     @POST
@@ -281,21 +281,21 @@ public interface EducationResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Puts data to te member of the smart rooms" )
     @ApiResponses(value = {
-	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-	})
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
     OssResponse uploadFileToRoom(@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") long roomId,
+            @PathParam("roomId") long roomId,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
             );
 
-	/******************************/
-	/* Functions to handle groups */
-	/******************************/
-	
+    /******************************/
+    /* Functions to handle groups */
+    /******************************/
+    
     /*
-	 * POST education/groups
-	 */
+     * POST education/groups
+     */
     @POST
     @Path("groups")
     @Produces(JSON_UTF8)
@@ -305,13 +305,13 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse  createGroup(
-    		@ApiParam(hidden = true) @Auth Session session,
-       		Group group
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+               Group group
+            );
 
     /*
-	 * POST education/groups/{groupId}
-	 */
+     * POST education/groups/{groupId}
+     */
     @POST
     @Path("groups/{groupId}")
     @Produces(JSON_UTF8)
@@ -321,14 +321,14 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse  modifyGroup(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("groupId") long groupId,
-    		Group group
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("groupId") long groupId,
+            Group group
+            );
     
     /*
- 	 * DELETE education/groups/{groupId}
- 	 */
+      * DELETE education/groups/{groupId}
+      */
      @DELETE
      @Path("groups/{groupId}")
      @Produces(JSON_UTF8)
@@ -338,9 +338,9 @@ public interface EducationResource {
      })
      @RolesAllowed({"sysadmins","teachers"})
      OssResponse  removeGroup(
-     		@ApiParam(hidden = true) @Auth Session session,
-     		@PathParam("groupId") long groupId
-     	   );
+             @ApiParam(hidden = true) @Auth Session session,
+             @PathParam("groupId") long groupId
+            );
      
      @POST
      @Path("education/groups/{groupId}/upload")
@@ -348,10 +348,10 @@ public interface EducationResource {
      @Consumes(MediaType.MULTIPART_FORM_DATA)
      @ApiOperation( value = "Puts data to te member of the smart rooms" )
      @ApiResponses(value = {
- 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
- 	})
+                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+     })
      OssResponse uploadFileToGroup(@ApiParam(hidden = true) @Auth Session session,
-     		 @PathParam("groupId")  long  groupId,
+              @PathParam("groupId")  long  groupId,
              @FormDataParam("file") final InputStream fileInputStream,
              @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
              );
@@ -373,10 +373,10 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse logOut(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("userId") long userId,
-    		@PathParam("deviceId") long deviceId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("userId") long userId,
+            @PathParam("deviceId") long deviceId
+            );
     
     /*
      * PUT education/users/{userId}/{deviceId}
@@ -391,10 +391,10 @@ public interface EducationResource {
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse logIn(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("userId") long userId,
-    		@PathParam("deviceId") long roomId
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("userId") long userId,
+            @PathParam("deviceId") long roomId
+            );
 
     /*
      * GET education/users/{userId}/actions
@@ -437,19 +437,19 @@ public interface EducationResource {
     @Path("users/{userId}/{deviceId}/{action}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Send a action to a user to a device. If the device is -1 the user gets this action on all devices. " +
-    					  "Depending on the action an arbitary map can be sent in the body.")
+                          "Depending on the action an arbitary map can be sent in the body.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse manageUSer(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("userId") long userId,
-    		@PathParam("deviceId") long deviceId,
-    		@PathParam("action") String action,
-    		Map<String, String> actionContent
-    		);
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("userId") long userId,
+            @PathParam("deviceId") long deviceId,
+            @PathParam("action") String action,
+            Map<String, String> actionContent
+            );
 
     @POST
     @Path("education/users/{userId}/upload")
@@ -457,10 +457,10 @@ public interface EducationResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Puts data to te member of the smart rooms" )
     @ApiResponses(value = {
-	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-	})
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
     OssResponse uploadFileToUser(@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("userId")   long  userId,
+            @PathParam("userId")   long  userId,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
             );
@@ -510,13 +510,13 @@ public interface EducationResource {
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Puts data to te member of the smart rooms" )
     @ApiResponses(value = {
-	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-	})
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
     @RolesAllowed({"sysadmins","teachers"})
     OssResponse uploadFileToDevice(@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("deviceId") long deviceId,
+            @PathParam("deviceId") long deviceId,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
-            );
+    );
  
 }

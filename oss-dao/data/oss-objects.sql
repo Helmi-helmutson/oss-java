@@ -234,36 +234,47 @@ CREATE TABLE IF NOT EXISTS Acls (
         FOREIGN KEY(group_id) REFERENCES Groups(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
-
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','adhoclan.search',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.add',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.delete',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.modify',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.search',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.add',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.delete',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.manage',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.modify',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.search',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.add',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.delete',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.manage',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.modify',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','information.add',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','information.delete',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.add',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.delete',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.manage',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.modify',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','sysadmins',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.add',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.delete',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.download',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.install',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.modify',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','sysadmins',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.add',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.delete',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.manage',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.modify',6);
 INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','adhoclan.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','category.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','device.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','group.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','room.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','software.search',6);
+INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','user.search',6);
 
 CREATE TABLE IF NOT EXISTS  Tests (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
