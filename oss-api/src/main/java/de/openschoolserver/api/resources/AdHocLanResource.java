@@ -147,7 +147,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	List<Long> getRooms(
+	List<Room> getRooms(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 

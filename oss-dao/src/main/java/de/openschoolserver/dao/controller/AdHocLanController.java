@@ -47,31 +47,32 @@ public class AdHocLanController extends Controller {
 		return groupIds;
 	}
 
-	public List<Long> getRooms() {
-		ArrayList<Long> roomIds = new ArrayList<Long>();
+	public List<Room> getRooms() {
+		ArrayList<Room> rooms = new ArrayList<Room>();
+		RoomController rc = new RoomController(this.session);
 		if( this.isSuperuser() ) {
 			for( Room room : new RoomController(this.session).getAll() ) {
 				if( room.getRoomType().equals("AdHocAccess")) {
-					roomIds.add(room.getId());
+					rooms.add(room);
 				}
 			}
 		} else {
 			for( String value : this.getMConfigs(this.session.getUser(),"AdHocAccess" )) {
-				Long id = Long.parseLong(value);
-				if( !roomIds.contains(id)) {
-					roomIds.add(id);
+				Room room = rc.getById(Long.parseLong(value));
+				if( !rooms.contains(room)) {
+					rooms.add(room);
 				}
 			}
 			for( Group group : this.session.getUser().getGroups() ) {
 				for( String value : this.getMConfigs(group,"AdHocAccess" )) {
-					Long id = Long.parseLong(value);
-					if( !roomIds.contains(id)) {
-						roomIds.add(id);
+					Room room = rc.getById(Long.parseLong(value));
+					if( !rooms.contains(room)) {
+						rooms.add(room);
 					}
 				}	
 			}
 		}
-		return roomIds;
+		return rooms;
 	}
 
 	public OssResponse add(Room room) {

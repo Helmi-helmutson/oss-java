@@ -40,7 +40,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
-	public List<Long> getRooms(Session session) {
+	public List<Room> getRooms(Session session) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.getRooms();
 	}
