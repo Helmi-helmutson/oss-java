@@ -207,4 +207,9 @@ public class RoomRescourceImpl implements RoomResource {
 		return roomController.getRooms(roomIds);
 	}
 
+	@Override
+	public OssResponse modify(Session session, Room room) {
+		return new RoomController(session).modify(room);
+	}
+
 }

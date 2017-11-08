@@ -784,6 +784,7 @@ public class RoomController extends Controller {
 		oldRoom.setHwconf(room.getHwconf());
 		oldRoom.setRoomType(room.getRoomType());
 		oldRoom.setRows(room.getRows());
+		oldRoom.setRoomControl(room.getRoomControl());
 		oldRoom.setPlaces(room.getPlaces());
 		try {
 			em.getTransaction().begin();
