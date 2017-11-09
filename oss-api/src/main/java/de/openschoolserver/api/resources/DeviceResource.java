@@ -6,6 +6,7 @@ import io.dropwizard.auth.Auth;
 
 
 
+
 import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
@@ -14,7 +15,6 @@ import javax.ws.rs.*;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.OssResponse;
 
 import java.util.List;
@@ -55,6 +55,22 @@ public interface DeviceResource {
     List<Device> getByType(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceType") String type
+    );
+    
+    /*
+	 * GET devices/byType/<deviceTyp>
+	 */
+    @GET
+    @Path("byHWConf/{hwconfId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get device by hwconfId.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Device not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("device.manage")
+    List<Device> getByHWConf(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("hwconfId") Long id
     );
     
     /*

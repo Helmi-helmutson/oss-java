@@ -2,7 +2,6 @@
  * (c) 2017 EXTIS GmbH www.extis.de - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
@@ -518,5 +518,10 @@ public class DeviceController extends Controller {
 			devices.add(this.getById(id));
 		}
 		return devices;
+	}
+
+	public List<Device> getByHWConf(Long id) {
+		HWConf hwconf = new CloneToolController(this.session).getById(id);
+		return hwconf.getDevices();
 	}
 }

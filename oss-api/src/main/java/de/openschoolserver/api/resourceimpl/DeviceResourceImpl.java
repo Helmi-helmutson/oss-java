@@ -152,4 +152,9 @@ public class DeviceResourceImpl implements DeviceResource {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.getDevices(deviceIds);
 	}
+
+	@Override
+	public List<Device> getByHWConf(Session session, Long id) {
+		return new DeviceController(session).getByHWConf(id);
+	}
 }
