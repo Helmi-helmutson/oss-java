@@ -326,6 +326,7 @@ public class SystemController extends Controller {
         statusMap = new HashMap<>();
         statusMap.put("ssh", "false");
         statusMap.put("https", "false");
+        statusMap.put("admin", "false");
         statusMap.put("rdesktop", "false");
         statusMap.put("other", "");
         for( String extPort : fwConfig.getConfigValue("FW_SERVICES_EXT_TCP").split(" ") ) {
@@ -337,6 +338,9 @@ public class SystemController extends Controller {
             case "443":
             case "https":
                 statusMap.put("https", "true");
+                break;
+            case "444":
+                statusMap.put("admin", "true");
                 break;
             case "3389":
             case "ms-wbt-server":
@@ -353,14 +357,21 @@ public class SystemController extends Controller {
     public OssResponse setFirewallIncomingRules(Map<String, String> firewallExt) {
         List<String> fwServicesExtTcp = new ArrayList<String>();
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
-        if( firewallExt.get("ssh").equals("true") )
+        if( firewallExt.get("ssh").equals("true") ) {
             fwServicesExtTcp.add("ssh");
-        if( firewallExt.get("https").equals("true"))
+        }
+        if( firewallExt.get("https").equals("true")) {
             fwServicesExtTcp.add("https");
-        if( firewallExt.get("rdesktop").equals("true") )
+        }
+        if( firewallExt.get("admin").equals("true")) {
+            fwServicesExtTcp.add("444");
+        }
+        if( firewallExt.get("rdesktop").equals("true") )  {
             fwServicesExtTcp.add("3389");
-        if( firewallExt.get("other") != null && !firewallExt.get("other").isEmpty())
+        }
+        if( firewallExt.get("other") != null && !firewallExt.get("other").isEmpty()) {
             fwServicesExtTcp.add(firewallExt.get("other"));
+        }
         fwConfig.setConfigValue("FW_SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
         this.systemctl("restart", "SuSEfirewall2");
         return new OssResponse(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
