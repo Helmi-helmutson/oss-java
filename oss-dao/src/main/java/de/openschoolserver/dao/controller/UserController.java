@@ -66,7 +66,7 @@ public class UserController extends Controller {
 			if (result!=null && result.size()>0) {
 				return (User) result.get(0);
 			}  else {
-				logger.error("getByUid: uid not found. uid=" + uid );
+				logger.debug("getByUid: uid not found. uid=" + uid );
 			}
 		} catch (Exception e) {
 			logger.error("getByUid: uid=" + uid + " " + e.getMessage());
@@ -90,6 +90,7 @@ public class UserController extends Controller {
 			em.close();
 		}
 	}
+
 	public List<User> findByName(String givenName, String sureName) {
 		EntityManager em = getEntityManager();
 		try {
@@ -104,6 +105,7 @@ public class UserController extends Controller {
 			em.close();
 		}
 	}
+
 	public List<User> findByNameAndRole(String givenName, String sureName, String role) {
 		EntityManager em = getEntityManager();
 		try {
