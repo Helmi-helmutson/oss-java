@@ -426,11 +426,13 @@ public class DeviceController extends Controller {
 
 	public OssResponse addLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
-		EntityManager em = getEntityManager();
-		UserController userController = new UserController(this.session);
-		User user = userController.getByUid(userName);
+		User user = new UserController(this.session).getByUid(userName);
+		if( user.getLoggedOn().contains(device)) {
+			return new OssResponse(this.getSession(),"OK", "Logged in user was already added on this device for you:" + device.getName() + ";" + IP + ";" + userName);
+		}
 		device.getLoggedIn().add(user);
 		user.getLoggedOn().add(device);
+		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(device);
@@ -448,14 +450,16 @@ public class DeviceController extends Controller {
 	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		EntityManager em = getEntityManager();
-		UserController userController = new UserController(this.session);
-		User user = userController.getByUid(userName);
-		List<User> loggedInUsers = device.getLoggedIn();
-		loggedInUsers.remove(user);
-		device.setLoggedIn(loggedInUsers);
+		User user = new UserController(this.session).getByUid(userName);
+		if( !user.getLoggedOn().contains(device)) {
+			return new OssResponse(this.getSession(),"OK", "Logged in user was already removed from this device for you:" + device.getName() + ";" + IP + ";" + userName);
+		}
+		device.getLoggedIn().remove(user);
+		user.getLoggedOn().remove(device);
 		try {
 			em.getTransaction().begin();
 			em.merge(device);
+			em.merge(user);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
