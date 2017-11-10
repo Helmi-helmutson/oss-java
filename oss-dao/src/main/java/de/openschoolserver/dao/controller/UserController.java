@@ -138,8 +138,9 @@ public class UserController extends Controller {
 	public OssResponse add(User user){
 		EntityManager em = getEntityManager();
 		//Check role
-		if( user.getRole() == null )
+		if( user.getRole() == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "You have to define the role of the user.");
+		}
 		//Check Birthday
 		if( user.getBirthDay() == null ) {
 			if( user.getRole().equals("sysadmins") || user.getRole().equals("templates")) {
@@ -149,7 +150,7 @@ public class UserController extends Controller {
 			}
 		}
 		// Create uid if not given
-		if( user.getUid().isEmpty() ) {
+		if( user.getUid() == null || user.getUid().isEmpty() ) {
 			String userId = UserUtil.createUserId( user.getGivenName(),
 					user.getSureName(),
 					user.getBirthDay(),
