@@ -1,6 +1,7 @@
 package de.openschoolserver.dao.internal;
 
 import java.io.File;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -317,13 +318,13 @@ public class ImportHandler {
 			if (!o.isTestOnly()) {
 				OssResponse res = userController.add(newUser);
 
-				newUser = userController.getByUid(person.getLoginId());
+				newUser = userController.getById(res.getId());
 				appendUserAddLog(importer,o,res, newUser, true);
 			} else {
 				appendUserAddLog(importer,o,null, newUser, true);
 			}
 			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSureName() ).append(", ").append(newUser.getGivenName()).append(LINESEP);
-			if (newUser != null) {
+			if (newUser != null && !o.isTestOnly()) {
 				if (person.getSchoolClasses() != null) {
 					for (SchoolClass schoolClass : person.getSchoolClasses()) {
 						Group group = groupController.getByName(schoolClass.getNormalizedName());
