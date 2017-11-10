@@ -195,11 +195,6 @@ public class UserController extends Controller {
 			em.getTransaction().begin();
 			em.persist(user);
 			em.getTransaction().commit();
-			GroupController groupController = new GroupController(this.session);
-			Group group = groupController.getByName(user.getRole());
-			if( group != null ) {
-				groupController.addMember(group,user);;
-			}
 		} catch (Exception e) {
 			logger.error("add: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -207,7 +202,16 @@ public class UserController extends Controller {
 			em.close();
 		}
 		this.startPlugin("add_user",user);
-		return new OssResponse(this.getSession(),"OK", user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.",user.getId());
+		GroupController groupController = new GroupController(this.session);
+		Group group = new GroupController(this.session).getByName(user.getRole());
+		if( group != null ) {
+			groupController.addMember(group,user);;
+		}
+		return new OssResponse( this.getSession(),
+				"OK",
+				user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.",
+				user.getId()
+			);
 	}
 
 
