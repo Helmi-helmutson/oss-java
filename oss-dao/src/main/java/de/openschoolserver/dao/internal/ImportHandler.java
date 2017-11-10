@@ -316,9 +316,11 @@ public class ImportHandler {
 			  newUser.setPassword(person.getPassword());
 			} 
 			if (!o.isTestOnly()) {
+				LOG.debug("Create user" + newUser.getGivenName() + " " + newUser.getSureName());
 				OssResponse res = userController.add(newUser);
 
 				newUser = userController.getById(res.getId());
+				LOG.debug("Created user" + newUser.getUid() + " " + newUser.getGivenName() + " " + newUser.getSureName());
 				appendUserAddLog(importer,o,res, newUser, true);
 			} else {
 				appendUserAddLog(importer,o,null, newUser, true);
@@ -329,7 +331,7 @@ public class ImportHandler {
 					for (SchoolClass schoolClass : person.getSchoolClasses()) {
 						Group group = groupController.getByName(schoolClass.getNormalizedName());
 						if (group != null) {
-
+							LOG.debug("Add user to classes" + newUser.getUid() + " " + group.getName() );
 							groupController.addMember(group.getId(), newUser.getId());
 						} else {
 							LOG.error("Group not found: " + schoolClass.getNormalizedName());
