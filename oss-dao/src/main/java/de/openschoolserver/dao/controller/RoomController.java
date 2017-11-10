@@ -172,7 +172,7 @@ public class RoomController extends Controller {
 		if( !this.isNameUnique(room.getName())){
 			return new OssResponse(this.getSession(),"ERROR", "Room name is not unique.");
 		}
-		if( !this.isDescriptionUnique(room.getDescription())){
+		if( room.getDescription() != null && !room.getDescription().isEmpty() && !this.isDescriptionUnique(room.getDescription())){
 			return new OssResponse(this.getSession(),"ERROR", "Room description is not unique.");
 		}
 
