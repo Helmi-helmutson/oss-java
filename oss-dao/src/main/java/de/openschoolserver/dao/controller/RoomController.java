@@ -26,6 +26,8 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.tools.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @SuppressWarnings( "unchecked" )
 public class RoomController extends Controller {
 
@@ -196,6 +198,7 @@ public class RoomController extends Controller {
 			em.getTransaction().begin();
 			em.persist(room);
 			em.getTransaction().commit();
+			logger.debug("Created Room:" + new ObjectMapper().writeValueAsString(room));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -748,7 +751,7 @@ public class RoomController extends Controller {
 		//Start plugin and create DHCP and salt configuration
 		this.startPlugin("add_device", device);
 		new DHCPConfig(this.session).Create();
-		return new OssResponse(this.getSession(),"OK","Device was created succesfully.");
+		return new OssResponse(this.getSession(),"OK","Device was created succesfully.",device.getId());
 	}
 
 	public HWConf getHWConf(long roomId) {

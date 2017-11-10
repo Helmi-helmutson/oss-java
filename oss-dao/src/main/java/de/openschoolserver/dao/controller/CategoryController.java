@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.ArrayList;
 import de.openschoolserver.dao.*;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @SuppressWarnings( "unchecked" )
 public class CategoryController extends Controller {
 
@@ -94,9 +96,11 @@ public class CategoryController extends Controller {
 					return new OssResponse(this.getSession(),"ERROR","Category description is not unique.");
 				}
 			}
+			category.setOwner(this.session.getUser());
 			em.getTransaction().begin();
 			em.persist(category);
 			em.getTransaction().commit();
+			logger.debug("Created Category:" + new ObjectMapper().writeValueAsString(category));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());

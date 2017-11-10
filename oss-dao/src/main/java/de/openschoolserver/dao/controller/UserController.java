@@ -15,6 +15,8 @@ import javax.persistence.Query;
 
 import de.extis.core.util.UserUtil;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.DHCPConfig;
@@ -199,10 +201,13 @@ public class UserController extends Controller {
 		}
 		//Make backup from password. password field is transient!
 		user.setInitialPassword(user.getPassword());
+		user.setCreatorId(this.session.getUserId());
 		try {
 			em.getTransaction().begin();
 			em.persist(user);
+			em.merge(user);
 			em.getTransaction().commit();
+			logger.debug("Created user" + new ObjectMapper().writeValueAsString(user));
 		} catch (Exception e) {
 			logger.error("add: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());

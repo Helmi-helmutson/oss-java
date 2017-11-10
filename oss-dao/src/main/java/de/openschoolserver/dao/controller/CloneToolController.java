@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -101,13 +103,14 @@ public class CloneToolController extends Controller {
 			em.getTransaction().begin();
 			em.persist(hwconf);
 			em.getTransaction().commit();
+			logger.debug("Created HWConf:" + new ObjectMapper().writeValueAsString(hwconf));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", hwconf.getName() + " (" + hwconf.getDeviceType() + ") was created.");
+		return new OssResponse(this.getSession(),"OK", hwconf.getName() + " (" + hwconf.getDeviceType() + ") was created.",hwconf.getId());
 	}
 
 	public OssResponse modifyHWConf(Long hwconfId, HWConf hwconf){

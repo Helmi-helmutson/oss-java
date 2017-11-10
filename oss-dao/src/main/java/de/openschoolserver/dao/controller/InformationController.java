@@ -9,6 +9,8 @@ import java.util.Date;
 
 import javax.persistence.EntityManager;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.openschoolserver.dao.Announcement;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Contact;
@@ -17,6 +19,8 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author varkoly
@@ -38,6 +42,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(announcement);
 			em.getTransaction().commit();
+			logger.debug("Created Announcement:" + new ObjectMapper().writeValueAsString(announcement));
 			return new OssResponse(this.getSession(),"OK", "Announcement was created succesfully.",announcement.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -54,6 +59,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(contact);
 			em.getTransaction().commit();
+			logger.debug("Created Contact:" + new ObjectMapper().writeValueAsString(contact));
 			return new OssResponse(this.getSession(),"OK", "Contact was created succesfully.",contact.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -70,6 +76,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(faq);
 			em.getTransaction().commit();
+			logger.debug("Created FAQ:" + new ObjectMapper().writeValueAsString(faq));
 			return new OssResponse(this.getSession(),"OK", "FAQ was created succesfully.",faq.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
