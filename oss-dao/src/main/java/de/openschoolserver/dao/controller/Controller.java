@@ -67,10 +67,12 @@ public class Controller extends Config {
 	}
 
 	public EntityManager getEntityManager() {
-		if( session != null)
+		if( session != null) {
 			return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
-		else
+		}
+		else {
 			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		}
 	}
 
 	public Session getSession() {
@@ -124,21 +126,24 @@ public class Controller extends Config {
 			error.add("User password is to long.");
 		}
 		if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY") == "yes" ) {
-			if( ! Pattern.matches("[A-Z]",password) )
+			if( ! Pattern.matches("[A-Z]",password) ) {
 				error.add("User password should contains upper case letters.");
-			if(! Pattern.matches("[0-9]",password) )
+			}
+			if(! Pattern.matches("[0-9]",password) ) {
 				error.add("User password should contains numbers.");
+			}
 			String[] program    = new String[1];
 			StringBuffer reply  = new StringBuffer();
 			StringBuffer stderr = new StringBuffer();
 			program[0] = "/usr/sbin/cracklib-check";
 			OSSShellTools.exec(program, reply, stderr, password);
-			if( ! reply.toString().startsWith(password + ": OK"))
+			if( ! reply.toString().startsWith(password + ": OK")) {
 				error.add(reply.toString());
+			}
 		}
-		if( error.size() > 0 )
+		if( error.size() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", String.join(System.lineSeparator(), error));
-		
+		}
 		return null;
 	}
 
