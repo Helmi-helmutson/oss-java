@@ -189,6 +189,14 @@ public class UserController extends Controller {
 				return ossResponse;
 			}
 		}
+		if( user.getFsQuota() == null ) {
+			//TODO
+			user.setFsQuota(Integer.getInteger(this.getConfigValue("SCHOOL_FILE_QUOTA")));
+		}
+		if( user.getMsQuota() == null ) {
+			//TODO
+			user.setMsQuota(Integer.getInteger(this.getConfigValue("SCHOOL_MAIL_QUOTA")));
+		}
 		//Make backup from password. password field is transient!
 		user.setInitialPassword(user.getPassword());
 		try {
