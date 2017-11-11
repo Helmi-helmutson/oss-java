@@ -316,11 +316,8 @@ public class ImportHandler {
 			  newUser.setPassword(person.getPassword());
 			} 
 			if (!o.isTestOnly()) {
-				LOG.debug("Create user" + newUser.getGivenName() + " " + newUser.getSureName());
 				OssResponse res = userController.add(newUser);
-
-				newUser = userController.getById(res.getId());
-				LOG.debug("Created user" + newUser.getUid() + " " + newUser.getGivenName() + " " + newUser.getSureName());
+				newUser = userController.getById(res.getObjecId());
 				appendUserAddLog(importer,o,res, newUser, true);
 			} else {
 				appendUserAddLog(importer,o,null, newUser, true);
