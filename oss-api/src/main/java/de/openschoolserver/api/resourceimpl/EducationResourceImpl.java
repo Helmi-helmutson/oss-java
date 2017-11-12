@@ -203,4 +203,10 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return null;
 	}
 
+	@Override
+	public OssResponse collectFileFromDevice(Session session, long deviceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

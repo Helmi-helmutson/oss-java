@@ -1,12 +1,10 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 /**
- * 
+ * @author Peter Varkoly <peter@varkoly.de>
+ *
  */
 package de.openschoolserver.api.resources;
 
-/**
- * @author varkoly
- *
- */
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
 import javax.annotation.security.PermitAll;

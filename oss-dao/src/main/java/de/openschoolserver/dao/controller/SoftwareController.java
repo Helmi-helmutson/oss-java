@@ -31,6 +31,8 @@ import org.slf4j.LoggerFactory;
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @SuppressWarnings( "unchecked" )
 public class SoftwareController extends Controller {
 	
@@ -348,15 +350,10 @@ public class SoftwareController extends Controller {
 	 *  @param		category A category object containing the name and description of the category
 	 *  @return		Returns the id of the created new category
 	 */
-	public Long createInstallationCategory(Category category) {
+	public OssResponse createInstallationCategory(Category category) {
 		CategoryController categoryController = new CategoryController(this.session);
 		category.setCategoryType("installation");
-		categoryController.add(category);
-		Category newCategory = categoryController.getByName(category.getName());
-		if( newCategory != null ) {
-			return newCategory.getId();
-		}
-		return null;
+		return categoryController.add(category);
 	}
 
 	public OssResponse addSoftwareToCategory(Long softwareId,Long categoryId){
@@ -568,11 +565,13 @@ public class SoftwareController extends Controller {
 	public void setSoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
 		EntityManager em = getEntityManager();
 		List<SoftwareVersion> lsv;
-		Query query= em.createNamedQuery("SoftwareStatus.get")
-				.setParameter("SOFTWARE", s.getId())
-				.setParameter("DEVICE", d.getId());
 		
-		List<SoftwareStatus> lss = query.getResultList();
+		List<SoftwareStatus> lss = new ArrayList<SoftwareStatus>();
+		for(SoftwareStatus ss : d.getSofwareStatus() ) {
+			if( ss.getSoftwareVersion().getSoftware().equals(s)) {
+				lss.add(ss);
+			}
+		}
 		try {
 			em.getTransaction().begin();
 			if( !lss.isEmpty()) {
@@ -585,11 +584,9 @@ public class SoftwareController extends Controller {
 					}
 				}
 			} else {
-				query = em.createNamedQuery("SoftwareVersion.getBySDoftware")
-						.setParameter("SOFTWARE", s.getId());
-				lsv = query.getResultList();
+				lsv = s.getSoftwareVersions();
 				if( lsv.isEmpty() ) {
-					SoftwareVersion sv = new SoftwareVersion(s,"0.0");
+					SoftwareVersion sv = new SoftwareVersion(s,version);
 					em.persist(sv);
 					SoftwareStatus ss = new SoftwareStatus(d,sv,status);
 					em.persist(ss);
@@ -696,12 +693,25 @@ public class SoftwareController extends Controller {
 	/*
 	 * Checks if there is a software status to a given version of a software on a device.
 	 */
-	public boolean checkSoftwareStatusOnDevice(Device d, Software s,  String version) {
+	public boolean checkSoftwareStatusOnDevice(Device d, Software s,  String state) {
+		for( SoftwareStatus ss : d.getSofwareStatus() ) {
+			if( ss.getStatus().equals(state) && 
+					ss.getSoftwareVersion().getSoftware().equals(s)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*
+	 * Checks if there is a software status to a given version of a software on a device.
+	 */
+	public boolean getSoftwareVersionOnDevice(Device d, Software s) {
+		//TODO Does not works.
 		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("SoftwareStatus.get")
+		Query query = em.createNamedQuery("SoftwareStatus.getForOne")
 					.setParameter("SOFTWARE", s.getId())
-					.setParameter("DEVICE", d.getId())
-					.setParameter("VERSION", version);
+					.setParameter("DEVICE", d.getId());
 		return ! query.getResultList().isEmpty();
 	}
 
@@ -712,10 +722,11 @@ public class SoftwareController extends Controller {
 		EntityManager em = getEntityManager();
 		RoomController   roomController   = new RoomController(this.session);
 		DeviceController deviceController = new DeviceController(this.session);
-		Map<Device,List<String>>   softwaresToInstall = new HashMap<>();
-		Map<Device,List<Software>> softwaresToRemove  = new HashMap<>();
-		String key;
-		final String domainName = this.getConfigValue("DOMAIN_NAME");
+		Map<String,List<String>>   softwaresToInstall = new HashMap<>();
+		Map<String,List<Software>> softwaresToRemove  = new HashMap<>();
+		List<String>   toInstall = new ArrayList<String>();
+		List<Software> toRemove  = new ArrayList<Software>();
+		final String domainName = this.getConfigValue("SCHOOL_DOMAIN");
 
 		List<String>   topSls = new ArrayList<String>();
 		Path SALT_TOP_TEMPL   = Paths.get("/usr/share/oss/templates/top.sls");
@@ -733,136 +744,142 @@ public class SoftwareController extends Controller {
 
 		//Evaluate device categories
 		for( Device device : deviceController.getAll() ) {
-			List<String>   toInstall = new ArrayList<String>();
-			List<Software> toRemove  = new ArrayList<Software>();
+			if( device.getHwconf() == null || ! device.getHwconf().getDeviceType().equals("FatClient") ) {
+				continue;
+			}
+			toInstall = new ArrayList<String>();
+			toRemove  = new ArrayList<Software>();
 			for( Category category : device.getCategories() ) {
-				if( !category.getCategoryType().equals("installation")) {
-					continue;
-				}
-				for( Software software : category.getRemovedSoftwares() ) {
-					toRemove.add(software);
+				if( category.getCategoryType().equals("installation")) {
+					for( Software software : category.getRemovedSoftwares() ) {
+						toRemove.add(software);
+					}
 				}
 			}
 			for( Category category : device.getCategories() ) {
-				if( !category.getCategoryType().equals("installation")) {
-					continue;
-				}
-				for( Software software : category.getSoftwares() ) {
-					toRemove.remove(software);
-					toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
+				if( category.getCategoryType().equals("installation")) {
+					for( Software software : category.getSoftwares() ) {
+						toRemove.remove(software);
+						toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
+					}
 				}
 			}
-			softwaresToInstall.put(device, toInstall);
-			softwaresToRemove.put(device, toRemove);
+			softwaresToInstall.put(device.getName(), toInstall);
+			softwaresToRemove.put(device.getName(), toRemove);
+		}
+		try {
+			logger.debug("Software map after devices:" + new ObjectMapper().writeValueAsString(softwaresToInstall));
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
 		}
 
 		//Evaluate room categories
 		for( Room room : roomController.getAll() ) {
-			List<Software> toRemove  = new ArrayList<Software>();
+			toRemove  = new ArrayList<Software>();
+			toInstall = new ArrayList<String>();
 			for( Category category : room.getCategories() ) {
-				if( !category.getCategoryType().equals("installation")) {
-					continue;
-				}
-				for( Software software : category.getRemovedSoftwares() ) {
-					toRemove.add(software);
+				if( category.getCategoryType().equals("installation")) {
+					for( Software software : category.getRemovedSoftwares() ) {
+					    toRemove.add(software);
+					}
 				}
 			}
 			for( Category category : room.getCategories() ) {
-				if( !category.getCategoryType().equals("installation")) {
-					continue;
-				}
-				for( Software software : category.getSoftwares() ) {
-					toRemove.remove(software);
-					key = String.format("%04d-%s",software.getWeight(),software.getName());
-					for( Device device : room.getDevices() ) {
-						if( ! softwaresToInstall.get(device).contains(key) ) {
-							softwaresToInstall.get(device).add(key);
-						}
+				if( category.getCategoryType().equals("installation")) {
+					for( Software software : category.getSoftwares() ) {
+						toRemove.remove(software);
+						toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
 					}
+					
 				}
 			}
 			for( Device device : room.getDevices() ) {
-				for( Software software : toRemove ) {
-					if( ! softwaresToRemove.get(device).contains(software) ) {
-						softwaresToRemove.get(device).add(software);
-					}
+				if( device.getHwconf() == null || ! device.getHwconf().getDeviceType().equals("FatClient") ) {
+					continue;
 				}
+				softwaresToInstall.get(device.getName()).addAll(toInstall);
+				softwaresToRemove.get(device.getName()).addAll(toRemove);
 			}
 		}
 
 		//Evaluate hwconf categories
 		Query query = em.createNamedQuery("HWConf.findAll");
 		for( HWConf hwconf : (List<HWConf>)  query.getResultList() ) {
+			if( !hwconf.getDeviceType().equals("FatClient")) {
+				continue;
+			}
 			//List of software to be removed
-			List<Software> toRemove  = new ArrayList<Software>();
+			toRemove  = new ArrayList<Software>();
+			toInstall = new ArrayList<String>();
 			for( Category category : hwconf.getCategories() ) {
-				if( !category.getCategoryType().equals("installation")) {
-					continue;
-				}
-				for( Software software : category.getRemovedSoftwares() ) {
-					toRemove.add(software);
+				if( category.getCategoryType().equals("installation")) {
+					for( Software software : category.getRemovedSoftwares() ) {
+						toRemove.add(software);
+					}
 				}
 			}
 			for( Category category : hwconf.getCategories() ) {
-				if( !category.getCategoryType().equals("installation")) {
-					continue;
-				}
-				for( Software software : category.getSoftwares() ) {
-					toRemove.remove(software);
-					key = String.format("%04d-%s",software.getWeight(),software.getName());
-					for( Device device : hwconf.getDevices() ) {
-						if( ! softwaresToInstall.get(device).contains(key) ) {
-							softwaresToInstall.get(device).add(key);
-						}
+				if( category.getCategoryType().equals("installation")) {
+					for( Software software : category.getSoftwares() ) {
+						toRemove.remove(software);
+						toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
 					}
 				}
 			}
 			for( Device device : hwconf.getDevices() ) {
-				for( Software software : toRemove ) {
-					if( ! softwaresToRemove.get(device).contains(software) ) {
-						softwaresToRemove.get(device).add(software);
-					}
-				}
+				softwaresToInstall.get(device.getName()).addAll(toInstall);
+				softwaresToRemove.get(device.getName()).addAll(toRemove);
 			}
 		}
-
+		try {
+			logger.debug("Software map:" + new ObjectMapper().writeValueAsString(softwaresToInstall));
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
 		//Write the hosts sls files
 		for( Device device : deviceController.getAll() ) {
 			List<String> deviceSls = new ArrayList<String>();
 			//Remove first the softwares.
-			for( Software software : softwaresToRemove.get(device) ) {
-				deviceSls.add(software.getName()+":");
-				deviceSls.add("  - pkg:");
-				deviceSls.add("    - removed:");
-				if( this.checkSoftwareStatusOnDevice(device, software, "I") ){
-					this.setSoftwareStatusOnDevice(device, software, "", "DS");
+			if( softwaresToRemove.containsKey(device.getName()) ) {
+				for( Software software : softwaresToRemove.get(device.getName()) ) {
+					deviceSls.add(software.getName()+":");
+					deviceSls.add("  - pkg:");
+					deviceSls.add("    - removed:");
+					if( this.checkSoftwareStatusOnDevice(device, software, "I") ){
+						this.setSoftwareStatusOnDevice(device, software, "", "DS");
+					}
 				}
 			}
-			softwaresToInstall.get(device).sort((String s1, String s2) -> { return s2.compareTo(s1); });
-			for( String softwareKey :  softwaresToInstall.get(device) ) {			
-				String softwareName = softwareKey.substring(4);
-				StringBuilder filePath = new StringBuilder(SALT_PACKAGE_DIR);
-				filePath.append(softwareName).append(".sls");
-				File file = new File(filePath.toString());
-				if( file.exists() ) {
-					Software software = this.getByName(softwareName);
-					for( SoftwareLicense sl : device.getSoftwareLicences() ) {
-						if( sl.getSoftware().equals(software) ) {
-							deviceSls.add(softwareName + "_KEY");
-							deviceSls.add("  grains.present:");
-							deviceSls.add("    - value: " + sl.getValue());
+			if( softwaresToInstall.containsKey(device.getName()) ) {
+				softwaresToInstall.get(device.getName()).sort((String s1, String s2) -> { return s2.compareTo(s1); });
+				for( String softwareKey :  softwaresToInstall.get(device.getName()) ) {			
+					String softwareName = softwareKey.substring(5);
+					StringBuilder filePath = new StringBuilder(SALT_PACKAGE_DIR);
+					filePath.append(softwareName).append(".sls");
+					File file = new File(filePath.toString());
+					logger.debug("Package File:" + filePath.toString() );
+					if( file.exists() ) {
+						Software software = this.getByName(softwareName);
+						for( SoftwareLicense sl : device.getSoftwareLicences() ) {
+							if( sl.getSoftware().equals(software) ) {
+								deviceSls.add(softwareName + "_KEY");
+								deviceSls.add("  grains.present:");
+								deviceSls.add("    - value: " + sl.getValue());
+							}
 						}
 						deviceSls.add("include:");
-						deviceSls.add(" - " + softwareName);
+						deviceSls.add("  - " + softwareName);
+					} else {
+						deviceSls.add(softwareName+":");
+						deviceSls.add("  - pkg:");
+						deviceSls.add("    - installed:");					
 					}
-				} else {
-					deviceSls.add(softwareName+":");
-					deviceSls.add("  - pkg:");
-					deviceSls.add("    - installed:");					
-				}
-				Software software = this.getByName(softwareName);
-				if(! this.checkSoftwareStatusOnDevice(device, software, "I")){
-					this.setSoftwareStatusOnDevice(device, software, "", "IS");
+					Software software = this.getByName(softwareName);
+					if(! this.checkSoftwareStatusOnDevice(device, software, "I")){
+						this.setSoftwareStatusOnDevice(device, software, "", "IS");
+					}
 				}
 			}
 			if( deviceSls.size() > 0) {
