@@ -343,7 +343,7 @@ public interface EducationResource {
             );
      
      @POST
-     @Path("education/groups/{groupId}/upload")
+     @Path("groups/{groupId}/upload")
      @Produces(JSON_UTF8)
      @Consumes(MediaType.MULTIPART_FORM_DATA)
      @ApiOperation( value = "Puts data to te member of the smart rooms" )
@@ -452,7 +452,7 @@ public interface EducationResource {
             );
 
     @POST
-    @Path("education/users/{userId}/upload")
+    @Path("users/{userId}/upload")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Puts data to te member of the smart rooms" )
@@ -505,7 +505,7 @@ public interface EducationResource {
     );
     
     @POST
-    @Path("education/devices/{deviceId}/upload")
+    @Path("devices/{deviceId}/upload")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Puts data to te member of the smart rooms" )
@@ -518,5 +518,20 @@ public interface EducationResource {
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
     );
+    
+    @POST
+    @Path("devices/{deviceId}/download")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation( value = "Puts data to te member of the smart rooms" )
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    OssResponse collectFileFromDevice(@ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") long deviceId
+    );
+    
  
+    
 }
