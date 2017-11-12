@@ -265,48 +265,58 @@ public class CategoryController extends Controller {
 				Device device = new DeviceController(this.session).getById(objectId);
 				category.getDevices().add(device);
 				device.getCategories().add(category);
+				em.merge(device);
 			break;
 			case("Group"):
 				Group group = new GroupController(this.session).getById(objectId);
 				category.getGroups().add(group);
 				group.getCategories().add(category);
+				em.merge(group);
 			break;
 			case("HWConf"):
 				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
 				category.getHWConfs().add(hwconf);
 				hwconf.getCategories().add(category);
+				em.merge(hwconf);
 			break;
 			case("Room"):
 				Room room = new RoomController(this.session).getById(objectId);
 				category.getRooms().add(room);
 				room.getCategories().add(category);
+				em.merge(room);
 			break;
 			case("Software"):
 				Software software = new SoftwareController(this.session).getById(objectId);
 				category.getSoftwares().add(software);
 				software.getCategories().add(category);
+				em.merge(software);
 			break;
 			case("User"):
 				User user = new UserController(this.session).getById(objectId);
 				category.getUsers().add(user);
 				user.getCategories().add(category);
+				em.merge(user);
 			break;
 			case("FAQ"):
 				FAQ faq = new InformationController(this.session).getFAQById(objectId);
 				category.getFaqs().add(faq);
 				faq.getCategories().add(category);
+				em.merge(faq);
 			break;
 			case("Announcement"):
 				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
 				category.getAnnouncements().add(info);
 				info.getCategories().add(category);
+				em.merge(info);
 			break;
 			case("Contact"):
 				Contact contact = new InformationController(this.session).getContactById(objectId);
 				category.getContacts().add(contact);
 				contact.getCategories().add(category);
+				em.merge(contact);
 			break;
 			}
+			em.merge(category);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -327,21 +337,25 @@ public class CategoryController extends Controller {
 				Device device = new DeviceController(this.session).getById(objectId);
 				category.getDevices().remove(device);
 				device.getCategories().remove(category);
+				em.merge(device);
 			break;
 			case("Group"):
 				Group group = new GroupController(this.session).getById(objectId);
 				category.getGroups().remove(group);
 				group.getCategories().remove(category);
+				em.merge(group);
 			break;
 			case("HWConf"):
 				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
 				category.getHWConfs().remove(hwconf);
 				hwconf.getCategories().remove(category);
+				em.merge(hwconf);
 			break;
 			case("Room"):
 				Room room = new RoomController(this.session).getById(objectId);
 				category.getRooms().remove(room);
 				room.getCategories().remove(category);
+				em.merge(room);
 			break;
 			case("Software"):
 				Software software = new SoftwareController(this.session).getById(objectId);
@@ -349,28 +363,34 @@ public class CategoryController extends Controller {
 				category.getRemovedSoftwares().add(software);
 				software.getCategories().remove(category);
 				software.getRemovedFromCategories().add(category);
+				em.merge(software);
 			break;
 			case("User"):
 				User user = new UserController(this.session).getById(objectId);
 				category.getUsers().remove(user);
 				user.getCategories().remove(category);
+				em.merge(user);
 			break;
 			case("FAQ"):
 				FAQ faq = new InformationController(this.session).getFAQById(objectId);
 				category.getFaqs().remove(faq);
 				faq.getCategories().remove(category);
+				em.merge(faq);
 			break;
 			case("Announcement"):
 				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
 				category.getAnnouncements().remove(info);
 				info.getCategories().remove(category);
+				em.merge(info);
 			break;
 			case("Contact"):
 				Contact contact = new InformationController(this.session).getContactById(objectId);
 				category.getContacts().remove(contact);
 				contact.getCategories().remove(category);
+				em.merge(contact);
 			break;
 			}
+			em.merge(category);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
