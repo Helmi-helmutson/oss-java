@@ -190,7 +190,7 @@ public interface SoftwareResource {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("software.install")
-	Long createInstallation(
+	OssResponse createInstallation(
 			@ApiParam(hidden = true) @Auth Session session,
 			Category category
 			);

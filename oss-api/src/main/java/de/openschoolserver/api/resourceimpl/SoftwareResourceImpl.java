@@ -74,9 +74,8 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public Long createInstallation(Session session, Category category) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.createInstallationCategory(category);
+	public OssResponse createInstallation(Session session, Category category) {
+		return new SoftwareController(session).createInstallationCategory(category);
 	}
 
 	@Override
