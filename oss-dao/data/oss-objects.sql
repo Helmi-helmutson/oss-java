@@ -152,7 +152,6 @@ CREATE TABLE IF NOT EXISTS Devices (
 	serial       VARCHAR(16) DEFAULT '',
 	inventary    VARCHAR(16) DEFAULT '',
 	locality     VARCHAR(16) DEFAULT '',
-        creator_id   BIGINT UNSIGNED DEFAULT NULL,
         FOREIGN KEY(room_id)   REFERENCES Rooms(id)   ON DELETE RESTRICT,
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
         FOREIGN KEY(owner_id)  REFERENCES Users(id)   ON DELETE CASCADE,
@@ -455,7 +454,7 @@ CREATE TABLE IF NOT EXISTS SoftwareStatus (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         version_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
-	status             VARCHAR(1) NOT NULL,
+	status             VARCHAR(2) NOT NULL,
 	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
 	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
 	PRIMARY KEY(id)
