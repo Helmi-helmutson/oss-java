@@ -108,6 +108,19 @@ public class RoomController extends Controller {
 		}
 	}
 
+	public Room getByName(String name) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Room.getByName").setParameter("name", name); 
+			return (Room) query.getResultList().get(0);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
 	/*
 	 * Return a list the rooms in which the session user can register devices
 	 * 
@@ -586,9 +599,9 @@ public class RoomController extends Controller {
 		DeviceController deviceController = new DeviceController(this.session);
 		List<String> ipAddress;
 		try {
-			em.getTransaction().begin();
 			for(Device device : devices) {
 				//Remove trailing and ending spaces.
+				em.getTransaction().begin();
 				device.setName(device.getName().trim());
 				ipAddress = this.getAvailableIPAddresses(roomId, 2);
 				if( device.getIp().isEmpty() ){
@@ -614,7 +627,9 @@ public class RoomController extends Controller {
 					return new OssResponse(this.getSession(),"ERROR",device.getMac() + " " + error);
 				}
 				device.setRoom(room);
-				device.setOwner(this.session.getUser());
+				if( device.getOwner() == null ) {
+					device.setOwner(this.session.getUser());
+				}
 				if(device.getHwconfId() == null){
 					device.setHwconf(room.getHwconf());
 				} else {
@@ -622,9 +637,8 @@ public class RoomController extends Controller {
 				}
 				room.addDevice(device);
 				em.merge(room);
+				em.getTransaction().commit();
 			}
-			em.getTransaction().commit();
-
 		} catch (Exception e) { 
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());

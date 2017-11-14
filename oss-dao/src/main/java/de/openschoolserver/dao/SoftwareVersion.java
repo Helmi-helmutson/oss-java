@@ -42,13 +42,16 @@ public class SoftwareVersion implements Serializable {
 	
 	@Column(name = "software_id", insertable = false, updatable = false)
     private Long softwareId;
+	
+	private String status;
 
 	public SoftwareVersion() {
 	}
 
-	public SoftwareVersion(Software software, String version) {
+	public SoftwareVersion(Software software, String version, String status) {
 		this.software = software;
 		this.version  = version;
+		this.status   = status;
 	}
 
 	public long getId() {
@@ -95,6 +98,14 @@ public class SoftwareVersion implements Serializable {
 
 	public void setSoftware(Software software) {
 		this.software = software;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }

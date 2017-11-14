@@ -12,11 +12,16 @@ import io.swagger.annotations.*;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
 
+import java.io.InputStream;
 import java.util.List;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
@@ -348,5 +353,24 @@ public interface DeviceResource {
     		@PathParam("deviceId") long deviceId
     );
     
-    
+    @POST
+    @Path("import")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation( position = 1,
+    				value =	"Import devices from a CSV file. This MUST have following format:\\n"  +
+    						"* Separator is the semicolon ';'.\\n" +
+    						"* A header line must be provided.\\n" +
+    						"* The header line is case insensitive.\\n" +
+    						"* The fields Room and MAC are mandatory.\\n" +
+    						"* The import is only allowed in existing rooms\\n")
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed({"sysadmins","teachers"})
+    OssResponse uploadFileToDevice(
+    		@ApiParam(hidden = true) @Auth Session session,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+    );
 }

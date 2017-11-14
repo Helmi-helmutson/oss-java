@@ -1,11 +1,21 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  
  * (c) 2017 EXTIS GmbH www.extis.de - all rights reserved */
 package de.openschoolserver.dao.controller;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Map;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -14,6 +24,7 @@ import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.*;
 
@@ -383,6 +394,104 @@ public class DeviceController extends Controller {
 		for( User user : device.getLoggedIn() )
 			users.add(user.getUid());
 		return users;
+	}
+
+	/*
+	 * Import devices from a CSV file. This MUST have following format:
+	 * Separator: semicolon
+	 * All fields MUST exists. 
+	 * Fields: Room; MAC; Serial; Inventary; Locality; HWConf; Owner; Name; IP; WLANMAC; WLANIP; Row; Place; 
+	 * Mandatory fields which must not be empty: Room and MAC;
+	 */
+	public OssResponse importDevices(InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		File file = null;
+		List<String> importFile;
+		try {
+			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			importFile = Files.readAllLines(file.toPath());
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		}
+		RoomController        roomController      = new RoomController(this.session);
+		CloneToolController   cloneToolController = new CloneToolController(this.session);
+		UserController        userController      = new UserController(this.session);
+		Map<Long,List<Device>> devicesToImport    = new HashMap<>();
+		Map<String,Integer> header                = new HashMap<>();
+		StringBuilder Error                       = new StringBuilder();
+		
+		//Initialize the the hash for the rooms
+		for( Room r : roomController.getAll() ) {
+			devicesToImport.put(r.getId(), new ArrayList<Device>() );
+		}
+		String headerLine = importFile.get(0);
+		int i = 0;
+		for(String field : headerLine.split(";")) {
+			header.put(field.toLowerCase(), i);
+			i++;
+		}
+		if( !header.containsKey("mac") || !header.containsKey("room")) {
+			return new OssResponse(this.getSession(),"ERROR", "MAC and Room are mandatory fields");
+		}
+		for(String line : importFile.subList(1, importFile.size()-1) ) {
+			String[] values = line.split(";");
+			Room room = roomController.getByName(values[header.get("room")]);
+			if( room == null ) {
+				
+			}
+			Device device = new Device();
+			device.setRoom(room);
+			device.setMac(values[header.get("mac")]);
+			if(header.containsKey("serial")) {
+				device.setSerial(values[header.get("serial")]);
+			}
+			if(header.containsKey("inventary")) {
+				device.setInventary(values[header.get("inventary")]);
+			}
+			if(header.containsKey("locality")) {
+				device.setLocality(values[header.get("locality")]);
+			}
+			if(header.containsKey("name")) {
+				device.setName(values[header.get("name")]);
+			}
+			if(header.containsKey("wlanmac")) {
+				device.setWlanMac(values[header.get("wlanmac")]);
+			}
+			if(header.containsKey("ip")) {
+				device.setIp(values[header.get("ip")]);
+			}
+			if(header.containsKey("wlanip")) {
+				device.setWlanIp(values[header.get("wlanip")]);
+			}
+			if(header.containsKey("raw")) {
+				device.setRow(Integer.parseInt(values[header.get("raw")]));
+			}
+			if(header.containsKey("serial")) {
+				device.setPlace(Integer.parseInt(values[header.get("raw")]));
+			}
+			if(header.containsKey("owner")) {
+				device.setOwner(userController.getByUid(values[header.get("owner")]));
+			}
+			if(header.containsKey("hwconf")) {
+				device.setHwconf(cloneToolController.getByName(values[header.get("hwconf")]));
+			}
+			devicesToImport.get(room.getId()).add(device);
+		}
+		
+		for( Room r : roomController.getAll() ) {
+			if( !devicesToImport.get(r.getId()).isEmpty() ) {
+				OssResponse ossResponse = roomController.addDevices(r.getId(), devicesToImport.get(r.getId()));
+				if( ossResponse.getCode().equals("ERROR")) {
+					Error.append(ossResponse.getValue()).append("<br>");
+				}
+			}
+		}
+		if( Error.length() == 0 ) {
+			return new OssResponse(this.getSession(),"OK", "Devices was imported succesfully.");
+		}
+		return new OssResponse(this.getSession(),"ERROR",Error.toString());
 	}
 
 	public OssResponse setDefaultPrinter(long deviceId, long defaultPrinterId) {

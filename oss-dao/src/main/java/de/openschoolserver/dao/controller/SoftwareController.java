@@ -71,12 +71,18 @@ public class SoftwareController extends Controller {
 		}
 	}
 
-	public OssResponse add(Software software) {
+	public OssResponse add(Software software, Boolean replace) {
 		EntityManager em = getEntityManager();
 		Software oldSoftware = this.getByName(software.getName());
 		SoftwareVersion softwareVersion = software.getSoftwareVersions().get(0);	
 		if( oldSoftware != null ) {
 			try {
+				if( replace ) {
+					for( SoftwareVersion sv : oldSoftware.getSoftwareVersions() ) {
+						sv.setStatus("R");
+					}
+					softwareVersion.setStatus("C");
+				}
 				oldSoftware.getSoftwareVersions().add(softwareVersion);
 				softwareVersion.setSoftware(oldSoftware);
 				em.getTransaction().begin();
@@ -93,6 +99,9 @@ public class SoftwareController extends Controller {
 		software.addSoftwareVersion(softwareVersion);
 		softwareVersion.setSoftware(software);
 		software.setCreator(this.session.getUser());
+		if( replace ) {
+			softwareVersion.setStatus("C");
+		}
 		try {
 			em.getTransaction().begin();
 			em.persist(software);
@@ -562,6 +571,10 @@ public class SoftwareController extends Controller {
 	/*
 	 * Sets the software status on a device to a given version and remove the other status.
 	 */
+
+	/*
+	 * Sets the software status on a device to a given version and remove the other status.
+	 */
 	public void setSoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
 		EntityManager em = getEntityManager();
 		List<SoftwareVersion> lsv;
@@ -586,7 +599,7 @@ public class SoftwareController extends Controller {
 			} else {
 				lsv = s.getSoftwareVersions();
 				if( lsv.isEmpty() ) {
-					SoftwareVersion sv = new SoftwareVersion(s,version);
+					SoftwareVersion sv = new SoftwareVersion(s,version,"U");
 					em.persist(sv);
 					SoftwareStatus ss = new SoftwareStatus(d,sv,status);
 					em.persist(ss);
@@ -692,11 +705,32 @@ public class SoftwareController extends Controller {
 
 	/*
 	 * Checks if there is a software status to a given version of a software on a device.
+	 * 
+	 * @param   d     The concerning device
+	 * @param   s     The software
+	 * @param   state The status we are looking for
 	 */
 	public boolean checkSoftwareStatusOnDevice(Device d, Software s,  String state) {
 		for( SoftwareStatus ss : d.getSofwareStatus() ) {
 			if( ss.getStatus().equals(state) && 
-					ss.getSoftwareVersion().getSoftware().equals(s)) {
+				ss.getSoftwareVersion().getSoftware().equals(s)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*
+	 * Checks if there is a software version status to a given version of a software on a device.
+	 * 
+	 * @param   d     The concerning device
+	 * @param   sv    The software version
+	 * @param   state The status we are looking for
+	 */
+	public boolean checkSoftwareVersionStatusOnDevice(Device d, SoftwareVersion sv, String state) {
+		for( SoftwareStatus ss : d.getSofwareStatus() ) {
+			if( ss.getStatus().equals(state) && 
+				ss.getSoftwareVersion().equals(sv)) {
 				return true;
 			}
 		}
@@ -716,10 +750,40 @@ public class SoftwareController extends Controller {
 	}
 
 	/*
+	 * Set the software status on a device to a defined software version
+	 */
+	public void setInstallUpdateOnDevice(Software software, SoftwareVersion softwareVersion, Device device) {
+		EntityManager em = getEntityManager();
+		try {
+			boolean update = false;
+			em.getTransaction().begin();
+			for(SoftwareStatus ss : device.getSofwareStatus() ) {
+				if( ss.getSoftwareVersion().getSoftware().equals(software)) {
+					update = true;
+					if( !ss.getSoftwareVersion().equals(softwareVersion) ) {
+						ss.setStatus("US");
+						em.merge(ss);
+					}
+				}
+			}
+			if(! update ) {
+				SoftwareStatus softwareStatus = new SoftwareStatus(device,softwareVersion,"IS");
+				device.getSofwareStatus().add(softwareStatus);
+				em.persist(softwareStatus);
+				em.merge(device);
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error("Error in setInstallUpdateOnDevice" + e.getMessage());
+		} finally {
+			em.close();
+		}
+	}
+	
+	/*
 	 * Save the software status what shall be installed to host sls files.
 	 */
 	public OssResponse applySoftwareStateToHosts(){
-		EntityManager em = getEntityManager();
 		RoomController   roomController   = new RoomController(this.session);
 		DeviceController deviceController = new DeviceController(this.session);
 		Map<String,List<String>>   softwaresToInstall = new HashMap<>();
@@ -781,7 +845,7 @@ public class SoftwareController extends Controller {
 			for( Category category : room.getCategories() ) {
 				if( category.getCategoryType().equals("installation")) {
 					for( Software software : category.getRemovedSoftwares() ) {
-					    toRemove.add(software);
+						toRemove.add(software);
 					}
 				}
 			}
@@ -791,7 +855,7 @@ public class SoftwareController extends Controller {
 						toRemove.remove(software);
 						toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
 					}
-					
+
 				}
 			}
 			for( Device device : room.getDevices() ) {
@@ -804,8 +868,7 @@ public class SoftwareController extends Controller {
 		}
 
 		//Evaluate hwconf categories
-		Query query = em.createNamedQuery("HWConf.findAll");
-		for( HWConf hwconf : (List<HWConf>)  query.getResultList() ) {
+		for( HWConf hwconf : new CloneToolController(this.session).getAllHWConf() ) {
 			if( !hwconf.getDeviceType().equals("FatClient")) {
 				continue;
 			}
@@ -838,8 +901,12 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		}
+
 		//Write the hosts sls files
 		for( Device device : deviceController.getAll() ) {
+			if( device.getHwconf() == null || ! device.getHwconf().getDeviceType().equals("FatClient") ) {
+				continue;
+			}
 			List<String> deviceSls = new ArrayList<String>();
 			//Remove first the softwares.
 			if( softwaresToRemove.containsKey(device.getName()) ) {
@@ -854,46 +921,56 @@ public class SoftwareController extends Controller {
 			}
 			if( softwaresToInstall.containsKey(device.getName()) ) {
 				softwaresToInstall.get(device.getName()).sort((String s1, String s2) -> { return s2.compareTo(s1); });
-				for( String softwareKey :  softwaresToInstall.get(device.getName()) ) {			
-					String softwareName = softwareKey.substring(5);
-					StringBuilder filePath = new StringBuilder(SALT_PACKAGE_DIR);
-					filePath.append(softwareName).append(".sls");
-					File file = new File(filePath.toString());
-					logger.debug("Package File:" + filePath.toString() );
-					if( file.exists() ) {
-						Software software = this.getByName(softwareName);
-						for( SoftwareLicense sl : device.getSoftwareLicences() ) {
-							if( sl.getSoftware().equals(software) ) {
-								deviceSls.add(softwareName + "_KEY");
-								deviceSls.add("  grains.present:");
-								deviceSls.add("    - value: " + sl.getValue());
-							}
-						}
-						deviceSls.add("include:");
-						deviceSls.add("  - " + softwareName);
-					} else {
-						deviceSls.add(softwareName+":");
-						deviceSls.add("  - pkg:");
-						deviceSls.add("    - installed:");					
-					}
+			}
+			for( String softwareKey :  softwaresToInstall.get(device.getName()) ) {		
+				String softwareName = softwareKey.substring(5);
+				StringBuilder filePath = new StringBuilder(SALT_PACKAGE_DIR);
+				filePath.append(softwareName).append(".sls");
+				File file = new File(filePath.toString());
+				logger.debug("Package File:" + filePath.toString() );
+				if( file.exists() ) {
 					Software software = this.getByName(softwareName);
-					if(! this.checkSoftwareStatusOnDevice(device, software, "I")){
-						this.setSoftwareStatusOnDevice(device, software, "", "IS");
+					for( SoftwareLicense sl : device.getSoftwareLicences() ) {
+						if( sl.getSoftware().equals(software) ) {
+							deviceSls.add(softwareName + "_KEY");
+							deviceSls.add("  grains.present:");
+							deviceSls.add("    - value: " + sl.getValue());
+						}
+					}
+					/*
+					 * TODO to implement frozen versions.
+					 */
+					deviceSls.add("include:");
+					deviceSls.add("  - " + softwareName);
+				} else {
+					deviceSls.add(softwareName+":");
+					deviceSls.add("  - pkg:");
+					deviceSls.add("    - installed:");					
+				}
+				Software software               = this.getByName(softwareName);
+				SoftwareVersion softwareVersion = null;
+				for( SoftwareVersion sv : software.getSoftwareVersions() ) {
+					if( sv.getStatus().equals("C") ) {
+						softwareVersion = sv;
+						break;
 					}
 				}
-			}
-			if( deviceSls.size() > 0) {
-				StringBuilder hostname = new StringBuilder();
-				hostname.append(device.getName()).append(".").append(domainName);
+				if( !this.checkSoftwareVersionStatusOnDevice(device, softwareVersion, "I")) {
+					this.setInstallUpdateOnDevice(software, softwareVersion, device);
+				}
+				if( deviceSls.size() > 0) {
+					StringBuilder hostname = new StringBuilder();
+					hostname.append(device.getName()).append(".").append(domainName);
 
-				topSls.add("  - " + hostname.toString() + ":");
-				topSls.add("    - oss_device_" + hostname.toString());
+					topSls.add("  - " + hostname.toString() + ":");
+					topSls.add("    - oss_device_" + hostname.toString());
 
-				Path SALT_DEV   = Paths.get("/srv/salt/oss_device_" + hostname.append(".sls").toString());
-				try {
-					Files.write(SALT_DEV, deviceSls );
-				} catch( IOException e ) { 
-					logger.error(e.getMessage());
+					Path SALT_DEV   = Paths.get("/srv/salt/oss_device_" + hostname.append(".sls").toString());
+					try {
+						Files.write(SALT_DEV, deviceSls );
+					} catch( IOException e ) { 
+						logger.error(e.getMessage());
+					}
 				}
 			}
 		}
@@ -916,7 +993,7 @@ public class SoftwareController extends Controller {
 	 * @param	softwareName	Name of the corresponding software package
 	 * @param	version			The version of the corresponding software
 	 * @param	status			The state to be set
-	 * @return					An OssResponse object will be responsed
+	 * @return					An OssResponse object will be responded
 	 */
 	public OssResponse setSoftwareStatusOnDevice(Device device, String softwareName, String version, String status) {
 		SoftwareStatus  softwareStatus  = null;

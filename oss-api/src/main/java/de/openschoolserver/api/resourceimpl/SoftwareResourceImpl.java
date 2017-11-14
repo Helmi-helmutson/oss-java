@@ -45,7 +45,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse add(Session session, Software software) {
 		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.add(software);
+		return softwareController.add(software,true);
 	}
 
 	@Override

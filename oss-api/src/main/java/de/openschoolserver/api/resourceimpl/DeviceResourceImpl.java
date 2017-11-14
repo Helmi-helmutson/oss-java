@@ -1,10 +1,13 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.InputStream;
 import java.util.List;
 
 
 import javax.ws.rs.WebApplicationException;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.DeviceResource;
 import de.openschoolserver.dao.Device;
@@ -156,5 +159,11 @@ public class DeviceResourceImpl implements DeviceResource {
 	@Override
 	public List<Device> getByHWConf(Session session, Long id) {
 		return new DeviceController(session).getByHWConf(id);
+	}
+
+	@Override
+	public OssResponse uploadFileToDevice(Session session, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		return new DeviceController(session).importDevices(fileInputStream, contentDispositionHeader);
 	}
 }

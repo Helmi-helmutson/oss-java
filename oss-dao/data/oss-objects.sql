@@ -431,26 +431,31 @@ CREATE TABLE IF NOT EXISTS Softwares (
         PRIMARY KEY(id)
 );
 
-
+# status C -> current this is the most recent version and does exists on the server and can be installed
+# status R -> replaced this version does not exists on the server but is installed on some clients
+# status D -> this is an older version which does exists on the server and can be installed
 CREATE TABLE IF NOT EXISTS SoftwareVersions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
 	version        VARCHAR(32) NOT NULL,
+	status         VARCHAR(1)  NOT NULL,
         FOREIGN KEY(software_id)    REFERENCES Softwares(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
 
 # status I  -> installed
 # status IS -> installation scheduled
+# status US -> update scheduled
 # status MD -> manuell deinstalled
 # status DS -> deinstallation scheduled
 # status DF -> deinstallation failed
 # status IF -> installation failed
+# status FR -> installed version is frozen: This must not be updated.
 CREATE TABLE IF NOT EXISTS SoftwareStatus (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         version_id         BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
-	status             VARCHAR(2) NOT NULL,
+	status             VARCHAR(1) NOT NULL,
 	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
 	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
 	PRIMARY KEY(id)
