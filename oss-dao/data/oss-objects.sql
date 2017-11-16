@@ -158,13 +158,13 @@ CREATE TABLE IF NOT EXISTS Devices (
         PRIMARY KEY(id)
 );
 
-INSERT INTO Devices VALUES(1,1,1,NULL,'#SCHOOL_NETBIOSNAME#','#SCHOOL_SERVER#',NULL,'','',0,0,'','','',6);
-INSERT INTO Devices VALUES(2,1,1,NULL,'schoolserver','#SCHOOL_MAILSERVER#',NULL,'','',0,0,'','','',6);
-INSERT INTO Devices VALUES(3,1,1,NULL,'proxy','#SCHOOL_PROXY#',NULL,'','',0,0,'','','',6);
-INSERT INTO Devices VALUES(4,1,1,NULL,'printserver','#SCHOOL_PRINTSERVER#',NULL,'','',0,0,'','','',6);
-INSERT INTO Devices VALUES(5,1,1,NULL,'backup','#SCHOOL_BACKUP_SERVER#',NULL,'','',0,0,'','','',6);
-INSERT INTO Devices VALUES(6,1,1,NULL,'install','#SCHOOL_SERVER#',NULL,'','',0,0,'','','',6);
-INSERT INTO Devices VALUES(7,1,1,NULL,'timeserver','#SCHOOL_SERVER#',NULL,'','',0,0,'','','',6);
+INSERT INTO Devices VALUES(1,1,1,6,'#SCHOOL_NETBIOSNAME#','#SCHOOL_SERVER#',NULL,'','',0,0,'','','');
+INSERT INTO Devices VALUES(2,1,1,6,'schoolserver','#SCHOOL_MAILSERVER#',NULL,'','',0,0,'','','');
+INSERT INTO Devices VALUES(3,1,1,6,'proxy','#SCHOOL_PROXY#',NULL,'','',0,0,'','','');
+INSERT INTO Devices VALUES(4,1,1,6,'printserver','#SCHOOL_PRINTSERVER#',NULL,'','',0,0,'','','');
+INSERT INTO Devices VALUES(5,1,1,6,'backup','#SCHOOL_BACKUP_SERVER#',NULL,'','',0,0,'','','');
+INSERT INTO Devices VALUES(6,1,1,6,'install','#SCHOOL_SERVER#',NULL,'','',0,0,'','','');
+INSERT INTO Devices VALUES(7,1,1,6,'timeserver','#SCHOOL_SERVER#',NULL,'','',0,0,'','','');
 
 CREATE TABLE IF NOT EXISTS AccessInRooms (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
