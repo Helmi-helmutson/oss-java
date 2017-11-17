@@ -657,6 +657,7 @@ public class Controller extends Config {
 		}
 		mconfig.setKeyword(key);
 		mconfig.setValue(value);
+		mconfig.setCreator(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(mconfig);
@@ -696,6 +697,7 @@ public class Controller extends Config {
 		}
 		config.setKeyword(key);
 		config.setValue(value);
+		config.setCreator(this.session.getUser());
 		try {
 			em.getTransaction().begin();
 			em.persist(config);
