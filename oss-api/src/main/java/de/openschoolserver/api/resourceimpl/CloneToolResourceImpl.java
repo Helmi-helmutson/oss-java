@@ -5,10 +5,14 @@ import de.openschoolserver.dao.HWConf;
 
 
 import de.openschoolserver.dao.Clone;
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.controller.CloneToolController;
+import de.openschoolserver.dao.controller.RoomController;
+import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.api.resources.CloneToolResource;
 
 
@@ -18,14 +22,12 @@ import java.util.List;
 public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
-	public Long getHWConf(Session session) {
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		final Long  hwconf = cloneToolController.getHWConf();
-		if (hwconf == null) {
-			throw new WebApplicationException(404);
+	public String getHWConf(Session session) {
+		if( session.getDevice() != null ) {
+			return Long.toString(session.getDevice().getHwconf().getId());
 		}
-		return hwconf;
-	}
+		return "";
+    }
 
 	@Override
 	public String isMaster(Session session) {
@@ -37,6 +39,50 @@ public class CloneToolResourceImpl implements CloneToolResource {
 			return "true";
 		}
 		return "";
+	}
+	
+	@Override
+	public String isMaster(Session session, Long deviceId) {
+		final DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getById(deviceId);
+		if( device != null &&  deviceController.checkConfig(device,"isMaster" ) ) {
+			return "true";
+		}
+		return "";
+	}
+
+	@Override
+	public OssResponse setMaster(Session session, Long deviceId, int isMaster) {
+		final DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getById(deviceId);
+		if( device == null ) {
+			return new OssResponse(session,"ERRO","Device was not found.");
+		}
+		if( deviceController.checkConfig(device,"isMaster" ) && isMaster == 0) {
+			return deviceController.deleteConfig(device, "isMaster");
+		}
+		if( ! deviceController.checkConfig(device,"isMaster" ) && isMaster == 1 ) {
+			return deviceController.setConfig(device, "isMaster","true");
+		}
+
+		return new OssResponse(session,"OK","Nothing to change.");
+	}
+
+	@Override
+	public OssResponse setMaster(Session session, int isMaster) {
+		final DeviceController deviceController = new DeviceController(session);
+		Device device = session.getDevice();
+		if( device == null ) {
+			return new OssResponse(session,"ERRO","Device was not found.");
+		}
+		if( deviceController.checkConfig(device,"isMaster" ) && isMaster == 0) {
+			return deviceController.deleteConfig(device, "isMaster");
+		}
+		if( ! deviceController.checkConfig(device,"isMaster" ) && isMaster == 1 ) {
+			return deviceController.setConfig(device, "isMaster","true");
+		}
+
+		return new OssResponse(session,"OK","Nothing to change.");
 	}
 
 	@Override
@@ -122,4 +168,15 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	public OssResponse stopCloning(Session session, Long hwconfId) {
 		return new CloneToolController(session).stopCloning(hwconfId);
 	}
+
+	@Override
+	public String getRoomsToRegister(Session session) {
+		StringBuilder roomList = new StringBuilder();
+		for( Room room : new RoomController(session).getAllToRegister() ) {
+			roomList.append(room.getId()).append("##").append(room.getName()).append(" ");
+		}
+		return roomList.toString();
+	}
+
+
 }

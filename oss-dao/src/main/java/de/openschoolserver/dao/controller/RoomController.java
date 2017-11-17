@@ -741,6 +741,7 @@ public class RoomController extends Controller {
 			} else {
 				device.setName(name);
 			}
+			device.setHwconf(room.getHwconf());
 			logger.debug("Sysadmin register:" + device.getMac() +"#" +device.getIp() +"#" +device.getName());
 		}
 		//Check if the Device settings are OK
@@ -755,6 +756,7 @@ public class RoomController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.merge(room);
+			em.merge(device);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());

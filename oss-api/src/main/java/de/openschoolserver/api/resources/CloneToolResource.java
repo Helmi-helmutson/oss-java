@@ -1,9 +1,6 @@
 package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
-
-
-
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -42,7 +39,7 @@ public interface CloneToolResource {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	Long getHWConf(
+	String getHWConf(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
   
@@ -59,6 +56,55 @@ public interface CloneToolResource {
 	@PermitAll
 	String isMaster(
 	        @ApiParam(hidden = true) @Auth Session session
+	);
+  
+	/*
+	 * Get clonetool/devices/{deviceId}/isMaster
+	 */
+	@GET
+	@Path("devices/{deviceId}/isMaster")
+	@Produces("text/plain")
+	@ApiOperation(value = "Returns 'true' if the workstation of the deviceId is master. Returns empty if not.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	String isMaster(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("deviceId") Long deviceId
+	);
+  
+	/*
+	 * Get clonetool/devices/{deviceId}/setMaster/{isMaster}
+	 */
+	@PUT
+	@Path("devices/{deviceId}/setMaster/{isMaster}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Returns 'true' if the workstation of the session is master. Returns empty if not.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("device.manage")
+	OssResponse setMaster(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("deviceId") Long deviceId,
+	        @PathParam("isMaster") int isMaster
+	);
+  
+	/*
+	 * Get clonetool/devices/{deviceIisMaster
+	 */
+	@PUT
+	@Path("devices/setMaster/{isMaster}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Returns 'true' if the workstation of the session is master. Returns empty if not.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("device.manage")
+	OssResponse setMaster(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("isMaster") int isMaster
 	);
   
 	/*
@@ -158,6 +204,22 @@ public interface CloneToolResource {
 	        @PathParam("hwconfId") Long hwconfId,
 	        @PathParam("partitionName") String partitionName,
 	        @PathParam("key") String key
+	);
+
+	/*
+	 * GET clonetool/roomsToRegister
+	 */
+	@GET
+	@Path("roomsToRegister")
+	@Produces("text/plain")
+	@ApiOperation(value = "Gets a list of rooms to register." +
+			      "The format is id name##id name" )
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("device.manage")
+	String getRoomsToRegister(
+	        @ApiParam(hidden = true) @Auth Session session
 	);
 
 	// POST and PUSH methodes.
