@@ -423,6 +423,53 @@ public interface CloneToolResource {
 	/*
 	 * 
 	 */
+	@PUT
+	@Path("{hwconfId}/cloning/{multiCast}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for all workstations in a hwconf." +
+						  "Multicast can be 0 or 1"
+						)
+	@RolesAllowed("device.add")
+	OssResponse startCloning(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("hwconfId")  Long hwconfId,
+			@PathParam("multiCast") int multiCast
+			);
+
+	/*
+	 * 
+	 */
+	@PUT
+	@Path("rooms/{roomId}/cloning/{multiCast}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for all workstations in a room." +
+			  			  "Multicast can be 0 or 1"
+						)
+	@RolesAllowed("device.add")
+	OssResponse startCloningInRoom(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId") Long roomId,
+			@PathParam("multiCast") int multiCast
+			);
+
+	/*
+	 * 
+	 */
+	@PUT
+	@Path("devices/{deviceId}/cloning")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for a workstations"
+						)
+	@RolesAllowed("device.add")
+	OssResponse startCloningOnDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("deviceId") Long deviceId
+			);
+
+
+	/*
+	 * 
+	 */
 	@DELETE
 	@Path("{hwconfId}/cloning")
 	@Produces(JSON_UTF8)
@@ -432,5 +479,35 @@ public interface CloneToolResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("hwconfId") Long hwconfId
 			);
+	
+	/*
+	 * 
+	 */
+	@DELETE
+	@Path("rooms/{roomId}/cloning")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for all workstations in a room." +
+			  			  "Multicast can be 0 or 1"
+						)
+	@RolesAllowed("device.add")
+	OssResponse stopCloningInRoom(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId") Long roomId
+			);
+
+	/*
+	 * 
+	 */
+	@DELETE
+	@Path("devices/{deviceId}/cloning")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for a workstations"
+						)
+	@RolesAllowed("device.add")
+	OssResponse stopCloningOnDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("deviceId") Long deviceId
+			);
+
 
 }

@@ -162,16 +162,6 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	}
 
 	@Override
-	public OssResponse startCloning(Session session, Long hwconfId, Clone parameters) {
-		return new CloneToolController(session).startCloning(hwconfId,parameters);
-	}
-
-	@Override
-	public OssResponse stopCloning(Session session, Long hwconfId) {
-		return new CloneToolController(session).stopCloning(hwconfId);
-	}
-
-	@Override
 	public String getRoomsToRegister(Session session) {
 		StringBuilder roomList = new StringBuilder();
 		for( Room room : new RoomController(session).getAllToRegister() ) {
@@ -198,6 +188,41 @@ public class CloneToolResourceImpl implements CloneToolResource {
 		ArrayList<Device> devices = new ArrayList<Device>();
 		devices.add(device);
 		return new RoomController(session).addDevices(roomId, devices);
+	}
+	
+	@Override
+	public OssResponse startCloning(Session session, Long hwconfId, Clone parameters) {
+		return new CloneToolController(session).startCloning(hwconfId,parameters);
+	}
+
+	@Override
+	public OssResponse startCloning(Session session, Long hwconfId, int multiCast) {
+		return new CloneToolController(session).startCloning("hwconf", hwconfId, multiCast);
+	}
+
+	@Override
+	public OssResponse startCloningInRoom(Session session, Long roomId, int multiCast) {
+		return new CloneToolController(session).startCloning("room", roomId, multiCast);
+	}
+
+	@Override
+	public OssResponse startCloningOnDevice(Session session, Long deviceId) {
+		return new CloneToolController(session).startCloning("device", deviceId, 0);
+	}
+
+	@Override
+	public OssResponse stopCloning(Session session, Long hwconfId) {
+		return new CloneToolController(session).stopCloning("hwconf",hwconfId);
+	}
+
+	@Override
+	public OssResponse stopCloningInRoom(Session session, Long roomId) {
+		return new CloneToolController(session).stopCloning("room",roomId);
+	}
+
+	@Override
+	public OssResponse stopCloningOnDevice(Session session, Long deviceId) {
+		return new CloneToolController(session).stopCloning("device",deviceId);
 	}
 
 }

@@ -1,5 +1,7 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
+import java.io.IOException;
+import java.nio.file.*;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import de.openschoolserver.dao.Clone;
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.OssResponse;
@@ -21,6 +24,9 @@ import de.openschoolserver.dao.Session;
 public class CloneToolController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(CloneToolController.class);
+	
+	protected Path PXE_BOOT   = Paths.get("/usr/share/oss/templates/pxeboot");
+	protected Path ELILO_BOOT = Paths.get("/usr/share/oss/templates/eliloboot");
 
 	public CloneToolController(Session session) {
 		super(session);
@@ -78,6 +84,18 @@ public class CloneToolController extends Controller {
 			Query query = em.createNamedQuery("Partition.getPartitionByName");
 			query.setParameter("hwconfId", hwconfId).setParameter("name",partition);
 			return (Partition) query.getSingleResult();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	public Partition getPartitionById(Long partitionId) {
+		EntityManager em = getEntityManager();
+		try {
+			return em.find(Partition.class, partitionId);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -333,21 +351,149 @@ public class CloneToolController extends Controller {
 		}
 	}
 
+	public OssResponse startCloning(String type, Long id, int multiCast) {
+		List<String> pxeBoot;
+		List<String> eliloBoot;
+		StringBuilder ERROR = new StringBuilder();
+		try {
+			pxeBoot   = Files.readAllLines(PXE_BOOT);
+			eliloBoot = Files.readAllLines(PXE_BOOT);
+		}
+		catch( IOException e ) { 
+			e.printStackTrace();
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		}
+		for(int i = 0; i < pxeBoot.size(); i++) {
+			String temp = pxeBoot.get(i);
+			temp = temp.replaceAll("#PARTITIONS#", "all");
+			if( multiCast != 1) {
+				temp = temp.replaceAll("MULTICAST=1", "");
+			}
+			pxeBoot.set(i, temp);
+		}
+		for(int i = 0; i < eliloBoot.size(); i++) {
+			String temp = eliloBoot.get(i);
+			temp = temp.replaceAll("#PARTITIONS#", "all");
+			if( multiCast != 1) {
+				temp = temp.replaceAll("MULTICAST=1", "");
+			}
+			eliloBoot.set(i, temp);
+		}
+		
+		List<Device> devices = new ArrayList<Device>();
+		switch(type) {
+			case "device":
+				devices.add(new DeviceController(this.session).getById(id));
+				break;
+			case "hwconf":
+				devices = new DeviceController(this.session).getByHWConf(id);
+				break;
+			case "room":
+				devices = new RoomController(this.session).getById(id).getDevices();
+				
+		}
+		
+		for( Device device : devices ) {
+			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
+			String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
+			try {
+				Files.write(Paths.get(pathPxe), pxeBoot);
+				Files.write(Paths.get(pathElilo), eliloBoot);
+			}catch( IOException e ) { 
+				e.printStackTrace();
+				ERROR.append(e.getMessage());
+			}
+		}
+		if( ERROR.length() == 0 ) {
+			return new OssResponse(this.getSession(),"OK", "Boot configuration was saved succesfully." );
+		}
+		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during saving the boot configuration:" + ERROR.toString());
+	}
+	
 	public OssResponse startCloning(Long hwconfId, Clone parameters) {
 		List<String> partitions = new ArrayList<String>();
-		for( Long partitionIds : parameters.getPartitionIds() ) {
-			
+		List<String> pxeBoot;
+		List<String> eliloBoot;
+		StringBuilder ERROR = new StringBuilder();
+		try {
+			pxeBoot   = Files.readAllLines(PXE_BOOT);
+			eliloBoot = Files.readAllLines(PXE_BOOT);
+		}
+		catch( IOException e ) { 
+			e.printStackTrace();
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		}
+		for( Long partitionId : parameters.getPartitionIds() ) {
+			Partition partition = this.getPartitionById(partitionId);
+			if( partition == null ) {
+				return new OssResponse(this.getSession(),"ERROR", "Can not find partition with id:" + partitionId);
+			}
+			partitions.add(partition.getName());
 		}
 		String parts = String.join(",",partitions);
-		
-		for( Long deviceId : parameters.getDeviceIds() ) {
-			
+		for(int i = 0; i < pxeBoot.size(); i++) {
+			String temp = pxeBoot.get(i);
+			temp = temp.replaceAll("#PARTITIONS#", parts.toString());
+			if(!parameters.isMultiCast()) {
+				temp = temp.replaceAll("MULTICAST=1", "");
+			}
+			pxeBoot.set(i, temp);
 		}
-		return null;
+		for(int i = 0; i < eliloBoot.size(); i++) {
+			String temp = eliloBoot.get(i);
+			temp = temp.replaceAll("#PARTITIONS#", parts.toString());
+			if(!parameters.isMultiCast()) {
+				temp = temp.replaceAll("MULTICAST=1", "");
+			}
+			eliloBoot.set(i, temp);
+		}
+		DeviceController dc = new DeviceController(this.session);
+		for( Long deviceId : parameters.getDeviceIds() ) {
+			Device device   = dc.getById(deviceId);
+			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
+			String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
+			try {
+				Files.write(Paths.get(pathPxe), pxeBoot);
+				Files.write(Paths.get(pathElilo), eliloBoot);
+			}catch( IOException e ) { 
+				e.printStackTrace();
+				ERROR.append(e.getMessage());
+			}
+		}
+		if( ERROR.length() == 0 ) {
+			return new OssResponse(this.getSession(),"OK", "Boot configuration was saved succesfully." );
+		}
+		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during saving the boot configuration:" + ERROR.toString());
 	}
 
-	public OssResponse stopCloning(Long hwconfId) {
-		// TODO Auto-generated method stub
-		return null;
+	public OssResponse stopCloning(String type, Long id) {
+		StringBuilder ERROR = new StringBuilder();
+		List<Device> devices = new ArrayList<Device>();
+		switch(type) {
+			case "device":
+				devices.add(new DeviceController(this.session).getById(id));
+				break;
+			case "hwconf":
+				devices = new DeviceController(this.session).getByHWConf(id);
+				break;
+			case "room":
+				devices = new RoomController(this.session).getById(id).getDevices();
+				
+		}
+		for( Device device : devices ) {
+			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
+			String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
+			try {
+				Files.deleteIfExists(Paths.get(pathPxe));
+				Files.deleteIfExists(Paths.get(pathElilo));
+			}catch( IOException e ) { 
+				e.printStackTrace();
+				ERROR.append(e.getMessage());
+			}
+		}
+		if( ERROR.length() == 0 ) {
+			return new OssResponse(this.getSession(),"OK", "Boot configuration was removed succesfully." );
+		}
+		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during removing the boot configuration:" + ERROR.toString());
 	}
 }

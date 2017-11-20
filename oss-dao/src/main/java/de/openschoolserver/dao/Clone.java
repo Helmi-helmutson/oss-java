@@ -14,11 +14,11 @@ public class Clone {
 		// TODO Auto-generated constructor stub
 	}
 
-	public boolean isMultipath() {
+	public boolean isMultiCast() {
 		return this.multicast;
 	}
 
-	public void setMultipath(boolean multicast) {
+	public void setMultiCast(boolean multicast) {
 		this.multicast = multicast;
 	}
 
