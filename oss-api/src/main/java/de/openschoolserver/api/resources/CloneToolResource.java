@@ -221,6 +221,43 @@ public interface CloneToolResource {
 	String getRoomsToRegister(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
+	
+	/*
+     * GET rooms/{roomId}/getAvailableIPAddresses
+     */
+    @GET
+    @Path("rooms/{roomId}/availableIPAddresses")
+    @Produces("text/plain")
+    @ApiOperation(value = "Get count available ip-adresses of the room. The string list will contains the proposed name too: 'IP-Addres Proposed-Name'")
+        @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "There is no more IP address in this room."),
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.add")
+    String getAvailableIPAddresses(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+    );
+
+    /*
+     * PUT rooms/{roomId}/device/{macAddress}/{name}
+     */
+    @PUT
+    @Path("rooms/{roomId}/{macAddress}/{IP}/{name}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create a new device. This api call can be used only for registering own devices.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    OssResponse addDevice(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("macAddress") String macAddress,
+            @PathParam("IP") String IP,
+            @PathParam("name") String name
+    );
 
 	// POST and PUSH methodes.
 

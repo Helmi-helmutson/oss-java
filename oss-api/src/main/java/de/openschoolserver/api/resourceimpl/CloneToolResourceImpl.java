@@ -17,6 +17,8 @@ import de.openschoolserver.api.resources.CloneToolResource;
 
 
 import javax.ws.rs.WebApplicationException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 public class CloneToolResourceImpl implements CloneToolResource {
@@ -178,5 +180,24 @@ public class CloneToolResourceImpl implements CloneToolResource {
 		return roomList.toString();
 	}
 
+	@Override
+	public String getAvailableIPAddresses(Session session, long roomId) {
+		StringBuilder roomList = new StringBuilder();
+		for( String name : new RoomController(session).getAvailableIPAddresses(roomId, 0) ) {
+			roomList.append(name.replaceFirst(" ","/")).append(" ").append(name.split(" ")[1]).append(" ");
+		}
+		return roomList.toString();
+	}
+
+	@Override
+	public OssResponse addDevice(Session session, long roomId, String macAddress, String IP, String name) {
+		Device device = new Device();
+		device.setName(name);
+		device.setMac(macAddress);
+		device.setIp(IP);
+		ArrayList<Device> devices = new ArrayList<Device>();
+		devices.add(device);
+		return new RoomController(session).addDevices(roomId, devices);
+	}
 
 }
