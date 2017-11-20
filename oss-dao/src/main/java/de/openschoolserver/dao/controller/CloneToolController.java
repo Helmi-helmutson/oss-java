@@ -88,6 +88,9 @@ public class CloneToolController extends Controller {
 
 	public String getConfigurationValue(Long hwconfId, String partition, String key ) {
 		Partition part = this.getPartition(hwconfId, partition);
+		if( part == null) {
+			return "";
+		}
 		switch (key) {
 		case "DESC" :
 			return part.getDescription();
