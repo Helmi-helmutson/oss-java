@@ -240,13 +240,16 @@ public class UserController extends Controller {
 		User oldUser = this.getById(user.getId());
 		if(!user.getPassword().isEmpty()) {
 			OssResponse ossResponse = this.checkPassword(user.getPassword());
-			if(ossResponse != null)
+			if(ossResponse != null) {
 				return ossResponse;
+			}
 		}
 		oldUser.setGivenName( user.getGivenName());
 		oldUser.setSureName(user.getSureName());
 		oldUser.setBirthDay(user.getBirthDay());
 		oldUser.setPassword(user.getPassword());
+		oldUser.setFsQuota(user.getFsQuota());
+		oldUser.setMsQuota(user.getMsQuota());
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
