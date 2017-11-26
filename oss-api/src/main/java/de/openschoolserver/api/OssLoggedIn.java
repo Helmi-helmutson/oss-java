@@ -1,4 +1,5 @@
 package de.openschoolserver.api;
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.DeviceController;
@@ -25,13 +26,12 @@ public class OssLoggedIn {
          while( true ){
         	 try {
         		 String ip = in.readLine();
-        		 if( deviceController.getLoggedInUsersObject(ip).isEmpty() ) {
-        			 System.out.println("ERR user=\"No user logged in " + ip + "\"");
-        		 } else {
-        			 User user = deviceController.getLoggedInUsersObject(ip).get(0);
-        			 //TODO check internetDisabled
-        			 System.out.println("OK user=\"" + user.getUid() + "\"");
-        		 }
+        		 Device device = deviceController.getByIP(ip);
+        			if( device != null && device.getLoggedIn() != null ) {
+        				System.out.println("OK user=\"" + device.getLoggedIn().get(0).getUid()+ "\"");
+        			} else {
+        				System.out.println("ERR user=\"No user logged in " + ip + "\"");
+        			}
         	 } catch (IOException e) {
         		 System.err.println("IO ERROR: " + e.getMessage());
         	 }

@@ -257,6 +257,21 @@ public interface DeviceResource {
     );
     
     /*
+     * GET devices/loggedIn/{IP-Address}
+     */
+    @GET
+    @Path("loggedIn/{IP}")
+    @Produces("text/plain")
+    @ApiOperation(value = "Get the logged on users on a device defined by IP.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("room.manage")
+    String getFirstLoggedInUser(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP
+    );
+    /*
      * PUT devices/loggedInUsers/{IP-Address}/{userName}
      */
     @PUT

@@ -362,11 +362,13 @@ public class DeviceController extends Controller {
 	public List<String> getLoggedInUsers(String IP) {
 		Device device = this.getByIP(IP);
 		List<String> users = new ArrayList<String>();
-		if( device == null)
+		if( device == null) {
 			return users;
-		for( User user : device.getLoggedIn() )
+		}
+		for( User user : device.getLoggedIn() ) {
 			users.add(user.getUid());
-		//users.add(user.getUid() + " " + user.getGivenName() + " " +user.getSureName());
+			//users.add(user.getUid() + " " + user.getGivenName() + " " +user.getSureName());
+		}
 		return users;
 	}
 
@@ -375,12 +377,7 @@ public class DeviceController extends Controller {
 	 */
 	public List<User> getLoggedInUsersObject(String IP) {
 		Device device = this.getByIP(IP);
-		List<User> users = new ArrayList<User>();
-		if( device == null)
-			return users;
-		for( User user : device.getLoggedIn() )
-			users.add(user);
-		return users;
+		return device.getLoggedIn();
 	}
 
 	/*
@@ -389,10 +386,12 @@ public class DeviceController extends Controller {
 	public List<String> getLoggedInUsers(Long deviceId) {
 		Device device = this.getById(deviceId);
 		List<String> users = new ArrayList<String>();
-		if( device == null)
+		if( device == null) {
 			return users;
-		for( User user : device.getLoggedIn() )
+		}
+		for( User user : device.getLoggedIn() ) {
 			users.add(user.getUid());
+		}
 		return users;
 	}
 
@@ -535,7 +534,13 @@ public class DeviceController extends Controller {
 
 	public OssResponse addLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP:" + IP);
+		}
 		User user = new UserController(this.session).getByUid(userName);
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid:" + userName);
+		}
 		if( user.getLoggedOn().contains(device)) {
 			return new OssResponse(this.getSession(),"OK", "Logged in user was already added on this device for you:" + device.getName() + ";" + IP + ";" + userName);
 		}

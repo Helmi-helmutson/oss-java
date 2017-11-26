@@ -92,8 +92,16 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public List<String> getLoggedInUsers(Session session, String IP) {
-		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.getLoggedInUsers(IP);
+		return new DeviceController(session).getLoggedInUsers(IP);
+	}
+	
+	@Override
+	public String getFirstLoggedInUser(Session session, String IP) {
+		Device device = new DeviceController(session).getByIP(IP);
+		if( device != null && device.getLoggedIn() != null ) {
+			return "OK " + device.getLoggedIn().get(0).getUid() + "\n";
+		}
+		return "NO\n";
 	}
 
 	@Override
@@ -166,4 +174,6 @@ public class DeviceResourceImpl implements DeviceResource {
 			FormDataContentDisposition contentDispositionHeader) {
 		return new DeviceController(session).importDevices(fileInputStream, contentDispositionHeader);
 	}
+
+	
 }
