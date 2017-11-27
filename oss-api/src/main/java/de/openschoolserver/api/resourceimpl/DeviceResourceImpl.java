@@ -94,14 +94,14 @@ public class DeviceResourceImpl implements DeviceResource {
 	public List<String> getLoggedInUsers(Session session, String IP) {
 		return new DeviceController(session).getLoggedInUsers(IP);
 	}
-	
+
 	@Override
 	public String getFirstLoggedInUser(Session session, String IP) {
 		Device device = new DeviceController(session).getByIP(IP);
-		if( device != null && device.getLoggedIn() != null ) {
-			return "OK " + device.getLoggedIn().get(0).getUid() + "\n";
+		if( device != null && !device.getLoggedIn().isEmpty() ) {
+			return "OK user=\"" + device.getLoggedIn().get(0).getUid()+ "\"\n";
 		}
-		return "NO\n";
+		return "ERR user=\"No user logged in \"\n";
 	}
 
 	@Override

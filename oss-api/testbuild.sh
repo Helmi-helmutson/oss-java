@@ -12,5 +12,4 @@ tar cjf /data1/OSC/home:varkoly:OSS-4-0/oss-java/oss-java.tar.bz2 oss-java
 cp ../oss-dao/data/oss-objects.sql /data1/OSC/home:varkoly:OSS-4-0/oss-java/
 CLASSPATH=$( grep "^CLASSPATH=" oss-java/bin/de.openschoolserver.api )
 sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > /data1/OSC/home:varkoly:OSS-4-0/oss-java/start-oss-api
-sed "s#@CLASSPATH@#$CLASSPATH#" oss-logged-in > /data1/OSC/home:varkoly:OSS-4-0/oss-java/oss-logged-in
 rm -r oss-java
