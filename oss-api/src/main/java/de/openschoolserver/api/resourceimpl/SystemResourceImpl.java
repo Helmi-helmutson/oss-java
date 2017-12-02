@@ -142,7 +142,6 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public OssResponse setProxyDefault(Session session, List<Map<String, Map<String, Boolean>>> acls) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ProxyController(session).setDefaults(acls);
 	}
 }
