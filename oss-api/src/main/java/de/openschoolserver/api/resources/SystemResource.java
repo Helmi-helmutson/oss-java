@@ -305,7 +305,7 @@ public interface SystemResource {
     		@ApiParam(hidden = true) @Auth Session session
     		);
     
-    @GET
+    @POST
     @Path("proxy/default")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Delivers the default setting for proxy.")
