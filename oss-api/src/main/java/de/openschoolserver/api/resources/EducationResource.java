@@ -43,7 +43,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse  createSmartRoom(
             @ApiParam(hidden = true) @Auth Session session,
             Category smartRoom
@@ -59,7 +59,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse  modifySmartRoom(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -76,7 +76,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse addUser(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -93,7 +93,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse addDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")   long roomId,
@@ -110,7 +110,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse addGroup(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -128,7 +128,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse deleteUser(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -145,7 +145,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse deleteDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")   long roomId,
@@ -162,7 +162,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse deleteGroup(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")  long roomId,
@@ -179,7 +179,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse  deleteSmartRoom(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -196,7 +196,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     List<Long> getMyRooms(
             @ApiParam(hidden = true) @Auth Session session
     );
@@ -215,7 +215,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     List<List<Long>>  getRoom(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -232,7 +232,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse  getRoomControl(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")  long roomId,
@@ -250,7 +250,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     List<String> getAvailableRoomActions(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -267,7 +267,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse manageRoom(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
@@ -303,7 +303,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.groups")
     OssResponse  createGroup(
             @ApiParam(hidden = true) @Auth Session session,
                Group group
@@ -319,7 +319,7 @@ public interface EducationResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.groups")
     OssResponse  modifyGroup(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId,
@@ -336,7 +336,7 @@ public interface EducationResource {
      @ApiResponses(value = {
              @ApiResponse(code = 500, message = "Server broken, please contact administrator")
      })
-     @RolesAllowed({"sysadmins","teachers"})
+     @RolesAllowed("education.groups")
      OssResponse  removeGroup(
              @ApiParam(hidden = true) @Auth Session session,
              @PathParam("groupId") long groupId
@@ -371,7 +371,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.users")
     OssResponse logOut(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId,
@@ -389,7 +389,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.users")
     OssResponse logIn(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId,
@@ -407,7 +407,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.users")
     List<String> getAvailableUserActions(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId
@@ -424,7 +424,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.groups")
     List<String> getAvailableGroupActions(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("groupId") long groupId
@@ -442,7 +442,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.users")
     OssResponse manageUSer(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId,
@@ -479,7 +479,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     List<String> getAvailableDeviceActions(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
@@ -496,7 +496,7 @@ public interface EducationResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse manageDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId,
@@ -512,7 +512,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse uploadFileToDevice(@ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId,
             @FormDataParam("file") final InputStream fileInputStream,
@@ -527,7 +527,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("education.rooms")
     OssResponse collectFileFromDevice(@ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
     );

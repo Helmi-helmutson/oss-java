@@ -10,6 +10,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Translation;
 import de.openschoolserver.dao.controller.SystemController;
+import de.openschoolserver.dao.controller.ProxyController;
 
 public class SystemResourceImpl implements SystemResource {
 
@@ -132,5 +133,16 @@ public class SystemResourceImpl implements SystemResource {
 	@Override
 	public OssResponse updateSyste(Session session) {
 		return new SystemController(session).updateSystem();
+	}
+
+	@Override
+	public  List<Map<String,Map<String,Boolean>>> getProxyDefault(Session session) {
+		return new ProxyController(session).readDefaults();
+	}
+
+	@Override
+	public OssResponse setProxyDefault(Session session, List<Map<String, Map<String, Boolean>>> acls) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

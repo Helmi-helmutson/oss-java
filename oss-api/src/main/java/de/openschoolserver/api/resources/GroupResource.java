@@ -56,6 +56,22 @@ public interface GroupResource {
                @PathParam("groupId") long groupId
        );
 
+      /*
+      	 * GET groups/text/<groupName>/members
+      	 */
+          @GET
+          @Path("text/{groupName}/members")
+          @Produces("text/plain")
+          @ApiOperation(value = "Get users which are member in this group.")
+          @ApiResponses(value = {
+                  @ApiResponse(code = 404, message = "Group not found"),
+                  @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+          @RolesAllowed("group.manage")
+          String getMembersText(
+                  @ApiParam(hidden = true) @Auth Session session,
+                  @PathParam("groupName") String groupName
+          );
+
     /*
 	* GET groups/<groupId>/availableMembers
 	*/
@@ -84,6 +100,22 @@ public interface GroupResource {
     })
     @RolesAllowed("group.search")
     List<Group> getByType(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("type") String type
+    );
+
+    /*
+     * GET groups/text/byType/{type}
+     */
+    @GET
+    @Path("text/byType/{type}")
+    @Produces("text/plain")
+    @ApiOperation(value = "Get groups from a type")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("group.search")
+    String getByTypeText(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type
     );

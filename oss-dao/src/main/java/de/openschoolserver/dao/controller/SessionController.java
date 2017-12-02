@@ -234,40 +234,25 @@ public class SessionController extends Controller {
 			return true;
 		}
 
-		EntityManager em = getEntityManager();
-		if (em != null) {
-			try {
-				Query q = em.createNamedQuery("Acl.checkByRole").setParameter("role", session.getUser().getRole())
-						.setParameter("acl",requiredRole).setMaxResults(1);
-				List<Acl> acls = q.getResultList();
-				//If there is one result this is allowed by role.
-				if( ! acls.isEmpty() ) {
-					return true;
-				}
-				//Is it allowed by the user
-				for( Acl acl : session.getUser().getAcls() ){
-					if( acl.getAcl().equals(requiredRole)) {
-						return true;
-					}
-				}
-				//Is it allowed by one of the groups of the user
-				for( Group group : session.getUser().getGroups() ) {
-					for( Acl acl : group.getAcls() ) {
-						if( acl.getAcl().equals(requiredRole)) {
-							return true;
-						}
-					}
-				}
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-			} finally {
-				if ((em != null) && (em.isOpen())) {
-					em.close();
+
+		//Is it allowed by the user
+		for( Acl acl : session.getUser().getAcls() ){
+			if( acl.getAcl().equals(requiredRole)) {
+				return acl.getAllowed();
+			}
+		}
+		//Is it allowed by one of the groups of the user
+		for( Group group : session.getUser().getGroups() ) {
+			for( Acl acl : group.getAcls() ) {
+				if( acl.getAcl().equals(requiredRole)) {
+					return acl.getAllowed();
 				}
 			}
 		}
 		return false;
 	}
+	
+	
 
 
 }

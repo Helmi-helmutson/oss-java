@@ -5,7 +5,6 @@ import de.openschoolserver.dao.Session;
 
 import de.openschoolserver.dao.tools.OSSShellTools;
 
-import javax.json.Json;
 import org.apache.http.client.fluent.*;
 import org.jdom.Document;
 import org.jdom.Element;

@@ -18,6 +18,8 @@ import de.openschoolserver.dao.Session;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
+import java.util.List;
+
 @Path("sessions")
 @Api(value = "sessions")
 @SwaggerDefinition(securityDefinition = @SecurityDefinition(apiKeyAuthDefinitions = {@ApiKeyAuthDefinition(
@@ -96,5 +98,17 @@ public interface SessionsResource {
     String getSessionValue(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("key") String key
+    );
+    
+    @GET
+    @Path("allowedModules")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get some session values. Available keys are: defaultPrinter, availablePrinters, dnsName, domainName.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+   List<String> allowedModules(
+            @ApiParam(hidden = true) @Auth Session session
     );
 }

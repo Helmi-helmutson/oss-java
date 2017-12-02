@@ -13,9 +13,7 @@ import javax.persistence.*;
 @Entity
 @Table(name="Acls")
 @NamedQueries({
-	@NamedQuery(name="Acl.findAll", query="SELECT a FROM Acl a"),
-	@NamedQuery(name="Acl.findByRole", query="SELECT a FROM Acl a where a.role = :role "),
-	@NamedQuery(name="Acl.checkByRole", query="SELECT a FROM Acl a where a.role = :role AND a.acl = :acl"),
+	@NamedQuery(name="Acl.findAll", query="SELECT a FROM Acl a")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Acl implements Serializable {
@@ -27,7 +25,8 @@ public class Acl implements Serializable {
 
 	private String acl;
 	
-	private String role;
+	@Convert(converter=BooleanToStringConverter.class)
+	private Boolean allowed;
 	
 	//bi-directional many-to-one association to User
 	@ManyToOne
@@ -76,13 +75,13 @@ public class Acl implements Serializable {
 	public void setAcl(String acl) {
 		this.acl = acl;
 	}
-	
-	public String getRole() {
-		return this.role;
+
+	public boolean getAllowed() {
+		return this.allowed;
 	}
 
-	public void setRole(String role) {
-		this.role = role;
+	public void setAllowed(boolean allowed) {
+		this.allowed = allowed;
 	}
 	
 	public void setUser(User user) {

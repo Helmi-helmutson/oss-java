@@ -1,5 +1,6 @@
 package de.openschoolserver.api.resourceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -15,80 +16,86 @@ public class GroupResourceImpl implements GroupResource {
 
 	@Override
 	public Group getById(Session session, long groupId) {
-	    final GroupController groupController = new GroupController(session);
-		return groupController.getById(groupId);
+		return new GroupController(session).getById(groupId);
 	}
 
 	@Override
 	public List<User> getAvailableMembers(Session session, long groupId) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.getAvailableMember(groupId);
+		return new GroupController(session).getAvailableMember(groupId);
 	}
 
 	@Override
 	public List<User> getMembers(Session session, long groupId) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.getMembers(groupId);
+		return new GroupController(session).getMembers(groupId);
 	}
 	
 	@Override
 	public List<Group> getByType(Session session, String type) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.getByType(type);
+		return new GroupController(session).getByType(type);
 	}
 
 	@Override
 	public List<Group> getAll(Session session) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.getAll();
+		return new GroupController(session).getAll();
 	}
 
 	@Override
 	public List<Group> search(Session session, String search) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.search(search);
+		return new GroupController(session).search(search);
 	}
 
 	@Override
 	public OssResponse add(Session session, Group group) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.add(group);
+		return new GroupController(session).add(group);
 	}
 
 	@Override
 	public OssResponse modify(Session session, Group group) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.modify(group);
+		return new GroupController(session).modify(group);
 	}
 
 	@Override
 	public OssResponse delete(Session session, long groupId) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.delete(groupId);
+		return new GroupController(session).delete(groupId);
 	}
 
 	@Override
 	public OssResponse setMembers(Session session, long groupId, List<Long> users) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.setMembers(groupId,users);
+		return new GroupController(session).setMembers(groupId,users);
 	}
 
 	@Override
 	public OssResponse removeMember(Session session, long groupId, long userId) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.removeMember(groupId,userId);	
+		return new GroupController(session).removeMember(groupId,userId);	
 	}
 
 	@Override
 	public OssResponse addMember(Session session, long groupId, long userId) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.addMember(groupId,userId);
+		return new GroupController(session).addMember(groupId,userId);
 	}
 
 	@Override
 	public List<Group> getGroups(Session session, List<Long> groupIds) {
-		final GroupController groupController = new GroupController(session);
-		return groupController.getGroups(groupIds);
+		return new GroupController(session).getGroups(groupIds);
+	}
+
+	@Override
+	public String getMembersText(Session session, String groupName) {
+		List<String> member = new ArrayList<String>();
+		Group group = new GroupController(session).getByName(groupName);
+		for(User user : group.getUsers() ) {
+			member.add(user.getUid());
+		}
+		return String.join("\n",member);
+	}
+
+	@Override
+	public String getByTypeText(Session session, String type) {
+		List<String> groups = new ArrayList<String>();
+		for( Group group : new GroupController(session).getByType(type)) {
+			groups.add(group.getName());
+		}
+		return String.join("\n",groups);
 	}
 
 }

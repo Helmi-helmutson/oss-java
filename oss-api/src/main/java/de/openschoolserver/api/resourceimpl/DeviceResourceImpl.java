@@ -136,8 +136,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	
 	@Override
 	public void refreshConfig(Session session) {
-		final DHCPConfig dhcpConfig = new DHCPConfig(session);
-		dhcpConfig.Create();
+		new DHCPConfig(session).Create();
 	}
 
 	@Override

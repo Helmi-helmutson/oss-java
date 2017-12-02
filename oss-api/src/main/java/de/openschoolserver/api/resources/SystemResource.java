@@ -31,7 +31,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.status")
     List<Map<String, String>> getStatus(
     		@ApiParam(hidden = true) @Auth Session session
     		);
@@ -58,7 +58,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.enumerates")
     OssResponse addEnumerate(
     		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
@@ -72,7 +72,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.enumerates")
     OssResponse deleteEnumerate(
     		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
@@ -88,7 +88,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.configuration")
     List<Map<String, String>>  getConfig(
     		@ApiParam(hidden = true) @Auth Session session
     		);
@@ -100,7 +100,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @PermitAll
+    @RolesAllowed("system.configuration.read")
     String getConfig(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("key") String key
@@ -113,7 +113,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.configuration")
     OssResponse setConfig(
     		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("key") String key,
@@ -128,7 +128,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.firewall")
     Map<String, String>  getFirewallIncomingRules(
     		@ApiParam(hidden = true) @Auth Session session
     		);
@@ -140,7 +140,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.firewall")
     OssResponse  setFirewallIncomingRules(
     		@ApiParam(hidden = true) @Auth Session session,
     		Map<String, String> incomingRules
@@ -153,7 +153,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.firewall")
     List<Map<String, String>>  getFirewallOutgoingRules(
     		@ApiParam(hidden = true) @Auth Session session
     		);
@@ -165,7 +165,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.firewall")
     OssResponse  setFirewallOutgoingRules(
     		@ApiParam(hidden = true) @Auth Session session,
     		List<Map<String, String>> incomingRules
@@ -178,7 +178,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.firewall")
     List<Map<String, String>>  getFirewallRemoteAccessRules(
     		@ApiParam(hidden = true) @Auth Session session
     		);
@@ -190,7 +190,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.firewall")
     OssResponse  setFirewallRemoteAccessRules(
     		@ApiParam(hidden = true) @Auth Session session,
     		List<Map<String, String>> incomingRules
@@ -246,7 +246,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.register")
     OssResponse register(
     		@ApiParam(hidden = true) @Auth Session session
     );
@@ -256,7 +256,7 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Searches packages.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.packages")
     List<Map<String,String>> searchPackages(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("filter") String filter
@@ -267,7 +267,7 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Install packages.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.packages")
     OssResponse installPackages(
     		@ApiParam(hidden = true) @Auth Session session,
     		List<String> packages
@@ -278,7 +278,7 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Update packages.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.packages")
     OssResponse updatePackages(
     		@ApiParam(hidden = true) @Auth Session session,
     		List<String> packages
@@ -290,8 +290,30 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Install all updates on the system.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("system.update")
     OssResponse updateSyste(
     		@ApiParam(hidden = true) @Auth Session session
     		);
+    
+    @GET
+    @Path("proxy/default")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the default setting for proxy.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    List<Map<String,Map<String,Boolean>>> getProxyDefault(
+    		@ApiParam(hidden = true) @Auth Session session
+    		);
+    
+    @GET
+    @Path("proxy/default")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the default setting for proxy.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    OssResponse setProxyDefault(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		List<Map<String,Map<String,Boolean>>> acls
+    		);
+    
 }

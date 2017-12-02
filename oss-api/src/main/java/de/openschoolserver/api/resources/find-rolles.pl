@@ -11,7 +11,7 @@ foreach( split /\n/, $ROLES )
 	{
 		my $r = $1;
 		$hroles->{$1} = 1;
-		if( $r =~ /.search/ ) {
+		if( $r =~ /.search/ || $r =~ /education/ ) {
 			$forTeachers->{$r} = 1;
 		}
 	}
@@ -19,11 +19,11 @@ foreach( split /\n/, $ROLES )
 }
 foreach( sort keys %$hroles )
 {
-	print "INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','$_',6);\n";
+	print "INSERT INTO Acls VALUES(NULL,NULL,1,'$_','Y',6);\n";
 }
 
 foreach( sort keys %$forTeachers )
 {
-	print "INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','$_',6);\n";
+	print "INSERT INTO Acls VALUES(NULL,NULL,2,'$_','Y',6);\n";
 }
 

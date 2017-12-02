@@ -8,6 +8,8 @@ import de.openschoolserver.api.resources.SessionsResource;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.Acl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,5 +111,28 @@ public class SessionsResourceImpl implements SessionsResource {
 			return sessionController.getConfigValue("SCHOOL_DOMAIN");
 		}
 		return "";
+	}
+
+	@Override
+	public List<String> allowedModules(Session session) {
+		List<String> modules = new ArrayList<String>();
+		//Is it allowed by the groups.
+		for( Group group : session.getUser().getGroups() ) {
+			for( Acl acl : group.getAcls() ) {
+				if( acl.getAllowed() ) {
+					modules.add(acl.getAcl());
+				}
+			}
+		}
+		//Is it allowed by the user
+		for( Acl acl : session.getUser().getAcls() ){
+			if( acl.getAllowed() && !modules.contains(acl.getAcl())) {
+				modules.add(acl.getAcl());
+			} else if( modules.contains(acl.getAcl()) ) {
+				//It is forbidden by the user
+				modules.remove(acl.getAcl());
+			}
+		}
+		return modules;
 	}
 }

@@ -8,8 +8,8 @@ USE OSS;
 CREATE TABLE IF NOT EXISTS Translations(
         id      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	lang	VARCHAR(2)   NOT NULL DEFAULT 'DE',
-	string  VARCHAR(256) NOT NULL,
-        value   VARCHAR(256),
+	string  VARCHAR(512) NOT NULL,
+        value   VARCHAR(512),
 	PRIMARY KEY  (id)
 );
 
@@ -225,55 +225,71 @@ CREATE TABLE IF NOT EXISTS Acls (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id      BIGINT UNSIGNED DEFAULT NULL,
         group_id     BIGINT UNSIGNED DEFAULT NULL,
-        role         VARCHAR(16) DEFAULT NULL,
         acl          VARCHAR(32) NOT NULL,
+        allowed      CHAR(1) NOT NULL DEFAULT 'Y',
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(user_id)  REFERENCES Users(id)  ON DELETE CASCADE,
         FOREIGN KEY(group_id) REFERENCES Groups(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 );
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','adhoclan.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.add',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.delete',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.modify',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','category.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.add',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.delete',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.manage',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.modify',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','device.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.add',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.delete',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.manage',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.modify',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','group.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','information.add',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','information.delete',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.add',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.delete',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.manage',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.modify',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','room.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.add',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.delete',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.download',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.install',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.modify',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','software.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','sysadmins',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.add',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.delete',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.manage',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.modify',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'sysadmins','user.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','adhoclan.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','category.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','device.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','group.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','room.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','software.search',6);
-INSERT INTO Acls VALUES(NULL,NULL,NULL,'teachers','user.search',6);
+
+INSERT INTO Acls VALUES(NULL,NULL,1,'adhoclan.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'category.add','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'category.delete','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'category.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'category.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'device.add','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'device.delete','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'device.manage','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'device.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'device.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'education.groups','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'education.rooms','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'education.users','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'group.add','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'group.delete','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'group.manage','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'group.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'group.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'information.add','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'information.delete','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'room.add','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'room.delete','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'room.manage','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'room.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'room.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'software.add','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'software.delete','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'software.download','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'software.install','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'software.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'software.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'sysadmins','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.configuration','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.configuration.read','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.enumerates','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.firewall','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.packages','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.proxy','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.register','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.status','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'system.update','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'user.add','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'user.delete','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'user.manage','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'user.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'user.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'adhoclan.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'category.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'device.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'education.groups','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'education.rooms','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'education.users','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'group.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'room.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'software.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'user.search','Y',6);
 
 CREATE TABLE IF NOT EXISTS  Tests (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
