@@ -20,12 +20,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.User;
 
 import java.util.List;
 

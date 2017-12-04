@@ -19,7 +19,6 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.User;
 
 import java.util.List;
 import java.util.Map;

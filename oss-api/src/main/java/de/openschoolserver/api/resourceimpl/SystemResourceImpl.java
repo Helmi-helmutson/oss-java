@@ -1,3 +1,4 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
@@ -136,12 +137,12 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public  List<Map<String,Map<String,Boolean>>> getProxyDefault(Session session) {
+	public  Map<String,List<String[]>> getProxyDefault(Session session) {
 		return new ProxyController(session).readDefaults();
 	}
 
 	@Override
-	public OssResponse setProxyDefault(Session session, List<Map<String, Map<String, Boolean>>> acls) {
+	public OssResponse setProxyDefault(Session session, Map<String,List<String[]>> acls) {
 		return new ProxyController(session).setDefaults(acls);
 	}
 }

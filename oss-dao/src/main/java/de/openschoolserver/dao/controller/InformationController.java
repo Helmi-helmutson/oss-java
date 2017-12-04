@@ -1,11 +1,8 @@
-/**
- * 
- */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.persistence.EntityManager;
 
@@ -19,9 +16,6 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author varkoly
  *

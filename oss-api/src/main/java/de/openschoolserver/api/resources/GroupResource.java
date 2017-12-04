@@ -6,8 +6,6 @@ import io.dropwizard.auth.Auth;
 
 
 import io.swagger.annotations.*;
-
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 

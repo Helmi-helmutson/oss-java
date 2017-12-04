@@ -1,4 +1,4 @@
-/* (c) 2017 P��ter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
 import de.openschoolserver.dao.AccessInRoom;
@@ -6,7 +6,6 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.api.resources.RoomResource;

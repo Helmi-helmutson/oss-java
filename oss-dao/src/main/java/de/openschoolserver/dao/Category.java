@@ -1,3 +1,4 @@
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
@@ -6,8 +7,6 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-
 
 /**
  * The persistent class for the Categories database table.

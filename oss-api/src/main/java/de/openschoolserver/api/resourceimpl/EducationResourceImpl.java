@@ -6,7 +6,6 @@ import java.io.InputStream;
 
 
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -15,6 +14,7 @@ import de.openschoolserver.api.resources.Resource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.*;
 
@@ -205,6 +205,46 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse collectFileFromDevice(Session session, long deviceId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<PositiveList> getPositiveLists(Session session) {
+		return new ProxyController(session).getAllPositiveList();
+	}
+
+	@Override
+	public List<PositiveList> getMyPositiveLists(Session session) {
+		return session.getUser().getOwnedPositiveLists();
+	}
+
+	@Override
+	public OssResponse addPositiveList(Session session, PositiveList positiveList) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PositiveList getPositiveListById(Session session, Long positiveListId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public PositiveList deletePositiveListById(Session session, Long positiveListId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OssResponse activatePositiveListsInRoom(Session session, Long roomId, List<Long> postiveListIds) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OssResponse deActivatePositiveListsInRoom(Session session, Long roomId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

@@ -24,7 +24,6 @@ import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.*;
 

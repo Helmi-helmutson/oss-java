@@ -196,7 +196,6 @@ public interface SystemResource {
     		List<Map<String, String>> incomingRules
     		);
     
-    
     /*
      * Translations stuff
      */
@@ -220,7 +219,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("sysadmins.translation")
     OssResponse addTranslation(
     		@ApiParam(hidden = true) @Auth Session session,
     		Translation	translation
@@ -233,7 +232,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins")
+    @RolesAllowed("sysadmins.translation")
     List<String> getMissedTranslations(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("lang") String lang
@@ -301,7 +300,7 @@ public interface SystemResource {
     @ApiOperation(value = "Delivers the default setting for proxy.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
-    List<Map<String,Map<String,Boolean>>> getProxyDefault(
+    Map<String,List<String[]>> getProxyDefault(
     		@ApiParam(hidden = true) @Auth Session session
     		);
     
@@ -313,7 +312,7 @@ public interface SystemResource {
     @RolesAllowed("system.proxy")
     OssResponse setProxyDefault(
     		@ApiParam(hidden = true) @Auth Session session,
-    		List<Map<String,Map<String,Boolean>>> acls
+    		Map<String,List<String[]>> acls
     		);
     
 }

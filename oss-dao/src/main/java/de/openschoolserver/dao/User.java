@@ -64,6 +64,11 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<Device> ownedDevices;
 	
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="owner")
+	@JsonIgnore
+	private List<PositiveList> ownedPositiveLists;
+	
 	//bi-directional many-to-one association to groups
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
@@ -152,10 +157,10 @@ public class User implements Serializable {
 	private Integer msQuota;
 	
 	@Column(name = "creator_id")
-        private Long creatorId;
+    private Long creatorId;
 
 	@JsonIgnore
-        private String initialPassword;
+    private String initialPassword;
 
 	@Transient
 	private String password ="";
@@ -489,10 +494,18 @@ public class User implements Serializable {
 	}
 
 	public String getInitialPassword() {
-		return initialPassword;
+		return this.initialPassword;
 	}
 
 	public void setInitialPassword(String initialPassword) {
 		this.initialPassword = initialPassword;
+	}
+
+	public List<PositiveList> getOwnedPositiveLists() {
+		return this.ownedPositiveLists;
+	}
+
+	public void setOwnedPositiveLists(List<PositiveList> ownedPositiveLists) {
+		this.ownedPositiveLists = ownedPositiveLists;
 	}
 }

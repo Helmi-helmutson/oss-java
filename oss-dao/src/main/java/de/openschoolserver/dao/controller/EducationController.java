@@ -215,6 +215,9 @@ public class EducationController extends Controller {
 	
 	/*
 	 * Get the list of users which are logged in a room or smart room
+	 * If a user of a smart room is not logged on the device id is 0L;
+	 * @param  roomId The id of the wanted room.
+	 * @return The id list of the logged on users: [ [ <userId>,<deviceId> ], [ <userId>, <deviceId] ... ]
 	 */
 	public List<List<Long>> getRoom(long roomId) {
 		List<List<Long>> loggedOns = new ArrayList<List<Long>>();
@@ -227,14 +230,21 @@ public class EducationController extends Controller {
 			for( Group group : category.getGroups() ) {
 				for( User user : group.getUsers() ) {
 					if(	category.getStudentsOnly() && ! user.getRole().equals("studetns") ||
-						user.equals(me)	){
+							user.equals(me)	){
 						continue;
 					}
-					for( Device device : user.getLoggedOn() ) {
+					if( user.getLoggedOn().isEmpty() ) {
 						loggedOn = new ArrayList<Long>();
 						loggedOn.add(user.getId());
-						loggedOn.add(device.getId());
+						loggedOn.add(0L);
 						loggedOns.add(loggedOn);
+					} else {
+						for( Device device : user.getLoggedOn() ) {
+							loggedOn = new ArrayList<Long>();
+							loggedOn.add(user.getId());
+							loggedOn.add(device.getId());
+							loggedOns.add(loggedOn);
+						}
 					}
 				}
 			}
@@ -242,11 +252,18 @@ public class EducationController extends Controller {
 				if( user.equals(me) ) {
 					continue;
 				}
-				for( Device device : user.getLoggedOn() ) {
+				if( user.getLoggedOn().isEmpty() ) {
+					loggedOn = new ArrayList<Long>();
+					loggedOn.add(user.getId());
+					loggedOn.add(0L);
+					loggedOns.add(loggedOn);
+				} else {
+					for( Device device : user.getLoggedOn() ) {
 						loggedOn = new ArrayList<Long>();
 						loggedOn.add(user.getId());
 						loggedOn.add(device.getId());
 						loggedOns.add(loggedOn);
+					}
 				}
 			}
 			for( Device device : category.getDevices() ) {

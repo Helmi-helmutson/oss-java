@@ -498,6 +498,16 @@ CREATE TABLE IF NOT EXISTS LicenseToDevice (
 	PRIMARY KEY(license_id,device_id)
 );
 
+CREATE TABLE IF NOT EXISTS PositiveList (
+	id BIGINT   UNSIGNED NOT NULL AUTO_INCREMENT,
+        owner_id    BIGINT UNSIGNED DEFAULT NULL,
+        name        VARCHAR(32) NOT NULL,
+        subject     VARCHAR(32) NOT NULL,
+        description VARCHAR(64) NOT NULL,
+	FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE SET NULL,
+        PRIMARY KEY(id)
+);
+
 CREATE TABLE IF NOT EXISTS Announcements (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         owner_id   BIGINT UNSIGNED DEFAULT NULL,
