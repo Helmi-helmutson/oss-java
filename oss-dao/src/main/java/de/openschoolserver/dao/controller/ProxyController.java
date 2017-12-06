@@ -1,6 +1,9 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,9 +12,9 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
+import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
@@ -54,7 +57,7 @@ public class ProxyController extends Controller {
 		StringBuilder output = new StringBuilder();
 		for(String group : acls.keySet() ) {
 			for( String[] acl : acls.get(group) ) {
-				output.append(group).append(":").append(acl[0]).append(":").append(acl[1]);
+				output.append(group).append(":").append(acl[0]).append(":").append(acl[1]).append("\n");
 			}
 		}
 		String[] program   = new String[2];
@@ -85,8 +88,8 @@ public class ProxyController extends Controller {
 	 */
 	public OssResponse editPositiveList(PositiveList positiveList) {
 		EntityManager em = getEntityManager();
-		PositiveList oldPositiveList= this.getPositiveListById(positiveList.getId());
-		
+		PositiveList oldPositiveList = this.getPositiveListById(positiveList.getId());
+
 		try {
 			positiveList.setOwner(session.getUser());
 			em.getTransaction().begin();
@@ -119,10 +122,17 @@ public class ProxyController extends Controller {
 	 * @param name The name of the positive list
 	 * @return The domain list of the positive list
 	 */
-	public List<String> getPositiveList(String name) {
-		List<String> domains = new ArrayList<String>();
-		//TODO
-		return domains;
+	public PositiveList getPositiveList(Long id) {
+		PositiveList positiveList = this.getPositiveListById(id);
+		try {
+			positiveList.setDomains(
+					Files.readAllLines(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains")).toString()
+					);
+		}
+		catch( IOException e ) { 
+			e.printStackTrace();
+		}
+		return positiveList;
 	}
 	
 	/*
@@ -141,16 +151,43 @@ public class ProxyController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	/*
-	 * Sets the acls in a room
+	 * Sets positive lists in a room
 	 * @param roomId The room id.
-	 * @param acls The acls which have to be set in this room
+	 * @param positiveListIds list of positiveList ids which have to be set in this room
 	 * @return An OssResponse object with the result
 	 */
-	public OssResponse setAclsInRoom(Long roomId,List<String[]> acls) {
-		//TODO
+	public OssResponse setAclsInRoom(Long roomId, List<Long> positiveListIds) {
+		String[] program   = new String[2];
+		program[0] = "/usr/share/oss/tools/squidGuard.pl";
+		program[1] = "write";
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		StringBuilder acls = new StringBuilder();
+		Room room  = new RoomController(session).getById(roomId);
+		for( Long id : positiveListIds ) {
+			PositiveList positiveList = this.getPositiveList(id);
+			acls.append(room.getName()).append(":").append(positiveList.getName()).append(":true\n");
+		}
+		acls.append(room.getName()).append(":all:false\n");
+		OSSShellTools.exec(program, reply, error, acls.toString());
 		return new OssResponse(this.session,"OK","Proxy Setting was saved succesfully in your room.");	
 	}
 
+	/*
+	 * Removes all positive list in a room and the default settings occurs
+	 * @param roomId The room id
+	 */
+	public OssResponse deleteAclsInRoom(Long roomId) {
+		String[] program   = new String[2];
+		program[0] = "/usr/share/oss/tools/squidGuard.pl";
+		program[1] = "write";
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		Room room  = new RoomController(session).getById(roomId);
+		String acls = room.getName() + ":remove-this-list:true\n";
+		OSSShellTools.exec(program, reply, error, acls);
+		return new OssResponse(this.session,"OK","Positive lists was succesfully deactivated in your room.");
+	}
 }
