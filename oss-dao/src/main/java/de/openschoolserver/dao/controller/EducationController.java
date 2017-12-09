@@ -334,7 +334,7 @@ public class EducationController extends Controller {
 	public String saveFileToUserImport(User user, File file, String fileName) {
 		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
 		try {
-			StringBuilder newFileName = new StringBuilder(this.getConfigValue("SCHOOL_HOME_BASE"));
+			StringBuilder newFileName = new StringBuilder(this.getConfigValue("HOME_BASE"));
 			newFileName.append("/").append(user.getUid()).append("/") .append("Import").append("/");
 			// Create the directory first.
 			File importDir = new File( newFileName.toString() );
@@ -475,7 +475,7 @@ public class EducationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "Do not control the own client.");
 		}
 		StringBuilder FQHN = new StringBuilder();
-		FQHN.append(device.getName()).append(".").append(this.getConfigValue("SCHOOL_DOMAIN"));
+		FQHN.append(device.getName()).append(".").append(this.getConfigValue("DOMAIN"));
 		File file;
 		String[] program    = null;
 		StringBuffer reply  = new StringBuffer();
@@ -534,7 +534,7 @@ public class EducationController extends Controller {
 	public OssResponse getRoomControl(long roomId, long minutes) {
 		Map<String, String> actionContent = new HashMap<String,String>();
 		StringBuilder controllers = new StringBuilder();
-		controllers.append(this.getConfigValue("SCHOOL_SERVER")).append(",").append(this.session.getDevice().getIp());
+		controllers.append(this.getConfigValue("SERVER")).append(",").append(this.session.getDevice().getIp());
 		if( this.session.getDevice().getWlanIp() != null ) {
 			controllers.append(",").append(this.session.getDevice().getWlanIp());
 		}

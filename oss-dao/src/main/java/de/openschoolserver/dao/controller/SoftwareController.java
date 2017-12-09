@@ -790,7 +790,7 @@ public class SoftwareController extends Controller {
 		Map<String,List<Software>> softwaresToRemove  = new HashMap<>();
 		List<String>   toInstall = new ArrayList<String>();
 		List<Software> toRemove  = new ArrayList<Software>();
-		final String domainName = this.getConfigValue("SCHOOL_DOMAIN");
+		final String domainName = this.getConfigValue("DOMAIN");
 
 		List<String>   topSls = new ArrayList<String>();
 		Path SALT_TOP_TEMPL   = Paths.get("/usr/share/oss/templates/top.sls");

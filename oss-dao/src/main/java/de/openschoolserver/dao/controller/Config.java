@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 public class Config {
 
 	Logger logger = LoggerFactory.getLogger(Config.class);
-
+	protected String prefix = "SCHOOL_";
 	protected Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
 
 	private Map<String,String>   config;
@@ -22,9 +22,10 @@ public class Config {
 		this.InitConfig();
 	}
 	
-	public Config(String configPath) {
+	public Config(String configPath, String prefix) {
 		OSS_CONFIG = Paths.get(configPath);
 		this.InitConfig();
+		this.prefix = prefix;
 	}
 	
 	public void InitConfig() {
@@ -52,6 +53,7 @@ public class Config {
 				String[] sline = line.split("=", 2);
 				if( sline.length == 2 )
 				{
+					String key   = sline[0].substring(prefix.length());
 					String value = sline[1];
 					if( value.startsWith("\"") || value.startsWith("'") ){
 						value = value.substring(1);
@@ -59,9 +61,9 @@ public class Config {
 					if( value.endsWith("\"") || value.endsWith("'") ){
 						value = value.substring(0,value.length()-1);
 					}
-					readOnly.put(sline[0],  ro);
-					config.put(sline[0],    value);
-					configPath.put(sline[0],path);
+					readOnly.put(key,  ro);
+					config.put(key,    value);
+					configPath.put(key,path);
 					ro = false;
 				}
 			}
@@ -71,6 +73,7 @@ public class Config {
 	public Date now() {
 		return new Date(System.currentTimeMillis());
 	}
+
 	public Boolean isConfgiReadOnly(String key){
 		return readOnly.get(key);
 	}
@@ -111,8 +114,8 @@ public class Config {
 		config.put(key, value);
 		List<String> tmpConfig =  new ArrayList<String>();
 		for ( String line : configFile ){
-			if(line.startsWith(key)){
-				tmpConfig.add( key + "=\"" + value + "\"" );  
+			if(line.startsWith(prefix + key)){
+				tmpConfig.add( prefix + key + "=\"" + value + "\"" );  
 			}
 			else{
 				tmpConfig.add( line );

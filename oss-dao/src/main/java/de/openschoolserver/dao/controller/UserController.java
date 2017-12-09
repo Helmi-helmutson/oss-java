@@ -156,13 +156,13 @@ public class UserController extends Controller {
 					user.getSureName(),
 					user.getBirthDay(),
 					true,
-					this.getConfigValue("SCHOOL_STRING_CONVERT_TYPE") == "telex", 
-					this.getConfigValue("SCHOOL_LOGIN_SCHEME")
+					this.getConfigValue("STRING_CONVERT_TYPE") == "telex", 
+					this.getConfigValue("LOGIN_SCHEME")
 					);
-			user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId );
+			user.setUid( this.getConfigValue("LOGIN_PREFIX") + userId );
 			Integer i = 1;
 			while( !this.isNameUnique(user.getUid()) ) {
-				user.setUid( this.getConfigValue("SCHOOL_LOGIN_PREFIX") + userId + i );
+				user.setUid( this.getConfigValue("LOGIN_PREFIX") + userId + i );
 			}
 		}
 		else
@@ -192,11 +192,11 @@ public class UserController extends Controller {
 		}
 		if( user.getFsQuota() == null ) {
 			//TODO
-			user.setFsQuota(Integer.getInteger(this.getConfigValue("SCHOOL_FILE_QUOTA")));
+			user.setFsQuota(Integer.getInteger(this.getConfigValue("FILE_QUOTA")));
 		}
 		if( user.getMsQuota() == null ) {
 			//TODO
-			user.setMsQuota(Integer.getInteger(this.getConfigValue("SCHOOL_MAIL_QUOTA")));
+			user.setMsQuota(Integer.getInteger(this.getConfigValue("MAIL_QUOTA")));
 		}
 		//Make backup from password. password field is transient!
 		user.setInitialPassword(user.getPassword());

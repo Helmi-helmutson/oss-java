@@ -108,7 +108,7 @@ public class SessionsResourceImpl implements SessionsResource {
 				return session.getDevice().getName();
 			break;
 		case "domainName": 
-			return sessionController.getConfigValue("SCHOOL_DOMAIN");
+			return sessionController.getConfigValue("DOMAIN");
 		}
 		return "";
 	}

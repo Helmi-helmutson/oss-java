@@ -193,7 +193,7 @@ public class RoomController extends Controller {
 
 		// If no network was configured we will use net school network.
 		if( room.getNetwork().isEmpty() ) {
-			room.setNetwork(this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK"));
+			room.setNetwork(this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK"));
 		}
 
 		// If the starIp is not given we have to search the next room IP
@@ -272,7 +272,7 @@ public class RoomController extends Controller {
 		List<String> allIPs  = net.getAvailableIPs(0);
 		List<String> usedIPs = new ArrayList<String>();
 		//TODO it is only for the school network. We need to check for all other subnets
-		String subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
+		String subnet = this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK");
 	    IPv4Net subNetwork = new IPv4Net( subnet );
 	    usedIPs.add(subNetwork.getBase());
 	    usedIPs.add(subNetwork.getLast());
@@ -293,7 +293,7 @@ public class RoomController extends Controller {
 		Room room   = this.getById(roomId);
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
 		//TODO it is only for the school network. We need to check for all other subnets
-		String subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
+		String subnet = this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK");
 	    IPv4Net subNetwork = new IPv4Net( subnet );
 	    String firstIP = subNetwork.getBase();
 	    String lastIP  = subNetwork.getLast();
@@ -321,7 +321,7 @@ public class RoomController extends Controller {
 	 */
 	public String getNextRoomIP( String subnet, int roomNetMask ) throws NumberFormatException {
 		if( subnet == null || subnet.isEmpty() ){
-			subnet = this.getConfigValue("SCHOOL_NETWORK") + "/" + this.getConfigValue("SCHOOL_NETMASK");
+			subnet = this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK");
 		}
 		IPv4Net subNetwork = new IPv4Net( subnet );
 		if(roomNetMask < subNetwork.getNetmaskNumeric() ) {
@@ -649,7 +649,10 @@ public class RoomController extends Controller {
 		for(Device device : devices) {
 			this.startPlugin("add_device", device);
 			// We'll create only for fatClients workstation users
-			if( device.getHwconf().getDeviceType().equals("fatClient")) {
+			if( device.getHwconf() != null && 
+					device.getHwconf().getDeviceType() != null &&
+					device.getHwconf().getDeviceType().equals("fatClient"))
+			{
 				User user = new User();
 				user.setUid(device.getName());
 				user.setSureName(device.getName() + "  Workstation-User");

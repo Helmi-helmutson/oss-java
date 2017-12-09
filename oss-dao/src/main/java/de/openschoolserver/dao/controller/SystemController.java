@@ -319,7 +319,7 @@ public class SystemController extends Controller {
     ///////////////////////////////////////////////////////
 
     public Map<String, String> getFirewallIncomingRules() {
-        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
+        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
         Map<String,String> statusMap;
         //External Ports
         statusMap = new HashMap<>();
@@ -328,7 +328,7 @@ public class SystemController extends Controller {
         statusMap.put("admin", "false");
         statusMap.put("rdesktop", "false");
         statusMap.put("other", "");
-        for( String extPort : fwConfig.getConfigValue("FW_SERVICES_EXT_TCP").split(" ") ) {
+        for( String extPort : fwConfig.getConfigValue("SERVICES_EXT_TCP").split(" ") ) {
             switch(extPort) {
             case "ssh":
             case "22":
@@ -355,7 +355,7 @@ public class SystemController extends Controller {
     
     public OssResponse setFirewallIncomingRules(Map<String, String> firewallExt) {
         List<String> fwServicesExtTcp = new ArrayList<String>();
-        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
+        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
         if( firewallExt.get("ssh").equals("true") ) {
             fwServicesExtTcp.add("ssh");
         }
@@ -371,19 +371,19 @@ public class SystemController extends Controller {
         if( firewallExt.get("other") != null && !firewallExt.get("other").isEmpty()) {
             fwServicesExtTcp.add(firewallExt.get("other"));
         }
-        fwConfig.setConfigValue("FW_SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
+        fwConfig.setConfigValue("SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
         this.systemctl("restart", "SuSEfirewall2");
         return new OssResponse(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
     }
     
     public List<Map<String, String>> getFirewallOutgoingRules() {
-        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
+        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
         List<Map<String, String>> firewallList = new ArrayList<>();
         Map<String,String> statusMap;
         RoomController roomController = new RoomController(this.session);
         DeviceController deviceController = new DeviceController(this.session);
         
-        for( String outRule : fwConfig.getConfigValue("FW_MASQ_NETS").split(" ") ) {
+        for( String outRule : fwConfig.getConfigValue("MASQ_NETS").split(" ") ) {
             if (outRule.length() > 0) {
                 statusMap = new HashMap<>();
                 String[] rule = outRule.split(",");
@@ -413,7 +413,7 @@ public class SystemController extends Controller {
     
     public OssResponse setFirewallOutgoingRules(List<Map<String, String>> firewallList) {
         List<String> fwMasqNets = new ArrayList<String>();
-        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
+        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
         RoomController roomController = new RoomController(this.session);
         DeviceController deviceController = new DeviceController(this.session);
         Device device;
@@ -433,25 +433,25 @@ public class SystemController extends Controller {
             }
             fwMasqNets.add(data.toString());
         }
-        fwConfig.setConfigValue("FW_ROUTE","yes");
+        fwConfig.setConfigValue("ROUTE","yes");
         if( fwMasqNets.isEmpty() ) {
-            fwConfig.setConfigValue("FW_MASQUERADE","no");
-            fwConfig.setConfigValue("FW_MASQ_NETS", " ");
+            fwConfig.setConfigValue("MASQUERADE","no");
+            fwConfig.setConfigValue("MASQ_NETS", " ");
         } else {
-            fwConfig.setConfigValue("FW_MASQUERADE","yes");
-            fwConfig.setConfigValue("FW_MASQ_NETS", String.join(" ", fwMasqNets));
+            fwConfig.setConfigValue("MASQUERADE","yes");
+            fwConfig.setConfigValue("MASQ_NETS", String.join(" ", fwMasqNets));
         }
         this.systemctl("restart", "SuSEfirewall2");
         return new OssResponse(this.getSession(),"OK","Firewall outgoing access rule  was set succesfully.");
     }
     
     public List<Map<String, String>> getFirewallRemoteAccessRules() {
-        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
+        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
         List<Map<String, String>> firewallList = new ArrayList<>();
         Map<String,String> statusMap;
         DeviceController deviceController = new DeviceController(this.session);
         
-        for( String outRule : fwConfig.getConfigValue("FW_FORWARD_MASQ").split(" ") ) {
+        for( String outRule : fwConfig.getConfigValue("FORWARD_MASQ").split(" ") ) {
            if (outRule!=null && outRule.length()>0) {
                statusMap = new HashMap<>();
                String[] rule = outRule.split(",");
@@ -470,13 +470,13 @@ public class SystemController extends Controller {
     
     public OssResponse setFirewallRemoteAccessRules(List<Map<String, String>> firewallList) {
         List<String> fwForwardMasq = new ArrayList<String>();
-        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2");
+        Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
         DeviceController deviceController = new DeviceController(this.session);
         for( Map<String,String> map : firewallList ) {
             Device device = deviceController.getById(Long.parseLong(map.get("id")));
             fwForwardMasq.add("0/0," + device.getIp() + ",tcp," + map.get("ext") + "," + map.get("port") );
         }
-        fwConfig.setConfigValue("FW_FORWARD_MASQ", String.join(" ", fwForwardMasq));
+        fwConfig.setConfigValue("FORWARD_MASQ", String.join(" ", fwForwardMasq));
         this.systemctl("restart", "SuSEfirewall2");
         return new OssResponse(this.getSession(),"OK","Firewall remote access rule  was set succesfully.");
     }

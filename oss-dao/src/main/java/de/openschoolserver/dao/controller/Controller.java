@@ -82,7 +82,11 @@ public class Controller extends Config {
 	public String getProperty(String property) {
 		return properties.get(property);
 	}
-
+	
+	public String getNl() {
+		return System.getProperty("line.separator");
+	}
+	
 	public boolean isNameUnique(String name){
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("User.getByUid");
@@ -119,13 +123,13 @@ public class Controller extends Config {
 	
 	public OssResponse checkPassword(String password) {
 		List<String> error = new ArrayList<String>();
-		if( password.length() < Integer.parseInt(this.getConfigValue("SCHOOL_MINIMAL_PASSWORD_LENGTH")) ) {
+		if( password.length() < Integer.parseInt(this.getConfigValue("MINIMAL_PASSWORD_LENGTH")) ) {
 			error.add("User password is to short.");
 		}
-		if( password.length() > Integer.parseInt(this.getConfigValue("SCHOOL_MAXIMAL_PASSWORD_LENGTH")) ) {
+		if( password.length() > Integer.parseInt(this.getConfigValue("MAXIMAL_PASSWORD_LENGTH")) ) {
 			error.add("User password is to long.");
 		}
-		if(  this.getConfigValue("SCHOOL_CHECK_PASSWORD_QUALITY") == "yes" ) {
+		if(  this.getConfigValue("CHECK_PASSWORD_QUALITY") == "yes" ) {
 			if( ! Pattern.matches("[A-Z]",password) ) {
 				error.add("User password should contains upper case letters.");
 			}
