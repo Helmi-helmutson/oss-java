@@ -245,7 +245,7 @@ public class ImportHandler {
 					+ person.getLoginId() + " " + person.getBirthday());
 		}
 		if (existingUser == null) {
-			existingUser = ImporterUtil.findUser(o, oldUserList, person);
+			existingUser = ImporterUtil.findUser(o, oldUserList, person); //TODO handle whether to ignore birthday or not (additional boolean parameter provided by lib)
 		}
 		if (existingUser == null) {
 			LOG.error("user not found: " + person.getFirstname() + " " + person.getName() + " " + person.getLoginId()
@@ -352,9 +352,9 @@ public class ImportHandler {
 		for (User user : oldUserlist) {
 			Person p = new Person();
 			p.setBirthday(user.getBirthDay());
-			if ("student".equals(user.getRole())) {
+			if ("students".equals(user.getRole())) {
 				p.addRole(Person.PersonType.STUDENT);
-			} else if ("teacher".equals(user.getRole())) {
+			} else if ("teachers".equals(user.getRole())) {
 				p.addRole(Person.PersonType.TEACHER);
 			}
 			p.setFirstname(user.getGivenName());
@@ -378,10 +378,10 @@ public class ImportHandler {
 	private String getOSSRole(Person p) {
 		switch (p.getPersonType()) {
 		case STUDENT:
-			return "student";
+			return "students";
 
 		case TEACHER:
-			return "teacher";
+			return "teachers";
 		case PERSON:
 			return "administration";
 		}
