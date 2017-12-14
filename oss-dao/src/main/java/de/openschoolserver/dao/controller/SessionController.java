@@ -16,14 +16,12 @@ import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.tools.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +56,6 @@ public class SessionController extends Controller {
 	public Session createSessionWithUser(String username, String password, String deviceType) {
 		UserController userController = new UserController(this.session);
 		DeviceController deviceController = new DeviceController(this.session);
-		List<String> credentials = new ArrayList<String>();
 		Room room = null;
 		String[]   program = new String[5];
 		StringBuffer reply = new StringBuffer();
@@ -67,9 +64,9 @@ public class SessionController extends Controller {
 		program[1] = "-L";
 		program[2] = "admin";
 		program[3] = "-A";
-		File file = null;
 		try {
-			file = File.createTempFile("login", ".cred", new File("/opt/oss-java/tmp/"));
+			File file = File.createTempFile("login", ".cred", new File("/opt/oss-java/tmp/"));
+			List<String> credentials = new ArrayList<String>();
 			credentials.add("username=" + username);
 			credentials.add("password=" + password);
 			credentials.add("domain=" + this.getConfigValue("WORKGROUP"));

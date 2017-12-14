@@ -214,7 +214,7 @@ public interface UserResource {
        @POST
        @Path("{userId}/groups")
        @Produces(JSON_UTF8)
-       @ApiOperation(value = "Sets the membe of this group.")
+       @ApiOperation(value = "Put the user to this groups as member.")
        @ApiResponses(value = {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -275,4 +275,23 @@ public interface UserResource {
                 @ApiParam(hidden = true) @Auth Session session,
                 List<List<String>> Quotas
     );
+    
+    /*
+     * GET users/byUid/{uid}/{attribute}
+     * Get's an attribute from a user 
+     */
+    @GET
+    @Path("byUid/{uid}/{attribute}")
+    @Produces("text/plain")
+    @ApiOperation(value = "Reads an attribute from a user")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+     @RolesAllowed("user.search")
+     String getUserAttribute(
+    		@ApiParam(hidden = true) @Auth Session session,
+            @PathParam("uid")  String uid,
+            @PathParam("attribute") String attribute
+    		);
+     
 }

@@ -129,5 +129,24 @@ public class UserResourceImpl implements UserResource {
 		return userController.getUsers(userIds);
 	}
 
+	@Override
+	public String getUserAttribute(Session session, String uid, String attribute) {
+		User user = new UserController(session).getByUid(uid);
+		if( user == null) {
+			return "";
+		}
+		switch(attribute.toLowerCase()) {
+		case "role":
+			return user.getRole();
+		case "uuid":
+			return user.getUuid();
+		case "givenname":
+			return user.getGivenName();
+		case "surname":
+			return user.getSureName();
+		}
+		return "";
+	}
+
 	
 }

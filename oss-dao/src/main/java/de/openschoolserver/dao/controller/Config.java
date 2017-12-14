@@ -10,9 +10,8 @@ import org.slf4j.LoggerFactory;
 public class Config {
 
 	Logger logger = LoggerFactory.getLogger(Config.class);
-	protected String prefix = "SCHOOL_";
-	protected Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
-
+	private Path OSS_CONFIG = Paths.get("/etc/sysconfig/schoolserver");
+	private String prefix = "SCHOOL_";
 	private Map<String,String>   config;
 	private Map<String,String>   configPath;
 	private Map<String,Boolean>  readOnly;
@@ -23,9 +22,9 @@ public class Config {
 	}
 	
 	public Config(String configPath, String prefix) {
-		OSS_CONFIG = Paths.get(configPath);
-		this.InitConfig();
+		this.OSS_CONFIG = Paths.get(configPath);
 		this.prefix = prefix;
+		this.InitConfig();
 	}
 	
 	public void InitConfig() {
@@ -33,7 +32,7 @@ public class Config {
 		readOnly   = new HashMap<>();
 		configPath = new HashMap<>();
 		try {
-			configFile = Files.readAllLines(OSS_CONFIG);
+			configFile = Files.readAllLines(this.OSS_CONFIG);
 		}
 		catch( IOException e ) { 
 			e.printStackTrace();
@@ -53,7 +52,7 @@ public class Config {
 				String[] sline = line.split("=", 2);
 				if( sline.length == 2 )
 				{
-					String key   = sline[0].substring(prefix.length());
+					String key   = sline[0].substring(this.prefix.length());
 					String value = sline[1];
 					if( value.startsWith("\"") || value.startsWith("'") ){
 						value = value.substring(1);
@@ -114,8 +113,8 @@ public class Config {
 		config.put(key, value);
 		List<String> tmpConfig =  new ArrayList<String>();
 		for ( String line : configFile ){
-			if(line.startsWith(prefix + key)){
-				tmpConfig.add( prefix + key + "=\"" + value + "\"" );  
+			if(line.startsWith(this.prefix + key)){
+				tmpConfig.add( this.prefix + key + "=\"" + value + "\"" );  
 			}
 			else{
 				tmpConfig.add( line );
@@ -123,7 +122,7 @@ public class Config {
 		}
 		configFile = tmpConfig;
 		try {
-			Files.write(OSS_CONFIG, tmpConfig );
+			Files.write(this.OSS_CONFIG, tmpConfig );
 		}
 		catch( IOException e ) { 
 			e.printStackTrace();
