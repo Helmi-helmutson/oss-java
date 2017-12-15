@@ -386,7 +386,7 @@ public class RoomController extends Controller {
 				userMap.put("deviceId", String.valueOf(device.getId()));
 				userMap.put("uid", user.getUid());
 				userMap.put("userId", String.valueOf(user.getId()));
-				userMap.put("sureName", user.getSureName());
+				userMap.put("surName", user.getSurName());
 				userMap.put("givenName", user.getGivenName());
 				users.add(userMap);
 			}
@@ -655,7 +655,7 @@ public class RoomController extends Controller {
 			{
 				User user = new User();
 				user.setUid(device.getName());
-				user.setSureName(device.getName() + "  Workstation-User");
+				user.setSurName(device.getName() + "  Workstation-User");
 				user.setRole("workstations");
 				//TODO do not ignore response.
 				OssResponse answer = userController.add(user);

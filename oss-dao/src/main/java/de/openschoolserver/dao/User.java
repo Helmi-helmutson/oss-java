@@ -23,9 +23,9 @@ import javax.persistence.*;
 	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' "),
 	@NamedQuery(name="User.getByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
 	@NamedQuery(name="User.getByUid",   query="SELECT u FROM User u WHERE u.uid = :uid "),
-	@NamedQuery(name="User.findByName",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.sureName = :sureName"),
-	@NamedQuery(name="User.findByNameAndRole",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.sureName = :sureName and u.role = :role"),
-	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.sureName LIKE :search")
+	@NamedQuery(name="User.findByName",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.surName = :surName"),
+	@NamedQuery(name="User.findByNameAndRole",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.surName = :surName and u.role = :role"),
+	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.surName LIKE :search")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class User implements Serializable {
@@ -39,7 +39,7 @@ public class User implements Serializable {
 
 	private String role;
 
-	private String sureName;
+	private String surName;
 
 	@Column(name="uid", updatable=false)
 	private String uid;
@@ -169,7 +169,7 @@ public class User implements Serializable {
 		this.id  = null;
 		this.uid = "";
 		this.uuid = "";
-		this.sureName = "";
+		this.surName = "";
 		this.givenName = "";
 		this.password = "";
 		this.role = "";
@@ -211,12 +211,12 @@ public class User implements Serializable {
 		this.role = role;
 	}
 
-	public String getSureName() {
-		return this.sureName;
+	public String getSurName() {
+		return this.surName;
 	}
 
-	public void setSureName(String surename) {
-		this.sureName = surename;
+	public void setSurName(String surname) {
+		this.surName = surname;
 	}
 
 	public String getUid() {

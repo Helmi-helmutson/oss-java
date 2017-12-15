@@ -92,12 +92,12 @@ public class UserController extends Controller {
 		}
 	}
 
-	public List<User> findByName(String givenName, String sureName) {
+	public List<User> findByName(String givenName, String surName) {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("User.findByName");
 			query.setParameter("givenName",givenName);
-			query.setParameter("sureName",sureName);
+			query.setParameter("surName",surName);
 			return query.getResultList();
 		} catch (Exception e) {
 			logger.error("findByName: " + e.getMessage());
@@ -107,12 +107,12 @@ public class UserController extends Controller {
 		}
 	}
 
-	public List<User> findByNameAndRole(String givenName, String sureName, String role) {
+	public List<User> findByNameAndRole(String givenName, String surName, String role) {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("User.findByNameAndRole");
 			query.setParameter("givenName",givenName);
-			query.setParameter("sureName",sureName);
+			query.setParameter("surName",surName);
 			query.setParameter("role",role);
 			return query.getResultList();
 		} catch (Exception e) {

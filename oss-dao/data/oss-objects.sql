@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS Users (
         uid          VARCHAR(32) NOT NULL,
         uuid         VARCHAR(64) DEFAULT NULL,
         role         VARCHAR(16) NOT NULL,
-        sureName     VARCHAR(64) NOT NULL,
+        surName      VARCHAR(64) NOT NULL,
         givenName    VARCHAR(64),
         birthDay     DATE NOT NULL,
 	fsQuota	     INTEGER DEFAULT 0,
