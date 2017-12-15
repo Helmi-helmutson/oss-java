@@ -153,7 +153,7 @@ public class UserController extends Controller {
 		// Create uid if not given
 		if( user.getUid() == null || user.getUid().isEmpty() ) {
 			String userId = UserUtil.createUserId( user.getGivenName(),
-					user.getSureName(),
+					user.getSurName(),
 					user.getBirthDay(),
 					true,
 					this.getConfigValue("STRING_CONVERT_TYPE") == "telex", 
@@ -221,7 +221,7 @@ public class UserController extends Controller {
 		}
 		return new OssResponse( this.getSession(),
 				"OK",
-				user.getUid() + " (" + user.getGivenName() + " " + user.getSureName() + ") was created with password: '" + user.getPassword()+ "'.",
+				user.getUid() + " (" + user.getGivenName() + " " + user.getSurName() + ") was created with password: '" + user.getPassword()+ "'.",
 				user.getId()
 			);
 	}
@@ -244,7 +244,7 @@ public class UserController extends Controller {
 			}
 		}
 		oldUser.setGivenName( user.getGivenName());
-		oldUser.setSureName(user.getSureName());
+		oldUser.setSurName(user.getSurName());
 		oldUser.setBirthDay(user.getBirthDay());
 		oldUser.setPassword(user.getPassword());
 		oldUser.setFsQuota(user.getFsQuota());

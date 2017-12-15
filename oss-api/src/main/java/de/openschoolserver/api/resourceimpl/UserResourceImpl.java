@@ -143,7 +143,7 @@ public class UserResourceImpl implements UserResource {
 		case "givenname":
 			return user.getGivenName();
 		case "surname":
-			return user.getSureName();
+			return user.getSurName();
 		}
 		return "";
 	}

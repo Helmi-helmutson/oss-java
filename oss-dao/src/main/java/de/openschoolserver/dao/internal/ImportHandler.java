@@ -220,7 +220,7 @@ public class ImportHandler {
 			String birthday = newUser.getBirthDay() != null ? fmt.format(newUser.getBirthDay()) : "";
 			String classes = getCSVClasses(newUser);
 			buf.append(newUser.getUid()).append(CSVSEP).append(normalizeValue(newUser.getGivenName())).append(CSVSEP)
-					.append(normalizeValue(newUser.getSureName())).append(CSVSEP).append(birthday).append(CSVSEP)
+					.append(normalizeValue(newUser.getSurName())).append(CSVSEP).append(birthday).append(CSVSEP)
 					.append(normalizeValue(classes)).append(CSVSEP).append(res != null ? extractPW(res.getValue()) : "")
 					.append(LINESEP);
 			useraddLogfile.write(buf.toString().getBytes("UTF-8"));
@@ -265,8 +265,8 @@ public class ImportHandler {
 				ossUser.setGivenName(person.getFirstname());
 				change = true;
 			}
-			if (person.getName() != null && !person.getName().equals(ossUser.getSureName())) {
-				ossUser.setSureName(person.getName());
+			if (person.getName() != null && !person.getName().equals(ossUser.getSurName())) {
+				ossUser.setSurName(person.getName());
 				change = true;
 			}
 			if (person.getBirthday() != null && !person.getBirthday().equals(ossUser.getBirthDay())) {
@@ -309,7 +309,7 @@ public class ImportHandler {
 			User newUser = new User();
 			newUser.setUid(person.getLoginId());
 			newUser.setGivenName(person.getFirstname());
-			newUser.setSureName(person.getName());
+			newUser.setSurName(person.getName());
 			newUser.setRole(o.getRequestedUserRole() != null ? o.getRequestedUserRole() : getOSSRole(person));
 			newUser.setBirthDay(person.getBirthday());
 			if (person.getPassword()!=null && person.getPassword().length()>0) {
@@ -322,7 +322,7 @@ public class ImportHandler {
 			} else {
 				appendUserAddLog(importer,o,null, newUser, true);
 			}
-			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSureName() ).append(", ").append(newUser.getGivenName()).append(LINESEP);
+			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName() ).append(", ").append(newUser.getGivenName()).append(LINESEP);
 			if (newUser != null && !o.isTestOnly()) {
 				if (person.getSchoolClasses() != null) {
 					for (SchoolClass schoolClass : person.getSchoolClasses()) {
@@ -358,7 +358,7 @@ public class ImportHandler {
 				p.addRole(Person.PersonType.TEACHER);
 			}
 			p.setFirstname(user.getGivenName());
-			p.setName(user.getSureName());
+			p.setName(user.getSurName());
 			p.setLoginId(user.getUid());
 			p.setData(user);
 			for (Group group : user.getGroups()) {
