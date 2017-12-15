@@ -1,6 +1,7 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
@@ -144,9 +145,13 @@ public class UserResourceImpl implements UserResource {
 			return user.getGivenName();
 		case "surname":
 			return user.getSurName();
+		case "groups":
+			List<String> groups = new ArrayList<String>();
+			for( Group group : user.getGroups() ) {
+				groups.add(group.getName());
+			}
+			return String.join(" ", groups);
 		}
 		return "";
 	}
-
-	
 }

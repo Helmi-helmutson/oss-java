@@ -244,7 +244,7 @@ public interface UserResource {
     );
     
     /*
-     * PUT groups/<groupId>/<userId>
+     * PUT users/<groupId>/<userId>
      */
     @PUT
     @Path("{userId}/{groupId}")
@@ -283,7 +283,7 @@ public interface UserResource {
     @GET
     @Path("byUid/{uid}/{attribute}")
     @Produces("text/plain")
-    @ApiOperation(value = "Reads an attribute from a user")
+    @ApiOperation(value = "Reads some attributes from a user. Available attributes are: role uuid givenname surname groups.")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
