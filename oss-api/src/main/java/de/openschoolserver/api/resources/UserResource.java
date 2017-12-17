@@ -245,7 +245,7 @@ public interface UserResource {
     
     /*
      * PUT users/<groupId>/<userId>
-     *
+     */
     @PUT
     @Path("{userId}/{groupId}")
     @Produces(JSON_UTF8)
