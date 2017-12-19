@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS Devices (
 CREATE TABLE IF NOT EXISTS AccessInRooms (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id        BIGINT UNSIGNED NOT NULL,
-        accessType     VARCHAR(8) NOT NULL,
+        accessType     VARCHAR(3) NOT NULL,
         pointInTime    CHAR(5) DEFAULT '06:00',
 	monday         CHAR(1) DEFAULT 'Y',
 	tusday         CHAR(1) DEFAULT 'Y',
