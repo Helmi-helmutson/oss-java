@@ -4,7 +4,7 @@ package de.openschoolserver.dao.controller;
 import java.io.File;
 
 
-
+import static de.openschoolserver.dao.internal.OSSConstatns.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -144,7 +144,7 @@ public class EducationController extends Controller {
 			UserController  userController  = new UserController(this.session);
 			for( Long id : smartRoom.getUserIds()) {
 				User user = userController.getById(Long.valueOf(id));
-				if(smartRoom.getStudentsOnly() && ! user.getRole().equals("studetns")){
+				if(smartRoom.getStudentsOnly() && ! user.getRole().equals(roleStudent)){
 					continue;
 				}
 				smartRoom.getUsers().add(user);
@@ -229,7 +229,7 @@ public class EducationController extends Controller {
 			Category category = room.getCategories().get(0);
 			for( Group group : category.getGroups() ) {
 				for( User user : group.getUsers() ) {
-					if(	category.getStudentsOnly() && ! user.getRole().equals("studetns") ||
+					if(	category.getStudentsOnly() && ! user.getRole().equals(roleStudent) ||
 							user.equals(me)	){
 						continue;
 					}

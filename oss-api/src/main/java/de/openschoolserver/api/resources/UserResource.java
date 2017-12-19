@@ -2,23 +2,17 @@
 package de.openschoolserver.api.resources;
 
 
-import io.dropwizard.auth.Auth;
-
-import io.swagger.annotations.*;
-
-import javax.annotation.security.RolesAllowed;
+import static de.openschoolserver.api.resources.Resource.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
+import io.dropwizard.auth.Auth;
+import io.swagger.annotations.*;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
-
+import java.util.List;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
-
-import java.util.List;
-
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
 @Path("users")
 @Api(value = "users")
@@ -282,7 +276,7 @@ public interface UserResource {
      */
     @GET
     @Path("byUid/{uid}/{attribute}")
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "Reads some attributes from a user. Available attributes are: role uuid givenname surname groups.")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),

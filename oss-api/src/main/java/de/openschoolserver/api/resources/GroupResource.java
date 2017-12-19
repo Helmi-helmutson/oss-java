@@ -16,7 +16,7 @@ import de.openschoolserver.dao.OssResponse;
 
 import java.util.List;
 
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
+import static de.openschoolserver.api.resources.Resource.*;
 
 @Path("groups")
 @Api(value = "groups")
@@ -59,7 +59,7 @@ public interface GroupResource {
       	 */
           @GET
           @Path("text/{groupName}/members")
-          @Produces("text/plain")
+          @Produces(TEXT)
           @ApiOperation(value = "Get users which are member in this group.")
           @ApiResponses(value = {
                   @ApiResponse(code = 404, message = "Group not found"),
@@ -107,7 +107,7 @@ public interface GroupResource {
      */
     @GET
     @Path("text/byType/{type}")
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "Get groups from a type")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")

@@ -2,13 +2,10 @@
 package de.openschoolserver.api.resources;
 
 
+import static de.openschoolserver.api.resources.Resource.*;
+
 import io.dropwizard.auth.Auth;
-
-
-
-
 import io.swagger.annotations.*;
-
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
@@ -22,8 +19,6 @@ import de.openschoolserver.dao.Session;
 
 import java.util.List;
 import java.util.Map;
-
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
 @Path("rooms")
 @Api(value = "rooms")
@@ -220,7 +215,7 @@ public interface RoomResource {
      */
     @PUT
     @Path("getNextRoomIP")
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "Delivers the next free ip address for a room.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),

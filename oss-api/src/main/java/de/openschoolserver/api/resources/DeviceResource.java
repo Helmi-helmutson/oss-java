@@ -24,7 +24,7 @@ import de.openschoolserver.dao.OssResponse;
 import java.io.InputStream;
 import java.util.List;
 
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
+import static de.openschoolserver.api.resources.Resource.*;
 
 @Path("devices")
 @Api(value = "devices")
@@ -261,7 +261,7 @@ public interface DeviceResource {
      */
     @GET
     @Path("loggedIn/{IP}")
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "Get the logged on users on a device defined by IP.")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")

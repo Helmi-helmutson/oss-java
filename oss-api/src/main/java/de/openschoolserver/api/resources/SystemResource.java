@@ -2,18 +2,14 @@
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api.resources;
 
+import static de.openschoolserver.api.resources.Resource.*;
 import io.dropwizard.auth.Auth;
-
 import io.swagger.annotations.*;
-
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
-
 import java.util.List;
 import java.util.Map;
-
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.MissedTranslation;
@@ -95,7 +91,7 @@ public interface SystemResource {
 
     @GET
     @Path("configuration/{key}")
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "Gets a system configuration value.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -201,7 +197,7 @@ public interface SystemResource {
      */
     @POST
     @Path("translate")
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "Translate a text into a given language")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")

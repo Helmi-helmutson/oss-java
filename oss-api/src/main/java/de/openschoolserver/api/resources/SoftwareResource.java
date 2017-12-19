@@ -1,14 +1,12 @@
 /* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resources;
 
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
-
-
-
-
-
+import static de.openschoolserver.api.resources.Resource.*;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
@@ -35,10 +33,6 @@ import de.openschoolserver.dao.SoftwareLicense;
 import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
-
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
 
 @Path("softwares")
 @Api(value = "softwares")
@@ -506,7 +500,7 @@ public interface SoftwareResource {
 	 */
 	@GET
 	@Path("devicesByName/{deviceName}/licences")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "Set a software on a device as installed in a given version.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
@@ -594,7 +588,7 @@ public interface SoftwareResource {
 	 */
 	@GET
 	@Path("devicesByName/{deviceName}/{softwareName}/{version}")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "the state of the installation of software(s) on a device.",
 			notes = "There are following installation states:<br>"
 				    + "I  -> installed<br>"
@@ -654,7 +648,7 @@ public interface SoftwareResource {
 	 */
 	@GET
 	@Path("devices/{deviceId}/{softwareName}/{version}")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "the state of the installation of software(s) on a device.",
 			notes = "There are following installation states:<br>"
 				    + "I  -> installed<br>"

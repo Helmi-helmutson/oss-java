@@ -2,22 +2,18 @@
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api.resources;
 
+
+import static de.openschoolserver.api.resources.Resource.*;
+
 import io.dropwizard.auth.Auth;
-
-
 import io.swagger.annotations.*;
-
 import javax.annotation.security.PermitAll;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
-
 import de.openschoolserver.dao.Session;
-
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
-
 import java.util.List;
 
 @Path("sessions")
@@ -47,7 +43,7 @@ public interface SessionsResource {
     @POST
     @Path("login")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "create a new session")
     @ApiResponses(value = {
             @ApiResponse(code = 401, message = "Login is incorrect"),
@@ -89,7 +85,7 @@ public interface SessionsResource {
 
     @GET
     @Path("{key}")
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "Get some session values. Available keys are: defaultPrinter, availablePrinters, dnsName, domainName.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")

@@ -1,23 +1,20 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.api.resources;
 
+
+import static de.openschoolserver.api.resources.Resource.*;
+
 import io.dropwizard.auth.Auth;
-
-
 import io.swagger.annotations.*;
-
 import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
-
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Category;

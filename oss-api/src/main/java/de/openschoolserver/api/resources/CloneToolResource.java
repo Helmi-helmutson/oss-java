@@ -1,7 +1,7 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resources;
 
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
+import static de.openschoolserver.api.resources.Resource.*;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -34,7 +34,7 @@ public interface CloneToolResource {
 	 */
 	@GET
 	@Path("hwconf")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "Gets the id of the hardware configuration based on the IP-address of the session.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
@@ -49,7 +49,7 @@ public interface CloneToolResource {
 	 */
 	@GET
 	@Path("isMaster")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "Returns 'true' if the workstation of the session is master. Returns empty if not.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
@@ -64,7 +64,7 @@ public interface CloneToolResource {
 	 */
 	@GET
 	@Path("devices/{deviceId}/isMaster")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "Returns 'true' if the workstation of the deviceId is master. Returns empty if not.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
@@ -144,7 +144,7 @@ public interface CloneToolResource {
     */
 	@GET
 	@Path("{hwconfId}/description")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "Gets the description of a hardware configuration.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
@@ -160,7 +160,7 @@ public interface CloneToolResource {
     */
 	@GET
 	@Path("{hwconfId}/partitions")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "Gets a space separated list of recorded partitions to a given hardware configuration.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
@@ -193,7 +193,7 @@ public interface CloneToolResource {
 	 */
 	@GET
 	@Path("{hwconfId}/{partitionName}/{key}")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "Gets the value of a key to a given partition." +
 			      "The key may be: OS, Description, Join, Format, Itool" )
 	@ApiResponses(value = {
@@ -212,7 +212,7 @@ public interface CloneToolResource {
 	 */
 	@GET
 	@Path("roomsToRegister")
-	@Produces("text/plain")
+	@Produces(TEXT)
 	@ApiOperation(value = "Gets a list of rooms to register." +
 			      "The format is id name##id name" )
 	@ApiResponses(value = {
@@ -228,7 +228,7 @@ public interface CloneToolResource {
      */
     @GET
     @Path("rooms/{roomId}/availableIPAddresses")
-    @Produces("text/plain")
+    @Produces(TEXT)
     @ApiOperation(value = "Get count available ip-adresses of the room. The string list will contains the proposed name too: 'IP-Addres Proposed-Name'")
         @ApiResponses(value = {
         @ApiResponse(code = 404, message = "There is no more IP address in this room."),

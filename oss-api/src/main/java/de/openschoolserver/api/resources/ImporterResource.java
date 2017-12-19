@@ -1,7 +1,7 @@
 /* (c) 2017 EXTIS GmbH (www.extis.de) - all rights reserved */
 package de.openschoolserver.api.resources;
 
-import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
+import static de.openschoolserver.api.resources.Resource.*;
 
 
 

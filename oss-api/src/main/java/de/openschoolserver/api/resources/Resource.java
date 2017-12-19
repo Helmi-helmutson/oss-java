@@ -5,5 +5,6 @@ package de.openschoolserver.api.resources;
 public interface Resource {
 
     String JSON_UTF8 = "application/json; charset=UTF-8";
+    String TEXT = "text/plain; charset=UTF-8";
 
 }
