@@ -829,4 +829,110 @@ public class RoomController extends Controller {
 		}
 		return rooms;
 	}
+
+	/*
+	 * Control of printer in this room
+	 */
+	public OssResponse setDefaultPrinter(Long roomId, Long deviceId) {
+		EntityManager em = getEntityManager();
+		Room room = this.getById(roomId);
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getById(deviceId);
+		room.setDefaultPrinter(device);
+		device.getDefaultInRooms().add(room);
+		try {
+			em.getTransaction().begin();
+			em.merge(room);
+			em.merge(device);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","The default printer of the room was set succesfully.");
+	}
+
+	public OssResponse deleteDefaultPrinter(long roomId) {
+		EntityManager em = getEntityManager();
+		Room room = this.getById(roomId);
+		Device device = room.getDefaultPrinter();
+		if( device != null  ) {
+			room.setDefaultPrinter(null);
+			device.getDefaultInRooms().remove(room);
+			try {
+				em.getTransaction().begin();
+				em.merge(room);
+				em.merge(device);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			} finally {
+				em.close();
+			}
+		}
+		return new OssResponse(this.getSession(),"OK","The default printer of the room was deleted succesfully.");
+	}
+
+	public OssResponse setAvailablePrinters(long roomId, List<Long> deviceIds) {
+		EntityManager em = getEntityManager();
+		Room room = this.getById(roomId);
+		DeviceController deviceController = new DeviceController(session);
+		try {
+			em.getTransaction().begin();
+			for( Device device : deviceController.getDevices(deviceIds)) {
+				device.getAvailableInRooms().add(room);
+				em.merge(device);
+			}
+			room.setAvailablePrinters(deviceController.getDevices(deviceIds));
+			em.merge(room);
+			em.getTransaction().commit();
+			
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","The available printers of the room was set succesfully.");
+	}
+
+	public OssResponse addAvailablePrinter(long roomId, long deviceId) {
+		EntityManager em = getEntityManager();
+		Room room = this.getById(roomId);
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getById(deviceId);
+		room.getAvailablePrinters().add(device);
+		device.getAvailableInRooms().add(room);
+		try {
+			em.getTransaction().begin();
+			em.merge(room);
+			em.merge(device);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","The default printer of the room was set succesfully.");
+	}
+	
+	public OssResponse deleteAvailablePrinter(long roomId, long deviceId) {
+		EntityManager em = getEntityManager();
+		Room room = this.getById(roomId);
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getById(deviceId);
+		room.getAvailablePrinters().remove(device);
+		device.getAvailableInRooms().remove(room);
+		try {
+			em.getTransaction().begin();
+			em.merge(room);
+			em.merge(device);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","The default printer of the room was set succesfully.");
+	}
 }
