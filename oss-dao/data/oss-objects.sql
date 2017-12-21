@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS AccessInRooms (
         accessType     VARCHAR(3) NOT NULL,
         pointInTime    CHAR(5) DEFAULT '06:00',
 	monday         CHAR(1) DEFAULT 'Y',
-	tusday         CHAR(1) DEFAULT 'Y',
+	tuesday        CHAR(1) DEFAULT 'Y',
 	wednesday      CHAR(1) DEFAULT 'Y',
 	thursday       CHAR(1) DEFAULT 'Y',
 	friday         CHAR(1) DEFAULT 'Y',

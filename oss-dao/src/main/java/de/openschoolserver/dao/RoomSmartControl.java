@@ -44,7 +44,7 @@ public class RoomSmartControl implements Serializable {
 	@Id
 	@SequenceGenerator(name="ACCESSINROOM_ID_GENERATOR", sequenceName="SEQ")
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ACCESSINROOM_ID_GENERATOR")
-	private long id;
+	private Long id;
 	
 	//bi-directional many-to-one association to room
     @Column(name = "room_id")
@@ -90,11 +90,11 @@ public class RoomSmartControl implements Serializable {
 		this.endTime   = new Date( System.currentTimeMillis( ) + duration * 60 * 1000 );
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -110,7 +110,7 @@ public class RoomSmartControl implements Serializable {
 		return this.owner;
 	}
 
-	public void setUserId(long ownerId) {
+	public void setUserId(Long ownerId) {
 		this.ownerId = ownerId;
 	}
 	

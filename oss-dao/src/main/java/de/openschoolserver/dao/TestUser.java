@@ -18,7 +18,7 @@ public class TestUser implements Serializable {
 	@Id
 	@SequenceGenerator(name="TESTUSERS_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="TESTUSERS_ID_GENERATOR")
-	private long id;
+	private Long id;
 
 	//bi-directional many-to-one association to Device
 	@ManyToOne
@@ -43,11 +43,11 @@ public class TestUser implements Serializable {
 	public TestUser() {
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

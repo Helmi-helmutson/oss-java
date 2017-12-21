@@ -40,7 +40,7 @@ public class EducationController extends Controller {
 	 * Return the Category to a smart room
 	 */
 	
-	public Long getCategoryToRoom(Long roomId){
+	public Category getCategoryToRoom(Long roomId){
 		EntityManager   em = getEntityManager();
 		Room room;
 		try {
@@ -53,7 +53,7 @@ public class EducationController extends Controller {
 		}
 		for( Category category : room.getCategories() ) {
 			if( room.getName().equals(category.getName()) && category.getCategoryType().equals("smartRoom")) {
-				return category.getId();
+				return category;
 			}
 		}
 		return null;
@@ -451,9 +451,8 @@ public class EducationController extends Controller {
 		OssResponse ossResponse = null;
 		List<String> errors = new ArrayList<String>();
 		for( List<Long> loggedOn : this.getRoom(roomId) ) {
-			if(this.session.getDevice().getIp().equals(loggedOn.get(1)) ||
-			   this.session.getDevice().getWlanIp().equals(loggedOn.get(1))
-			  ) {
+			//Do not control the own workstation
+			if( this.session.getDevice().getId().equals(loggedOn.get(1))) {
 				continue;
 			}
 			ossResponse = this.manageDevice(loggedOn.get(1), action, actionContent);
@@ -494,10 +493,13 @@ public class EducationController extends Controller {
 			program[2] = "system.reboot";
 			break;
 		case "logout":
+			//TODO
 			break;
 		case "close":
+			//TODO
 			break;
 		case "open":
+			//TODO
 			break;
 		case "wol":
 			program = new String[4];

@@ -24,7 +24,7 @@ public class OSSConfig implements Serializable {
 
         @Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
-        private long id;
+        private Long id;
 
         private String objectType;
 
@@ -50,11 +50,11 @@ public class OSSConfig implements Serializable {
         public OSSConfig() {
 	}
 
-        public long getId() {
+        public Long getId() {
                 return this.id;
         }
 
-        public void setId(long id) {
+        public void setId(Long id) {
                 this.id = id;
         }
 

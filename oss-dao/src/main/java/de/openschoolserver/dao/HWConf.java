@@ -24,7 +24,7 @@ public class HWConf implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
-	private long id;
+	private Long id;
 
 	private String description;
 
@@ -67,11 +67,11 @@ public class HWConf implements Serializable {
 	public HWConf() {
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

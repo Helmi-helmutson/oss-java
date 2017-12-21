@@ -27,7 +27,7 @@ public class SoftwareVersion implements Serializable {
 	@Id
 	@SequenceGenerator(name="SOFTWAREVERSION_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWAREVERSION_ID_GENERATOR")
-	private long id;
+	private Long id;
 
 	private String version;
 
@@ -55,11 +55,11 @@ public class SoftwareVersion implements Serializable {
 		this.status   = status;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

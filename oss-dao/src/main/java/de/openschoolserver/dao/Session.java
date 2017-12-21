@@ -5,7 +5,6 @@ package de.openschoolserver.dao;
 import java.security.Principal;
 
 import java.util.Date;
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
@@ -81,7 +80,7 @@ public class Session implements Principal {
 		this.temporaryUploadData = temporaryUploadData;
 	}
     
-    public Session(String token, long userid, String password, String ip) {
+    public Session(String token, Long userid, String password, String ip) {
         this.userId = userid;
         this.password = password;
         this.token = token;
@@ -174,11 +173,11 @@ public class Session implements Principal {
         this.role = role;
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return this.userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

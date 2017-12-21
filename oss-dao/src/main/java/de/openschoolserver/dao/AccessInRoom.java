@@ -25,56 +25,101 @@ public class AccessInRoom implements Serializable {
 	@Id
 	@SequenceGenerator(name="ACCESSINROOM_ID_GENERATOR", sequenceName="SEQ")
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ACCESSINROOM_ID_GENERATOR")
-	private long id;
+	private Long id;
 
 	//uni-directional many-to-one association to Room
 	@ManyToOne
 	@JsonIgnore
 	private Room room;
 
+	/*
+	 * The type of the access control. This can be ACT (action) or FWC or firewall access control 
+	 */
 	private String accessType;
 
+	/*
+	 * The action to be executed when accesType is ACT
+	 */
 	private String action;
 
 	@Column(name="room_id", insertable = false, updatable = false)
-	private long roomId;
+	private Long roomId;
 
+	/*
+	 * If the corresponding access should be applied Mondays
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean monday;
 
+	/*
+	 * If the corresponding access should be applied Tuesdays
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
-	private Boolean tusday;
+	private Boolean tuesday;
 
+	/*
+	 * If the corresponding access should be applied Wednesdays 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean wednesday;
 
+	/*
+	 * If the corresponding access should be applied Thursdays 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean thursday;
 
+	/*
+	 * If the corresponding access should be applied Fridays 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean friday;
 
+	/*
+	 * If the corresponding access should be applied Saturdays 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean saturday;
 
+	/*
+	 * If the corresponding access should be applied Sundays 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean sunday;
 
+	/*
+	 * If the corresponding access should be applied on holidays 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean holiday;
 
+	/*
+	 * If the direct internet access is allowed or should be allowed. 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean direct;
 
+	/*
+	 * If is allowed log in or should be allowed. 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean login;
 
+	/*
+	 * If the access to the portal and mailserver is allowed or should be allowed. 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean portal;
 
+	/*
+	 * If the access to the printserver is allowed or should be allowed. 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean printing;
 
+	/*
+	 * If the direct internet access via proxy is allowed or should be allowed. 
+	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean proxy;
 	
@@ -83,7 +128,7 @@ public class AccessInRoom implements Serializable {
 	public AccessInRoom() {
 		this.pointInTime = "06:00";
 		this.monday   = true;
-		this.tusday   = true;
+		this.tuesday   = true;
 		this.wednesday= true;
 		this.thursday = true;
 		this.friday   = true;
@@ -114,11 +159,11 @@ public class AccessInRoom implements Serializable {
 		this.room = room;
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
@@ -210,11 +255,11 @@ public class AccessInRoom implements Serializable {
 		this.proxy = proxy;
 	}
 
-	public long getRoomId() {
+	public Long getRoomId() {
 		return this.roomId;
 	}
 
-	public void setRoomId(long roomId) {
+	public void setRoomId(Long roomId) {
 		this.roomId = roomId;
 	}
 
@@ -242,12 +287,12 @@ public class AccessInRoom implements Serializable {
 		this.thursday = thursday;
 	}
 
-	public Boolean getTusday() {
-		return this.tusday;
+	public Boolean getTuesday() {
+		return this.tuesday;
 	}
 
-	public void setTusday(Boolean tusday) {
-		this.tusday = tusday;
+	public void setTuesday(Boolean tuesday) {
+		this.tuesday = tuesday;
 	}
 
 	public Boolean getWednesday() {

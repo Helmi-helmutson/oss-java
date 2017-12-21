@@ -26,7 +26,7 @@ public class SoftwareStatus implements Serializable {
 	@Id
 	@SequenceGenerator(name="SOFTWARESTATUS_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARESTATUS_ID_GENERATOR")
-	private long id;
+	private Long id;
 	
 	private String status;
 

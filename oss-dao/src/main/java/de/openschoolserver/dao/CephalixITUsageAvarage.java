@@ -19,7 +19,7 @@ public class CephalixITUsageAvarage implements Serializable {
 	@Id
 	@SequenceGenerator(name="CEPHALIXITUSAGEAVARAGE_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CEPHALIXITUSAGEAVARAGE_ID_GENERATOR")
-	private long id;
+	private Long id;
 
 	private BigInteger avarage;
 
@@ -41,11 +41,11 @@ public class CephalixITUsageAvarage implements Serializable {
 	public CephalixITUsageAvarage() {
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

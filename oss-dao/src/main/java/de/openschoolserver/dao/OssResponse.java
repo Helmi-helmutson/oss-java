@@ -18,7 +18,7 @@ public class OssResponse implements Serializable {
 	@Id
 	@SequenceGenerator(name="RESPONSES_ID_GENERATOR", sequenceName="SEQ")
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="RESPONSES_ID_GENERATOR")
-	private long id;
+	private Long id;
 
 	private String code;
 	private String value;
@@ -59,11 +59,11 @@ public class OssResponse implements Serializable {
         this.objectId = objectId;
     }
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 

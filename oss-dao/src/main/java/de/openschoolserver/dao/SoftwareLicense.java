@@ -22,7 +22,7 @@ public class SoftwareLicense implements Serializable {
 	@Id
 	@SequenceGenerator(name="SOFTWARELICENSES_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARELICENSES_ID_GENERATOR")
-	private long id;
+	private Long id;
 
 	/*
 	 * The amount of the devices the license can be used for.
@@ -71,11 +71,11 @@ public class SoftwareLicense implements Serializable {
 	public SoftwareLicense() {
 	}
 
-	public long getId() {
+	public Long getId() {
 		return this.id;
 	}
 
-	public void setId(long id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
