@@ -645,7 +645,7 @@ public interface EducationResource {
     @Path("proxy/positiveLists")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Puts data to te member of the smart rooms" )
+    @ApiOperation( value = "Creates a new positive list." )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -708,7 +708,4 @@ public interface EducationResource {
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );
-    
-
- 
 }
