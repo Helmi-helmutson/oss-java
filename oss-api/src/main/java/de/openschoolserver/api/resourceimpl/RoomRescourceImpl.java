@@ -7,6 +7,7 @@ import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.RoomController;
+import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.api.resources.RoomResource;
 
@@ -209,6 +210,41 @@ public class RoomRescourceImpl implements RoomResource {
 	@Override
 	public OssResponse modify(Session session, Room room) {
 		return new RoomController(session).modify(room);
+	}
+
+	@Override
+	public OssResponse setDefaultPrinter(Session session, long roomId, Long deviceId) {
+		return new RoomController(session).setDefaultPrinter(roomId, deviceId);
+	}
+
+	@Override
+	public OssResponse deleteDefaultPrinter(Session session, long roomId) {
+		return new RoomController(session).deleteDefaultPrinter(roomId);
+	}
+
+	@Override
+	public Device getDefaultPrinter(Session session, long roomId) {
+		return new RoomController(session).getById(roomId).getDefaultPrinter();
+	}
+
+	@Override
+	public OssResponse setAvailablePrinters(Session session, long roomId, List<Long> deviceIds) {
+		return new RoomController(session).setAvailablePrinters(roomId, deviceIds);
+	}
+
+	@Override
+	public OssResponse addAvailablePrinters(Session session, long roomId, long deviceId) {
+		return new RoomController(session).addAvailablePrinter(roomId, deviceId);
+	}
+
+	@Override
+	public OssResponse deleteAvailablePrinters(Session session, long roomId, long deviceId) {
+		return new RoomController(session).deleteAvailablePrinter(roomId, deviceId);
+	}
+
+	@Override
+	public List<Device> getAvailablePrinters(Session session, long roomId) {
+		return new RoomController(session).getById(roomId).getAvailablePrinters();
 	}
 
 }

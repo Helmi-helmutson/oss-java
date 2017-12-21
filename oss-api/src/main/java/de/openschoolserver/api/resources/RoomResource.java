@@ -267,7 +267,7 @@ public interface RoomResource {
     @GET
     @Path("{roomId}/accessList")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the access list in a room")
+    @ApiOperation(value = "Gets the access scheduler in a room")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -451,4 +451,103 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             @PathParam("deviceId") Long deviceId
     );
+    
+    /*
+     * Printer control
+     */
+    @PUT
+    @Path("{roomId}/defaultPrinter/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Sets the default printer in a room.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("room.manage")
+    OssResponse setDefaultPrinter(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("deviceId") Long deviceId
+    );
+    
+    @DELETE
+    @Path("{roomId}/defaultPrinter")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Deletes the default printer in a room.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("room.manage")
+    OssResponse deleteDefaultPrinter(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+    );
+
+    @GET
+    @Path("{roomId}/defaultPrinter")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the default printer in a room.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("room.manage")
+    Device getDefaultPrinter(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+    );
+
+    @POST
+    @Path("{roomId}/availablePrinters")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Sets the available printers in a room.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("room.manage")
+    OssResponse setAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            List<Long> deviceIds
+    );
+
+    @PUT
+    @Path("{roomId}/availablePrinters/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Adds an available printers in a room.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("room.manage")
+    OssResponse addAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId,
+            @PathParam("deviceId") long deviceId
+    );
+    
+    @DELETE
+    @Path("{roomId}/availablePrinters/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Deletes an avilable printer in a room.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("room.manage")
+    OssResponse deleteAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId")   long roomId,
+            @PathParam("deviceId") long deviceId
+    );
+
+    @GET
+    @Path("{roomId}/availablePrinters")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of available printers in a room.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Device not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("room.manage")
+    List<Device> getAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+    );
+
 }
