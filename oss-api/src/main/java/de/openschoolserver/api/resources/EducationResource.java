@@ -20,6 +20,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.Device;
 
 @Path("education")
 @Api(value = "education")
@@ -215,6 +216,55 @@ public interface EducationResource {
     })
     @RolesAllowed("education.rooms")
     List<List<Long>>  getRoom(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+            );
+
+    /*
+     * GET education/rooms/{roomId}/users
+     * Delivers the list of the member users of a smart room
+     */
+    @GET
+    @Path("rooms/{roomId}/users")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the ids of the user members in a smart room" )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<Long>  getUserMember(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+            );
+ 
+    /*
+     * GET education/rooms/{roomId}/groups
+     */
+    @GET
+    @Path("rooms/{roomId}/users")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the ids of the group members in a smart room" )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<Long>  getGroupMember(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") long roomId
+            );
+
+    /*
+     * GET education/rooms/{roomId}/devices
+     */
+    @GET
+    @Path("rooms/{roomId}/devices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the ids of the group members in a smart room" )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<Long>  getDeviceMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
             );
@@ -526,11 +576,44 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    OssResponse collectFileFromDevice(@ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceId") long deviceId
+    OssResponse collectFileFromDevice(
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("deviceId") long deviceId
     );
     
- 
+    /*
+     * Get informations from the printers in the room
+     */
+    @GET
+    @Path("rooms/{roomId}/defaultPrinter")
+    @Produces(JSON_UTF8)
+    @ApiOperation( value = "Gets the default printer in the room." )
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    Device getDefaultPrinter(
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("roomId") Long roomId
+    );
+    
+    /*
+     * Get informations from the printers in the room
+     */
+    @GET
+    @Path("rooms/{roomId}/availablePrinters")
+    @Produces(JSON_UTF8)
+    @ApiOperation( value = "Gets the list fo the available printers in the room." )
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<Device> getAvailablePrinters(
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("roomId") Long roomId
+    );
+    
+    
     /*******************************************/
     /* Functions to handle proxy settings.     */
     /*******************************************/
@@ -542,7 +625,9 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.proxy")
-    List<PositiveList> getPositiveLists(@ApiParam(hidden = true) @Auth Session session );
+    List<PositiveList> getPositiveLists(
+        @ApiParam(hidden = true) @Auth Session session
+    );
     
     @GET
     @Path("proxy/myPositiveLists")
@@ -552,7 +637,9 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.proxy")
-    List<PositiveList> getMyPositiveLists(@ApiParam(hidden = true) @Auth Session session );
+    List<PositiveList> getMyPositiveLists(
+        @ApiParam(hidden = true) @Auth Session session
+    );
     
     @POST
     @Path("proxy/positiveLists")
@@ -563,8 +650,9 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.proxy")
-    OssResponse addPositiveList(@ApiParam(hidden = true) @Auth Session session,
-    		PositiveList positiveList
+    OssResponse addPositiveList(
+        @ApiParam(hidden = true) @Auth Session session,
+        PositiveList positiveList
     );
     
     @GET
@@ -576,9 +664,9 @@ public interface EducationResource {
     })
     @RolesAllowed("education.proxy")
     PositiveList getPositiveListById(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("positiveListId") Long positiveListId
-    		);
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("positiveListId") Long positiveListId
+    );
     
     @DELETE
     @Path("proxy/positiveLists/{positiveListId}")
@@ -589,9 +677,9 @@ public interface EducationResource {
     })
     @RolesAllowed("education.proxy")
     PositiveList deletePositiveListById(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("positiveListId") Long positiveListId
-    		);
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("positiveListId") Long positiveListId
+    );
 
     @POST
     @Path("proxy/rooms/{roomId}")
@@ -603,10 +691,10 @@ public interface EducationResource {
     })
     @RolesAllowed("education.proxy")
     OssResponse activatePositiveListsInRoom(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") Long roomId,
-    		List<Long> postiveListIds
-    		);
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("roomId") Long roomId,
+        List<Long> postiveListIds
+    );
     
     @DELETE
     @Path("proxy/rooms/{roomId}")
@@ -617,8 +705,10 @@ public interface EducationResource {
     })
     @RolesAllowed("education.proxy")
     OssResponse deActivatePositiveListsInRoom(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("roomId") Long roomId
-    		);
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("roomId") Long roomId
+    );
+    
+
  
 }
