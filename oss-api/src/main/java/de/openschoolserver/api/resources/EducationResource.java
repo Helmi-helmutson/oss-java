@@ -241,7 +241,7 @@ public interface EducationResource {
      * GET education/rooms/{roomId}/groups
      */
     @GET
-    @Path("rooms/{roomId}/users")
+    @Path("rooms/{roomId}/groups")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Delivers the ids of the group members in a smart room" )
     @ApiResponses(value = {
