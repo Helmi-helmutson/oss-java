@@ -262,7 +262,10 @@ public class DeviceController extends Controller {
 		try {
 			Query query = em.createNamedQuery("Device.getByIP");
 			query.setParameter("IP", IP);
-			return (Device) query.getSingleResult();
+			if( query.getResultList().isEmpty() ) {
+				return null;
+			}
+			return (Device) query.getResultList().get(0);
 		} catch (Exception e) {
 			logger.debug("device.getByIP " + IP + " "+ e.getMessage());
 			return null;
