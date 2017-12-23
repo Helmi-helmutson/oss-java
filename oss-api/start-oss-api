@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#Create a session for local services
+grep -q de.openschoolserver.api.auth.localhost= /opt/oss-java/conf/oss-api.properties || echo de.openschoolserver.api.auth.localhost=TOKEN >> /opt/oss-java/conf/oss-api.properties
+TOKEN="localhost_"$(uuidgen)
+sed -i s/de.openschoolserver.api.auth.localhost=.*/de.openschoolserver.api.auth.localhost=$TOKEN/ /opt/oss-java/conf/oss-api.properties
+chmod 600            /opt/oss-java/conf/oss-api.properties
+SQLUSER=$( grep javax.persistence.jdbc.user= /opt/oss-java/conf/oss-api.properties | sed 's/javax.persistence.jdbc.user=//' )
+SQLPW=$( grep javax.persistence.jdbc.password= /opt/oss-java/conf/oss-api.properties | sed 's/javax.persistence.jdbc.password=//' )
+echo "DELETE FROM Sessions WHERE IP='127.0.0.1'" | mysql -u $SQLUSER -p${SQLPW} OSS
+echo "INSERT INTO Sessions VALUES(NULL,1,NULL,NULL,NOW(),'127.0.0.1','$TOKEN')" | mysql -u $SQLUSER -p${SQLPW} OSS
+
+#Restart some scripts
+SQUIDACTIVE=$(  systemctl is-active squid.service )
+SQUIDENABLED=$(  systemctl is-enabled squid.service )
+if [ "$SQUIDACTIVE" = "active" -o "$SQUIDENABLED" = "enabled" ]; then
+        setfacl -m u:squid:r /opt/oss-java/conf/oss-api.properties
+        systemctl restart squid.service
+fi
+
+#Java path
+APP_HOME="/opt/oss-java"
+
+@CLASSPATH@
+
+exec java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp $CLASSPATH de.openschoolserver.api.ServerApplication server /opt/oss-java/conf/config.yml >> /var/log/oss-api.log 2>&1
+
