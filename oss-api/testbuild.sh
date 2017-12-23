@@ -10,6 +10,7 @@ if [ -e oss-java ]; then
     rm -r oss-java
 fi
 mv de.openschoolserver.api-1.0-SNAPSHOT  oss-java
+chmod 644 oss-java/lib/*
 tar cjf /data1/OSC/home:varkoly:OSS-4-0/oss-java/oss-java.tar.bz2 oss-java
 cp ../oss-dao/data/oss-objects.sql /data1/OSC/home:varkoly:OSS-4-0/oss-java/
 cp ../oss-dao/data/school-INSERT.sql /data1/OSC/home:varkoly:OSS-4-0/oss-java/
