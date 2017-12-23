@@ -99,9 +99,9 @@ public class DeviceResourceImpl implements DeviceResource {
 	public String getFirstLoggedInUser(Session session, String IP) {
 		Device device = new DeviceController(session).getByIP(IP);
 		if( device != null && !device.getLoggedIn().isEmpty() ) {
-			return "OK user=\"" + device.getLoggedIn().get(0).getUid()+ "\"\n";
+			return device.getLoggedIn().get(0).getUid();
 		}
-		return "ERR user=\"No user logged in \"\n";
+		return "";
 	}
 
 	@Override
