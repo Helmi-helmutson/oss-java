@@ -8,6 +8,7 @@ import javax.ws.rs.WebApplicationException;
 
 import de.openschoolserver.api.resources.UserResource;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.OSSConfig;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.GroupController;
@@ -132,7 +133,8 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public String getUserAttribute(Session session, String uid, String attribute) {
-		User user = new UserController(session).getByUid(uid);
+		final UserController userController = new UserController(session);
+		User user = userController.getByUid(uid);
 		if( user == null) {
 			return "";
 		}
@@ -151,7 +153,40 @@ public class UserResourceImpl implements UserResource {
 				groups.add(group.getName());
 			}
 			return String.join(" ", groups);
+		default:
+			//This is a config or mconfig. We have to merge it from the groups from actual room and from the user
+			List<String> configs = new ArrayList<String>();
+			//Group configs
+			for( Group group : user.getGroups() ) {
+				if( userController.getConfig(group, attribute) != null ) {
+					configs.add(userController.getConfig(group, attribute));
+				}
+				for( String config : userController.getMConfigs(group, attribute) ) {
+					if( config != null ) {
+						configs.add(config);
+					}
+				}
+			}
+			//Room configs.
+			if( session.getRoom() != null ) {
+				if( userController.getConfig(session.getRoom(), attribute) != null ) {
+					configs.add(userController.getConfig(session.getRoom(), attribute));
+				}
+				for( String config : userController.getMConfigs(session.getRoom(), attribute) ) {
+					if( config != null ) {
+						configs.add(config);
+					}
+				}	
+			}
+			if( userController.getConfig(user, attribute) != null ) {
+				configs.add(userController.getConfig(user, attribute));
+			}
+			for( String config : userController.getMConfigs(user, attribute) ) {
+				if( config != null ) {
+					configs.add(config);
+				}
+			}
+			return String.join(userController.getNl(), configs);
 		}
-		return "";
 	}
 }
