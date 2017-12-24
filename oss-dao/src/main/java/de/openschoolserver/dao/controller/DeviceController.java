@@ -587,7 +587,9 @@ public class DeviceController extends Controller {
 	
 	public OssResponse modify(Device device) {
 		Device oldDevice = this.getById(device.getId());
-		List<String> error = new ArrayList<String>();
+		List<String> error = new ArrayList<String>();	
+		//If the mac was changed.
+		boolean  macChange = false;
 		String   name = "";
 		//Check the MAC address
 		if( !this.mayModify(oldDevice) ) {
@@ -602,6 +604,7 @@ public class DeviceController extends Controller {
 			if( ! IPv4.validateMACAddress(device.getMac())) {
 				error.add("The MAC address is not valid:" + device.getMac() );
 			}
+			macChange = true;
 		}
 		if( !device.getWlanMac().isEmpty() ) {
 			//Check the MAC address
@@ -615,6 +618,21 @@ public class DeviceController extends Controller {
 					error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );
 				}
 			}
+			if( oldDevice.getWlanMac() == null ) {
+				//There was no WLAN-Mac befor we need a new IP-Address
+				RoomController rc = new RoomController(this.session);
+				List<String> wlanIps = rc.getAvailableIPAddresses(oldDevice.getRoom().getId());
+				if( wlanIps.isEmpty() ) {
+					error.add("The are no more IP addesses in room" );
+				} else {
+					oldDevice.setWlanIp(wlanIps.get(0));
+				}
+			}
+			macChange = true;
+		} 
+		else if( ! oldDevice.getWlanMac().isEmpty() ) {
+			// The wlan mac was removed
+			device.setWlanIp("");
 		}
 		if(!error.isEmpty()){
 			return new OssResponse(this.getSession(),"ERROR",String.join(System.lineSeparator(),error));
@@ -634,6 +652,9 @@ public class DeviceController extends Controller {
 			em.close();
 		}
 		this.startPlugin("modify_device", oldDevice);
+		if( macChange ) {
+			new DHCPConfig(this.session).Create();
+		}
 		return new OssResponse(this.getSession(),"OK", "Device was modified succesfully.");
 	}
 
