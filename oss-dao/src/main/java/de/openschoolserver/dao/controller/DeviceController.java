@@ -618,7 +618,7 @@ public class DeviceController extends Controller {
 					error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );
 				}
 			}
-			if( oldDevice.getWlanMac() == null ) {
+			if( oldDevice.getWlanMac().isEmpty() ) {
 				//There was no WLAN-Mac befor we need a new IP-Address
 				RoomController rc = new RoomController(this.session);
 				List<String> wlanIps = rc.getAvailableIPAddresses(oldDevice.getRoom().getId());
