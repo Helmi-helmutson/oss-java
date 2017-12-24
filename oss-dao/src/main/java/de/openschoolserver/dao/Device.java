@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -145,6 +147,8 @@ public class Device implements Serializable {
 		this.mac = "";
 		this.wlanip   = "";
 		this.wlanmac  = "";
+		this.softwareLicenses = new ArrayList<SoftwareLicense>();
+		this.softwareStatus   = new ArrayList<SoftwareStatus>();
 	}
 
 	public Long getId() {
