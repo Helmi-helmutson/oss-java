@@ -588,27 +588,32 @@ public class DeviceController extends Controller {
 	public OssResponse modify(Device device) {
 		Device oldDevice = this.getById(device.getId());
 		List<String> error = new ArrayList<String>();
+		String   name = "";
 		//Check the MAC address
 		if( !this.mayModify(oldDevice) ) {
-			return new OssResponse(this.getSession(),"ERROR","You must not delete this device: " + oldDevice.getName());
+			return new OssResponse(this.getSession(),"ERROR","You must not modify this device: " + oldDevice.getName());
 		}
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
-		String name =  this.isMacUnique(device.getMac());
-		if( name != "" ){
-			error.add("The MAC address '" + device.getMac() + "' will be used allready:" + name );
-		}
-		if( ! IPv4.validateMACAddress(device.getMac())) {
-			error.add("The MAC address is not valid:" + device.getMac() );	
+		if( ! oldDevice.getMac().equals(device.getMac() ) ) {
+			name =  this.isMacUnique(device.getMac());
+			if( name != "" ){
+				error.add("The MAC address '" + device.getMac() + "' will be used allready:" + name );
+			}
+			if( ! IPv4.validateMACAddress(device.getMac())) {
+				error.add("The MAC address is not valid:" + device.getMac() );
+			}
 		}
 		if( !device.getWlanMac().isEmpty() ) {
 			//Check the MAC address
 			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
-			name =  this.isMacUnique(device.getWlanMac());
-			if( name != "" ){
-				error.add("The WLAN MAC address will be used allready:" + name );
-			}
-			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );	
+			if( ! oldDevice.getWlanMac().equals(device.getWlanMac() ) ) {
+				name =  this.isMacUnique(device.getWlanMac());
+				if( name != "" ){
+					error.add("The WLAN MAC address will be used allready:" + name );
+				}
+				if( ! IPv4.validateMACAddress(device.getMac())) {
+					error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );
+				}
 			}
 		}
 		if(!error.isEmpty()){
