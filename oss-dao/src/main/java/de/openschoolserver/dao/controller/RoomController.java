@@ -662,8 +662,7 @@ public class RoomController extends Controller {
 				logger.debug(answer.getValue());
 			}
 		}
-		DHCPConfig dhcpconfig = new DHCPConfig(this.session);
-		dhcpconfig.Create();
+		new DHCPConfig(this.session).Create();
 		return new OssResponse(this.getSession(),"OK", "Devices were created succesfully." );
 	}
 
