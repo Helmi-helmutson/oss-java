@@ -537,8 +537,8 @@ public class EducationController extends Controller {
 		Map<String, String> actionContent = new HashMap<String,String>();
 		StringBuilder controllers = new StringBuilder();
 		controllers.append(this.getConfigValue("SERVER")).append(",").append(this.session.getDevice().getIp());
-		if( this.session.getDevice().getWlanIp() != null ) {
-			controllers.append(",").append(this.session.getDevice().getWlanIp());
+		if( this.session.getDevice().getWlanip() != null ) {
+			controllers.append(",").append(this.session.getDevice().getWlanip());
 		}
 		actionContent.put("path",  OSS_CLIENT_CONTROL_FILE);
 		actionContent.put("content", controllers.toString());

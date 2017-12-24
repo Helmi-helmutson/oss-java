@@ -528,7 +528,7 @@ public class SoftwareController extends Controller {
 		SoftwareLicense softwareLicense;
  		List<String> failedDevices = new ArrayList<String>();
  		for( Device device : devices ) {
- 			for( SoftwareLicense myLicense : device.getSoftwareLicences() ) {
+ 			for( SoftwareLicense myLicense : device.getSoftwareLicenses() ) {
  				if( myLicense.getSoftware().equals(software) ){
  					continue;
  				}
@@ -539,7 +539,7 @@ public class SoftwareController extends Controller {
  			} else {
  				try {
  					em.getTransaction().begin();
- 					device.getSoftwareLicences().add(softwareLicense);
+ 					device.getSoftwareLicenses().add(softwareLicense);
  					softwareLicense.getDevices().add(device);
  					em.getTransaction().commit();
  				} catch (Exception e) {
@@ -930,7 +930,7 @@ public class SoftwareController extends Controller {
 				logger.debug("Package File:" + filePath.toString() );
 				if( file.exists() ) {
 					Software software = this.getByName(softwareName);
-					for( SoftwareLicense sl : device.getSoftwareLicences() ) {
+					for( SoftwareLicense sl : device.getSoftwareLicenses() ) {
 						if( sl.getSoftware().equals(software) ) {
 							deviceSls.add(softwareName + "_KEY");
 							deviceSls.add("  grains.present:");
@@ -1165,7 +1165,7 @@ public class SoftwareController extends Controller {
 
 		Device        device    =  new DeviceController(this.session).getByName(deviceName);
 		StringBuilder softwares = new StringBuilder();
-		for( SoftwareLicense license : device.getSoftwareLicences() ) {
+		for( SoftwareLicense license : device.getSoftwareLicenses() ) {
 			softwares.append("'LIC_");
 			softwares.append(license.getSoftware().getName());
 			softwares.append("' '");

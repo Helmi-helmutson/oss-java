@@ -203,22 +203,6 @@ public class Device implements Serializable {
 		this.mac = mac;
 	}
 
-	public String getWlanIp() {
-		return this.wlanip;
-	}
-
-	public void setWlanIp(String wlanip) {
-		this.wlanip = wlanip;
-	}
-
-	public String getWlanMac() {
-		return this.wlanmac;
-	}
-
-	public void setWlanMac(String wlanmac) {
-		this.wlanmac = wlanmac;
-	}
-
 	public int getRow() {
 		return this.row;
 	}
@@ -275,15 +259,6 @@ public class Device implements Serializable {
 		this.defaultPrinter = defaultPrinter;
 	}
 
-/*
- * 	public List<Device> getDefaultForDevices() {
-		return this.defaultForDevices;
-	}
-
-	public void setDefaultForDevices(List<Device> defaultForDevices) {
-		this.defaultForDevices = defaultForDevices;
-	}
-*/
 	public HWConf getHwconf() {
 		return this.hwconf;
 	}
@@ -363,27 +338,55 @@ public class Device implements Serializable {
 	        this.categories = categories;
 	}
 
-	public List<SoftwareLicense> getSoftwareLicences() {
-		return this.softwareLicenses;
-	}
-
-	public void getSoftwareLicences(List<SoftwareLicense> licenses) {
-		this.softwareLicenses = licenses;
-	}
-
-	public void addSoftwareLicens(SoftwareLicense sl) {
-		this.softwareLicenses.add(sl);
-	}
-
-	public void removeSoftwareLicens(SoftwareLicense sl) {
-		this.softwareLicenses.remove(sl);
-	}
-
 	public void setSofwareStatus(List<SoftwareStatus> st) {
 		this.softwareStatus = st;
 	}
 
 	public List<SoftwareStatus> getSofwareStatus() {
 		return this.softwareStatus;
+	}
+
+	public String getWlanip() {
+		return wlanip;
+	}
+
+	public void setWlanip(String wlanip) {
+		this.wlanip = wlanip;
+	}
+
+	public String getWlanmac() {
+		return wlanmac;
+	}
+
+	public void setWlanmac(String wlanmac) {
+		this.wlanmac = wlanmac;
+	}
+
+	public List<Device> getDefaultForDevices() {
+		return defaultForDevices;
+	}
+
+	public void setDefaultForDevices(List<Device> defaultForDevices) {
+		this.defaultForDevices = defaultForDevices;
+	}
+
+	public List<SoftwareLicense> getSoftwareLicenses() {
+		return softwareLicenses;
+	}
+
+	public void setSoftwareLicenses(List<SoftwareLicense> softwareLicenses) {
+		this.softwareLicenses = softwareLicenses;
+	}
+
+	public List<SoftwareStatus> getSoftwareStatus() {
+		return softwareStatus;
+	}
+
+	public void setSoftwareStatus(List<SoftwareStatus> softwareStatus) {
+		this.softwareStatus = softwareStatus;
+	}
+
+	public void setHwconfId(Long hwconfId) {
+		this.hwconfId = hwconfId;
 	}
 }

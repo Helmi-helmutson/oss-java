@@ -206,27 +206,27 @@ public class DeviceController extends Controller {
 			error.add("The IP address is not in the room ip address range.");
 		}
 		
-		if( device.getWlanMac().isEmpty() ) {
-			device.setWlanIp("");
+		if( device.getWlanmac().isEmpty() ) {
+			device.setWlanip("");
 		} else {
 			//Check the MAC address
-			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
-			name =  this.isMacUnique(device.getWlanMac());
+			device.setWlanmac(device.getWlanmac().toUpperCase().replaceAll("-", ":"));
+			name =  this.isMacUnique(device.getWlanmac());
 			if( name != "" ){
 				error.add("The WLAN MAC address will be used allready:" + name );
 			}
 			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );	
+				error.add("The WLAN MAC address is not valid:" + device.getWlanmac() );	
 			}
 			//Check the IP address
-			name =  this.isIPUnique(device.getWlanIp());
+			name =  this.isIPUnique(device.getWlanip());
 			if( name != "" ){
 				error.add("The IP address will be used allready:" + name );
 			}
-			if( ! IPv4.validateIPAddress(device.getWlanIp())) {
+			if( ! IPv4.validateIPAddress(device.getWlanip())) {
 				error.add("The IP address is not valid:" + device.getIp() );	
 			}
-			if( !net.contains(device.getWlanIp())) {
+			if( !net.contains(device.getWlanip())) {
 				error.add("The IP address is not in the room ip address range.");
 			}
 		}
@@ -458,13 +458,13 @@ public class DeviceController extends Controller {
 				device.setName(values[header.get("name")]);
 			}
 			if(header.containsKey("wlanmac")) {
-				device.setWlanMac(values[header.get("wlanmac")]);
+				device.setWlanmac(values[header.get("wlanmac")]);
 			}
 			if(header.containsKey("ip")) {
 				device.setIp(values[header.get("ip")]);
 			}
 			if(header.containsKey("wlanip")) {
-				device.setWlanIp(values[header.get("wlanip")]);
+				device.setWlanip(values[header.get("wlanip")]);
 			}
 			if(header.containsKey("raw")) {
 				device.setRow(Integer.parseInt(values[header.get("raw")]));
@@ -588,7 +588,9 @@ public class DeviceController extends Controller {
 	public OssResponse modify(Device device) {
 		Device oldDevice = this.getById(device.getId());
 		List<String> error = new ArrayList<String>();	
-		//If the mac was changed.
+		/*
+		 * If the mac was changed.
+		 */
 		boolean  macChange = false;
 		String   name = "";
 		//Check the MAC address
@@ -606,33 +608,34 @@ public class DeviceController extends Controller {
 			}
 			macChange = true;
 		}
-		if( !device.getWlanMac().isEmpty() ) {
+		if( !device.getWlanmac().isEmpty() ) {
 			//Check the MAC address
-			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
-			if( ! oldDevice.getWlanMac().equals(device.getWlanMac() ) ) {
-				name =  this.isMacUnique(device.getWlanMac());
+			device.setWlanmac(device.getWlanmac().toUpperCase().replaceAll("-", ":"));
+			if( ! oldDevice.getWlanmac().equals(device.getWlanmac() ) ) {
+				name =  this.isMacUnique(device.getWlanmac());
 				if( name != "" ){
 					error.add("The WLAN MAC address will be used allready:" + name );
 				}
 				if( ! IPv4.validateMACAddress(device.getMac())) {
-					error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );
+					error.add("The WLAN MAC address is not valid:" + device.getWlanmac() );
 				}
 			}
-			if( oldDevice.getWlanMac().isEmpty() ) {
+			if( oldDevice.getWlanmac().isEmpty() ) {
 				//There was no WLAN-Mac befor we need a new IP-Address
 				RoomController rc = new RoomController(this.session);
 				List<String> wlanIps = rc.getAvailableIPAddresses(oldDevice.getRoom().getId());
 				if( wlanIps.isEmpty() ) {
 					error.add("The are no more IP addesses in room" );
 				} else {
-					oldDevice.setWlanIp(wlanIps.get(0));
+					oldDevice.setWlanip(wlanIps.get(0));
 				}
 			}
 			macChange = true;
 		} 
-		else if( ! oldDevice.getWlanMac().isEmpty() ) {
+		else if( ! oldDevice.getWlanmac().isEmpty() ) {
 			// The wlan mac was removed
-			device.setWlanIp("");
+			device.setWlanip("");
+			macChange = true;
 		}
 		if(!error.isEmpty()){
 			return new OssResponse(this.getSession(),"ERROR",String.join(System.lineSeparator(),error));
@@ -640,9 +643,10 @@ public class DeviceController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			oldDevice.setMac(device.getMac());
-			oldDevice.setWlanMac(device.getWlanMac());
+			oldDevice.setWlanmac(device.getWlanmac());
 			oldDevice.setPlace(device.getPlace());
 			oldDevice.setRow(device.getPlace());
+			oldDevice.setHwconf(device.getHwconf());
 			em.getTransaction().begin();
 			em.merge(oldDevice);
 			em.getTransaction().commit();
