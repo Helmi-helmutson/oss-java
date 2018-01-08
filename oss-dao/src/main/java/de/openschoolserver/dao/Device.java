@@ -2,12 +2,26 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import javax.persistence.*;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 /**
@@ -19,10 +33,10 @@ import java.util.List;
 @NamedQueries( {
 	@NamedQuery(name="Device.findAll",      query="SELECT d FROM Device d"),
 	@NamedQuery(name="Device.findAllId",    query="SELECT d.id FROM Device d"),
-	@NamedQuery(name="Device.getByIP",      query="SELECT d FROM Device d where d.ip = :IP OR d.wlanip = :IP"),
-	@NamedQuery(name="Device.getByMAC",     query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanmac = :MAC"),
+	@NamedQuery(name="Device.getByIP",      query="SELECT d FROM Device d where d.ip = :IP OR d.wlanIp = :IP"),
+	@NamedQuery(name="Device.getByMAC",     query="SELECT d FROM Device d where d.mac = :MAC OR d.wlanMac = :MAC"),
 	@NamedQuery(name="Device.getByName",    query="SELECT d FROM Device d where d.name = :name"),
-	@NamedQuery(name="Device.search",       query="SELECT d FROM Device d where d.name LIKE :search OR d.ip LIKE :search OR d.wlanip LIKE :search OR d.mac LIKE :search OR d.wlanmac LIKE :search" ),
+	@NamedQuery(name="Device.search",       query="SELECT d FROM Device d where d.name LIKE :search OR d.ip LIKE :search OR d.wlanIp LIKE :search OR d.mac LIKE :search OR d.wlanMac LIKE :search" ),
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Device implements Serializable {
@@ -45,11 +59,9 @@ public class Device implements Serializable {
 	@Column(name="MAC")
 	private String mac;
 
-	@Column(name="WLANIP")
-	private String wlanip;
+	private String wlanIp;
 
-	@Column(name="WLANMAC")
-	private String wlanmac;
+	private String wlanMac;
 
 	private String serial;
 
@@ -145,8 +157,8 @@ public class Device implements Serializable {
 		this.name = "";
 		this.ip = "";
 		this.mac = "";
-		this.wlanip   = "";
-		this.wlanmac  = "";
+		this.wlanIp   = "";
+		this.wlanMac  = "";
 		this.softwareLicenses = new ArrayList<SoftwareLicense>();
 		this.softwareStatus   = new ArrayList<SoftwareStatus>();
 	}
@@ -346,20 +358,20 @@ public class Device implements Serializable {
 		return this.softwareStatus;
 	}
 
-	public String getWlanip() {
-		return wlanip;
+	public String getWlanIp() {
+		return wlanIp;
 	}
 
-	public void setWlanip(String wlanip) {
-		this.wlanip = wlanip;
+	public void setWlanIp(String wlanip) {
+		this.wlanIp = wlanip;
 	}
 
-	public String getWlanmac() {
-		return wlanmac;
+	public String getWlanMac() {
+		return wlanMac;
 	}
 
-	public void setWlanmac(String wlanmac) {
-		this.wlanmac = wlanmac;
+	public void setWlanMac(String wlanmac) {
+		this.wlanMac = wlanmac;
 	}
 
 	public List<Device> getDefaultForDevices() {
