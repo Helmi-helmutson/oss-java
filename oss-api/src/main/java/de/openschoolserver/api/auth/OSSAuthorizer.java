@@ -20,7 +20,7 @@ public class OSSAuthorizer implements Authorizer<Session> {
     @Override
     public boolean authorize(Session session, String requiredRole) {
 
-        logger.info("authorize() Person: " + session.getUser().getUid() + ", required role category: " + requiredRole);
+        logger.debug("authorize() Person: " + session.getUser().getUid() + ", required role category: " + requiredRole);
         final SessionController sessionController = new SessionController();
         return sessionController.authorize(session, requiredRole);
     }
