@@ -240,18 +240,18 @@ public class Controller extends Config {
 				data.append(String.format("name: %s%n", device.getName()));
 				data.append(String.format("ip: %s%n", device.getIp()));
 				data.append(String.format("mac: %s%n", device.getMac()));
-				if( ! device.getWlanip().isEmpty() ) {
-					data.append(String.format("wlanip: %s%n", device.getWlanip()));
-					data.append(String.format("wlanmac: %s%n", device.getWlanmac()));
+				if( ! device.getWlanIp().isEmpty() ) {
+					data.append(String.format("wlanIp: %s%n", device.getWlanIp()));
+					data.append(String.format("wlanMac: %s%n", device.getWlanMac()));
 				}
 				break;
 			case "delete_device":
 				data.append(String.format("name: %s%n", device.getName()));
 				data.append(String.format("ip: %s%n", device.getIp()));
 				data.append(String.format("mac: %s%n", device.getMac()));
-				if( ! device.getWlanip().isEmpty() ) {
-					data.append(String.format("wlanip: %s%n", device.getWlanip()));
-					data.append(String.format("wlanmac: %s%n", device.getWlanmac()));
+				if( ! device.getWlanIp().isEmpty() ) {
+					data.append(String.format("wlanIp: %s%n", device.getWlanIp()));
+					data.append(String.format("wlanMac: %s%n", device.getWlanMac()));
 				}
 				break;
 			}

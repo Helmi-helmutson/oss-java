@@ -206,27 +206,27 @@ public class DeviceController extends Controller {
 			error.add("The IP address is not in the room ip address range.");
 		}
 		
-		if( device.getWlanmac().isEmpty() ) {
-			device.setWlanip("");
+		if( device.getWlanMac().isEmpty() ) {
+			device.setWlanIp("");
 		} else {
 			//Check the MAC address
-			device.setWlanmac(device.getWlanmac().toUpperCase().replaceAll("-", ":"));
-			name =  this.isMacUnique(device.getWlanmac());
+			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
+			name =  this.isMacUnique(device.getWlanMac());
 			if( name != "" ){
 				error.add("The WLAN MAC address will be used allready:" + name );
 			}
 			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.add("The WLAN MAC address is not valid:" + device.getWlanmac() );	
+				error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );	
 			}
 			//Check the IP address
-			name =  this.isIPUnique(device.getWlanip());
+			name =  this.isIPUnique(device.getWlanIp());
 			if( name != "" ){
 				error.add("The IP address will be used allready:" + name );
 			}
-			if( ! IPv4.validateIPAddress(device.getWlanip())) {
+			if( ! IPv4.validateIPAddress(device.getWlanIp())) {
 				error.add("The IP address is not valid:" + device.getIp() );	
 			}
-			if( !net.contains(device.getWlanip())) {
+			if( !net.contains(device.getWlanIp())) {
 				error.add("The IP address is not in the room ip address range.");
 			}
 		}
@@ -458,13 +458,13 @@ public class DeviceController extends Controller {
 				device.setName(values[header.get("name")]);
 			}
 			if(header.containsKey("wlanmac")) {
-				device.setWlanmac(values[header.get("wlanmac")]);
+				device.setWlanMac(values[header.get("wlanmac")]);
 			}
 			if(header.containsKey("ip")) {
 				device.setIp(values[header.get("ip")]);
 			}
 			if(header.containsKey("wlanip")) {
-				device.setWlanip(values[header.get("wlanip")]);
+				device.setWlanIp(values[header.get("wlanip")]);
 			}
 			if(header.containsKey("raw")) {
 				device.setRow(Integer.parseInt(values[header.get("raw")]));
@@ -608,33 +608,33 @@ public class DeviceController extends Controller {
 			}
 			macChange = true;
 		}
-		if( !device.getWlanmac().isEmpty() ) {
+		if( !device.getWlanMac().isEmpty() ) {
 			//Check the MAC address
-			device.setWlanmac(device.getWlanmac().toUpperCase().replaceAll("-", ":"));
-			if( ! oldDevice.getWlanmac().equals(device.getWlanmac() ) ) {
-				name =  this.isMacUnique(device.getWlanmac());
+			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
+			if( ! oldDevice.getWlanMac().equals(device.getWlanMac() ) ) {
+				name =  this.isMacUnique(device.getWlanMac());
 				if( name != "" ){
 					error.add("The WLAN MAC address will be used allready:" + name );
 				}
 				if( ! IPv4.validateMACAddress(device.getMac())) {
-					error.add("The WLAN MAC address is not valid:" + device.getWlanmac() );
+					error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );
 				}
 			}
-			if( oldDevice.getWlanmac().isEmpty() ) {
+			if( oldDevice.getWlanMac().isEmpty() ) {
 				//There was no WLAN-Mac befor we need a new IP-Address
 				RoomController rc = new RoomController(this.session);
 				List<String> wlanIps = rc.getAvailableIPAddresses(oldDevice.getRoom().getId());
 				if( wlanIps.isEmpty() ) {
 					error.add("The are no more IP addesses in room" );
 				} else {
-					oldDevice.setWlanip(wlanIps.get(0));
+					oldDevice.setWlanIp(wlanIps.get(0));
 				}
 			}
 			macChange = true;
 		} 
-		else if( ! oldDevice.getWlanmac().isEmpty() ) {
+		else if( ! oldDevice.getWlanMac().isEmpty() ) {
 			// The wlan mac was removed
-			device.setWlanip("");
+			device.setWlanIp("");
 			macChange = true;
 		}
 		if(!error.isEmpty()){
@@ -643,7 +643,7 @@ public class DeviceController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			oldDevice.setMac(device.getMac());
-			oldDevice.setWlanmac(device.getWlanmac());
+			oldDevice.setWlanMac(device.getWlanMac());
 			oldDevice.setPlace(device.getPlace());
 			oldDevice.setRow(device.getPlace());
 			oldDevice.setHwconf(device.getHwconf());

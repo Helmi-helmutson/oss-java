@@ -98,10 +98,10 @@ public class DHCPConfig extends Controller {
 			dhcpConfigFile.add("      fixed-address " + device.getIp() + ";");
 			//TODO add dhcp options and statements from DeviceConfig
 			dhcpConfigFile.add("    }");
-			if( IPv4.validateIPAddress(device.getWlanip()) ){
+			if( IPv4.validateIPAddress(device.getWlanIp()) ){
 				dhcpConfigFile.add("    host " + device.getName() + "-wlan {");
-				dhcpConfigFile.add("      hardware ethernet " + device.getWlanmac() + ";");
-				dhcpConfigFile.add("      fixed-address " + device.getWlanip() + ";");
+				dhcpConfigFile.add("      hardware ethernet " + device.getWlanMac() + ";");
+				dhcpConfigFile.add("      fixed-address " + device.getWlanIp() + ";");
 				//TODO add dhcp options and statements from DeviceConfig
 				dhcpConfigFile.add("    }");
 				line.add(device.getName() + "-wlan" );

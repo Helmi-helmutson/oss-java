@@ -278,8 +278,8 @@ public class RoomController extends Controller {
 	    usedIPs.add(subNetwork.getLast());
 		for( Device dev : room.getDevices() ){
 			usedIPs.add(dev.getIp());
-			if( dev.getWlanip() != "" ) {
-				usedIPs.add(dev.getWlanip());
+			if( dev.getWlanIp() != "" ) {
+				usedIPs.add(dev.getWlanIp());
 			}
 		}
 		allIPs.removeAll(usedIPs);
@@ -614,12 +614,12 @@ public class RoomController extends Controller {
 					}
 					device.setIp(ipAddress.get(0).split(" ")[0]);
 				}
-				if( !device.getWlanmac().isEmpty() ){
+				if( !device.getWlanMac().isEmpty() ){
 					if( ipAddress.size() < 2 ) {
 						em.getTransaction().rollback();
-						return new OssResponse(this.getSession(),"ERROR",device.getWlanmac() + " " + "There are no more free ip addresses in this room.");
+						return new OssResponse(this.getSession(),"ERROR",device.getWlanMac() + " " + "There are no more free ip addresses in this room.");
 					}
-					device.setWlanip(ipAddress.get(1).split(" ")[0]);
+					device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 				}
 				String error = deviceController.check(device, room);
 				if( ! error.isEmpty() ) {
