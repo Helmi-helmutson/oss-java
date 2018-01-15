@@ -416,7 +416,8 @@ public interface SoftwareResource {
 	@ApiOperation(value = "Gets the available softwares from the CEPHALIX repository.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
-			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator"),
+			@ApiResponse(code = 600, message = "Connection to CEPHALIX software repository server is broken.")})
 	@RolesAllowed("software.download")
 	List<Map<String,String>> getAvailable(
 			@ApiParam(hidden = true) @Auth Session session
