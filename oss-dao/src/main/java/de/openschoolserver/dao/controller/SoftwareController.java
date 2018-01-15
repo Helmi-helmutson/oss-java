@@ -262,7 +262,11 @@ public class SoftwareController extends Controller {
 		OSSShellTools.exec(program, reply, stderr, null);
 		try {
 			Document doc = new SAXBuilder().build( new StringReader(reply.toString()) );
+			logger.debug(reply.toString());
 			Element rootNode = doc.getRootElement();
+			if( rootNode.getChild("search-result") == null ) {
+				throw new WebApplicationException(600);
+			}
 			List<Element> elements = rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable");
 			for( Element node : elements ) {
 				software = new HashMap<String,String>();
