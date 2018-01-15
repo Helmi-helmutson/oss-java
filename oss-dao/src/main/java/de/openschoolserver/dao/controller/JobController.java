@@ -38,6 +38,18 @@ public class JobController extends Controller {
 		super(session);
 	}
 	
+	public Job getById(Long jobId) {
+		EntityManager em = getEntityManager();
+		try {
+			return em.find(Job.class, jobId);
+		} catch (Exception e) {
+			logger.error("DeviceId:" + jobId + " " + e.getMessage(),e);
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+	
 	public OssResponse createJob(Job job) {
 		String scheduledTime = "now";
 		if( job.isPromptly() ) {
@@ -48,6 +60,9 @@ public class JobController extends Controller {
 			scheduledTime        = fmt.format(date);
 		}
 
+		/*
+		 * Create the Job entity
+		 */
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -65,11 +80,6 @@ public class JobController extends Controller {
 		 */
 
 		StringBuilder path = new StringBuilder(basePath);
-		Long instituteId   = 0L;
-		if( job.getCephalixInstitute() != null ) {
-			instituteId = job.getCephalixInstitute().getId();
-		}
-		path.append(String.valueOf(instituteId)).append("/").append(String.valueOf(instituteId));
 		File jobDir = new File( path.toString() );
 		try {
 			Files.createDirectories(jobDir.toPath(), privatDirAttribute );
@@ -78,12 +88,19 @@ public class JobController extends Controller {
 			List<String> tmp =  new ArrayList<String>();
 			tmp.add("( /usr/share/oss/tools/oss_date.sh");
 			tmp.add(job.getCommand());
+			tmp.add("E=$?");
+			tmp.add("oss_api.sh PUT system/jobs/"+String.valueOf(job.getId())+"/exitCode/$E");
+			tmp.add("echo $E");
 			tmp.add("/usr/share/oss/tools/oss_date.sh) &> " + path.toString()+ ".log");
 			Files.write(jobFile, tmp );
 		} catch (Exception e) {
 			logger.error("createJob" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
+		
+		/*
+		 * Start the job
+		 */
 		String[] program   = new String[4];
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
@@ -93,7 +110,27 @@ public class JobController extends Controller {
 		program[3] = scheduledTime;
 		OSSShellTools.exec(program, reply, error, null);
 		logger.debug("create job  : " + path.toString() + " : " + job.getCommand());
-		return null;
+		return new OssResponse(this.getSession(),"OK","Job was created successfully",job.getId());
+	}
+	
+	public OssResponse setExitCode(Long jobId, Integer exitCode) {
+		EntityManager em = getEntityManager();
+		Job job = this.getById(jobId);
+		if( job == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Job was not found.");
+		}
+		try {
+			job.setExitCode(exitCode);
+			em.getTransaction().begin();
+			em.merge(job);
+			em.getTransaction().commit();
+		}  catch (Exception e) {
+			logger.error("createJob" + e.getMessage(),e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Jobs exit code was set successfully");
 	}
 	
 	public List<Job> findJobByDescription(String description, Timestamp after, Timestamp befor) {

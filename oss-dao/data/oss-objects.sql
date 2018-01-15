@@ -572,10 +572,9 @@ CREATE TABLE IF NOT EXISTS CephalixMappings (
 
 CREATE TABLE IF NOT EXISTS Jobs (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-       institute_id    BIGINT UNSIGNED DEFAULT NULL,
        description     VARCHAR(128)    NOT NULL,
        startTime       timestamp       NOT NULL DEFAULT '0000-00-00 00:00:00',
-       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       exitCode        INT             DEFAULT NULL,
        PRIMARY KEY(id)
 );
 

@@ -67,11 +67,6 @@ public class CephalixInstitute implements Serializable {
 
 	//bi-directional many-to-one association to CephalixITUsage
 	@OneToMany(mappedBy="cephalixInstitute")
-	private List<Job> job;
-
-
-	//bi-directional many-to-one association to CephalixITUsage
-	@OneToMany(mappedBy="cephalixInstitute")
 	private List<CephalixITUsage> cephalixItusages;
 
 	//bi-directional many-to-one association to CephalixITUsageAvarage
@@ -333,14 +328,6 @@ public class CephalixInstitute implements Serializable {
 		cephalixMapping.setCephalixInstitute(null);
 
 		return cephalixMapping;
-	}
-
-	public List<Job> getCephalixJob() {
-		return this.job;
-	}
-
-	public void setCephalixJob(List<Job> job) {
-		this.job = job;
 	}
 
 }

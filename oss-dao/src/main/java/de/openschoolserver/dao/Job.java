@@ -14,12 +14,12 @@ import java.sql.Timestamp;
 @Entity
 @Table(name="Jobs")
 @NamedQueries({
-	@NamedQuery(name="Job.findAll",               query="SELECT c FROM Job c"),
-	@NamedQuery(name="Job.findAllByTime",         query="SELECT c FROM Job c WHERE c.startTime > :after AND c.startTime < :befor"),
-	@NamedQuery(name="Job.getByInstitute",        query="SELECT c FROM Job c WHERE c.cephalixInstitute = :institute"),
-	@NamedQuery(name="Job.getByInstituteAndTime", query="SELECT c FROM Job c WHERE c.cephalixInstitute = :institute AND c.startTime > :after AND c.startTime < :befor"),
-	@NamedQuery(name="Job.getDescriptionAndTime", query="SELECT c FROM Job c WHERE c.description LIKE :description AND c.startTime > :after AND c.startTime < :befor"),
-	@NamedQuery(name="Job.getByAll",              query="SELECT c FROM Job c WHERE c.cephalixInstitute = :institute AND c.description LIKE :description AND c.startTime > :after AND c.startTime < :befor")
+	@NamedQuery(name="Job.findAll",                 query="SELECT c FROM Job c"),
+	@NamedQuery(name="Job.findAllByTime",           query="SELECT c FROM Job c WHERE c.startTime > :after AND c.startTime < :befor"),
+	@NamedQuery(name="Job.getByDescriptionAndTime", query="SELECT c FROM Job c WHERE c.description LIKE :description AND c.startTime > :after AND c.startTime < :befor"),
+	@NamedQuery(name="Job.getByDescription",        query="SELECT c FROM Job c WHERE c.description LIKE :description"),
+	@NamedQuery(name="Job.getByExtiCode",           query="SELECT c FROM Job c WHERE c.exitCode = :extiCode"),
+	@NamedQuery(name="Job.getByNonExtiCode",        query="SELECT c FROM Job c WHERE c.exitCode != :extiCode")
 })
 public class Job implements Serializable {
 
@@ -34,6 +34,8 @@ public class Job implements Serializable {
 
 	private Timestamp startTime;
 	
+	private Integer exitCode;
+	
 	@Transient
 	private String command;
 	
@@ -43,22 +45,15 @@ public class Job implements Serializable {
 	@Transient
 	private String result;
 
-	//bi-directional many-to-one association to CephalixInstitute
-	@ManyToOne
-	@JoinColumn(name="institute_id")
-	private CephalixInstitute cephalixInstitute;
-
 	public Job() {
 	}
 
-	public Job(String description, Timestamp startTime, String command, boolean promptly,
-			CephalixInstitute cephalixInstitute) {
+	public Job(String description, Timestamp startTime, String command, boolean promptly) {
 		super();
 		this.description = description;
 		this.startTime = startTime;
 		this.command = command;
 		this.promptly = promptly;
-		this.cephalixInstitute = cephalixInstitute;
 	}
 
 	public Long getId() {
@@ -85,14 +80,6 @@ public class Job implements Serializable {
 		this.startTime = startTime;
 	}
 
-	public CephalixInstitute getCephalixInstitute() {
-		return this.cephalixInstitute;
-	}
-
-	public void setCephalixInstitute(CephalixInstitute cephalixInstitute) {
-		this.cephalixInstitute = cephalixInstitute;
-	}
-
 	public String getCommand() {
 		return command;
 	}
@@ -117,4 +104,11 @@ public class Job implements Serializable {
 		this.result = result;
 	}
 
+	public Integer getExitCode() {
+		return exitCode;
+	}
+
+	public void setExitCode(Integer exitCode) {
+		this.exitCode = exitCode;
+	}
 }
