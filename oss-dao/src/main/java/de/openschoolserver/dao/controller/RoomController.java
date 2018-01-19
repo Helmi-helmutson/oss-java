@@ -934,4 +934,27 @@ public class RoomController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK","The default printer of the room was set succesfully.");
 	}
+
+	public OssResponse manageRoom(long roomId, String action, Map<String, String> actionContent) {
+		OssResponse ossResponse = null;
+		List<String> errors = new ArrayList<String>();
+		DeviceController dc = new DeviceController(this.session);
+		for( Device device : this.getById(roomId).getDevices() ) {
+			//Do not control the own workstation
+			if( this.session.getDevice().getId().equals(device.getId())) {
+				continue;
+			}
+			ossResponse = dc.manageDevice(device.getId(), action, actionContent);
+			if( ossResponse.getCode().equals("ERROR")) {
+				errors.add(ossResponse.getValue());
+			}
+		}
+		if( errors.isEmpty() ) {
+			new OssResponse(this.getSession(),"OK", "Device control was applied.");
+		} else {
+			return new OssResponse(this.getSession(),"ERROR",String.join("<br>", errors));
+		}
+		return null;
+	}
+
 }
