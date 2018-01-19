@@ -430,12 +430,13 @@ public interface SoftwareResource {
 	@Path("download")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Downloads softwares from the CEPHALIX repository.",
-	notes = "The call must provide a list of softwares to be downloaded:<br>"
-			+ "[ \"MSWhatever\", \"AnOtherProgram\" ]<br>"
+	notes = "The call must provide a list of softwares to be downloaded: "
+			+ "[ \"MSWhatever\", \"AnOtherProgram\" ] "
 			+ "The requirements will be solved automaticaly.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
-			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator"),
+			@ApiResponse(code = 600, message = "Connection to CEPHALIX software repository server is broken.")})
 	@RolesAllowed("software.download")
 	OssResponse download(
 			@ApiParam(hidden = true) @Auth Session session,
@@ -443,7 +444,7 @@ public interface SoftwareResource {
 			);
 	
 	/*
-	 * POST softwares/download/{softwareName}
+	 * PUT softwares/download/{softwareName}
 	 */
 	@PUT
 	@Path("download/{softwareName}")
@@ -451,7 +452,8 @@ public interface SoftwareResource {
 	@ApiOperation(value = "Downloads a software from the CEPHALIX repository.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
-			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator"),
+			@ApiResponse(code = 600, message = "Connection to CEPHALIX software repository server is broken.")})
 	@RolesAllowed("software.download")
 	OssResponse downloadOne(
 			@ApiParam(hidden = true) @Auth Session session,
