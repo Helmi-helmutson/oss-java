@@ -104,7 +104,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse manageDevice(Session session, long deviceId, String action, Map<String, String> actionContent) {
-		return new EducationController(session).manageDevice(deviceId,action,actionContent);
+		return new DeviceController(session).manageDevice(deviceId,action,actionContent);
 	}
 
 	@Override

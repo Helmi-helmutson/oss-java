@@ -674,4 +674,78 @@ public class DeviceController extends Controller {
 		HWConf hwconf = new CloneToolController(this.session).getById(id);
 		return hwconf.getDevices();
 	}
+	
+
+	public OssResponse manageDevice(long deviceId, String action, Map<String, String> actionContent) {
+		Device device = new DeviceController(this.session).getById(deviceId);
+		if(this.session.getDevice().equals(device)) {
+			return new OssResponse(this.getSession(),"ERROR", "Do not control the own client.");
+		}
+		StringBuilder FQHN = new StringBuilder();
+		FQHN.append(device.getName()).append(".").append(this.getConfigValue("DOMAIN"));
+		File file;
+		String graceTime    = "0";
+		if( actionContent.containsKey("graceTime")) {
+			graceTime = actionContent.get("graceTime");
+		}
+		String[] program    = null;
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		switch(action) {
+		case "shutDown":
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = FQHN.toString();
+			program[2] = "system.shutdown";		
+			program[3] = graceTime;
+			break;
+		case "reboot":
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = FQHN.toString();
+			program[2] = "system.reboot";
+			program[3] = graceTime;
+			break;
+		case "logout":
+			//TODO
+			break;
+		case "close":
+			//TODO
+			break;
+		case "open":
+			//TODO
+			break;
+		case "wol":
+			program = new String[4];
+			program[0] = "/usr/bin/wol";
+			program[1] = "-i";
+			program[2] = device.getIp();
+			program[3] = device.getMac();
+			break;
+		case "controlProxy":
+			break;
+		case "saveFile":
+			List<String>   fileContent =new ArrayList<String>();
+			fileContent.add(actionContent.get("content"));
+			try {
+				file  = File.createTempFile("oss_", ".ossb", new File("/opt/oss-java/tmp/"));
+				Files.write(file.toPath(), fileContent);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			}
+			program = new String[4];
+			program[0] = "/usr/bin/salt-cp";
+			program[1] = FQHN.toString();
+			program[2] = file.toPath().toString();
+			program[3] = actionContent.get("path");
+			break;
+		default:
+				return new OssResponse(this.getSession(),"ERROR", "Unknonw action.");	
+		}
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new OssResponse(this.getSession(),"OK", "Device control was applied.");
+	}
+
+
 }
