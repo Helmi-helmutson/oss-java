@@ -963,13 +963,13 @@ public class SoftwareController extends Controller {
 					this.setInstallUpdateOnDevice(software, softwareVersion, device);
 				}
 				if( deviceSls.size() > 0) {
-					StringBuilder hostname = new StringBuilder();
-					hostname.append(device.getName()).append(".").append(domainName);
+					StringBuilder firstLine = new StringBuilder();
+					firstLine.append("  ").append(device.getName()).append(".").append(domainName).append(":");
 
-					topSls.add("  - " + hostname.toString() + ":");
-					topSls.add("    - oss_device_" + hostname.toString());
+					topSls.add(firstLine.toString());
+					topSls.add("    - oss_device_" + device.getName() );
 
-					Path SALT_DEV   = Paths.get("/srv/salt/oss_device_" + hostname.append(".sls").toString());
+					Path SALT_DEV   = Paths.get("/srv/salt/oss_device_" + device.getName() + ".sls");
 					try {
 						Files.write(SALT_DEV, deviceSls );
 					} catch( IOException e ) { 
