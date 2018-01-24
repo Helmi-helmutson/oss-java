@@ -17,6 +17,8 @@ import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.*;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +31,7 @@ public class EducationController extends Controller {
 	Logger logger = LoggerFactory.getLogger(EducationController.class);
     static FileAttribute<Set<PosixFilePermission>> privatDirAttribute  = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
     static FileAttribute<Set<PosixFilePermission>> privatFileAttribute = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));
-    //TODO
-    static String OSS_CLIENT_CONTROL_FILE = "OSS_CLIENT_CONTROL_FILE";
-	
+
 	public EducationController(Session session) {
 		super(session);
 	}
@@ -469,32 +469,74 @@ public class EducationController extends Controller {
 		return null;
 	}
 
+	public Long getRoomActualController(long roomId) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("SmartControl.getAllActiveInRoom");
+			query.setParameter("roomId", roomId);
+			if( query.getResultList().isEmpty() ) {
+				//The room is free
+				return null;
+			}
+			RoomSmartControl rsc = (RoomSmartControl) query.getResultList().get(0);
+			return rsc.getOwner().getId();
+		} catch (Exception e) {
+		  logger.error(e.getMessage());
+		  return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	/*
+	 * getRoomControl
+	 * @param roomId	The roomId which should be controlled
+	 * @param minutes   How long do you want to control the room
+	 * @return          An OssResponse object
+	 */
 	public OssResponse getRoomControl(long roomId, long minutes) {
-		Map<String, String> actionContent = new HashMap<String,String>();
+
+		//Create the list of the controllers
 		StringBuilder controllers = new StringBuilder();
-		controllers.append(this.getConfigValue("SERVER")).append(",").append(this.session.getDevice().getIp());
+		controllers.append(this.getConfigValue("SERVER")).append(";").append(this.session.getDevice().getIp());
 		if( this.session.getDevice().getWlanIp() != null ) {
-			controllers.append(",").append(this.session.getDevice().getWlanIp());
+			controllers.append(";").append(this.session.getDevice().getWlanIp());
 		}
-		actionContent.put("path",  OSS_CLIENT_CONTROL_FILE);
-		actionContent.put("content", controllers.toString());
-		
-		OssResponse ossResponse = this.manageRoom(roomId, "saveFile", actionContent);
-		if( ossResponse.getCode().equals("OK")) {
-			RoomSmartControl roomSmartControl = new RoomSmartControl(roomId,this.session.getUserId(),minutes);
-			EntityManager em = getEntityManager();
-			try {
-				em.getTransaction().begin();
-				em.persist(roomSmartControl);
-				em.getTransaction().commit();
-			} catch (Exception e) {
-				logger.error(e.getMessage());
-				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
-			} finally {
-				em.close();
-			}	
-			return new OssResponse(this.getSession(),"OK", "Now you have the control for the selected room.");
+
+		// Get the list of the devices
+		DeviceController dc = new DeviceController(this.session);
+		List<String>  devices = new ArrayList<String>();
+		String domain         = "." + this.getConfigValue("DOMAIN");
+		for( List<Long> loggedOn : this.getRoom(roomId) ) {
+			//Do not control the own workstation
+			if( this.session.getDevice().getId().equals(loggedOn.get(1))) {
+				continue;
+			}
+			devices.add(dc.getById(loggedOn.get(1)).getName() + domain );
 		}
-		return ossResponse;
+		String[] program    = new String[5];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/bin/salt";
+		program[1] = "-L";
+		program[2] = String.join(",", devices);
+		program[3] = "oss_client.set_controller_ip";
+		program[4] = controllers.toString();
+		OSSShellTools.exec(program, reply, stderr, null);
+
+		RoomSmartControl roomSmartControl = new RoomSmartControl(roomId,this.session.getUserId(),minutes);
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.persist(roomSmartControl);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}	
+		return new OssResponse(this.getSession(),"OK", "Now you have the control for the selected room.");
+
 	}
 }

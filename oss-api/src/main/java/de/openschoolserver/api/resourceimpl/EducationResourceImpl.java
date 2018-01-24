@@ -30,12 +30,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse modifySmartRoom(Session session, long roomId, Category smartRoom) {
+	public OssResponse modifySmartRoom(Session session, Long roomId, Category smartRoom) {
 		return new EducationController(session).modifySmartRoom(roomId, smartRoom);
 	}
 
 	@Override
-	public OssResponse deleteSmartRoom(Session session, long roomId) {
+	public OssResponse deleteSmartRoom(Session session, Long roomId) {
 		return new EducationController(session).deleteSmartRoom(roomId);
 	}
 
@@ -45,17 +45,17 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<List<Long>> getRoom(Session session, long roomId) {
+	public List<List<Long>> getRoom(Session session, Long roomId) {
 		return new EducationController(session).getRoom(roomId);
 	}
 
 	@Override
-	public List<String> getAvailableRoomActions(Session session, long roomId) {
+	public List<String> getAvailableRoomActions(Session session, Long roomId) {
 		return new EducationController(session).getAvailableRoomActions(roomId);
 	}
 
 	@Override
-	public OssResponse manageRoom(Session session, long roomId, String action, Map<String, String> actionContent) {
+	public OssResponse manageRoom(Session session, Long roomId, String action, Map<String, String> actionContent) {
 		return new EducationController(session).manageRoom(roomId,action,actionContent);
 	}
 
@@ -65,122 +65,116 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse modifyGroup(Session session, long groupId, Group group) {
+	public OssResponse modifyGroup(Session session, Long groupId, Group group) {
 		return new EducationController(session).modifyGroup(groupId, group);
 	}
 
 	@Override
-	public OssResponse removeGroup(Session session, long groupId) {
+	public OssResponse removeGroup(Session session, Long groupId) {
 		return new EducationController(session).deleteGroup(groupId);
 	}
 
 	@Override
-	public OssResponse logOut(Session session, long userId, long deviceId) {
+	public OssResponse logOut(Session session, Long userId, Long deviceId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public OssResponse logIn(Session session, long userId, long roomId) {
+	public OssResponse logIn(Session session, Long userId, Long roomId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<String> getAvailableUserActions(Session session, long userId) {
+	public List<String> getAvailableUserActions(Session session, Long userId) {
 		return new EducationController(session).getAvailableUserActions(userId);
 	}
 
 	@Override
-	public OssResponse manageUSer(Session session, long userId, long deviceId, String action,
+	public OssResponse manageUSer(Session session, Long userId, Long deviceId, String action,
 			Map<String, String> actionContent) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 	@Override
-	public List<String> getAvailableDeviceActions(Session session, long deviceId) {
+	public List<String> getAvailableDeviceActions(Session session, Long deviceId) {
 		return new EducationController(session).getAvailableDeviceActions(deviceId);
 	}
 
 	@Override
-	public OssResponse manageDevice(Session session, long deviceId, String action, Map<String, String> actionContent) {
+	public OssResponse manageDevice(Session session, Long deviceId, String action, Map<String, String> actionContent) {
 		return new DeviceController(session).manageDevice(deviceId,action,actionContent);
 	}
 
 	@Override
-	public OssResponse addUser(Session session, long roomId, long userId) {
+	public OssResponse addUser(Session session, Long roomId, Long userId) {
 		EducationController educationController = new EducationController(session);
 		return new CategoryController(session).addMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
 	}
 
 	@Override
-	public OssResponse addDevice(Session session, long roomId, long deviceId) {
+	public OssResponse addDevice(Session session, Long roomId, Long deviceId) {
 		EducationController educationController = new EducationController(session);
 		return new CategoryController(session).addMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
 	}
 
 	@Override
-	public OssResponse deleteUser(Session session, long roomId, long userId) {
+	public OssResponse deleteUser(Session session, Long roomId, Long userId) {
 		EducationController educationController = new EducationController(session);
 		return new CategoryController(session).deleteMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
 	}
 
 	@Override
-	public OssResponse deleteDevice(Session session, long roomId, long deviceId) {
+	public OssResponse deleteDevice(Session session, Long roomId, Long deviceId) {
 		EducationController educationController = new EducationController(session);
 		return new CategoryController(session).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
 	}
 
 	@Override
-	public OssResponse addGroup(Session session, long roomId, long groupId) {
+	public OssResponse addGroup(Session session, Long roomId, Long groupId) {
 		EducationController educationController = new EducationController(session);
 		return new CategoryController(session).addMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
 	}
 
 	@Override
-	public OssResponse deleteGroup(Session session, long roomId, long groupId) {
+	public OssResponse deleteGroup(Session session, Long roomId, Long groupId) {
 		EducationController educationController = new EducationController(session);
 		return new CategoryController(session).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
 	}
 
 	@Override
-	public OssResponse uploadFileToRoom(Session session, long roomId, InputStream fileInputStream,
+	public OssResponse uploadFileToRoom(Session session, Long roomId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		return new EducationController(session).uploadFileTo("room",roomId,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
-	public OssResponse uploadFileToUser(Session session, long userId, InputStream fileInputStream,
+	public OssResponse uploadFileToUser(Session session, Long userId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		return new EducationController(session).uploadFileTo("user",userId,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
-	public OssResponse uploadFileToDevice(Session session, long deviceId, InputStream fileInputStream,
+	public OssResponse uploadFileToDevice(Session session, Long deviceId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		return new EducationController(session).uploadFileTo("device",deviceId,fileInputStream,contentDispositionHeader);
 
 	}
 
 	@Override
-	public OssResponse uploadFileToGroup(Session session, long groupId, InputStream fileInputStream,
+	public OssResponse uploadFileToGroup(Session session, Long groupId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		return new EducationController(session).uploadFileTo("group",groupId,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
-	public OssResponse getRoomControl(Session session, long roomId, long minutes) {
+	public OssResponse getRoomControl(Session session, Long roomId, Long minutes) {
 		return new EducationController(session).getRoomControl(roomId,minutes);
 	}
 
 	@Override
-	public List<String> getAvailableGroupActions(Session session, long groupId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public OssResponse collectFileFromDevice(Session session, long deviceId) {
+	public List<String> getAvailableGroupActions(Session session, Long groupId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -232,7 +226,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Long> getUserMember(Session session, long roomId) {
+	public List<Long> getUserMember(Session session, Long roomId) {
 		List<Long> memberIds = new ArrayList<Long>();
 		for ( User member : new EducationController(session).getCategoryToRoom(roomId).getUsers() ) {
 			memberIds.add(member.getId());
@@ -241,7 +235,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Long> getGroupMember(Session session, long roomId) {
+	public List<Long> getGroupMember(Session session, Long roomId) {
 		List<Long> memberIds = new ArrayList<Long>();
 		for ( Group member : new EducationController(session).getCategoryToRoom(roomId).getGroups() ) {
 			memberIds.add(member.getId());
@@ -250,12 +244,36 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Long> getDeviceMember(Session session, long roomId) {
+	public List<Long> getDeviceMember(Session session, Long roomId) {
 		List<Long> memberIds = new ArrayList<Long>();
 		for ( Device member : new EducationController(session).getCategoryToRoom(roomId).getDevices() ) {
 			memberIds.add(member.getId());
 		}
 		return memberIds;
+	}
+
+	@Override
+	public OssResponse collectFileFromDevice(Session session, Long deviceId, String projectName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OssResponse collectFileFromRoom(Session session, Long roomId, String projectName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OssResponse collectFileFromStudentsOfGroup(Session session, Long groupId, String projectName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OssResponse collectFileFromMembersOfGroup(Session session, Long groupId, String projectName) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

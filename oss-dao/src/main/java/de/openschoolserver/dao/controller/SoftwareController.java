@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+ /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
@@ -9,6 +9,7 @@ import java.util.Map;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.File;
 
@@ -200,49 +201,45 @@ public class SoftwareController extends Controller {
 		program[8] = "salt-packages";
 		OSSShellTools.exec(program, reply, stderr, null);
 		try {
-			Document doc = new SAXBuilder().build( reply.toString() );
+			Document doc = new SAXBuilder().build( new StringReader(reply.toString()) );
 			Element rootNode = doc.getRootElement();
-			for( Element node : (List<Element>) rootNode.getChild("update-list").getChildren("update") ) {
-				updates.put(node.getAttributeValue("name").substring(8),node.getAttributeValue("edition"));
-				updatesDescription.put(node.getAttributeValue("name").substring(8), node.getChildText("description"));
+			if(!rootNode.getChildren("update-list").isEmpty()) {
+				if( !rootNode.getChild("update-list").getChildren("update").isEmpty() ) { 
+					for( Element node : (List<Element>) rootNode.getChild("update-list").getChildren("update") ) {
+						updates.put(node.getAttributeValue("name").substring(8),node.getAttributeValue("edition"));
+						updatesDescription.put(node.getAttributeValue("name").substring(8), node.getChildText("description"));
+					}
+				}
 			}
 		} catch(IOException e ) { 
-			logger.error(e.getMessage());
-			throw new WebApplicationException(500);
+			logger.error("1" + e.getMessage());
+			//throw new WebApplicationException(500);
 		} catch(JDOMException e)  {
-			logger.error(e.getMessage());
+			logger.error("2" + e.getMessage());
 			throw new WebApplicationException(500);
 		}
-		program    = new String[8];
-		program[0] = "/usr/bin/zypper";
-		program[1] = "-nx";
-		program[2] = "-D";
-		program[3] = "/srv/salt/repos.d/";
-		program[4] = "se";
-		program[5] = "-si";
-		program[6] = "-r";
-		program[7] = "salt-packages";
+		program    = new String[5];
+		program[0] = "rpm";
+		program[1] = "-qa";
+		program[2] = "oss-pkg-*";
+		program[3] = "--qf";
+		program[4] = "%{NAME}##%{SUMMARY}##%{VERSION}\\n";;
+		reply  = new StringBuffer();
+		stderr = new StringBuffer();
 		OSSShellTools.exec(program, reply, stderr, null);
-		try {
-			Document doc = new SAXBuilder().build( reply.toString() );
-			Element rootNode = doc.getRootElement();
-			for( Element node : (List<Element>) rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable") ) {
-				software = new HashMap<String,String>();
-				software.put("name", node.getAttributeValue("name").substring(8));
-				software.put("description", node.getAttributeValue("kind"));
-				software.put("version", node.getAttributeValue("edition"));
-				if( updates.containsKey(node.getAttributeValue("name").substring(8)) ) {
-					software.put("update",updates.get(node.getAttributeValue("name").substring(8)));
-					software.put("updateDescription",updatesDescription.get(node.getAttributeValue("name").substring(8)));
-				}
-				softwares.add(software);
+		logger.debug("Reply" + reply.toString());
+		for( String line : reply.toString().split("\\n") ) {
+			String[] values = line.split("##");
+			String name     = values[0].substring(8);
+			software = new HashMap<String,String>();
+			software.put("name",  name);
+			software.put("description", values[1]);
+			software.put("version",values[2]);
+			if( updates.containsKey(name) ) {
+				software.put("update",updates.get(name));
+				software.put("updateDescription",updatesDescription.get(name));
 			}
-		} catch(IOException e ) { 
-			logger.error(e.getMessage());
-			throw new WebApplicationException(500);
-		} catch(JDOMException e)  {
-			logger.error(e.getMessage());
-			throw new WebApplicationException(500);
+			softwares.add(software);
 		}
 		return softwares;
 	}
@@ -267,6 +264,10 @@ public class SoftwareController extends Controller {
 			if( rootNode.getChild("search-result") == null ) {
 				throw new WebApplicationException(600);
 			}
+			if( rootNode.getChild("search-result").getChild("solvable-list").getChildren().isEmpty() ||
+				rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable").isEmpty()	) {
+				throw new WebApplicationException(600);
+			}
 			List<Element> elements = rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable");
 			for( Element node : elements ) {
 				software = new HashMap<String,String>();
@@ -275,13 +276,15 @@ public class SoftwareController extends Controller {
 				software.put("version", node.getAttributeValue("edition"));
 				softwares.add(software);
 			}
-		} catch(IOException e ) { 
-			logger.error(e.getMessage());
+		} catch(IOException e ) {
+			logger.error("1 " + reply.toString());
+			logger.error("1 " + stderr.toString());
+			logger.error("1 " + e.getMessage());
 			throw new WebApplicationException(500);
 		} catch(JDOMException e)  {
-			logger.error(reply.toString());
-			logger.error(stderr.toString());
-			logger.error(e.getMessage());
+			logger.error("2 " + reply.toString());
+			logger.error("2 " + stderr.toString());
+			logger.error("2 " + e.getMessage());
 			throw new WebApplicationException(500);
 		}
 		return softwares;
@@ -289,13 +292,31 @@ public class SoftwareController extends Controller {
 	
 
 	public OssResponse downloadSoftwares(List<String> softwares) {
-		String[] program    = new String[1+ softwares.size()];
+		File file = null;
+		try {
+			file = File.createTempFile("oss_download_job", ".ossb", new File("/opt/oss-java/tmp/"));
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		}
+		StringBuilder command = new StringBuilder();
+		command.append("/usr/sbin/oss_download_packages ");
+		for(int i = 0; i < softwares.size(); i++) {
+			command.append("oss-pkg-").append(softwares.get(i)).append(" ");
+		}
+		try(  PrintWriter out = new PrintWriter( file.toPath().toString() )  ){
+		    out.println( command.toString() );
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		String[] program    = new String[4];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/sbin/oss_download_packages";
-		for(int i = 0; i < softwares.size(); i++) {
-			program[1+i] = "oss-pkg-" + softwares.get(i);
-		}
+		program[0]   = "at";
+		program[1]   = "-f";
+		program[2]   = file.toPath().toString();
+		program[3]   = "now";
 		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(this.getSession(),"OK","Download of the softwares was started succesfully");
 	}
