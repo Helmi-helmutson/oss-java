@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
 public class JobController extends Controller {
 	
@@ -83,7 +84,7 @@ public class JobController extends Controller {
 		File jobDir = new File( path.toString() );
 		try {
 			Files.createDirectories(jobDir.toPath(), privatDirAttribute );
-			path.append("/").append(String.valueOf(job.getId()));
+			path.append(String.valueOf(job.getId()));
 			Path jobFile     = Paths.get(path.toString());
 			List<String> tmp =  new ArrayList<String>();
 			tmp.add("( /usr/share/oss/tools/oss_date.sh");
@@ -121,6 +122,7 @@ public class JobController extends Controller {
 		}
 		try {
 			job.setExitCode(exitCode);
+			job.setEndTime(this.now);
 			em.getTransaction().begin();
 			em.merge(job);
 			em.getTransaction().commit();
@@ -132,12 +134,48 @@ public class JobController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK","Jobs exit code was set successfully");
 	}
-	
-	public List<Job> findJobByDescription(String description, Timestamp after, Timestamp befor) {
-		List<Job> jobs   = new ArrayList<Job>();
+
+	public OssResponse restartJob(Long jobId) {
 		EntityManager em = getEntityManager();
-		
-		return jobs;
+		Job job = this.getById(jobId);
+		if( job == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Job was not found.");
+		}
+		try {
+			job.setStartTime(new Timestamp(System.currentTimeMillis()));
+			em.getTransaction().begin();
+			em.merge(job);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error("createJob" + e.getMessage(),e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		String[] program   = new String[4];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "at";
+		program[1] = "-f";
+		program[2] = basePath + String.valueOf(jobId);
+		program[3] = "now" ;
+		OSSShellTools.exec(program, reply, error, null);
+		return new OssResponse(this.getSession(),"OK","Job was restarted successfully",jobId);
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Job> searchJobs(String description, Timestamp after, Timestamp befor) {
+		EntityManager em = getEntityManager();
+		Query query = null;
+		if( after == befor ) {
+			query = em.createNamedQuery("Job.getByDescription").setParameter("description", description);
+		} else {
+			query = em.createNativeQuery("Job.getByDescriptionAndTime")
+					.setParameter("description", description)
+					.setParameter("after", after)
+					.setParameter("befor", befor);
+		}
+		return query.getResultList();
 	}
 
 }

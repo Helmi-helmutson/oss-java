@@ -2,16 +2,19 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.util.List;
-
 import java.util.Map;
 
+import java.sql.Timestamp;
+
 import de.openschoolserver.api.resources.SystemResource;
+import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Translation;
 import de.openschoolserver.dao.controller.SystemController;
 import de.openschoolserver.dao.controller.ProxyController;
+import de.openschoolserver.dao.controller.JobController;
 
 public class SystemResourceImpl implements SystemResource {
 
@@ -144,5 +147,33 @@ public class SystemResourceImpl implements SystemResource {
 	@Override
 	public OssResponse setProxyDefault(Session session, Map<String,List<String[]>> acls) {
 		return new ProxyController(session).setDefaults(acls);
+	}
+
+	@Override
+	public OssResponse createJob(Session session, Job job) {
+		return new JobController(session).createJob(job);
+	}
+
+	@Override
+	public List<Job> searchJob(Session session, Job job ) {
+		return new JobController(session).searchJobs(job.getDescription(), job.getStartTime(), job.getEndTime());
+	}
+
+	@Override
+	public Job getJob(Session session, Long jobId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OssResponse setJobExitValue(Session session, Long jobId, Integer exitValue) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OssResponse restartJob(Session session, Long jobId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

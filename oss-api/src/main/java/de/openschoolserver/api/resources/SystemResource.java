@@ -10,6 +10,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import java.util.List;
 import java.util.Map;
+import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.MissedTranslation;
@@ -234,6 +235,9 @@ public interface SystemResource {
     		@PathParam("lang") String lang
     );
     
+    /*
+     * Registration
+     */
     @PUT
     @Path("register")
     @Produces(JSON_UTF8)
@@ -246,6 +250,9 @@ public interface SystemResource {
     		@ApiParam(hidden = true) @Auth Session session
     );
     
+    /*
+     * Package handling
+     */
     @GET
     @Path("packages/{filter}")
     @Produces(JSON_UTF8)
@@ -290,6 +297,9 @@ public interface SystemResource {
     		@ApiParam(hidden = true) @Auth Session session
     		);
     
+    /*
+     * Proxy default handling
+     */
     @GET
     @Path("proxy/default")
     @Produces(JSON_UTF8)
@@ -310,5 +320,68 @@ public interface SystemResource {
     		@ApiParam(hidden = true) @Auth Session session,
     		Map<String,List<String[]>> acls
     		);
+
+    /*
+     * Job management
+     */
+    @POST
+    @Path("jobs/add")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Creates a new job")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.jobs")
+    OssResponse createJob(
+		@ApiParam(hidden = true) @Auth Session session,
+		Job job
+    );
+
+    @POST
+    @Path("jobs/search")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Searching for jobs by description and time.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.jobs")
+    List<Job> searchJob(
+		@ApiParam(hidden = true) @Auth Session session,
+		Job job
+    );
     
+    @GET
+    @Path("jobs/{jobId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the job with all parameters inclusive log.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.jobs")
+    Job getJob(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("jobId") Long jobId
+    );
+
+    @PUT
+    @Path("jobs/{jobId}/exit/{exitValue}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set the exit value of a job.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.jobs")
+    OssResponse setJobExitValue(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("jobId") Long jobId,
+		@PathParam("exitValue") Integer exitValue
+    );
+
+    @PUT
+    @Path("jobs/{jobId}/restart")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set the exit value of a job.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.jobs")
+    OssResponse restartJob(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("jobId") Long jobId
+    );
+
 }
