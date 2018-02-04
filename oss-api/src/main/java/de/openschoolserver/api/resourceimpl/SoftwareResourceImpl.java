@@ -151,7 +151,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<Long> getRooms(Session session, long installationId) {
 		CategoryController categoryController = new CategoryController(session);
-		return categoryController.getMembers(installationId, "Rooms");
+		return categoryController.getMembers(installationId, "Room");
 	}
 
 	@Override
@@ -249,6 +249,11 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public String getSoftwareLicencesOnDevice(Session session, String deviceName) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.getSoftwareLicencesOnDevice(deviceName);
+	}
+
+	@Override
+	public List<Category> getInstallations(Session session) {
+		return new CategoryController(session).getByType("installation");
 	}
 	
 }

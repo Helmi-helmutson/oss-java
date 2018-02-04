@@ -176,7 +176,7 @@ public interface SoftwareResource {
             );
 	
 	/*
-	 * POST software/installations
+	 * POST softwares/installations
 	 */
 	@POST
 	@Path("installations")
@@ -190,6 +190,21 @@ public interface SoftwareResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			Category category
 			);
+
+	/*
+	 * GET softwares/installations
+	 */
+	@GET
+	@Path("installations")
+	@Produces(JSON_UTF8)
+	@ApiOperation( value = "Gets all installations" )
+    @ApiResponses(value = {
+	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("software.install")
+	List<Category> getInstallations(
+			@ApiParam(hidden = true) @Auth Session session
+	);
 
 	/*
 	 * PUT softwares/installations/{installationId}/softwares/{softwareId}
