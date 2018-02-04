@@ -122,7 +122,7 @@ public class JobController extends Controller {
 		}
 		try {
 			job.setExitCode(exitCode);
-			job.setEndTime(this.now);
+			job.setEndTime(new Timestamp(System.currentTimeMillis()));
 			em.getTransaction().begin();
 			em.merge(job);
 			em.getTransaction().commit();
