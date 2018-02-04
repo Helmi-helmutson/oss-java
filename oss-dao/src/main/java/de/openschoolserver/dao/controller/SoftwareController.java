@@ -932,13 +932,17 @@ public class SoftwareController extends Controller {
 			if( device.getHwconf() == null || ! device.getHwconf().getDeviceType().equals("FatClient") ) {
 				continue;
 			}
-			List<String> deviceSls = new ArrayList<String>();
+			List<String> deviceRemove  = new ArrayList<String>();
+			List<String> deviceGrains  = new ArrayList<String>();
+			List<String> deviceInstall = new ArrayList<String>();
+			List<String> deviceOssInst = new ArrayList<String>();
+
 			//Remove first the softwares.
 			if( softwaresToRemove.containsKey(device.getName()) ) {
 				for( Software software : softwaresToRemove.get(device.getName()) ) {
-					deviceSls.add(software.getName()+":");
-					deviceSls.add("  - pkg:");
-					deviceSls.add("    - removed:");
+					deviceRemove.add(software.getName()+":");
+					deviceRemove.add("  - pkg:");
+					deviceRemove.add("    - removed:");
 					if( this.checkSoftwareStatusOnDevice(device, software, "I") ){
 						this.setSoftwareStatusOnDevice(device, software, "", "DS");
 					}
@@ -957,20 +961,19 @@ public class SoftwareController extends Controller {
 					Software software = this.getByName(softwareName);
 					for( SoftwareLicense sl : device.getSoftwareLicenses() ) {
 						if( sl.getSoftware().equals(software) ) {
-							deviceSls.add(softwareName + "_KEY");
-							deviceSls.add("  grains.present:");
-							deviceSls.add("    - value: " + sl.getValue());
+							deviceGrains.add(softwareName + "_KEY");
+							deviceGrains.add("  grains.present:");
+							deviceGrains.add("    - value: " + sl.getValue());
 						}
 					}
 					/*
 					 * TODO to implement frozen versions.
 					 */
-					deviceSls.add("include:");
-					deviceSls.add("  - " + softwareName);
+					deviceOssInst.add("  - " + softwareName);
 				} else {
-					deviceSls.add(softwareName+":");
-					deviceSls.add("  - pkg:");
-					deviceSls.add("    - installed:");					
+					deviceInstall.add(softwareName+":");
+					deviceInstall.add("  - pkg:");
+					deviceInstall.add("    - installed:");
 				}
 				Software software               = this.getByName(softwareName);
 				SoftwareVersion softwareVersion = null;
@@ -983,19 +986,28 @@ public class SoftwareController extends Controller {
 				if( !this.checkSoftwareVersionStatusOnDevice(device, softwareVersion, "I")) {
 					this.setInstallUpdateOnDevice(software, softwareVersion, device);
 				}
-				if( deviceSls.size() > 0) {
-					StringBuilder firstLine = new StringBuilder();
-					firstLine.append("  ").append(device.getName()).append(".").append(domainName).append(":");
+			}
+			List<String> deviceSls = new ArrayList<String>();
+			deviceSls.addAll(deviceRemove);
+			deviceSls.addAll(deviceInstall);
+			deviceSls.addAll(deviceGrains);
+			if( deviceOssInst.size() > 0 ) {
+				deviceSls.add("include");
+				deviceSls.addAll(deviceOssInst);
+			}
 
-					topSls.add(firstLine.toString());
-					topSls.add("    - oss_device_" + device.getName() );
+			if( deviceSls.size() > 0) {
+				StringBuilder firstLine = new StringBuilder();
+				firstLine.append("  ").append(device.getName()).append(".").append(domainName).append(":");
 
-					Path SALT_DEV   = Paths.get("/srv/salt/oss_device_" + device.getName() + ".sls");
-					try {
-						Files.write(SALT_DEV, deviceSls );
-					} catch( IOException e ) { 
-						logger.error(e.getMessage());
-					}
+				topSls.add(firstLine.toString());
+				topSls.add("    - oss_device_" + device.getName() );
+
+				Path SALT_DEV   = Paths.get("/srv/salt/oss_device_" + device.getName() + ".sls");
+				try {
+					Files.write(SALT_DEV, deviceSls );
+				} catch( IOException e ) { 
+					logger.error(e.getMessage());
 				}
 			}
 		}
@@ -1012,7 +1024,7 @@ public class SoftwareController extends Controller {
 	}
 
 	/*
-	 * Sets the software installation status on a device
+	 * Sets the software installation status on a device and remove the status of older version if the status is installed.
 	 * 
 	 * @param	device			The corresponding device object
 	 * @param	softwareName	Name of the corresponding software package
@@ -1041,20 +1053,23 @@ public class SoftwareController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 			}		
 		}
+
+		//Search for the real software version
 		for( SoftwareVersion sv :  software.getSoftwareVersions() ) {
 			if( sv.getVersion().equals(version)) {
 				softwareVersion = sv;
 				break;
 			}
 		}
+
 		if( softwareVersion == null ) {
-			softwareVersion = new SoftwareVersion();
-			softwareVersion.setVersion(version);
-			softwareVersion.setSoftware(software);
+			//This software version does not exists. We have create it
+			softwareVersion = new SoftwareVersion(software,version,"U");
 			try {
 				em.getTransaction().begin();
-				em.merge(software);
 				em.persist(softwareVersion);
+				software.addSoftwareVersion(softwareVersion);
+				em.merge(software);
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -1062,17 +1077,27 @@ public class SoftwareController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 			}
 		}
+
+		//We are searching for the status of this version of the server on the device.
+		List<SoftwareStatus> softwareStatusToRemove = new ArrayList<SoftwareStatus>();
 		for( SoftwareStatus st : device.getSofwareStatus() ) {
 			if( st.getSoftwareVersion().equals(softwareVersion) ) {
 				softwareStatus = st;
-				break;
+			} else if( status == "I" && st.getSoftwareVersion().getSoftware().equals(software)) {
+				//Remove the other versions of the software if this is installed.
+				softwareStatusToRemove.add(st);
 			}
 		}
+
 		if( softwareStatus == null ) {
+			//This software version has no status on this device. Let's create it.
 			softwareStatus = new SoftwareStatus(device,softwareVersion,status);
 			try {
 				em.getTransaction().begin();
 				em.persist(softwareStatus);
+				for( SoftwareStatus st : softwareStatusToRemove ) {
+					em.remove(st);
+				}
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
@@ -1084,6 +1109,9 @@ public class SoftwareController extends Controller {
 			try {
 				em.getTransaction().begin();
 				em.merge(softwareStatus);
+				for( SoftwareStatus st : softwareStatusToRemove ) {
+					em.remove(st);
+				}
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
