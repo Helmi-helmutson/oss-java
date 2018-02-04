@@ -574,6 +574,7 @@ CREATE TABLE IF NOT EXISTS Jobs (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
        description     VARCHAR(128)    NOT NULL,
        startTime       timestamp       NOT NULL DEFAULT '0000-00-00 00:00:00',
+       endTime         timestamp       DEFAULT NULL,
        exitCode        INT             DEFAULT NULL,
        PRIMARY KEY(id)
 );

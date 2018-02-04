@@ -34,6 +34,8 @@ public class Job implements Serializable {
 
 	private Timestamp startTime;
 	
+	private Timestamp endTime;
+
 	private Integer exitCode;
 	
 	@Transient
@@ -51,9 +53,9 @@ public class Job implements Serializable {
 	public Job(String description, Timestamp startTime, String command, boolean promptly) {
 		super();
 		this.description = description;
-		this.startTime = startTime;
-		this.command = command;
-		this.promptly = promptly;
+		this.startTime   = startTime;
+		this.command     = command;
+		this.promptly    = promptly;
 	}
 
 	public Long getId() {
@@ -110,5 +112,13 @@ public class Job implements Serializable {
 
 	public void setExitCode(Integer exitCode) {
 		this.exitCode = exitCode;
+	}
+
+	public Timestamp getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Timestamp endTime) {
+		this.endTime = endTime;
 	}
 }
