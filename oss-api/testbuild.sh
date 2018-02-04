@@ -2,12 +2,18 @@
 HERE=$( pwd )
 gradle clean build
 tar xf build/distributions/de.openschoolserver.api-1.0-SNAPSHOT.tar 
-scp  de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@192.168.2.60:/opt/oss-java/lib/
-ssh  root@192.168.2.60 systemctl restart oss-api
-#scp  de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@192.168.100.20:/opt/oss-java/lib/
-#ssh  root@192.168.100.20 systemctl restart oss-api
-#scp -P 34022 de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@oss40.cephalix.eu:/opt/oss-java/lib/
-#ssh -p 34022 root@oss40.cephalix.eu systemctl restart oss-api
+
+if [ "$1" ]; then
+	scp -P $2 de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@$1:/opt/oss-java/lib/
+	ssh -p $2 root@$1 systemctl restart oss-api
+else 
+	scp  de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@192.168.2.60:/opt/oss-java/lib/
+	ssh  root@192.168.2.60 systemctl restart oss-api
+	#scp  de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@192.168.100.20:/opt/oss-java/lib/
+	#ssh  root@192.168.100.20 systemctl restart oss-api
+	#scp -P 34022 de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@oss40.cephalix.eu:/opt/oss-java/lib/
+	#ssh -p 34022 root@oss40.cephalix.eu systemctl restart oss-api
+fi
 if [ -e oss-java ]; then
     rm -r oss-java
 fi
