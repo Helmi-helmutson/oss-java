@@ -35,8 +35,6 @@ public class FAQ implements Serializable {
 
 	private String title;
 
-	private String uuid;
-
 	//bi-directional many-to-many association to Category
 	@ManyToMany
 	@JoinColumn(name="id")
@@ -92,14 +90,6 @@ public class FAQ implements Serializable {
 
 	public void setTitle(String title) {
 		this.title = title;
-	}
-
-	public String getUuid() {
-		return this.uuid;
-	}
-
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
 	}
 
 	public List<Category> getCategories() {
