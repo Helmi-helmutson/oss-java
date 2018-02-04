@@ -6,11 +6,15 @@ import javax.persistence.Query;
 import java.util.List;
 import java.util.ArrayList;
 import de.openschoolserver.dao.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SuppressWarnings( "unchecked" )
 public class CategoryController extends Controller {
+
+	Logger logger = LoggerFactory.getLogger(CategoryController.class);
 
 	public CategoryController(Session session) {
 		super(session);
@@ -57,15 +61,19 @@ public class CategoryController extends Controller {
 
 	public List<Category> getByType(String search) {
 		EntityManager em = getEntityManager();
+		List<Category> categories = new ArrayList<Category>();
 		try {
 			Query query = em.createNamedQuery("Category.getByType").setParameter("type", search);
-			return query.getResultList();
+			for( Category c :  (List<Category>) query.getResultList() ) {
+				c.setIds();
+				categories.add(c);
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ArrayList<>();
 		} finally {
 			em.close();
 		}
+		return categories;
 	}
 
 	public Category getByName(String name) {
