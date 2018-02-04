@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 
 import javax.persistence.*;
+
+import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -184,6 +186,15 @@ public class Category implements Serializable {
 	}
 
 	public Category() {
+		this.announcementIds = new ArrayList<Long>();
+		this.contactIds = new ArrayList<Long>();
+		this.deviceIds  = new ArrayList<Long>();
+		this.faqIds     = new ArrayList<Long>();
+		this.groupIds   = new ArrayList<Long>();
+		this.hwConfIds  = new ArrayList<Long>();
+		this.roomIds    = new ArrayList<Long>();
+		this.softwareIds= new ArrayList<Long>();
+		this.userIds    = new ArrayList<Long>();
 	}
 
 	public Long getId() {
@@ -385,6 +396,54 @@ public class Category implements Serializable {
 
 	public void setFAQIds(List<Long> ids) {
 		this.faqIds = ids;
+	}
+
+	public void setIds() {
+		if( this.announcements != null ) {
+			for (Announcement a : this.getAnnouncements() ) {
+				this.announcementIds.add(a.getId());
+			}
+		}
+		if( this.contacts != null ) {
+			for (Contact c : this.getContacts()) {
+				this.contactIds.add(c.getId());
+			}
+		}
+		if( this.devices != null ) {
+			for (Device d : this.getDevices() ) {
+				this.deviceIds.add(d.getId());
+			}
+		}
+		if( this.faqs != null ) {
+			for (FAQ f: this.getFaqs()) {
+				this.faqIds.add(f.getId());
+			}
+		}
+		if( this.groups != null ) {
+			for (Group g: this.getGroups()) {
+				this.groupIds.add(g.getId());
+			}
+		}
+		if( this.hwconfs != null ) {
+			for (HWConf h: this.getHWConfs()) {
+				this.hwConfIds.add(h.getId());
+			}
+		}
+		if( this.rooms != null ) {
+			for (Room r: this.getRooms()) {
+				this.roomIds.add(r.getId());
+			}
+		}
+		if( this.softwares != null ) {
+			for (Software s: this.getSoftwares()) {
+				this.softwareIds.add(s.getId());
+			}
+		}
+		if( this.users != null ) {
+			for (User u: this.getUsers()) {
+				this.userIds.add(u.getId());
+			}
+		}
 	}
 
 
