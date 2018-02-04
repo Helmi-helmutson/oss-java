@@ -225,4 +225,14 @@ public class CloneToolResourceImpl implements CloneToolResource {
 		return new CloneToolController(session).stopCloning("device",deviceId);
 	}
 
+	@Override
+	public String resetMinion(Session session) {
+		return new CloneToolController(session).resetMinion(session.getDevice().getId());
+	}
+
+	@Override
+	public String resetMinion(Session session, Long deviceId) {
+		return new CloneToolController(session).resetMinion(deviceId);
+	}
+
 }

@@ -496,4 +496,16 @@ public class CloneToolController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during removing the boot configuration:" + ERROR.toString());
 	}
+
+	public String resetMinion(Long deviceId) {
+		StringBuilder path = new StringBuilder("/etc/salt/pki/master/minions");
+		path.append(new DeviceController(this.session).getById(deviceId).getName()).append(".").append(this.getConfigValue("DOMAIN"));
+		try {
+			Files.deleteIfExists(Paths.get(path.toString()));
+		} catch ( IOException e ) {
+			logger.error(e.getMessage());
+		}
+		return null;
+	}
+
 }

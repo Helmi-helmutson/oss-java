@@ -45,6 +45,37 @@ public interface CloneToolResource {
 	);
   
 	/*
+	 * PUT clonetool/resetMinion
+	 */
+	@GET
+	@Path("resetMinion")
+	@Produces(TEXT)
+	@ApiOperation(value = "Removes the pubkey of the minion of the session device.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	String resetMinion(
+	        @ApiParam(hidden = true) @Auth Session session
+	);
+
+	/*
+	 * PUT clonetool/devices/{deviceId}/resetMinion
+	 */
+	@GET
+	@Path("devices/{deviceId}/resetMinion")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Removes the pubkey of the minion.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	String resetMinion(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("deviceId") Long deviceId
+	);
+  
+	/*
 	 * Get clonetool/isMaster
 	 */
 	@GET
