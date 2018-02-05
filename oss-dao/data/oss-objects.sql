@@ -1,7 +1,7 @@
 #TEST ONLY
 #DROP DATABASE OSS;
 
-CREATE DATABASE OSS;
+CREATE DATABASE OSS DEFAULT CHARACTER SET utf8mb4 COLLATE = utf8mb4_unicode_ci;
 USE OSS;
 
 CREATE TABLE IF NOT EXISTS Translations(
@@ -10,14 +10,14 @@ CREATE TABLE IF NOT EXISTS Translations(
 	string  VARCHAR(512) NOT NULL,
         value   VARCHAR(512),
 	PRIMARY KEY  (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS MissedTranslations(
         id      BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	lang	VARCHAR(2)   NOT NULL DEFAULT 'DE',
 	string  VARCHAR(250) NOT NULL,
 	PRIMARY KEY  (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Users (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS Users (
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -45,7 +45,7 @@ CREATE TABLE IF NOT EXISTS Groups (
         owner_id    BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS GroupMember (
         user_id        BIGINT UNSIGNED NOT NULL,
@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS GroupMember (
 	FOREIGN KEY(user_id)  REFERENCES Users(id)  ON DELETE CASCADE,
 	FOREIGN KEY(group_id) REFERENCES Groups(id) ON DELETE CASCADE,
 	PRIMARY KEY(user_id,group_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Aliases (
         id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS Aliases (
         alias           VARCHAR(64) NOT NULL,
         FOREIGN KEY(user_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS HWConfs (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS HWConfs (
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Partitions (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -86,7 +86,7 @@ CREATE TABLE IF NOT EXISTS Partitions (
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Rooms (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS Devices (
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
         FOREIGN KEY(owner_id)  REFERENCES Users(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS AccessInRooms (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS AccessInRooms (
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(room_id) REFERENCES Rooms(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS LoggedOn (
         user_id      BIGINT UNSIGNED NOT NULL,
@@ -157,7 +157,7 @@ CREATE TABLE IF NOT EXISTS LoggedOn (
         FOREIGN KEY(user_id)   REFERENCES Users(id)   ON DELETE CASCADE,
         FOREIGN KEY(device_id) REFERENCES Devices(id) ON DELETE CASCADE,
         PRIMARY KEY(device_id, user_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS DefaultPrinter (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS DefaultPrinter (
         FOREIGN KEY(device_id)  REFERENCES Devices(id) ON DELETE CASCADE,
         FOREIGN KEY(printer_id) REFERENCES Devices(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS AvailablePrinters (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -179,7 +179,7 @@ CREATE TABLE IF NOT EXISTS AvailablePrinters (
         FOREIGN KEY(device_id)  REFERENCES Devices(id) ON DELETE CASCADE,
         FOREIGN KEY(printer_id) REFERENCES Devices(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Acls (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS Acls (
         FOREIGN KEY(user_id)  REFERENCES Users(id)  ON DELETE CASCADE,
         FOREIGN KEY(group_id) REFERENCES Groups(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS  Tests (
         id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -210,7 +210,7 @@ CREATE TABLE IF NOT EXISTS  Tests (
         FOREIGN KEY(teacher_id) REFERENCES Users(id) ON DELETE SET NULL,
         FOREIGN KEY(room_id)    REFERENCES Rooms(id) ON DELETE SET NULL,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS TestFiles (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -222,7 +222,7 @@ CREATE TABLE IF NOT EXISTS TestFiles (
         FOREIGN KEY(test_id) REFERENCES Tests(id) ON DELETE CASCADE,
         FOREIGN KEY(user_id) REFERENCES Users(id) ON DELETE SET NULL,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS TestUsers (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -233,7 +233,7 @@ CREATE TABLE IF NOT EXISTS TestUsers (
         FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE SET NULL,
         FOREIGN KEY(device_id) REFERENCES Devices(id) ON DELETE SET NULL,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Enumerates (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -242,7 +242,7 @@ CREATE TABLE IF NOT EXISTS Enumerates (
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 #Some additional config tables
 CREATE TABLE IF NOT EXISTS OSSConfig (
@@ -254,7 +254,7 @@ CREATE TABLE IF NOT EXISTS OSSConfig (
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS OSSMConfig (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS OSSMConfig (
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS RoomSmartControlls (
 	id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -276,7 +276,7 @@ CREATE TABLE IF NOT EXISTS RoomSmartControlls (
         FOREIGN KEY(room_id) REFERENCES   Rooms(id)   ON DELETE CASCADE,
         FOREIGN KEY(user_id) REFERENCES   Users(id)   ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Sessions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -290,7 +290,7 @@ CREATE TABLE IF NOT EXISTS Sessions (
         FOREIGN KEY(room_id)   REFERENCES Rooms(id)   ON DELETE SET NULL,
 	FOREIGN KEY(device_id) REFERENCES Devices(id) ON DELETE SET NULL,
         PRIMARY KEY(id)
- );
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS OssResponses (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -299,7 +299,7 @@ CREATE TABLE IF NOT EXISTS OssResponses (
 	value   VARCHAR(1024) NOT NULL,
 	FOREIGN KEY(session_id) REFERENCES Sessions(id) ON DELETE CASCADE,
 	PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Softwares (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -310,7 +310,7 @@ CREATE TABLE IF NOT EXISTS Softwares (
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 # status C -> current this is the most recent version and does exists on the server and can be installed
 # status R -> replaced this version does not exists on the server but is installed on some clients
@@ -322,7 +322,7 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
 	status         VARCHAR(1)  NOT NULL,
         FOREIGN KEY(software_id)    REFERENCES Softwares(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 # status I  -> installed
 # status IS -> installation scheduled
@@ -340,7 +340,7 @@ CREATE TABLE IF NOT EXISTS SoftwareStatus (
 	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
 	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
 	PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 # licenseType C -> command line license
 # licenseType F -> file license in this case the value contains the license file name
@@ -354,7 +354,7 @@ CREATE TABLE IF NOT EXISTS SoftwareLicenses (
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(software_id)    REFERENCES Softwares(id)     ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS LicenseToDevice (
         license_id         BIGINT UNSIGNED NOT NULL,
@@ -362,7 +362,7 @@ CREATE TABLE IF NOT EXISTS LicenseToDevice (
 	FOREIGN KEY(license_id)  REFERENCES SoftwareLicenses(id) ON DELETE CASCADE,
 	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
 	PRIMARY KEY(license_id,device_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS PositiveList (
 	id BIGINT   UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -372,7 +372,7 @@ CREATE TABLE IF NOT EXISTS PositiveList (
         description VARCHAR(64) NOT NULL,
 	FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE SET NULL,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Announcements (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -386,7 +386,7 @@ CREATE TABLE IF NOT EXISTS Announcements (
         issuer     VARCHAR(128),
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY  (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS HaveSeen (
         user_id            BIGINT UNSIGNED DEFAULT NULL,
@@ -394,7 +394,7 @@ CREATE TABLE IF NOT EXISTS HaveSeen (
 	FOREIGN KEY(user_id)           REFERENCES Users(id)         ON DELETE CASCADE,
 	FOREIGN KEY(announcement_id)   REFERENCES Announcements(id) ON DELETE CASCADE,
 	PRIMARY KEY(announcement_id,user_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS FAQs (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -405,7 +405,7 @@ CREATE TABLE IF NOT EXISTS FAQs (
         text       BLOB,
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE SET NULL,
         PRIMARY KEY  (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Contacts (
 	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -417,7 +417,7 @@ CREATE TABLE IF NOT EXISTS Contacts (
         title      VARCHAR(128) default NULL,
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE SET NULL,
         PRIMARY KEY  (id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Categories (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -428,7 +428,7 @@ CREATE TABLE IF NOT EXISTS Categories (
 	studentsOnly CHAR(1) DEFAULT 'N',
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS DeviceInCategories (
         device_id          BIGINT UNSIGNED NOT NULL,
@@ -436,7 +436,7 @@ CREATE TABLE IF NOT EXISTS DeviceInCategories (
 	FOREIGN KEY(device_id)    REFERENCES Devices(id)     ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id)  ON DELETE CASCADE,
 	PRIMARY KEY(device_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS GroupInCategories (
         group_id           BIGINT UNSIGNED NOT NULL,
@@ -444,7 +444,7 @@ CREATE TABLE IF NOT EXISTS GroupInCategories (
 	FOREIGN KEY(group_id)     REFERENCES Groups(id)     ON DELETE CASCADE,	
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(group_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS HWConfInCategories (
         hwconf_id          BIGINT UNSIGNED NOT NULL,
@@ -452,7 +452,7 @@ CREATE TABLE IF NOT EXISTS HWConfInCategories (
 	FOREIGN KEY(hwconf_id)    REFERENCES HWConfs(id)    ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(hwconf_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS RoomInCategories (
         room_id            BIGINT UNSIGNED NOT NULL,
@@ -460,7 +460,7 @@ CREATE TABLE IF NOT EXISTS RoomInCategories (
 	FOREIGN KEY(room_id)      REFERENCES Rooms(id)      ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(room_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS SoftwareInCategories (
         software_id        BIGINT UNSIGNED NOT NULL,
@@ -468,7 +468,7 @@ CREATE TABLE IF NOT EXISTS SoftwareInCategories (
 	FOREIGN KEY(software_id)  REFERENCES Softwares(id)   ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(software_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS SoftwareRemovedFromCategories (
         software_id        BIGINT UNSIGNED NOT NULL,
@@ -476,7 +476,7 @@ CREATE TABLE IF NOT EXISTS SoftwareRemovedFromCategories (
 	FOREIGN KEY(software_id)  REFERENCES Softwares(id)   ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(software_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS UserInCategories (
         user_id            BIGINT UNSIGNED NOT NULL,
@@ -484,7 +484,7 @@ CREATE TABLE IF NOT EXISTS UserInCategories (
 	FOREIGN KEY(user_id)      REFERENCES Users(id)      ON DELETE CASCADE,
 	FOREIGN KEY(category_id)  REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(user_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS AnnouncementInCategories (
         announcement_id    BIGINT UNSIGNED NOT NULL,
@@ -492,7 +492,7 @@ CREATE TABLE IF NOT EXISTS AnnouncementInCategories (
 	FOREIGN KEY(announcement_id) REFERENCES Announcements(id) ON DELETE CASCADE,
 	FOREIGN KEY(category_id)     REFERENCES Categories(id)    ON DELETE CASCADE,
 	PRIMARY KEY(announcement_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS FAQInCategories (
         faq_id    BIGINT UNSIGNED NOT NULL,
@@ -500,7 +500,7 @@ CREATE TABLE IF NOT EXISTS FAQInCategories (
 	FOREIGN KEY(faq_id) REFERENCES FAQs(id) ON DELETE CASCADE,
 	FOREIGN KEY(category_id)     REFERENCES Categories(id)    ON DELETE CASCADE,
 	PRIMARY KEY(faq_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS ContactInCategories (
         contact_id    BIGINT UNSIGNED NOT NULL,
@@ -508,7 +508,7 @@ CREATE TABLE IF NOT EXISTS ContactInCategories (
 	FOREIGN KEY(contact_id) REFERENCES Contacts(id) ON DELETE CASCADE,
 	FOREIGN KEY(category_id)     REFERENCES Categories(id)    ON DELETE CASCADE,
 	PRIMARY KEY(contact_id,category_id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 #TABLES for CEPHALIX
 CREATE TABLE IF NOT EXISTS CephalixInstitutes (
@@ -536,7 +536,7 @@ CREATE TABLE IF NOT EXISTS CephalixInstitutes (
        anonDhcp        VARCHAR(32) NOT NULL,
        firstRoom       VARCHAR(16) NOT NULL,
        PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS CephalixITUsage (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -545,7 +545,7 @@ CREATE TABLE IF NOT EXISTS CephalixITUsage (
        counter         BIGINT UNSIGNED NOT NULL,
        FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
        PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS CephalixITUsageAvarage (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -558,7 +558,7 @@ CREATE TABLE IF NOT EXISTS CephalixITUsageAvarage (
        avarage         BIGINT UNSIGNED NOT NULL,
        FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
        PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS CephalixMappings (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -568,7 +568,7 @@ CREATE TABLE IF NOT EXISTS CephalixMappings (
        ossId           BIGINT UNSIGNED DEFAULT NULL,
        FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
        PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Jobs (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -577,5 +577,5 @@ CREATE TABLE IF NOT EXISTS Jobs (
        endTime         timestamp       DEFAULT '0000-00-00 00:00:00',
        exitCode        INT             DEFAULT NULL,
        PRIMARY KEY(id)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
