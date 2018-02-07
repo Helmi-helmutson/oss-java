@@ -16,8 +16,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NamedQueries({
 	@NamedQuery(name="SoftwareStatus.findAll",		query="SELECT s FROM SoftwareStatus s"),
 	@NamedQuery(name="SoftwareStatus.findByStatus", query="SELECT s FROM SoftwareStatus s WHERE s.status = :STATUS"),
-	@NamedQuery(name="SoftwareStatus.getAllForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE"),
-	@NamedQuery(name="SoftwareStatus.getForOne",	query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.version_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE AND sv.version = :VERSION"),
+	@NamedQuery(name="SoftwareStatus.getAllForOne", query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.softwarversion_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE"),
+	@NamedQuery(name="SoftwareStatus.getForOne",	query="SELECT ss, sv FROM SoftwareStatus ss JOIN SoftwareVersion sv ON ss.softwareversion_id=sv.id WHERE ss.deviceId= :DEVICE AND sv.softwareId= :SOFTWARE AND sv.version = :VERSION"),
 })
 
 public class SoftwareStatus implements Serializable {
@@ -30,18 +30,14 @@ public class SoftwareStatus implements Serializable {
 	
 	private String status;
 
-	//bi-directional many-to-one association to SoftwareVersion
 	@ManyToOne
-	@JoinColumn(name="version_id")
     @JsonIgnore
 	private SoftwareVersion softwareVersion;
 
-	@Column(name = "version_id", insertable = false, updatable = false)
-    private Long versionId;
+	@Column(name = "softwareversion_id", insertable = false, updatable = false)
+    private Long softwareversionId;
 
-	//bi-directional many-to-one association to device
 	@ManyToOne
-	@JoinColumn(name="device_id")
     @JsonIgnore
 	private Device device;
 
@@ -62,6 +58,14 @@ public class SoftwareStatus implements Serializable {
 	
 	@Transient
 	private String version;
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SoftwareStatus && obj !=null) {
+			return getId() == ((SoftwareStatus)obj).getId();
+		}
+		return super.equals(obj);
+	}
 	
 	public SoftwareStatus() {
 	}
@@ -104,12 +108,12 @@ public class SoftwareStatus implements Serializable {
 		this.device = device;
 	}
 
-	public Long getVersionId() {
-		return versionId;
+	public Long getSoftwareversionId() {
+		return softwareversionId;
 	}
 
-	public void setVersionId(Long versionId) {
-		this.versionId = versionId;
+	public void setSoftwareversionId(Long versionId) {
+		this.softwareversionId = versionId;
 	}
 
 	public String getDeviceName() {

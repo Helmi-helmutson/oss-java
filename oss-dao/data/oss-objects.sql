@@ -334,11 +334,11 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
 # status FR -> installed version is frozen: This must not be updated.
 CREATE TABLE IF NOT EXISTS SoftwareStatus (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        version_id         BIGINT UNSIGNED NOT NULL,
+        softwareversion_id BIGINT UNSIGNED NOT NULL,
         device_id          BIGINT UNSIGNED NOT NULL,
 	status             VARCHAR(2) NOT NULL,
-	FOREIGN KEY(version_id)  REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
-	FOREIGN KEY(device_id)   REFERENCES Devices(id)          ON DELETE CASCADE,
+	FOREIGN KEY(softwareversion_id) REFERENCES SoftwareVersions(id) ON DELETE CASCADE,
+	FOREIGN KEY(device_id)          REFERENCES Devices(id)          ON DELETE CASCADE,
 	PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 

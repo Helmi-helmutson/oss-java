@@ -59,6 +59,30 @@ public class SoftwareController extends Controller {
 		}
 	}
 
+	public SoftwareVersion getSoftwareVersionById(long id) {
+		EntityManager em = getEntityManager();
+		try {
+			return em.find(SoftwareVersion.class, id);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
+	public SoftwareStatus getSoftwareStatusById(long id) {
+		EntityManager em = getEntityManager();
+		try {
+			return em.find(SoftwareStatus.class, id);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
 	public List<Software> search(String search) {
 		EntityManager em = getEntityManager();
 		try {
@@ -605,7 +629,7 @@ public class SoftwareController extends Controller {
 		List<SoftwareVersion> lsv;
 		
 		List<SoftwareStatus> lss = new ArrayList<SoftwareStatus>();
-		for(SoftwareStatus ss : d.getSofwareStatus() ) {
+		for(SoftwareStatus ss : d.getSoftwareStatus() ) {
 			if( ss.getSoftwareVersion().getSoftware().equals(s)) {
 				lss.add(ss);
 			}
@@ -736,7 +760,7 @@ public class SoftwareController extends Controller {
 	 * @param   state The status we are looking for
 	 */
 	public boolean checkSoftwareStatusOnDevice(Device d, Software s,  String state) {
-		for( SoftwareStatus ss : d.getSofwareStatus() ) {
+		for( SoftwareStatus ss : d.getSoftwareStatus() ) {
 			if( ss.getStatus().equals(state) && 
 				ss.getSoftwareVersion().getSoftware().equals(s)) {
 				return true;
@@ -753,7 +777,7 @@ public class SoftwareController extends Controller {
 	 * @param   state The status we are looking for
 	 */
 	public boolean checkSoftwareVersionStatusOnDevice(Device d, SoftwareVersion sv, String state) {
-		for( SoftwareStatus ss : d.getSofwareStatus() ) {
+		for( SoftwareStatus ss : d.getSoftwareStatus() ) {
 			if( ss.getStatus().equals(state) && 
 				ss.getSoftwareVersion().equals(sv)) {
 				return true;
@@ -782,7 +806,7 @@ public class SoftwareController extends Controller {
 		try {
 			boolean update = false;
 			em.getTransaction().begin();
-			for(SoftwareStatus ss : device.getSofwareStatus() ) {
+			for(SoftwareStatus ss : device.getSoftwareStatus() ) {
 				if( ss.getSoftwareVersion().getSoftware().equals(software)) {
 					update = true;
 					if( !ss.getSoftwareVersion().equals(softwareVersion) ) {
@@ -793,7 +817,7 @@ public class SoftwareController extends Controller {
 			}
 			if(! update ) {
 				SoftwareStatus softwareStatus = new SoftwareStatus(device,softwareVersion,"IS");
-				device.getSofwareStatus().add(softwareStatus);
+				device.getSoftwareStatus().add(softwareStatus);
 				em.persist(softwareStatus);
 				em.merge(device);
 			}
@@ -1037,8 +1061,10 @@ public class SoftwareController extends Controller {
 		Software        software        = this.getByName(softwareName);
 		SoftwareVersion softwareVersion = null;
 		EntityManager em = getEntityManager();
+		logger.debug("setSoftwareStatusOnDevice called: " + softwareName + " ## " + version +" ## " + status);
 		if( software == null ) {
 			// Software does not exist. It is a manually installed software.
+			logger.debug("Create new software:" + softwareName);
 			software = new Software();
 			software.setName(softwareName);
 			software.setManually(true);
@@ -1048,16 +1074,21 @@ public class SoftwareController extends Controller {
 				em.persist(software);
 				em.getTransaction().commit();
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				logger.error("Can not create software: " + e.getMessage());
 				em.close();
-				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+				return new OssResponse(this.getSession(),"ERROR","Can not create software: " +e.getMessage());
 			}		
 		}
 
 		//Search for the real software version
+		try {
+			logger.debug("Software versions:" + new ObjectMapper().writeValueAsString(software.getSoftwareVersions()));
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
 		for( SoftwareVersion sv :  software.getSoftwareVersions() ) {
 			if( sv.getVersion().equals(version)) {
-				softwareVersion = sv;
+				softwareVersion = this.getSoftwareVersionById(sv.getId());
 				break;
 			}
 		}
@@ -1065,6 +1096,7 @@ public class SoftwareController extends Controller {
 		if( softwareVersion == null ) {
 			//This software version does not exists. We have create it
 			softwareVersion = new SoftwareVersion(software,version,"U");
+			logger.debug("Create new software version:" + softwareName + " ## " + version);
 			try {
 				em.getTransaction().begin();
 				em.persist(softwareVersion);
@@ -1072,16 +1104,23 @@ public class SoftwareController extends Controller {
 				em.merge(software);
 				em.getTransaction().commit();
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				logger.error("Can not create software version: " + e.getMessage());
 				em.close();
-				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+				return new OssResponse(this.getSession(),"ERROR","Can not create software version " + e.getMessage());
 			}
 		}
 
-		//We are searching for the status of this version of the server on the device.
+		//We are searching for the status of this version of the software on the device.
 		List<SoftwareStatus> softwareStatusToRemove = new ArrayList<SoftwareStatus>();
-		for( SoftwareStatus st : device.getSofwareStatus() ) {
+		try {
+			logger.debug("Software Status on Device:" + new ObjectMapper().writeValueAsString(device.getSoftwareStatus()));
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		for( SoftwareStatus st : device.getSoftwareStatus() ) {
+			logger.debug("Software Status of " + st.getSoftwareVersion().getSoftware().getName());
 			if( st.getSoftwareVersion().equals(softwareVersion) ) {
+				logger.debug("equal:" +st.getSoftwareVersion().getVersion());
 				softwareStatus = st;
 			} else if( status == "I" && st.getSoftwareVersion().getSoftware().equals(software)) {
 				//Remove the other versions of the software if this is installed.
@@ -1091,33 +1130,51 @@ public class SoftwareController extends Controller {
 
 		if( softwareStatus == null ) {
 			//This software version has no status on this device. Let's create it.
+			logger.debug("Create new software status:" + softwareName + " ## " + version + " ## " + status);
 			softwareStatus = new SoftwareStatus(device,softwareVersion,status);
 			try {
 				em.getTransaction().begin();
 				em.persist(softwareStatus);
-				for( SoftwareStatus st : softwareStatusToRemove ) {
-					em.remove(st);
-				}
+				device.getSoftwareStatus().add(softwareStatus);
+				softwareVersion.getSoftwareStatuses().add(softwareStatus);
+				em.merge(device);
+				em.merge(softwareVersion);
 				em.getTransaction().commit();
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				logger.error("Can not create software status:" + e.getMessage());
 				em.close();
-				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+				return new OssResponse(this.getSession(),"ERROR","Can not create software status:" + e.getMessage());
 			}
 		} else {
 			softwareStatus.setStatus(status);
 			try {
 				em.getTransaction().begin();
-				em.merge(softwareStatus);
-				for( SoftwareStatus st : softwareStatusToRemove ) {
-					em.remove(st);
-				}
+				em.merge(softwareStatus);		
 				em.getTransaction().commit();
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				logger.error("Can not modify software status:" + e.getMessage());
 				em.close();
-				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+				return new OssResponse(this.getSession(),"ERROR","Can not modify software status:" + e.getMessage());
 			}
+		}
+		
+		//Remove the old software statuses
+		try {
+			try {
+				logger.debug("Software status to remove:" + new ObjectMapper().writeValueAsString(softwareStatusToRemove));
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+			for( SoftwareStatus st : softwareStatusToRemove ) {
+				em.getTransaction().begin();
+				softwareStatus = em.merge(st);
+				em.remove(softwareStatus);
+				em.getTransaction().commit();
+			}
+		} catch (Exception e) {
+			logger.error("Can not remove software status:" + e.getMessage());
+			em.close();
+			return new OssResponse(this.getSession(),"ERROR","Can not remove software status:" + e.getMessage());
 		}
 		em.close();
 		return new OssResponse(this.getSession(),"OK","Software State was saved succesfully");
@@ -1148,7 +1205,7 @@ public class SoftwareController extends Controller {
 	 */
 	public OssResponse deleteSoftwareStatusFromDevice(Device device, String softwareName, String version ) {
 		EntityManager em = getEntityManager();
-		for(SoftwareStatus st : device.getSofwareStatus() ) {
+		for(SoftwareStatus st : device.getSoftwareStatus() ) {
 			if( st.getSoftwareVersion().getVersion().equals(version) && st.getSoftwareVersion().getSoftware().getName().equals(softwareName) ) {
 				try {
 					em.getTransaction().begin();
@@ -1192,7 +1249,7 @@ public class SoftwareController extends Controller {
 
 	public List<SoftwareStatus> getSoftwareStatusOnDevice(Device device, String softwareName) {
 		List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
-		for( SoftwareStatus st : device.getSofwareStatus() ) {
+		for( SoftwareStatus st : device.getSoftwareStatus() ) {
 			st.setSoftwareName(st.getSoftwareVersion().getSoftware().getName());
 			st.setDeviceName(device.getName());
 			if( softwareName.equals("*") || st.getSoftwareName().equals(softwareName) ) {

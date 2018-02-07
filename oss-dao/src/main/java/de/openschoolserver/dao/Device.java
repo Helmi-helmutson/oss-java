@@ -350,14 +350,6 @@ public class Device implements Serializable {
 	        this.categories = categories;
 	}
 
-	public void setSofwareStatus(List<SoftwareStatus> st) {
-		this.softwareStatus = st;
-	}
-
-	public List<SoftwareStatus> getSofwareStatus() {
-		return this.softwareStatus;
-	}
-
 	public String getWlanIp() {
 		return wlanIp;
 	}

@@ -51,6 +51,14 @@ public class SoftwareVersion implements Serializable {
 	 * U -> unknown this version of software was not installed from the oss
 	 */
 	private String status;
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj instanceof SoftwareVersion && obj !=null) {
+			return getId() == ((SoftwareVersion)obj).getId();
+		}
+		return super.equals(obj);
+	}
 
 	public SoftwareVersion() {
 	}
