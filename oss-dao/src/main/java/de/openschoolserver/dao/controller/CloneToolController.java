@@ -502,10 +502,12 @@ public class CloneToolController extends Controller {
 		path.append(new DeviceController(this.session).getById(deviceId).getName()).append(".").append(this.getConfigValue("DOMAIN"));
 		try {
 			Files.deleteIfExists(Paths.get(path.toString()));
+			this.systemctl("restart", "salt-master");
 		} catch ( IOException e ) {
 			logger.error(e.getMessage());
+			return "ERROR "+e.getMessage();
 		}
-		return null;
+		return "OK";
 	}
 
 }

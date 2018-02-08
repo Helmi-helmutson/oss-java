@@ -47,7 +47,7 @@ public interface CloneToolResource {
 	/*
 	 * PUT clonetool/resetMinion
 	 */
-	@GET
+	@PUT
 	@Path("resetMinion")
 	@Produces(TEXT)
 	@ApiOperation(value = "Removes the pubkey of the minion of the session device.")
@@ -62,7 +62,7 @@ public interface CloneToolResource {
 	/*
 	 * PUT clonetool/devices/{deviceId}/resetMinion
 	 */
-	@GET
+	@PUT
 	@Path("devices/{deviceId}/resetMinion")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Removes the pubkey of the minion.")

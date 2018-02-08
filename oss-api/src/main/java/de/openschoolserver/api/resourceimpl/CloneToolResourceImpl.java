@@ -227,6 +227,9 @@ public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
 	public String resetMinion(Session session) {
+		if( session.getDevice() == null ) {
+			throw new WebApplicationException(404);
+		}
 		return new CloneToolController(session).resetMinion(session.getDevice().getId());
 	}
 
