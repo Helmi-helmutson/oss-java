@@ -1,3 +1,4 @@
+/* (c) 2018 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
