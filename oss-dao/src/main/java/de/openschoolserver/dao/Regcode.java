@@ -2,6 +2,9 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 
 
@@ -28,10 +31,10 @@ public class Regcode implements Serializable {
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date validity;
 
-        //bi-directional many-to-one association to CephalixInstitue
-        @ManyToOne
-        @JsonIgnore
-        private CephalixInstitue cephalixInstitute;
+    //bi-directional many-to-one association to CephalixInstitue
+    @ManyToOne
+    @JsonIgnore
+    private CephalixInstitute cephalixInstitute;
 
 	public Regcode() {
 	}
