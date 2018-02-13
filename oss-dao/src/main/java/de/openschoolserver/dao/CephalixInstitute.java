@@ -3,6 +3,8 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import java.util.Date;
 import java.util.List;
 
 
@@ -64,6 +66,13 @@ public class CephalixInstitute implements Serializable {
 	private String state;
 
 	private String type;
+	
+    //bi-directional many-to-one association to Device
+    @OneToMany(mappedBy="cephalixinstitute", cascade=CascadeType.ALL, orphanRemoval=true)
+    private List<Regcode> regcodes;
+	
+    @Temporal(TemporalType.TIMESTAMP)
+	private Date recDate;
 
 	//bi-directional many-to-one association to CephalixITUsage
 	@OneToMany(mappedBy="cephalixInstitute")
@@ -328,6 +337,21 @@ public class CephalixInstitute implements Serializable {
 		cephalixMapping.setCephalixInstitute(null);
 
 		return cephalixMapping;
+	}
+
+	public Date getRecdate() {
+		return recDate;
+	}
+
+	public void setRecdate(Date date) {
+		this.recDate = date;
+	}
+	public List<Regcode> getRegcodes() {
+		return regcodes;
+	}
+
+	public void setRegcodes(List<Regcode> regcodes) {
+		this.regcodes = regcodes;
 	}
 
 }

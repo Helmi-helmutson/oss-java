@@ -4,6 +4,9 @@ package de.openschoolserver.api.resourceimpl;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.UriInfo;
+
 import java.sql.Timestamp;
 
 import de.openschoolserver.api.resources.SystemResource;
@@ -175,5 +178,11 @@ public class SystemResourceImpl implements SystemResource {
 	public OssResponse restartJob(Session session, Long jobId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public String getStatusString(UriInfo ui, HttpServletRequest req) {
+		// TODO Auto-generated method stub
+		return "Es tut";
 	}
 }

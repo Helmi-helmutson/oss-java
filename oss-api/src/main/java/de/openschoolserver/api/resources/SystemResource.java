@@ -15,6 +15,10 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.Translation;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
+import javax.servlet.http.HttpServletRequest;
 
 
 @Path("system")
@@ -22,13 +26,27 @@ import de.openschoolserver.dao.Translation;
 public interface SystemResource {
 
     @GET
+    @Path("login")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(TEXT)
+    @ApiOperation(value = "create a new session")
+    @ApiResponses(value = {
+            @ApiResponse(code = 401, message = "Login is incorrect"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    String getStatusString(
+            @Context UriInfo ui,
+            @Context HttpServletRequest req
+    );
+    
+    @GET
     @Path("status")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Gets the system status.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("system.status")
+	@RolesAllowed("system.status")
     List<Map<String, String>> getStatus(
     		@ApiParam(hidden = true) @Auth Session session
     		);

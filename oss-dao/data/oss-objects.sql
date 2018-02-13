@@ -503,40 +503,77 @@ CREATE TABLE IF NOT EXISTS FAQInCategories (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS ContactInCategories (
-        contact_id    BIGINT UNSIGNED NOT NULL,
-        category_id        BIGINT UNSIGNED NOT NULL,
-	FOREIGN KEY(contact_id) REFERENCES Contacts(id) ON DELETE CASCADE,
-	FOREIGN KEY(category_id)     REFERENCES Categories(id)    ON DELETE CASCADE,
+        contact_id               BIGINT UNSIGNED NOT NULL,
+        category_id              BIGINT UNSIGNED NOT NULL,
+	FOREIGN KEY(contact_id)  REFERENCES Contacts(id)   ON DELETE CASCADE,
+	FOREIGN KEY(category_id) REFERENCES Categories(id) ON DELETE CASCADE,
 	PRIMARY KEY(contact_id,category_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 #TABLES for CEPHALIX
+CREATE TABLE IF NOT EXISTS Customers (
+        id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        recDate      DATETIME,
+        name         VARCHAR(50),
+        name2        VARCHAR(50),
+        description  BLOB,
+        category     VARCHAR(10),
+        address1     VARCHAR(50),
+        address2     VARCHAR(50),
+        city         VARCHAR(50),
+        state        VARCHAR(8),
+        postalCode   VARCHAR(10),
+        country      VARCHAR(25),
+        contact      VARCHAR(50),
+        telephone    VARCHAR(15),
+        iban         VARCHAR(35),
+        bic          VARCHAR(12),
+        PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+
+
 CREATE TABLE IF NOT EXISTS CephalixInstitutes (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
        cn              VARCHAR(16) NOT NULL,
        name            VARCHAR(32) NOT NULL,
        type            VARCHAR(16) NOT NULL,
-       domain          VARCHAR(32) NOT NULL,
-       locality        VARCHAR(32) NOT NULL,
-       state           VARCHAR(32) NOT NULL,
-       adminPW         VARCHAR(16) NOT NULL,
-       cephalixPW      VARCHAR(16) NOT NULL,
+       domain          VARCHAR(32) DEFAULT NULL,
+       locality        VARCHAR(32) DEFAULT NULL,
+       state           VARCHAR(32) DEFAULT NULL,
+       adminPW         VARCHAR(16) DEFAULT NULL,
+       cephalixPW      VARCHAR(16) DEFAULT NULL,
        ipVPN           VARCHAR(16) DEFAULT NULL,
        ipTrNet         VARCHAR(16) DEFAULT NULL,
        nmTrNet         VARCHAR(16) DEFAULT NULL,
        gwTrNet         VARCHAR(16) DEFAULT NULL,
-       network         VARCHAR(16) NOT NULL,
-       netmask         VARCHAR(16) NOT NULL,
-       nmServerNet     VARCHAR(16) NOT NULL,
-       ipAdmin         VARCHAR(16) NOT NULL,
-       ipMail          VARCHAR(16) NOT NULL,
-       ipPrint         VARCHAR(16) NOT NULL,
-       ipProxy         VARCHAR(16) NOT NULL,
-       ipBackup        VARCHAR(16) NOT NULL,
-       anonDhcp        VARCHAR(32) NOT NULL,
-       firstRoom       VARCHAR(16) NOT NULL,
+       network         VARCHAR(16) DEFAULT NULL,
+       netmask         VARCHAR(16) DEFAULT NULL,
+       nmServerNet     VARCHAR(16) DEFAULT NULL,
+       ipAdmin         VARCHAR(16) DEFAULT NULL,
+       ipMail          VARCHAR(16) DEFAULT NULL,
+       ipPrint         VARCHAR(16) DEFAULT NULL,
+       ipProxy         VARCHAR(16) DEFAULT NULL,
+       ipBackup        VARCHAR(16) DEFAULT NULL,
+       anonDhcp        VARCHAR(32) DEFAULT NULL,
+       firstRoom       VARCHAR(16) DEFAULT NULL,
+       recDate         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+       customer_id     BIGINT UNSIGNED DEFAULT NULL,
+       FOREIGN KEY(customer_id)  REFERENCES Customers(id),
        PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+
+CREATE TABLE IF NOT EXISTS Regcodes (
+        id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        name         VARCHAR(32) NOT NULL,
+        recDate      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        validity     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        status       enum('PROD','TEST','FREE','DEVEL'),
+        cephalixinstitute_id               BIGINT UNSIGNED DEFAULT NULL,
+        FOREIGN KEY(cephalixinstitute_id)  REFERENCES CephalixInstitutes(id),
+        PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+
+
 
 CREATE TABLE IF NOT EXISTS CephalixITUsage (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,

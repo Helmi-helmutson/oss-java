@@ -488,10 +488,9 @@ public class SystemController extends Controller {
     public Date getValidityOfRegcode() {
 		StringBuilder url = new StringBuilder();
 		url.append("https://").append("UPDATE_SERVER").append("/api/validateRegcode/").append(this.getConfigValue("REG_CODE"));
-		DateFormat dateFormat = DateFormat.getDateInstance();
 		try {
-			String resp = Request.Get(url.toString()).toString();
-			return dateFormat.parse(resp);
+			Long milis = Long.parseLong(Request.Get(url.toString()).toString());
+			return new Date(milis);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;

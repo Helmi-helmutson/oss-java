@@ -20,7 +20,6 @@ import java.util.List;
 @Api(value = "sessions")
 @SwaggerDefinition(securityDefinition = @SecurityDefinition(apiKeyAuthDefinitions = {@ApiKeyAuthDefinition(
 	       key = "apiKeyAuth", name = "Authorization", in = ApiKeyAuthDefinition.ApiKeyLocation.HEADER)
-
 		}))
 public interface SessionsResource {
 
