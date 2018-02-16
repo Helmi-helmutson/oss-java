@@ -180,9 +180,4 @@ public class SystemResourceImpl implements SystemResource {
 		return null;
 	}
 
-	@Override
-	public String getStatusString(UriInfo ui, HttpServletRequest req) {
-		// TODO Auto-generated method stub
-		return "Es tut";
-	}
 }
