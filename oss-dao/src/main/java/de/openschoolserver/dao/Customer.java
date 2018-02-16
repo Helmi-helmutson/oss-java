@@ -3,6 +3,9 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +16,7 @@ import java.util.List;
  */
 @Entity
 @Table(name="Customers")
-@NamedQuery(name="Customer.findAll", query="SELECT c FROM Customer c")
+@NamedQuery(name="Customer.findAll", query="SELECT c FROM Customer c WHERE")
 public class Customer implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -47,11 +50,13 @@ public class Customer implements Serializable {
 
 	private String telephone;
 	
+	@JsonIgnore
 	@Convert(converter=BooleanToStringConverter.class)
 	private boolean deleted;
 
 	//bi-directional many-to-one association to Cephalix Institutes
 	@OneToMany(mappedBy="customer")
+	@JsonIgnore
 	private List<CephalixInstitute> cephalixInstitutes;
 
 	public Customer() {

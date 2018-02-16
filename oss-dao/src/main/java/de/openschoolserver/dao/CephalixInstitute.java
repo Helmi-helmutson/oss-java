@@ -85,14 +85,17 @@ public class CephalixInstitute implements Serializable {
 
 	//bi-directional many-to-one association to CephalixITUsage
 	@OneToMany(mappedBy="cephalixinstitute")
+	@JsonIgnore
 	private List<CephalixITUsage> cephalixItusages;
 
 	//bi-directional many-to-one association to CephalixITUsageAvarage
 	@OneToMany(mappedBy="cephalixinstitute")
+	@JsonIgnore
 	private List<CephalixITUsageAvarage> cephalixItusageAvarages;
 
 	//bi-directional many-to-one association to CephalixMapping
 	@OneToMany(mappedBy="cephalixinstitute")
+	@JsonIgnore
 	private List<CephalixMapping> cephalixMappings;
 
 	public CephalixInstitute() {
