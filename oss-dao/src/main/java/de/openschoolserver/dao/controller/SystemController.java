@@ -487,13 +487,13 @@ public class SystemController extends Controller {
     
     public Date getValidityOfRegcode() {
 		StringBuilder url = new StringBuilder();
-		url.append("https://").append("UPDATE_SERVER").append("/api/validateRegcode/").append(this.getConfigValue("REG_CODE"));
+		url.append("https://").append("UPDATE_SERVER").append("/api/customers/validateRegcode/regcode=\"").append(this.getConfigValue("REG_CODE")).append("\"");
 		try {
 			Long milis = Long.parseLong(Request.Get(url.toString()).toString());
 			return new Date(milis);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return null;
+			throw new WebApplicationException(500);
 		}
     }
     
@@ -535,7 +535,7 @@ public class SystemController extends Controller {
 			Document doc = new SAXBuilder().build( reply.toString() );
 			Element rootNode = doc.getRootElement();
 			for( Element node : (List<Element>) rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable") ) {
-				if( !node.getAttribute("kind").equals("package")) {
+				if( !node.getAttribute("kind").getValue().equals("package")) {
 					continue;
 				}
 				software = new HashMap<String,String>();

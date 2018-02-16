@@ -4,9 +4,10 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 import java.util.List;
-
 
 /**
  * The persistent class for the CephalixInstitutes database table.
@@ -67,6 +68,14 @@ public class CephalixInstitute implements Serializable {
 
 	private String type;
 	
+	@Convert(converter=BooleanToStringConverter.class)
+	private boolean deleted;
+	
+	//bi-directional many-to-one association to Room
+	@ManyToOne
+	@JsonIgnore
+	private Customer customer;
+	
     //bi-directional many-to-one association to Device
     @OneToMany(mappedBy="cephalixinstitute", cascade=CascadeType.ALL, orphanRemoval=true)
     private List<Regcode> regcodes;
@@ -75,15 +84,15 @@ public class CephalixInstitute implements Serializable {
 	private Date recDate;
 
 	//bi-directional many-to-one association to CephalixITUsage
-	@OneToMany(mappedBy="cephalixInstitute")
+	@OneToMany(mappedBy="cephalixinstitute")
 	private List<CephalixITUsage> cephalixItusages;
 
 	//bi-directional many-to-one association to CephalixITUsageAvarage
-	@OneToMany(mappedBy="cephalixInstitute")
+	@OneToMany(mappedBy="cephalixinstitute")
 	private List<CephalixITUsageAvarage> cephalixItusageAvarages;
 
 	//bi-directional many-to-one association to CephalixMapping
-	@OneToMany(mappedBy="cephalixInstitute")
+	@OneToMany(mappedBy="cephalixinstitute")
 	private List<CephalixMapping> cephalixMappings;
 
 	public CephalixInstitute() {
@@ -271,6 +280,14 @@ public class CephalixInstitute implements Serializable {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public boolean getDeleted() {
+		return this.deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	public List<CephalixITUsage> getCephalixItusages() {

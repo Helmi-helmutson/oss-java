@@ -80,7 +80,10 @@ public class Controller extends Config {
 	}
 
 	public String getProperty(String property) {
-		return properties.get(property);
+		if( properties.containsKey(property) ) {
+			return properties.get(property);
+		}
+		return null;
 	}
 	
 	public String getNl() {

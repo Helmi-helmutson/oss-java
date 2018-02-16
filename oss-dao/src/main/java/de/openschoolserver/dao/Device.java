@@ -68,6 +68,8 @@ public class Device implements Serializable {
 	private String inventary;
 
 	private String locality;
+	
+	private Long   counter;
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
@@ -392,5 +394,13 @@ public class Device implements Serializable {
 
 	public void setHwconfId(Long hwconfId) {
 		this.hwconfId = hwconfId;
+	}
+
+	public Long getCounter() {
+		return counter;
+	}
+
+	public void setCounter(Long counter) {
+		this.counter = counter;
 	}
 }

@@ -270,7 +270,11 @@ public class SessionController extends Controller {
 		return false;
 	}
 	
-	
-
-
+	public Session getLocalhostSession() {
+		String token = this.getProperty("de.openschoolserver.api.auth.localhost");
+		if( token != null ) {
+			return this.getByToken(token);
+		}
+		return null;
+	}
 }

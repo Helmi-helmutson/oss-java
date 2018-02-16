@@ -32,8 +32,7 @@ public class Customer implements Serializable {
 
 	private String country;
 
-	@Lob
-	private byte[] description;
+	private String description;
 
 	private String name;
 
@@ -47,9 +46,12 @@ public class Customer implements Serializable {
 	private String state;
 
 	private String telephone;
+	
+	@Convert(converter=BooleanToStringConverter.class)
+	private boolean deleted;
 
 	//bi-directional many-to-one association to Cephalix Institutes
-	@OneToMany(mappedBy="cephalixinstitute")
+	@OneToMany(mappedBy="customer")
 	private List<CephalixInstitute> cephalixInstitutes;
 
 	public Customer() {
@@ -61,6 +63,14 @@ public class Customer implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+	
+	public boolean getDeleted() {
+		return this.deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 	public String getAddress1() {
@@ -111,11 +121,11 @@ public class Customer implements Serializable {
 		this.country = country;
 	}
 
-	public byte[] getDescription() {
+	public String getDescription() {
 		return this.description;
 	}
 
-	public void setDescription(byte[] description) {
+	public void setDescription(String description) {
 		this.description = description;
 	}
 
