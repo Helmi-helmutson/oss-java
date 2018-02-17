@@ -8,6 +8,7 @@
                 <class>de.openschoolserver.dao.BooleanToStringConverter</class>
                 <class>de.openschoolserver.dao.Category</class>
                 <class>de.openschoolserver.dao.CephalixCustomer</class>
+                <class>de.openschoolserver.dao.CephalixDynDns</class>
                 <class>de.openschoolserver.dao.CephalixInstitute</class>
                 <class>de.openschoolserver.dao.CephalixITUsageAvarage</class>
                 <class>de.openschoolserver.dao.CephalixITUsage</class>
