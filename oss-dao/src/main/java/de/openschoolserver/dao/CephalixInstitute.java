@@ -77,7 +77,7 @@ public class CephalixInstitute implements Serializable {
 	private Customer customer;
 	
     //bi-directional many-to-one association to Device
-    @OneToMany(mappedBy="cephalixinstitute", cascade=CascadeType.ALL, orphanRemoval=true)
+    @OneToMany(mappedBy="cephalixInstitute", cascade=CascadeType.ALL, orphanRemoval=true)
     private List<Regcode> regcodes;
 	
     @Temporal(TemporalType.TIMESTAMP)

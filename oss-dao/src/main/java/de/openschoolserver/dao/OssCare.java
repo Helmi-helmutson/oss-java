@@ -40,7 +40,7 @@ public class OssCare implements Serializable {
 	@OneToOne
 	private Regcode  regcode;
 
-	@OneToMany(mappedBy="osscare")
+	@OneToMany(mappedBy="ossCare")
 	@JsonIgnore
 	private  List<OssCareMessage> ossCareMessages;
 
