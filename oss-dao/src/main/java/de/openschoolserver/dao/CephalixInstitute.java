@@ -74,11 +74,11 @@ public class CephalixInstitute implements Serializable {
 	//bi-directional many-to-one association to Room
 	@ManyToOne
 	@JsonIgnore
-	private Customer customer;
+	private CephalixCustomer cephalixCustomer;
 	
     //bi-directional many-to-one association to Device
     @OneToMany(mappedBy="cephalixInstitute", cascade=CascadeType.ALL, orphanRemoval=true)
-    private List<Regcode> regcodes;
+    private List<CephalixRegcode> cephalixRegcodes;
 	
     @Temporal(TemporalType.TIMESTAMP)
 	private Date recDate;
@@ -366,12 +366,12 @@ public class CephalixInstitute implements Serializable {
 	public void setRecdate(Date date) {
 		this.recDate = date;
 	}
-	public List<Regcode> getRegcodes() {
-		return regcodes;
+	public List<CephalixRegcode> getRegcodes() {
+		return cephalixRegcodes;
 	}
 
-	public void setRegcodes(List<Regcode> regcodes) {
-		this.regcodes = regcodes;
+	public void setRegcodes(List<CephalixRegcode> cephalixRegcodes) {
+		this.cephalixRegcodes = cephalixRegcodes;
 	}
 
 }

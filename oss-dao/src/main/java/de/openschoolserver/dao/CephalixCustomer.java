@@ -16,8 +16,8 @@ import java.util.List;
  */
 @Entity
 @Table(name="Customers")
-@NamedQuery(name="Customer.findAll", query="SELECT c FROM Customer c")
-public class Customer implements Serializable {
+@NamedQuery(name="CephalixCustomer.findAll", query="SELECT c FROM CephalixCustomer c")
+public class CephalixCustomer implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -59,7 +59,7 @@ public class Customer implements Serializable {
 	@JsonIgnore
 	private List<CephalixInstitute> cephalixInstitutes;
 
-	public Customer() {
+	public CephalixCustomer() {
 	}
 
 	public Long getId() {

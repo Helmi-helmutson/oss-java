@@ -1,6 +1,6 @@
 USE OSS;
 
-CREATE TABLE IF NOT EXISTS Customers (
+CREATE TABLE IF NOT EXISTS CephalixCustomers (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         recDate      TIMESTAMP,
         name         VARCHAR(50),
@@ -48,12 +48,12 @@ CREATE TABLE IF NOT EXISTS CephalixInstitutes (
 	firstRoom       VARCHAR(16) DEFAULT NULL,
 	recDate         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	deleted         CHAR(1) DEFAULT 'N',
-	customer_id     BIGINT UNSIGNED DEFAULT NULL,
-	FOREIGN KEY(customer_id)  REFERENCES Customers(id),
+	cephalixcustomer_id     BIGINT UNSIGNED DEFAULT NULL,
+	FOREIGN KEY(cephalixcustomer_id)  REFERENCES CephalixCustomers(id),
 	PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
-CREATE TABLE IF NOT EXISTS Regcodes (
+CREATE TABLE IF NOT EXISTS CephalixRegcodes (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         name         VARCHAR(32) NOT NULL,
         description  VARCHAR(32) DEFAULT NULL,
@@ -66,20 +66,20 @@ CREATE TABLE IF NOT EXISTS Regcodes (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 
-CREATE TABLE IF NOT EXISTS OssDynDns (
+CREATE TABLE IF NOT EXISTS CephalixDynDns (
 	id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	regcode_id      BIGINT UNSIGNED NOT NULL,
+	cephalixregcode_id      BIGINT UNSIGNED NOT NULL,
 	hostname        VARCHAR(32)     DEFAULT NULL,
 	domain          VARCHAR(32)     DEFAULT NULL,
 	ip              VARCHAR(40)     NOT NULL,
 	port		INTEGER		DEFAULT 22,
 	ts              TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	ro              CHAR(1) DEFAULT 'N',
-	FOREIGN KEY(regcode_id) REFERENCES Regcodes(id) ON DELETE CASCADE,
+	FOREIGN KEY(cephalixregcode_id) REFERENCES CephalixRegcodes(id) ON DELETE CASCADE,
 	PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
-CREATE TABLE IF NOT EXISTS OssCares (
+CREATE TABLE IF NOT EXISTS CephalixOssCares (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
        regcode_id      BIGINT UNSIGNED NOT NULL,
        description     VARCHAR(128)    DEFAULT NULL,
@@ -87,50 +87,50 @@ CREATE TABLE IF NOT EXISTS OssCares (
        contact         VARCHAR(256)    NOT NULL,
        recDate         TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
        validity        TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
-       FOREIGN KEY(regcode_id) REFERENCES Regcodes(id) ON DELETE CASCADE,
+       FOREIGN KEY(regcode_id) REFERENCES CephalixRegcodes(id) ON DELETE CASCADE,
        PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
-CREATE TABLE IF NOT EXISTS OssCareMessages (
+CREATE TABLE IF NOT EXISTS CephalixOssCareMessages (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-       osscare_id      BIGINT UNSIGNED NOT NULL,
+       cephalixosscare_id      BIGINT UNSIGNED NOT NULL,
        recDate         TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
        type            enum('WARNING','REPORT')    NOT NULL,
        description     VARCHAR(128)    NOT NULL,
        text            BLOB            NOT NULL,
-       FOREIGN KEY(osscare_id) REFERENCES OssCares(id) ON DELETE CASCADE,
+       FOREIGN KEY(cephalixosscare_id) REFERENCES CephalixOssCares(id) ON DELETE CASCADE,
        PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS CephalixITUsage (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-       institute_id    BIGINT UNSIGNED NOT NULL,
+       cephalixinstitute_id    BIGINT UNSIGNED NOT NULL,
        device          VARCHAR(32) NOT NULL,
        counter         BIGINT UNSIGNED NOT NULL,
-       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       FOREIGN KEY(cephalixinstitute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
        PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS CephalixITUsageAvarage (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-       institute_id    BIGINT UNSIGNED NOT NULL,
+       cephalixinstitute_id    BIGINT UNSIGNED NOT NULL,
        device          VARCHAR(32) NOT NULL,
        counter         BIGINT UNSIGNED NOT NULL,
        time            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
        counter0        BIGINT UNSIGNED NOT NULL,
        time0           TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00',
        avarage         BIGINT UNSIGNED NOT NULL,
-       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       FOREIGN KEY(cephalixinstitute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
        PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS CephalixMappings (
        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-       institute_id    BIGINT UNSIGNED NOT NULL,
+       cephalixinstitute_id    BIGINT UNSIGNED NOT NULL,
        objectName      VARCHAR(16)     NOT NULL,
        cephalixId      BIGINT UNSIGNED NOT NULL,
        ossId           BIGINT UNSIGNED DEFAULT NULL,
-       FOREIGN KEY(institute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
+       FOREIGN KEY(cephalixinstitute_id) REFERENCES CephalixInstitutes(id) ON DELETE CASCADE,
        PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 

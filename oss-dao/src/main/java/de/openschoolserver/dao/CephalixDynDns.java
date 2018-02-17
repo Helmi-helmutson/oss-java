@@ -10,11 +10,11 @@ import java.util.Date;
 import javax.persistence.*;
 
 /**
- * Entity implementation class for Entity: OssDynDns
+ * Entity implementation class for Entity: CephalixDynDns
  *
  */
 @Entity
-public class OssDynDns implements Serializable {
+public class CephalixDynDns implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -38,24 +38,24 @@ public class OssDynDns implements Serializable {
 	private Boolean ro;
 	
 	@OneToOne
-	private Regcode regcode;
+	private CephalixRegcode cephalixRegcode;
 
-	public OssDynDns() {
+	public CephalixDynDns() {
 	}
 
-	public OssDynDns(String ip, Regcode regcode) {
+	public CephalixDynDns(String ip, CephalixRegcode cephalixRegcode) {
 		this.ip      = ip;
-		this.regcode = regcode;
+		this.cephalixRegcode = cephalixRegcode;
 		this.ro      = false;
 		this.port    = 22;
 		this.domain  = "cephalix.de";
-		regcode.setOssDynDns(this);
+		cephalixRegcode.setOssDynDns(this);
 	}   
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof OssDynDns && obj !=null) {
-			return getId() == ((OssDynDns)obj).getId();
+		if (obj instanceof CephalixDynDns && obj !=null) {
+			return getId() == ((CephalixDynDns)obj).getId();
 		}
 		return super.equals(obj);
 	}
@@ -109,12 +109,12 @@ public class OssDynDns implements Serializable {
 	public void setRo(Boolean ro) {
 		this.ro = ro;
 	}   
-	public Regcode getRegcode() {
-		return this.regcode;
+	public CephalixRegcode getRegcode() {
+		return this.cephalixRegcode;
 	}
 
-	public void setRegcode(Regcode regcode) {
-		this.regcode = regcode;
+	public void setRegcode(CephalixRegcode cephalixRegcode) {
+		this.cephalixRegcode = cephalixRegcode;
 	}
    
 }

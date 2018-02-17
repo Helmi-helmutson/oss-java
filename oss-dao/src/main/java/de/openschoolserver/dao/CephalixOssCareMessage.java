@@ -7,11 +7,11 @@ import javax.persistence.*;
 import java.util.Date;
 
 /**
- * Entity implementation class for Entity: OssCareMessage
+ * Entity implementation class for Entity: CephalixOssCareMessage
  *
  */
 @Entity
-public class OssCareMessage implements Serializable {
+public class CephalixOssCareMessage implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -20,7 +20,7 @@ public class OssCareMessage implements Serializable {
 	private Long id;
 
 	@ManyToOne
-	private OssCare ossCare;
+	private CephalixOssCare cephalixOssCare;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date recDate;
@@ -31,7 +31,7 @@ public class OssCareMessage implements Serializable {
 
 	private String type;
 
-	public OssCareMessage() {
+	public CephalixOssCareMessage() {
 		super();
 	}   
 	public Long getId() {
@@ -41,12 +41,12 @@ public class OssCareMessage implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}   
-	public OssCare getOssCare() {
-		return this.ossCare;
+	public CephalixOssCare getOssCare() {
+		return this.cephalixOssCare;
 	}
 
-	public void setOssCare(OssCare osscare) {
-		this.ossCare = osscare;
+	public void setOssCare(CephalixOssCare osscare) {
+		this.cephalixOssCare = osscare;
 	}  
 	public Date getRecDate() {
 		return this.recDate;

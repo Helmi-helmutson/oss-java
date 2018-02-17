@@ -10,15 +10,15 @@ import java.util.Date;
 
 
 /**
- * The persistent class for the Regcode database table.
+ * The persistent class for the CephalixRegcode database table.
  * 
  */
 @Entity
 @NamedQueries({
-	@NamedQuery(name="Regcode.findAll",   query="SELECT r FROM Regcode r"),
-	@NamedQuery(name="Regcode.getByName", query="SELECT r FROM Regcode r WHERE r.name = :name" )
+	@NamedQuery(name="CephalixRegcode.findAll",   query="SELECT r FROM CephalixRegcode r"),
+	@NamedQuery(name="CephalixRegcode.getByName", query="SELECT r FROM CephalixRegcode r WHERE r.name = :name" )
 })
-public class Regcode implements Serializable {
+public class CephalixRegcode implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -43,21 +43,21 @@ public class Regcode implements Serializable {
     @JsonIgnore
     private CephalixInstitute cephalixInstitute;
     
-    @OneToOne(mappedBy="regcode")
-    private OssCare osscare;
+    @OneToOne(mappedBy="cephalixRegcode")
+    private CephalixOssCare osscare;
     
     @OneToOne(mappedBy="regcode")
-    private OssDynDns ossdyndns;
+    private CephalixDynDns ossdyndns;
 
-	public Regcode() {
+	public CephalixRegcode() {
 		osscare   = null;
 		ossdyndns = null;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Regcode && obj !=null) {
-			return getId() == ((Regcode)obj).getId();
+		if (obj instanceof CephalixRegcode && obj !=null) {
+			return getId() == ((CephalixRegcode)obj).getId();
 		}
 		return super.equals(obj);
 	}
@@ -71,19 +71,19 @@ public class Regcode implements Serializable {
 		this.id = id;
 	}
 
-	public OssCare getOssCare() {
+	public CephalixOssCare getOssCare() {
 		return this.osscare;
 	}
 
-	public void setOssCare(OssCare osscare) {
+	public void setOssCare(CephalixOssCare osscare) {
 		this.osscare = osscare;
 	}
 
-	public OssDynDns getOssDynDns() {
+	public CephalixDynDns getOssDynDns() {
 		return this.ossdyndns;
 	}
 
-	public void setOssDynDns(OssDynDns ossdyndns) {
+	public void setOssDynDns(CephalixDynDns ossdyndns) {
 		this.ossdyndns = ossdyndns;
 	}
 

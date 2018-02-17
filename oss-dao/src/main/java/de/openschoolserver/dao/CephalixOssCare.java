@@ -11,12 +11,12 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
- * Entity implementation class for Entity: OssCare
+ * Entity implementation class for Entity: CephalixOssCare
  *
  */
 @Entity
-@NamedQuery(name="OssCare.findAll", query="SELECT r FROM OssCare r")
-public class OssCare implements Serializable {
+@NamedQuery(name="CephalixOssCare.findAll", query="SELECT r FROM CephalixOssCare r")
+public class CephalixOssCare implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -38,20 +38,20 @@ public class OssCare implements Serializable {
 	private Date validity;
 	
 	@OneToOne
-	private Regcode  regcode;
+	private CephalixRegcode  cephalixRegcode;
 
-	@OneToMany(mappedBy="ossCare")
+	@OneToMany(mappedBy="cephalixOssCare")
 	@JsonIgnore
-	private  List<OssCareMessage> ossCareMessages;
+	private  List<CephalixOssCareMessage> cephalixOssCareMessages;
 
-	public OssCare() {
+	public CephalixOssCare() {
 		super();
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof OssCare && obj !=null) {
-			return getId() == ((OssCare)obj).getId();
+		if (obj instanceof CephalixOssCare && obj !=null) {
+			return getId() == ((CephalixOssCare)obj).getId();
 		}
 		return super.equals(obj);
 	}
@@ -71,12 +71,12 @@ public class OssCare implements Serializable {
 	public void setDescription(String description) {
 		this.description = description;
 	}   
-	public Regcode getRegcode() {
-		return this.regcode;
+	public CephalixRegcode getRegcode() {
+		return this.cephalixRegcode;
 	}
 
-	public void setRegcode(Regcode regcode) {
-		this.regcode = regcode;
+	public void setRegcode(CephalixRegcode cephalixRegcode) {
+		this.cephalixRegcode = cephalixRegcode;
 	}   
 	public String getAccess() {
 		return this.access;
@@ -94,12 +94,12 @@ public class OssCare implements Serializable {
 		this.contact = contact;
 	}
 	
-	public List<OssCareMessage> getOssCareMessages() {
-		return this.ossCareMessages;
+	public List<CephalixOssCareMessage> getOssCareMessages() {
+		return this.cephalixOssCareMessages;
 	}
 	
-	public void setOssCareMessages(List<OssCareMessage> ossCareMessages) {
-		this.ossCareMessages = ossCareMessages; 
+	public void setOssCareMessages(List<CephalixOssCareMessage> cephalixOssCareMessages) {
+		this.cephalixOssCareMessages = cephalixOssCareMessages; 
 	}
 	public Date getRecDate() {
 		return this.recDate;
