@@ -317,7 +317,7 @@ public class ImportHandler {
 			} 
 			if (!o.isTestOnly()) {
 				OssResponse res = userController.add(newUser);
-				newUser = userController.getById(res.getObjecId());
+				newUser = userController.getById(res.getObjectId());
 				appendUserAddLog(importer,o,res, newUser, true);
 			} else {
 				appendUserAddLog(importer,o,null, newUser, true);
