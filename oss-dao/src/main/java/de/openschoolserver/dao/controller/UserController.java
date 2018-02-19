@@ -27,6 +27,7 @@ import de.openschoolserver.dao.OssResponse;
 public class UserController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(UserController.class);
+	private List<String> parameters = new ArrayList<String>();
 
 	public UserController(Session session) {
 		super(session);
@@ -219,10 +220,16 @@ public class UserController extends Controller {
 		if( group != null ) {
 			groupController.addMember(group,user);;
 		}
+
+		parameters.add(user.getUid());
+		parameters.add(user.getGivenName());
+		parameters.add(user.getSurName());
+		parameters.add(user.getPassword());
 		return new OssResponse( this.getSession(),
 				"OK",
-				user.getUid() + " (" + user.getGivenName() + " " + user.getSurName() + ") was created with password: '" + user.getPassword()+ "'.",
-				user.getId()
+				"%s ( %s %s ) was created with password '%s'",
+				user.getId(),
+				parameters
 			);
 	}
 

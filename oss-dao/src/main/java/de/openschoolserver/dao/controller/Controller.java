@@ -275,7 +275,7 @@ public class Controller extends Config {
 				break;
 			}
 			break;
-		case "de.openschoolserver.dao.CephalixInstitute":
+		case "de.cephalix.api.dao.CephalixInstitute":
 			try {
 				switch(pluginName){
 				case "add_institute":

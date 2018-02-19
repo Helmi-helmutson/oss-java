@@ -2,6 +2,9 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.*;
 
 
@@ -20,9 +23,23 @@ public class OssResponse implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="RESPONSES_ID_GENERATOR")
 	private Long id;
 
+	/*
+	 * The error code for machine work
+	 */
 	private String code;
+	
+	/*
+	 * Human readable code. Can contains '%s' as place holder.
+	 */
 	private String value;
 	
+	/*
+	 * The values for the place holders.
+	 */
+	@Transient
+	private List<String> parameters;
+	
+
 	/*
 	 * This id will be set to the id of a object which was created or deleted or manipulated if any
 	 */
@@ -46,9 +63,18 @@ public class OssResponse implements Serializable {
     }
 
     public OssResponse(Session session,String code, String value){
+        this.session  = session;
+        this.code     = code;
+        this.value    = value;
+        this.parameters = new ArrayList<String>();
+        this.objectId = null;
+    }
+
+    public OssResponse(Session session,String code, String value, List<String> parameters){
             this.session  = session;
             this.code     = code;
             this.value    = value;
+            this.parameters = parameters;
             this.objectId = null;
     }
    
@@ -56,6 +82,24 @@ public class OssResponse implements Serializable {
         this.session  = session;
         this.code     = code;
         this.value    = value;
+        this.parameters = new ArrayList<String>();
+        this.objectId = objectId;
+    }
+
+    public OssResponse(Session session,String code, String value, Long objectId, List<String> parameters){
+        this.session  = session;
+        this.code     = code;
+        this.value    = value;
+        this.parameters = parameters;
+        this.objectId = objectId;
+    }
+
+    public OssResponse(Session session,String code, String value, Long objectId, String parameter){
+        this.session  = session;
+        this.code     = code;
+        this.value    = value;
+        this.parameters = new ArrayList<String>();
+        this.parameters.add(parameter);
         this.objectId = objectId;
     }
 
@@ -93,6 +137,14 @@ public class OssResponse implements Serializable {
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public List<String> getParameters() {
+		return parameters;
+	}
+
+	public void setParameters(List<String> parameters) {
+		this.parameters = parameters;
 	}
 
 }

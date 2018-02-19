@@ -31,6 +31,7 @@ import de.openschoolserver.dao.tools.*;
 public class DeviceController extends Controller {
 	
 	Logger logger = LoggerFactory.getLogger(DeviceController.class);
+	private List<String>  parameters;
 
 	public DeviceController(Session session) {
 		super(session);
@@ -151,10 +152,10 @@ public class DeviceController extends Controller {
 			em.getTransaction().begin();
 			Device dev = em.find(Device.class, deviceId);
 			if( this.isProtected(dev) ) {
-				return new OssResponse(this.getSession(),"ERROR","This device must not be deleted: " + dev.getName() );
+				return new OssResponse(this.getSession(),"ERROR","This device must not be deleted.");
 			}
 			if( !this.mayModify(dev) ) {
-				return new OssResponse(this.getSession(),"ERROR","You must not delete this device: " + dev.getName());
+				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
 			}
 			
 			em.remove(dev);
@@ -434,7 +435,7 @@ public class DeviceController extends Controller {
 			i++;
 		}
 		if( !header.containsKey("mac") || !header.containsKey("room")) {
-			return new OssResponse(this.getSession(),"ERROR", "MAC and Room are mandatory fields");
+			return new OssResponse(this.getSession(),"ERROR", "MAC and Room are mandatory fields.");
 		}
 		for(String line : importFile.subList(1, importFile.size()-1) ) {
 			String[] values = line.split(";");
@@ -490,7 +491,7 @@ public class DeviceController extends Controller {
 			}
 		}
 		if( Error.length() == 0 ) {
-			return new OssResponse(this.getSession(),"OK", "Devices was imported succesfully.");
+			return new OssResponse(this.getSession(),"OK", "Devices were imported succesfully.");
 		}
 		return new OssResponse(this.getSession(),"ERROR",Error.toString());
 	}
@@ -536,15 +537,19 @@ public class DeviceController extends Controller {
 
 	public OssResponse addLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
+		parameters = new ArrayList<String>();
 		if( device == null ) {
-			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP:" + IP);
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP: %s",null,IP);
 		}
 		User user = new UserController(this.session).getByUid(userName);
 		if( user == null ) {
-			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid:" + userName);
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
 		}
 		if( user.getLoggedOn().contains(device)) {
-			return new OssResponse(this.getSession(),"OK", "Logged in user was already added on this device for you:" + device.getName() + ";" + IP + ";" + userName);
+			parameters.add(device.getName());
+			parameters.add(IP);
+			parameters.add(userName);
+			return new OssResponse(this.getSession(),"OK", "Logged in user was already added on this device for you:%s;%s;%s",null,parameters);
 		}
 		device.getLoggedIn().add(user);
 		user.getLoggedOn().add(device);
@@ -560,15 +565,22 @@ public class DeviceController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:" + device.getName() + ";" + IP + ";" + userName);
+		parameters.add(device.getName());
+		parameters.add(IP);
+		parameters.add(userName);
+		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}
 
 	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
+		parameters = new ArrayList<String>();
 		EntityManager em = getEntityManager();
 		User user = new UserController(this.session).getByUid(userName);
 		if( !user.getLoggedOn().contains(device)) {
-			return new OssResponse(this.getSession(),"OK", "Logged in user was already removed from this device for you:" + device.getName() + ";" + IP + ";" + userName);
+			parameters.add(device.getName());
+			parameters.add(IP);
+			parameters.add(userName);
+			return new OssResponse(this.getSession(),"OK", "Logged in user was already removed from this device for you:%s;%s;%s",null,parameters);
 		}
 		device.getLoggedIn().remove(user);
 		user.getLoggedOn().remove(device);
@@ -582,12 +594,16 @@ public class DeviceController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Logged in user was removed succesfully:" + device.getName() + ";" + IP + ";" + userName);
+		parameters.add(device.getName());
+		parameters.add(IP);
+		parameters.add(userName);
+		return new OssResponse(this.getSession(),"OK", "Logged in user was removed succesfully:%s;%s;%s",null,parameters);
 	}
 	
 	public OssResponse modify(Device device) {
 		Device oldDevice = this.getById(device.getId());
-		List<String> error = new ArrayList<String>();	
+		List<String> error = new ArrayList<String>();
+		parameters = new ArrayList<String>();
 		/*
 		 * If the mac was changed.
 		 */
@@ -595,16 +611,20 @@ public class DeviceController extends Controller {
 		String   name = "";
 		//Check the MAC address
 		if( !this.mayModify(oldDevice) ) {
-			return new OssResponse(this.getSession(),"ERROR","You must not modify this device: " + oldDevice.getName());
+			parameters.add(oldDevice.getName());
+			return new OssResponse(this.getSession(),"ERROR","You must not modify this device: %s",null,parameters);
 		}
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		if( ! oldDevice.getMac().equals(device.getMac() ) ) {
 			name =  this.isMacUnique(device.getMac());
 			if( name != "" ){
-				error.add("The MAC address '" + device.getMac() + "' will be used allready:" + name );
+				parameters.add(device.getMac());
+				parameters.add(name);
+				error.add("The MAC address '%s' will be used allready: %s");
 			}
 			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.add("The MAC address is not valid:" + device.getMac() );
+				parameters.add(device.getMac());
+				error.add("The MAC address is not valid: '%s'");
 			}
 			macChange = true;
 		}
@@ -614,10 +634,13 @@ public class DeviceController extends Controller {
 			if( ! oldDevice.getWlanMac().equals(device.getWlanMac() ) ) {
 				name =  this.isMacUnique(device.getWlanMac());
 				if( name != "" ){
-					error.add("The WLAN MAC address will be used allready:" + name );
+					parameters.add(device.getWlanMac());
+					parameters.add(name);
+					error.add("The WLAN MAC address '%s' will be used allready: %s");
 				}
 				if( ! IPv4.validateMACAddress(device.getMac())) {
-					error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );
+					parameters.add(device.getWlanMac());
+					error.add("The WLAN MAC address is not valid: '%s'");
 				}
 			}
 			if( oldDevice.getWlanMac().isEmpty() ) {
@@ -638,7 +661,7 @@ public class DeviceController extends Controller {
 			macChange = true;
 		}
 		if(!error.isEmpty()){
-			return new OssResponse(this.getSession(),"ERROR",String.join(System.lineSeparator(),error));
+			return new OssResponse(this.getSession(),"ERROR",String.join(System.lineSeparator(),error),null,parameters);
 		}
 		EntityManager em = getEntityManager();
 		try {
@@ -723,6 +746,7 @@ public class DeviceController extends Controller {
 			program[3] = device.getMac();
 			break;
 		case "controlProxy":
+			//TODO
 			break;
 		case "saveFile":
 			List<String>   fileContent =new ArrayList<String>();
@@ -744,7 +768,7 @@ public class DeviceController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR", "Unknonw action.");	
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
-		return new OssResponse(this.getSession(),"OK", "Device control was applied.");
+		return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
 	}
 
 

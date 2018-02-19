@@ -29,6 +29,7 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 public class EducationController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(EducationController.class);
+	private List<String>  parameters;
     static FileAttribute<Set<PosixFilePermission>> privatDirAttribute  = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
     static FileAttribute<Set<PosixFilePermission>> privatFileAttribute = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));
 
@@ -170,7 +171,7 @@ public class EducationController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Smart Room was created succesfully"); 
+		return new OssResponse(this.getSession(),"OK","Smart Room was created succesfully."); 
 	}
 
 	public OssResponse modifySmartRoom(long roomId, Category smartRoom) {
@@ -189,7 +190,7 @@ public class EducationController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Smart Room was modified succesfully");
+		return new OssResponse(this.getSession(),"OK","Smart Room was modified succesfully.");
 	}
 	
 	public OssResponse deleteSmartRoom(Long roomId) {
@@ -209,7 +210,7 @@ public class EducationController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Smart Room was deleted succesfully");
+		return new OssResponse(this.getSession(),"OK","Smart Room was deleted succesfully.");
 	}
 
 	
@@ -381,7 +382,7 @@ public class EducationController extends Controller {
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
 		if( stderr.toString().isEmpty() ) {
-			return new OssResponse(this.getSession(),"OK", "File was collected from:" + user.getUid() );
+			return new OssResponse(this.getSession(),"OK", "File was collected from:",null,user.getUid() );
 		}
 		return new OssResponse(this.getSession(),"ERROR", stderr.toString());
 	}

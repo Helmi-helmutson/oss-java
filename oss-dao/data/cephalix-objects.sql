@@ -24,8 +24,8 @@ CREATE TABLE IF NOT EXISTS CephalixCustomers (
 
 CREATE TABLE IF NOT EXISTS CephalixInstitutes (
 	id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-	cn              VARCHAR(16) NOT NULL,
-	name            VARCHAR(32) NOT NULL,
+	uuid            VARCHAR(16) NOT NULL,
+	name            VARCHAR(50) NOT NULL,
 	type            VARCHAR(16) NOT NULL,
 	domain          VARCHAR(32) DEFAULT NULL,
 	locality        VARCHAR(32) DEFAULT NULL,

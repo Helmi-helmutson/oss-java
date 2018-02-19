@@ -24,6 +24,7 @@ import de.openschoolserver.dao.Session;
 public class CloneToolController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(CloneToolController.class);
+	private List<String> parameters = new ArrayList<String>();
 	
 	protected Path PXE_BOOT   = Paths.get("/usr/share/oss/templates/pxeboot");
 	protected Path ELILO_BOOT = Paths.get("/usr/share/oss/templates/eliloboot");
@@ -144,7 +145,7 @@ public class CloneToolController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", hwconf.getName() + " (" + hwconf.getDeviceType() + ") was created.",hwconf.getId());
+		return new OssResponse(this.getSession(),"OK","Hardware configuration was created.",hwconf.getId());
 	}
 
 	public OssResponse modifyHWConf(Long hwconfId, HWConf hwconf){
@@ -166,7 +167,7 @@ public class CloneToolController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", hwconf.getName() + " (" + hwconf.getDeviceType() + ") was modified.");
+		return new OssResponse(this.getSession(),"OK", "Hardware configuration was modified.");
 	}
 
 	public OssResponse addPartitionToHWConf(Long hwconfId, String name ) {
@@ -188,7 +189,10 @@ public class CloneToolController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Partition: " + name + "was created in" + hwconf.getName() + " (" + hwconf.getDeviceType() + ")");
+		parameters.add(name);
+		parameters.add(hwconf.getName());
+		parameters.add(hwconf.getDeviceType());
+		return new OssResponse(this.getSession(),"OK", "Partition: %s was created in %s (%s)",null,parameters);
 	}
 	
 	public OssResponse addPartitionToHWConf(Long hwconfId, Partition partition ) {
@@ -207,7 +211,10 @@ public class CloneToolController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Partition: " + partition.getName() + " was created in " + hwconf.getName() + " (" + hwconf.getDeviceType() + ")");
+		parameters.add(partition.getName());
+		parameters.add(hwconf.getName());
+		parameters.add(hwconf.getDeviceType());
+		return new OssResponse(this.getSession(),"OK", "Partition: %s was created in %s (%s)",null,parameters);
 	}
 
 
@@ -251,7 +258,9 @@ public class CloneToolController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Partitions key: " +  key + " was set to " + value );
+		parameters.add(key);
+		parameters.add(value);
+		return new OssResponse(this.getSession(),"OK", "Partitions key: %s was set to %s.");
 	}
 	
 	public OssResponse delete(Long hwconfId){
@@ -335,7 +344,8 @@ public class CloneToolController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Partitions key: " +  key + " was deleted" );
+		parameters.add(key);
+		return new OssResponse(this.getSession(),"OK", "Partitions key: %s was deleted",null,parameters );
 	}
 
 	public List<HWConf> getAllHWConf() {

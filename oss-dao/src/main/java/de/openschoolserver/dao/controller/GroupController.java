@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class GroupController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(GroupController.class);
+	private List<String> parameters;
 
 	public GroupController(Session session) {
 		super(session);
@@ -118,7 +119,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		}
 		this.startPlugin("add_group", group);
-		return new OssResponse(this.getSession(),"OK","Group was created",group.getId());
+		return new OssResponse(this.getSession(),"OK","Group was created.",group.getId());
 	}
 
 	public OssResponse modify(Group group){
@@ -137,7 +138,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		}
 		this.startPlugin("modify_group", oldGroup);
-		return new OssResponse(this.getSession(),"OK","Group was modified");
+		return new OssResponse(this.getSession(),"OK","Group was modified.");
 	}
 
 	public OssResponse delete(long groupId){
@@ -166,7 +167,7 @@ public class GroupController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Group was deleted");
+		return new OssResponse(this.getSession(),"OK","Group was deleted.");
 	}
 
 	public List<User> getAvailableMember(long groupId){
@@ -251,7 +252,10 @@ public class GroupController extends Controller {
 			em.close();
 		}
 		this.changeMemberPlugin("addmembers", group, user);
-		return new OssResponse(this.getSession(),"OK","User " + user.getUid() + " was added to group " + group.getName() );
+		parameters = new ArrayList<String>();
+		parameters.add(user.getUid());
+		parameters.add(group.getName());
+		return new OssResponse(this.getSession(),"OK","User %s was added to group %s.",null,parameters );
 	}
 
 	public OssResponse addMember(long groupId, long userId) {
@@ -281,7 +285,10 @@ public class GroupController extends Controller {
 			em.close();
 		}
 		this.changeMemberPlugin("removemembers", group, user);
-		return new OssResponse(this.getSession(),"OK","User " + user.getUid() + " was removed from group " + group.getName() );
+		parameters = new ArrayList<String>();
+		parameters.add(user.getUid());
+		parameters.add(group.getName());
+		return new OssResponse(this.getSession(),"OK","User %s was removed from group %s.",null,parameters );
 	}
 
 	public List<Group> getGroups(List<Long> groupIds) {
