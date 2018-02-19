@@ -1,8 +1,9 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao;
+package de.cephalix.api.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import de.openschoolserver.dao.*;
 
 
 /**
@@ -54,52 +55,52 @@ public class CephalixMapping implements Serializable {
 		this.cephalixInstitute	= institute;
 		this.ossId				= ossId;
 		switch(object.getClass().getName()) {
-		case "de.openschoolserver.dao.Announcement":
+		case "package de.cephalix.api.dao.Announcement":
 			Announcement Announcement = (Announcement)object;
 			this.cephalixId = Announcement.getId();
 			this.objectName = "Announcement";
 			break;
-		case "de.openschoolserver.dao.Category":
+		case "package de.cephalix.api.dao.Category":
 			Category Category = (Category)object;
 			this.cephalixId = Category.getId();
 			this.objectName = "Category";
 			break;
-		case "de.openschoolserver.dao.Contact":
+		case "package de.cephalix.api.dao.Contact":
 			Contact Contact = (Contact)object;
 			this.cephalixId = Contact.getId();
 			this.objectName = "Contact";
 			break;
-		case "de.openschoolserver.dao.Device":
+		case "package de.cephalix.api.dao.Device":
 			Device Device = (Device)object;
 			this.cephalixId = Device.getId();
 			this.objectName = "Device";
 			break;
-		case "de.openschoolserver.dao.FAQ":
+		case "package de.cephalix.api.dao.FAQ":
 			FAQ FAQ = (FAQ)object;
 			this.cephalixId = FAQ.getId();
 			this.objectName = "FAQ";
 			break;
-		case "de.openschoolserver.dao.Group":
+		case "package de.cephalix.api.dao.Group":
 			Group group = (Group)object;
 			this.cephalixId = group.getId();
 			this.objectName = "Group";
 			break;
-		case "de.openschoolserver.dao.HWConf":
+		case "package de.cephalix.api.dao.HWConf":
 			HWConf HWConf = (HWConf)object;
 			this.cephalixId = HWConf.getId();
 			this.objectName = "HWConf";
 			break;
-		case "de.openschoolserver.dao.Room":
+		case "package de.cephalix.api.dao.Room":
 			Room Room = (Room)object;
 			this.cephalixId = Room.getId();
 			this.objectName = "Room";
 			break;
-		case "de.openschoolserver.dao.Software":
+		case "package de.cephalix.api.dao.Software":
 			Software Software = (Software)object;
 			this.cephalixId = Software.getId();
 			this.objectName = "Software";
 			break;
-		case "de.openschoolserver.dao.User":
+		case "package de.cephalix.api.dao.User":
 			User user = (User)object;
 			this.cephalixId = user.getId();
 			this.objectName = "User";

@@ -1,11 +1,12 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao;
+package de.cephalix.api.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -15,7 +16,7 @@ import java.util.List;
  */
 @Entity
 @Table(name="CephalixInstitutes")
-@NamedQuery(name="CephalixInstitute.findAll", query="SELECT c FROM CephalixInstitute c")
+@NamedQuery(name="CephalixInstitute.findAll", query="SELECT c FROM CephalixInstitute c WHERE NOT c.deleted = 'Y'")
 public class CephalixInstitute implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -68,8 +69,7 @@ public class CephalixInstitute implements Serializable {
 
 	private String type;
 	
-	@Convert(converter=BooleanToStringConverter.class)
-	private boolean deleted;
+	private String deleted;
 	
 	//bi-directional many-to-one association to Room
 	@ManyToOne
@@ -99,6 +99,11 @@ public class CephalixInstitute implements Serializable {
 	private List<CephalixMapping> cephalixMappings;
 
 	public CephalixInstitute() {
+		this.deleted = "N";
+		this.cephalixItusages = new ArrayList<CephalixITUsage>();
+		this.cephalixRegcodes = new ArrayList<CephalixRegcode>();
+		this.cephalixMappings = new ArrayList<CephalixMapping>();
+		this.cephalixItusageAvarages = new ArrayList<CephalixITUsageAvarage>();
 	}
 
 	public Long getId() {
@@ -285,11 +290,11 @@ public class CephalixInstitute implements Serializable {
 		this.type = type;
 	}
 	
-	public boolean getDeleted() {
+	public String getDeleted() {
 		return this.deleted;
 	}
 
-	public void setDeleted(boolean deleted) {
+	public void setDeleted(String deleted) {
 		this.deleted = deleted;
 	}
 
@@ -348,14 +353,12 @@ public class CephalixInstitute implements Serializable {
 	public CephalixMapping addCephalixMapping(CephalixMapping cephalixMapping) {
 		getCephalixMappings().add(cephalixMapping);
 		cephalixMapping.setCephalixInstitute(this);
-
 		return cephalixMapping;
 	}
 
 	public CephalixMapping removeCephalixMapping(CephalixMapping cephalixMapping) {
 		getCephalixMappings().remove(cephalixMapping);
 		cephalixMapping.setCephalixInstitute(null);
-
 		return cephalixMapping;
 	}
 

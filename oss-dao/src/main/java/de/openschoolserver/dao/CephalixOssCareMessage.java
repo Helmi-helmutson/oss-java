@@ -1,4 +1,4 @@
-package de.openschoolserver.dao;
+package de.cephalix.api.dao;
 
 import java.io.Serializable;
 import java.lang.Long;

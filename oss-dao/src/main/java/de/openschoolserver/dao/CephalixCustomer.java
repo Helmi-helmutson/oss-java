@@ -1,5 +1,5 @@
 /* (c) 2018 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao;
+package de.cephalix.api.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -16,7 +16,7 @@ import java.util.List;
  */
 @Entity
 @Table(name="Customers")
-@NamedQuery(name="CephalixCustomer.findAll", query="SELECT c FROM CephalixCustomer c")
+@NamedQuery(name="CephalixCustomer.findAll", query="SELECT c FROM CephalixCustomer c WHERE NOT c.deleted = 'Y'")
 public class CephalixCustomer implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -51,8 +51,7 @@ public class CephalixCustomer implements Serializable {
 	private String telephone;
 	
 	@JsonIgnore
-	@Convert(converter=BooleanToStringConverter.class)
-	private boolean deleted;
+	private String deleted;
 
 	//bi-directional many-to-one association to Cephalix Institutes
 	@OneToMany(mappedBy="cephalixCustomer")
@@ -60,6 +59,7 @@ public class CephalixCustomer implements Serializable {
 	private List<CephalixInstitute> cephalixInstitutes;
 
 	public CephalixCustomer() {
+		this.deleted = "N";
 	}
 
 	public Long getId() {
@@ -70,11 +70,11 @@ public class CephalixCustomer implements Serializable {
 		this.id = id;
 	}
 	
-	public boolean getDeleted() {
+	public String getDeleted() {
 		return this.deleted;
 	}
 
-	public void setDeleted(boolean deleted) {
+	public void setDeleted(String deleted) {
 		this.deleted = deleted;
 	}
 

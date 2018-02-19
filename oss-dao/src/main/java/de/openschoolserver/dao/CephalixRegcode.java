@@ -1,5 +1,5 @@
 /* (c) 2018 Péter Varkoly <peter@varkoly.de> - all rights reserved */
-package de.openschoolserver.dao;
+package de.cephalix.api.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;

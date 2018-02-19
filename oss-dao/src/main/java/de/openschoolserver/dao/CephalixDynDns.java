@@ -1,4 +1,4 @@
-package de.openschoolserver.dao;
+package de.cephalix.api.dao;
 
 import java.io.Serializable;
 import java.lang.Boolean;
@@ -8,6 +8,8 @@ import java.lang.String;
 import java.util.Date;
 
 import javax.persistence.*;
+
+import de.openschoolserver.dao.BooleanToStringConverter;
 
 /**
  * Entity implementation class for Entity: CephalixDynDns

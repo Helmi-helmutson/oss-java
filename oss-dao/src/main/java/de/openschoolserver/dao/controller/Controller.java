@@ -8,6 +8,8 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.persistence.Query;
 import java.util.List;
 import java.util.Locale;
@@ -274,13 +276,16 @@ public class Controller extends Config {
 			}
 			break;
 		case "de.openschoolserver.dao.CephalixInstitute":
-			CephalixInstitute institute = (CephalixInstitute)object;
-			switch(pluginName){
-			case "add_institute":
-			case "modify_institute":
-			case "delete_institue":
-				data.append(institute.toString());
-				break;
+			try {
+				switch(pluginName){
+				case "add_institute":
+				case "modify_institute":
+				case "delete_institue":
+					data.append(new ObjectMapper().writeValueAsString(object));
+					break;
+				}
+			} catch (Exception e) {
+				logger.error("pluginHandler : CephalixInstitute:" + e.getMessage());
 			}
 		}
 		OSSShellTools.exec(program, reply, error, data.toString());
@@ -420,55 +425,56 @@ public class Controller extends Config {
 
 	public boolean isProtected(Object object){
 		if (object!=null) {
-		switch(object.getClass().getName()) {
-		case "de.openschoolserver.dao.User":
-			if(properties.containsKey("de.openschoolserver.dao.User.protected")){
-				User u = (User)object;
-				for( String s : properties.get("de.openschoolserver.dao.User.protected").split(",") ){
-					if( s.equals(u.getUid()))
-						return true;
+			switch(object.getClass().getName()) {
+			case "de.openschoolserver.dao.User":
+				if(properties.containsKey("de.openschoolserver.dao.User.protected")){
+					User u = (User)object;
+					for( String s : properties.get("de.openschoolserver.dao.User.protected").split(",") ){
+						if( s.equals(u.getUid()))
+							return true;
+					}
 				}
-			}
-			return false;
-		case "de.openschoolserver.dao.Room":
-			if(properties.containsKey("de.openschoolserver.dao.Room.protected")){
-				Room r = (Room) object;
-				for( String s : properties.get("de.openschoolserver.dao.Room.protected").split(",") ){
-					if( s.equals(r.getName()))
-						return true;
+				return false;
+			case "de.openschoolserver.dao.Room":
+				if(properties.containsKey("de.openschoolserver.dao.Room.protected")){
+					Room r = (Room) object;
+					for( String s : properties.get("de.openschoolserver.dao.Room.protected").split(",") ){
+						if( s.equals(r.getName()))
+							return true;
+					}
 				}
-			}
-			return false;
-		case "de.openschoolserver.dao.Device":
-			if(properties.containsKey("de.openschoolserver.dao.Device.protected")){
-				Device d = (Device)object;
-				for( String s : properties.get("de.openschoolserver.dao.Device.protected").split(",") ){
-					if( s.equals(d.getName()))
-						return true;
+				return false;
+			case "de.openschoolserver.dao.Device":
+				if(properties.containsKey("de.openschoolserver.dao.Device.protected")){
+					Device d = (Device)object;
+					for( String s : properties.get("de.openschoolserver.dao.Device.protected").split(",") ){
+						if( s.equals(d.getName()))
+							return true;
+					}
 				}
-			}
-			return false;
-		case "de.openschoolserver.dao.Group":
-			if(properties.containsKey("de.openschoolserver.dao.Group.protected")){
-				Group g = (Group)object;
-				for( String s : properties.get("de.openschoolserver.dao.Group.protected").split(",") ){
-					if( s.equals(g.getName()))
-						return true;
+				return false;
+			case "de.openschoolserver.dao.Group":
+				if(properties.containsKey("de.openschoolserver.dao.Group.protected")){
+					Group g = (Group)object;
+					for( String s : properties.get("de.openschoolserver.dao.Group.protected").split(",") ){
+						if( s.equals(g.getName()))
+							return true;
+					}
 				}
-			}
-			return false;
-		case "de.openschoolserver.dao.HWConf":
-			if(properties.containsKey("de.openschoolserver.dao.HWConf.protected")){
-				HWConf hw = (HWConf)object;
-				for( String s : properties.get("de.openschoolserver.dao.HWConf.protected").split(",") ){
-					if( s.equals(hw.getName()))
-						return true;
+				return false;
+			case "de.openschoolserver.dao.HWConf":
+				if(properties.containsKey("de.openschoolserver.dao.HWConf.protected")){
+					HWConf hw = (HWConf)object;
+					for( String s : properties.get("de.openschoolserver.dao.HWConf.protected").split(",") ){
+						if( s.equals(hw.getName()))
+							return true;
+					}
 				}
+				return false;
 			}
-			return false;
-		}}
+		}
 		return false;
-		
+
 	}
 	
 	public boolean systemctl(String action, String service) {

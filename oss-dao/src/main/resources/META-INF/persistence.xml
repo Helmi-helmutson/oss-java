@@ -34,14 +34,6 @@
                 <class>de.openschoolserver.dao.TestUserPK</class>
                 <class>de.openschoolserver.dao.Translation</class>
                 <class>de.openschoolserver.dao.User</class>
-                <class>de.openschoolserver.dao.CephalixRegcode</class>
-                <class>de.openschoolserver.dao.CephalixInstitute</class>
-                <class>de.openschoolserver.dao.CephalixCustomer</class>
-                <class>de.openschoolserver.dao.CephalixMapping</class>
-                <class>de.openschoolserver.dao.CephalixITUsage</class>
-                <class>de.openschoolserver.dao.CephalixITUsageAvarage</class>
-                <class>de.openschoolserver.dao.CephalixOssCare</class>
-                <class>de.openschoolserver.dao.CephalixOssCareMessage</class>
 		<properties>
 			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/OSS"/>
 			<property name="javax.persistence.jdbc.user" value="root"/>
