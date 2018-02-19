@@ -55,7 +55,7 @@ public class CephalixCustomer implements Serializable {
 	private boolean deleted;
 
 	//bi-directional many-to-one association to Cephalix Institutes
-	@OneToMany(mappedBy="customer")
+	@OneToMany(mappedBy="cephalixCustomer")
 	@JsonIgnore
 	private List<CephalixInstitute> cephalixInstitutes;
 

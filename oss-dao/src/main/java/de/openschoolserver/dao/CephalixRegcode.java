@@ -46,7 +46,7 @@ public class CephalixRegcode implements Serializable {
     @OneToOne(mappedBy="cephalixRegcode")
     private CephalixOssCare osscare;
     
-    @OneToOne(mappedBy="regcode")
+    @OneToOne(mappedBy="cephalixRegcode")
     private CephalixDynDns ossdyndns;
 
 	public CephalixRegcode() {
