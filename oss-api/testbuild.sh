@@ -4,15 +4,12 @@ gradle clean build
 tar xf build/distributions/de.openschoolserver.api-1.0-SNAPSHOT.tar 
 
 if [ "$1" ]; then
-	scp -P $2 de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@$1:/opt/oss-java/lib/
-	ssh -p $2 root@$1 systemctl restart oss-api
-else 
-	scp  de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@192.168.2.60:/opt/oss-java/lib/
-	ssh  root@192.168.2.60 systemctl restart oss-api
-	#scp  de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@192.168.100.20:/opt/oss-java/lib/
-	#ssh  root@192.168.100.20 systemctl restart oss-api
-	#scp -P 34022 de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@oss40.cephalix.eu:/opt/oss-java/lib/
-	#ssh -p 34022 root@oss40.cephalix.eu systemctl restart oss-api
+        PORT=22
+        if [ "$2" ]; then
+           PORT=$2
+        fi
+	scp -P $PORT de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@$1:/opt/oss-java/lib/
+	ssh -p $PORT root@$1 systemctl restart oss-api
 fi
 if [ -e oss-java ]; then
     rm -r oss-java
@@ -23,9 +20,6 @@ tar cjf /data1/OSC/home:varkoly:OSS-4-0/oss-java/oss-java.tar.bz2 oss-java
 cp ../oss-dao/data/oss-objects.sql /data1/OSC/home:varkoly:OSS-4-0/oss-java/
 cp ../oss-dao/data/school-INSERT.sql /data1/OSC/home:varkoly:OSS-4-0/oss-java/
 cp ../oss-dao/data/business-INSERT.sql /data1/OSC/home:varkoly:OSS-4-0/oss-java/
-#cp ../oss-dao/data/oss-objects.sql /data1/OSC/home:varkoly:OSS-4-0/cephalix-java/
-#cp ../oss-dao/data/cephalix-objects.sql /data1/OSC/home:varkoly:OSS-4-0/cephalix-java/
-#cp ../oss-dao/data/school-INSERT.sql /data1/OSC/home:varkoly:OSS-4-0/oss-java/
 CLASSPATH=$( grep "^CLASSPATH=" oss-java/bin/de.openschoolserver.api )
 sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > /data1/OSC/home:varkoly:OSS-4-0/oss-java/start-oss-api
 cp start-oss-squid-sso /data1/OSC/home:varkoly:OSS-4-0/oss-java/start-oss-squid-sso
