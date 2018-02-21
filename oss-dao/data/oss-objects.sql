@@ -117,9 +117,9 @@ CREATE TABLE IF NOT EXISTS Devices (
         wlanMac      VARCHAR(17) DEFAULT '',
         row          INTEGER  DEFAULT 0,
         place        INTEGER  DEFAULT 0,
-	serial       VARCHAR(16) DEFAULT '',
-	inventary    VARCHAR(16) DEFAULT '',
-	locality     VARCHAR(16) DEFAULT '',
+	serial       VARCHAR(32) DEFAULT '',
+	inventary    VARCHAR(32) DEFAULT '',
+	locality     VARCHAR(32) DEFAULT '',
         counter      BIGINT UNSIGNED DEFAULT NULL,
         FOREIGN KEY(room_id)   REFERENCES Rooms(id)   ON DELETE RESTRICT,
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id) ON DELETE RESTRICT,
@@ -384,7 +384,7 @@ CREATE TABLE IF NOT EXISTS Announcements (
         title      VARCHAR(128) NOT NULL,
         abstract   BLOB,
         text       BLOB,
-        issuer     VARCHAR(128),
+        issue      VARCHAR(128),
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY  (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
