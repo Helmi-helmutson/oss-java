@@ -3,6 +3,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -24,14 +25,19 @@ public class Contact implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CONTACTS_ID_GENERATOR")
 	private Long id;
 
+	@Size(max=128, message="Email must not be longer then 128 characters.")
 	private String email;
 
+	@Size(max=128, message="Issue must not be longer then 128 characters.")
 	private String issue;
 
+	@Size(max=128, message="Name must not be longer then 128 characters.")
 	private String name;
 
+	@Size(max=128, message="Phone must not be longer then 128 characters.")
 	private String phone;
 
+	@Size(max=128, message="Title must not be longer then 128 characters.")
 	private String title;
 
 

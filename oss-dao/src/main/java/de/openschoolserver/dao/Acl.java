@@ -33,29 +33,29 @@ public class Acl implements Serializable {
 	@JsonIgnore
 	private User user;
 	
-    @Column(name = "user_id", insertable = false, updatable = false)
-    private Long userId;
+	@Column(name = "user_id", insertable = false, updatable = false)
+	private Long userId;
 
-    //bi-directional many-to-one association to Group
+	//bi-directional many-to-one association to Group
 	@ManyToOne
 	@JsonIgnore
 	private Group group;
 	
-    @Column(name = "group_id", insertable = false, updatable = false)
-    private Long groupId;
+	@Column(name = "group_id", insertable = false, updatable = false)
+	private Long groupId;
 
-    //bi-directional many-to-one association to User
+	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
 	private User creator;
 		
 	@Override
-    public boolean equals(Object obj) {
+	public boolean equals(Object obj) {
                 if (obj instanceof Acl && obj !=null) {
                         return getId() == ((Acl)obj).getId();
                 }
                 return super.equals(obj);
-    }
+	}
 
 	public Acl() {
 	}

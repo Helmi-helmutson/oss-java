@@ -20,6 +20,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -47,6 +48,7 @@ public class Device implements Serializable {
 	private Long id;
 
 	@Column(name = "name", updatable = false)
+	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
 	private int place;
@@ -54,19 +56,26 @@ public class Device implements Serializable {
 	private int row;
 
 	@Column(name="IP")
+	@Size(max=16, message="IP must not be longer then 16 characters.")
 	private String ip;
 
 	@Column(name="MAC")
+	@Size(max=17, message="MAC must not be longer then 17 characters.")
 	private String mac;
 
+	@Size(max=16, message="WLAN-IP must not be longer then 16 characters.")
 	private String wlanIp;
 
+	@Size(max=17, message="WLAN-MAC must not be longer then 17 characters.")
 	private String wlanMac;
 
+	@Size(max=32, message="Serial must not be longer then 32 characters.")
 	private String serial;
 
+	@Size(max=32, message="Inventary must not be longer then 32 characters.")
 	private String inventary;
 
+	@Size(max=32, message="IP must not be longer then 32 characters.")
 	private String locality;
 	
 	private Long   counter;

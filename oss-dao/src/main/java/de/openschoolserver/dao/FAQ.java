@@ -3,6 +3,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -28,11 +29,13 @@ public class FAQ implements Serializable {
 	@Column(name="abstract")
 	private byte[] abstract_;
 
+	@Size(max=128, message="Issue must not be longer then 128 characters.")
 	private String issue;
 
 	@Lob
 	private byte[] text;
 
+	@Size(max=128, message="Title must not be longer then 128 characters.")
 	private String title;
 
 	//bi-directional many-to-many association to Category

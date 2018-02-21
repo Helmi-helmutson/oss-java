@@ -31,18 +31,18 @@ public class SoftwareStatus implements Serializable {
 	private String status;
 
 	@ManyToOne
-    @JsonIgnore
+	@JsonIgnore
 	private SoftwareVersion softwareVersion;
 
 	@Column(name = "softwareversion_id", insertable = false, updatable = false)
-    private Long softwareversionId;
+	private Long softwareversionId;
 
 	@ManyToOne
-    @JsonIgnore
+	@JsonIgnore
 	private Device device;
 
 	@Column(name = "device_id", insertable = false, updatable = false)
-    private Long deviceId;
+	private Long deviceId;
 	
 	@Transient
 	private String deviceName;

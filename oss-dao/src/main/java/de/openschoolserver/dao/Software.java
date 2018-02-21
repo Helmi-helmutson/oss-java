@@ -2,9 +2,8 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
-
+import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.List;
@@ -28,11 +27,13 @@ public class Software implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARE_ID_GENERATOR")
 	private Long id;
 
+	@Size(max=64, message="Description must not be longer then 64 characters.")
 	private String description;
 
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean manually;
 
+	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
 	private Integer weight;

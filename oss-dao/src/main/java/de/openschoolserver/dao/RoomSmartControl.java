@@ -18,7 +18,6 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
@@ -47,22 +46,22 @@ public class RoomSmartControl implements Serializable {
 	private Long id;
 	
 	//bi-directional many-to-one association to room
-    @Column(name = "room_id")
-    private Long roomId;
-
-    @ManyToOne
-    @JoinColumn(name = "room_id", insertable = false, updatable = false)
-    @JsonIgnore
-    private Room room;
+	@Column(name = "room_id")
+	private Long roomId;
 	
-    //bi-directional many-to-one association to room
-    @Column(name = "user_id")
-    private Long ownerId;
-
-    @ManyToOne
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
-    @JsonIgnore
-    private User owner;
+	@ManyToOne
+	@JoinColumn(name = "room_id", insertable = false, updatable = false)
+	@JsonIgnore
+	private Room room;
+	    
+	//bi-directional many-to-one association to room
+	@Column(name = "user_id")
+	private Long ownerId;
+	
+	@ManyToOne
+	@JoinColumn(name = "user_id", insertable = false, updatable = false)
+	@JsonIgnore
+	private User owner;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "startTime")
@@ -83,7 +82,7 @@ public class RoomSmartControl implements Serializable {
 	public RoomSmartControl() {
 	}
 	
-    public RoomSmartControl(Long roomId, Long ownerId, Long duration) {
+	public RoomSmartControl(Long roomId, Long ownerId, Long duration) {
 		this.ownerId = ownerId;
 		this.roomId = roomId;
 		this.startTime = new Date();

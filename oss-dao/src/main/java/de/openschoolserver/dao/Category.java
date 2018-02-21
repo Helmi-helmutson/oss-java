@@ -5,10 +5,12 @@ import java.io.Serializable;
 
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 /**
  * The persistent class for the Categories database table.
@@ -32,8 +34,10 @@ public class Category implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CATEGORIES_ID_GENERATOR")
 	private Long id;
 
+	@Size(max=64, message="Uid must not be longer then 64 characters..")
 	private String description;
 
+	@Size(max=32, message="Name must not be longer then 32 characters..")
 	private String name;
 
 	private String categoryType;

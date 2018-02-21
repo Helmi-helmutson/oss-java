@@ -34,7 +34,8 @@ dependencies {
     compile "org.eclipse.persistence:eclipselink:2.6.0"
     compile "org.apache.httpcomponents:httpclient:4.5.2"
     compile "org.apache.httpcomponents:httpcomponents-client:4.5.2"
-compile group: 'org.apache.httpcomponents', name: 'fluent-hc', version: '4.5.2'
+    compile "javax.validation:validation-api:1.1.0.Final"
+    compile group: 'org.apache.httpcomponents', name: 'fluent-hc', version: '4.5.2'
 
 }
 

@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 import java.util.List;
+import javax.validation.constraints.Size;
 
 
 /**
@@ -29,13 +30,16 @@ public class Announcement implements Serializable {
 	@Column(name="abstract")
 	private byte[] abstract_;
 
-	private String issuer;
+	@Size(max=128, message="Issue must not be longer then 64 characters.")
+	private String issue;
 
+	@Size(max=128, message="Keywords must not be longer then 64 characters.")
 	private String keywords;
 
 	@Lob
 	private byte[] text;
 
+	@Size(max=128, message="Title must not be longer then 64 characters.")
 	private String title;
 
 
@@ -82,12 +86,12 @@ public class Announcement implements Serializable {
 		this.abstract_ = abstract_;
 	}
 
-	public String getIssuer() {
-		return this.issuer;
+	public String getIssue() {
+		return this.issue;
 	}
 
-	public void setIssuer(String issuer) {
-		this.issuer = issuer;
+	public void setIssue(String issue) {
+		this.issue = issue;
 	}
 
 	public String getKeywords() {

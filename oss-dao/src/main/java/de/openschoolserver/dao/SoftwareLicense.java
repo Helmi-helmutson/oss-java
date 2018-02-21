@@ -5,7 +5,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.*;
-
+import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -38,6 +38,7 @@ public class SoftwareLicense implements Serializable {
 	 * By C licenses this is the value of the license.
 	 * By F licenses this is the name of the file in which the license was saved.
 	 */
+	@Size(max=1024, message="License must not be longer then 1024 characters.")
 	private String value;
 	
 	//bi-directional many-to-many association to Device

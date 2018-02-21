@@ -28,13 +28,13 @@ public class Alias implements Serializable {
 	@JsonIgnore
 	private User user;
 
-    @Override
-    public boolean equals(Object obj) {
-           if (obj instanceof Alias && obj !=null) {
-                   return getId() == ((Alias)obj).getId();
-           }
-           return super.equals(obj);
-    }
+	@Override
+	public boolean equals(Object obj) {
+	       if (obj instanceof Alias && obj !=null) {
+	               return getId() == ((Alias)obj).getId();
+	       }
+	       return super.equals(obj);
+	}
 
 	public Alias() {
 	}

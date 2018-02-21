@@ -3,7 +3,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
-
+import javax.validation.constraints.Size;
 
 /**
  * The persistent class for the MissedTranslations database table.
@@ -24,8 +24,10 @@ public class MissedTranslation implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="MISSEDTRANSLATIONS_ID_GENERATOR")
 	private Long id;
 
+	@Size(max=2, message="Language name must not be longer then 2 characters.")
 	private String lang;
 
+	@Size(max=250, message="String must not be longer then 250 characters.")
 	private String string;
 
 	public MissedTranslation() {

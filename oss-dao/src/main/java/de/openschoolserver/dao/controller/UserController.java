@@ -181,7 +181,7 @@ public class UserController extends Controller {
 		// Check the user password
 		if( user.getRole().equals("workstations")) {
 			user.setPassword(user.getUid());
-		} else if( user.getPassword().isEmpty() ) {
+		} else if( user.getPassword() == null || user.getPassword().isEmpty() ) {
 			user.setPassword(UserUtil.createRandomPassword(9,"ACGqf123#"));
 		}
 		else
@@ -192,11 +192,9 @@ public class UserController extends Controller {
 			}
 		}
 		if( user.getFsQuota() == null ) {
-			//TODO
 			user.setFsQuota(Integer.getInteger(this.getConfigValue("FILE_QUOTA")));
 		}
 		if( user.getMsQuota() == null ) {
-			//TODO
 			user.setMsQuota(Integer.getInteger(this.getConfigValue("MAIL_QUOTA")));
 		}
 		//Make backup from password. password field is transient!

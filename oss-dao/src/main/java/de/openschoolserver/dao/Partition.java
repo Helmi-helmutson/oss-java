@@ -3,6 +3,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
@@ -25,17 +26,22 @@ public class Partition implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private Long id;
 
+	@Size(max=64, message="Description must not be longer then 64 characters.")
 	private String description;
 
+	@Size(max=16, message="Format must not be longer then 16 characters.")
 	private String format;
 
 	private String joinType;
 
+	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
 	@Column(name="OS")
+	@Size(max=16, message="OS must not be longer then 16 characters.")
 	private String os;
 
+	@Size(max=16, message="Tool must not be longer then 16 characters.")
 	private String tool;
 
 	//bi-directional many-to-one association to HWConf

@@ -4,6 +4,7 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 
@@ -36,12 +37,14 @@ public class Room implements Serializable {
 	private Long id;
 
 	@Column(name = "name", updatable = false)
+	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
 	private int places;
 
 	private int rows;
 
+	@Size(max=64, message="Description must not be longer then 64 characters.")
 	private String description;
 
 	@Column(name = "netMask", updatable = false)

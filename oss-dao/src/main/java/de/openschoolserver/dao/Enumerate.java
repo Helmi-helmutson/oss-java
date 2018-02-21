@@ -3,6 +3,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 
 /**
@@ -24,17 +25,19 @@ public class Enumerate implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private Long id;
 
+	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
+	@Size(max=32, message="Value must not be longer then 32 characters.")
 	private String value;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof Enumerate && obj !=null) {
-           return getId() == ((Enumerate)obj).getId();
-        }
-        return super.equals(obj);
-    }
+	@Override
+	public boolean equals(Object obj) {
+	    if (obj instanceof Enumerate && obj !=null) {
+	       return getId() == ((Enumerate)obj).getId();
+	    }
+	    return super.equals(obj);
+	}
 
 	public Enumerate() {
 	}

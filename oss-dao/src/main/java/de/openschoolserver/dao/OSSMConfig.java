@@ -2,8 +2,6 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
-
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 /**

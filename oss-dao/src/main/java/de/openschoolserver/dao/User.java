@@ -1,5 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved 
- * (c) 2017 EXTIS GmbH - all rights reserved */
+/* (c) 2018 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
@@ -7,8 +6,8 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.List;
-
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 
 /**
@@ -35,15 +34,19 @@ public class User implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	Long id;
 
+	@Size(max=64, message="Givenname must not be longer then 64 characters.")
 	private String givenName;
 
 	private String role;
 
+	@Size(max=64, message="Surname must not be longer then 64 characters.")
 	private String surName;
 
 	@Column(name="uid", updatable=false)
+	@Size(max=32, message="Uid must not be longer then 32 characters.")
 	private String uid;
 	
+	@Size(max=64, message="UUID must not be longer then 64 characters.")
 	private String uuid;
 
 	@Temporal(TemporalType.DATE)	
@@ -157,10 +160,10 @@ public class User implements Serializable {
 	private Integer msQuota;
 	
 	@Column(name = "creator_id")
-    private Long creatorId;
+	private Long creatorId;
 
 	@JsonIgnore
-    private String initialPassword;
+	private String initialPassword;
 
 	@Transient
 	private String password ="";

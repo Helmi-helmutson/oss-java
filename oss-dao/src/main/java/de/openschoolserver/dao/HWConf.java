@@ -4,6 +4,7 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -26,8 +27,10 @@ public class HWConf implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private Long id;
 
+	@Size(max=64, message="Description must not be longer then 64 characters.")
 	private String description;
 
+	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
 	private String deviceType;
@@ -56,13 +59,13 @@ public class HWConf implements Serializable {
 	@JsonIgnore
 	private User creator;
 
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof HWConf && obj !=null) {
-            return getId() == ((HWConf)obj).getId();
-        }
-        return super.equals(obj);
-    }
+	@Override
+	public boolean equals(Object obj) {
+	    if (obj instanceof HWConf && obj !=null) {
+	        return getId() == ((HWConf)obj).getId();
+	    }
+	    return super.equals(obj);
+	}
 
 	public HWConf() {
 	}

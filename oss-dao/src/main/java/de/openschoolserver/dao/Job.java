@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import javax.validation.constraints.Size;
 
 
 /**
@@ -30,6 +31,7 @@ public class Job implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CEPHALIXJOBS_ID_GENERATOR")
 	private Long id;
 
+	@Size(max=128, message="Description must not be longer then 128 characters.")
 	private String description;
 
 	private Timestamp startTime;

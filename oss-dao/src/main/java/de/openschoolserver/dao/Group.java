@@ -2,12 +2,11 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.List;
 
+import javax.persistence.*;
+import javax.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * The persistent class for the Groups database table.
@@ -31,8 +30,10 @@ public class Group implements Serializable {
 	private Long id;
 
 	@Column(name = "name", updatable = false)
+	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
+	@Size(max=64, message="Description must not be longer then 64 characters.")
 	private String description;
 
 	private String groupType;

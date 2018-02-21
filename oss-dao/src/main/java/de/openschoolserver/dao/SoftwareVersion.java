@@ -42,7 +42,7 @@ public class SoftwareVersion implements Serializable {
 	private Software software;
 	
 	@Column(name = "software_id", insertable = false, updatable = false)
-    private Long softwareId;
+	private Long softwareId;
 
 	/*
 	 * C -> current this is the most recent version and does exists on the server and can be installed
