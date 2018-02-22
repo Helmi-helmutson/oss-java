@@ -16,7 +16,12 @@ import java.util.Calendar;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
+
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.FAQ;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
@@ -181,7 +186,15 @@ public class RoomController extends Controller {
 		if( room.getRoomType().equals("smartRoom") ) {
 			return new OssResponse(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
-		EntityManager em = getEntityManager();
+		//Check parameters
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Room> violation : factory.getValidator().validate(room) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 
 		// First we check if the parameter are unique.
 		if( !this.isNameUnique(room.getName())){
@@ -192,19 +205,20 @@ public class RoomController extends Controller {
 		}
 
 		// If no network was configured we will use net school network.
-		if( room.getNetwork().isEmpty() ) {
+		if( room.getNetwork() == null || room.getNetwork().isEmpty() ) {
 			room.setNetwork(this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK"));
 		}
 
 		// If the starIp is not given we have to search the next room IP
-		if( room.getStartIP().isEmpty() ) {
+		if( room.getStartIP() == null || room.getStartIP().isEmpty() ) {
 			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
 		}
 
-		//		Set default control mode
-		if( room.getRoomControl().isEmpty() ) {
+		//	Set default control mode
+		if( room.getRoomControl() == null || room.getRoomControl().isEmpty() ) {
 			room.setRoomControl("inRoom");
 		}
+		EntityManager em = getEntityManager();
 		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
 		room.setCreator(this.session.getUser());
 		try {

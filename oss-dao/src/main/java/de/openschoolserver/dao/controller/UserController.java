@@ -11,6 +11,9 @@ import java.lang.Integer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 import de.extis.core.util.UserUtil;
 
@@ -200,6 +203,15 @@ public class UserController extends Controller {
 		//Make backup from password. password field is transient!
 		user.setInitialPassword(user.getPassword());
 		user.setCreatorId(this.session.getUserId());
+		//Check user parameter
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<User> violation : factory.getValidator().validate(user) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		try {
 			em.getTransaction().begin();
 			em.persist(user);
@@ -254,6 +266,15 @@ public class UserController extends Controller {
 		oldUser.setPassword(user.getPassword());
 		oldUser.setFsQuota(user.getFsQuota());
 		oldUser.setMsQuota(user.getMsQuota());
+		//Check user parameter
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<User> violation : factory.getValidator().validate(oldUser) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();

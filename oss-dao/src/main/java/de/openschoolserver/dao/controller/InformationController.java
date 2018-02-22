@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -30,6 +33,15 @@ public class InformationController extends Controller {
 	}
 
 	public OssResponse addAnnouncement(Announcement announcement) {
+		//Check parameters
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Announcement> violation : factory.getValidator().validate(announcement) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		announcement.setOwner(this.session.getUser());
 		try {
@@ -47,6 +59,15 @@ public class InformationController extends Controller {
 	}
 
 	public OssResponse addContact(Contact contact) {
+		//Check parameters
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Contact> violation : factory.getValidator().validate(contact) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		contact.setOwner(this.session.getUser());
 		try {
@@ -64,6 +85,15 @@ public class InformationController extends Controller {
 	}
 
 	public OssResponse addFAQ(FAQ faq) {
+		//Check parameters
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<FAQ> violation : factory.getValidator().validate(faq) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		faq.setOwner(this.session.getUser());
 		try {
@@ -161,6 +191,15 @@ public class InformationController extends Controller {
 	}
 
 	public OssResponse modifyAnnouncement(Announcement announcement) {
+		//Check parameters
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Announcement> violation : factory.getValidator().validate(announcement) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		if( !this.mayModify(announcement) )
 		{
@@ -180,6 +219,15 @@ public class InformationController extends Controller {
 	}
 	
 	public OssResponse modifyContact(Contact contact) {
+		//Check parameters
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Contact> violation : factory.getValidator().validate(contact) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		if( !this.mayModify(contact) )
 		{
@@ -199,6 +247,15 @@ public class InformationController extends Controller {
 	}
 
 	public OssResponse modifyFAQ(FAQ faq) {
+		//Check parameters
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<FAQ> violation : factory.getValidator().validate(faq) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		if( !this.mayModify(faq) )
 		{

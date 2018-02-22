@@ -12,8 +12,12 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
@@ -103,11 +107,20 @@ public class GroupController extends Controller {
 	}
 
 	public OssResponse add(Group group){
-		EntityManager em = getEntityManager();
+		//Check group parameter
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Group> violation : factory.getValidator().validate(group) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(group.getName())){
 			return new OssResponse(this.getSession(),"ERROR","Group name is not unique.");
 		}
+		EntityManager em = getEntityManager();
 		group.setOwner(this.session.getUser());
 		try {
 			em.getTransaction().begin();
@@ -117,6 +130,8 @@ public class GroupController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
 		}
 		this.startPlugin("add_group", group);
 		return new OssResponse(this.getSession(),"OK","Group was created.",group.getId());
@@ -128,6 +143,15 @@ public class GroupController extends Controller {
         	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
         }
 		oldGroup.setDescription(group.getDescription());
+		//Check group parameter
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Group> violation : factory.getValidator().validate(group) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+				return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -136,6 +160,8 @@ public class GroupController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		}  finally {
+			em.close();
 		}
 		this.startPlugin("modify_group", oldGroup);
 		return new OssResponse(this.getSession(),"OK","Group was modified.");

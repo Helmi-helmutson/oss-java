@@ -3,6 +3,10 @@ package de.openschoolserver.dao.controller;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
+
 import java.util.List;
 import java.util.ArrayList;
 import de.openschoolserver.dao.*;
@@ -90,8 +94,16 @@ public class CategoryController extends Controller {
 	}
 
 	public OssResponse add(Category category){
+		//Check category parameter
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Category> violation : factory.getValidator().validate(category) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
-
 		try {
 			// First we check if the parameter are unique.
 			Query query = em.createNamedQuery("Category.getByName").setParameter("name",category.getName());
@@ -117,6 +129,15 @@ public class CategoryController extends Controller {
 	}
 
 	public OssResponse modify(Category category){
+		//Check category parameter
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Category> violation : factory.getValidator().validate(category) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();

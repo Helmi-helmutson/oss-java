@@ -18,6 +18,9 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
@@ -230,6 +233,11 @@ public class DeviceController extends Controller {
 			if( !net.contains(device.getWlanIp())) {
 				error.add("The IP address is not in the room ip address range.");
 			}
+		}
+		//Check user parameter
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Device> violation : factory.getValidator().validate(device) ) {
+			error.add(violation.getMessage());
 		}
 		return String.join(System.lineSeparator(), error);
 	}
