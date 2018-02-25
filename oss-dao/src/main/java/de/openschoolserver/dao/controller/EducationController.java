@@ -23,6 +23,8 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
@@ -50,6 +52,7 @@ public class EducationController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
+			 
 			em.close();
 		}
 		for( Category category : room.getCategories() ) {
@@ -225,6 +228,11 @@ public class EducationController extends Controller {
 		List<Long> loggedOn;
 		RoomController roomController = new RoomController(this.session);
 		Room room = roomController.getById(roomId);
+		try {
+			logger.debug("EducationController.getRoom:" + new ObjectMapper().writeValueAsString(room));
+		}  catch (Exception e) {
+			logger.error("EducationController.getRoom error:" + e.getMessage());
+		}
 		User me   = this.session.getUser();
 		if( room.getRoomType().equals("smartRoom")) {
 			Category category = room.getCategories().get(0);
@@ -268,23 +276,48 @@ public class EducationController extends Controller {
 				}
 			}
 			for( Device device : category.getDevices() ) {
-				for( User user : device.getLoggedIn() ) {
-					if( ! user.equals(me) ) {
-						loggedOn = new ArrayList<Long>();
-						loggedOn.add(user.getId());
-						loggedOn.add(device.getId());
-						loggedOns.add(loggedOn);
+				/*
+				 * If nobody is logged in set user id to 0L
+				 */
+				if( device.getLoggedIn().isEmpty() ) {
+					loggedOn = new ArrayList<Long>();
+					loggedOn.add(0L);
+					loggedOn.add(device.getId());
+					loggedOns.add(loggedOn);
+				} else {
+					for( User user : device.getLoggedIn() ) {
+						if( ! user.equals(me) ) {
+							loggedOn = new ArrayList<Long>();
+							loggedOn.add(user.getId());
+							loggedOn.add(device.getId());
+							loggedOns.add(loggedOn);
+						}
 					}
 				}
 			}
 		} else {
 			for( Device device : room.getDevices() ) {
-				for( User user : device.getLoggedIn() ) {
-					if( ! user.equals(me) ) {
-						loggedOn = new ArrayList<Long>();
-						loggedOn.add(user.getId());
-						loggedOn.add(device.getId());
-						loggedOns.add(loggedOn);
+				try {
+					logger.debug("EducationController.getRoom:" + new ObjectMapper().writeValueAsString(device));
+				}  catch (Exception e) {
+					logger.error("EducationController.getRoom error:" + e.getMessage());
+				}
+				/*
+				 * If nobody is logged in set user id to 0L
+				 */
+				if( device.getLoggedIn().isEmpty() ) {
+					loggedOn = new ArrayList<Long>();
+					loggedOn.add(0L);
+					loggedOn.add(device.getId());
+					loggedOns.add(loggedOn);
+				} else {
+					for( User user : device.getLoggedIn() ) {
+						if( ! user.equals(me) ) {
+							loggedOn = new ArrayList<Long>();
+							loggedOn.add(user.getId());
+							loggedOn.add(device.getId());
+							loggedOns.add(loggedOn);
+						}
 					}
 				}
 			}
@@ -452,9 +485,12 @@ public class EducationController extends Controller {
 		OssResponse ossResponse = null;
 		List<String> errors = new ArrayList<String>();
 		DeviceController dc = new DeviceController(this.session);
+		logger.debug("manageRoom called " + roomId + " action:");
 		for( List<Long> loggedOn : this.getRoom(roomId) ) {
+			logger.debug("manageRoom " + roomId + " user:" + loggedOn.get(0) + " device:" +  loggedOn.get(1));
 			//Do not control the own workstation
-			if( this.session.getDevice().getId().equals(loggedOn.get(1))) {
+			if( this.session.getDevice().getId().equals(loggedOn.get(1)) ||
+					this.session.getUser().getId().equals(loggedOn.get(0)) ) {
 				continue;
 			}
 			ossResponse = dc.manageDevice(loggedOn.get(1), action, actionContent);

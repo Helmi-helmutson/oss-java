@@ -319,6 +319,27 @@ public interface EducationResource {
     OssResponse manageRoom(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId,
+            @PathParam("action") String action
+    );
+
+    /*
+     * POST education/rooms/{roomId}/{action}
+     */
+    @POST
+    @Path("rooms/{roomId}/actionWithMap/{action}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Manage a room. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy."
+    		+ "This version of call allows to send a map with some parametrs:"
+    		+ "graceTime : seconds to wait befor execute action."
+    		+ "message : the message to shown befor/during execute the action.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    OssResponse manageRoom(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") Long roomId,
             @PathParam("action") String action,
             Map<String, String> actionContent
     );
@@ -718,7 +739,7 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.proxy")
-    PositiveList deletePositiveListById(
+    OssResponse deletePositiveListById(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("positiveListId") Long positiveListId
     );

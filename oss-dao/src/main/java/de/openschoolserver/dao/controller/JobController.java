@@ -25,6 +25,9 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.ValidatorFactory;
 
 public class JobController extends Controller {
 	
@@ -42,7 +45,14 @@ public class JobController extends Controller {
 	public Job getById(Long jobId) {
 		EntityManager em = getEntityManager();
 		try {
-			return em.find(Job.class, jobId);
+			Job job = em.find(Job.class, jobId);
+			Path JOB_COMMAND = Paths.get(basePath + String.valueOf(jobId));
+			Path JOB_RESULT  = Paths.get(basePath + String.valueOf(jobId) + ".log");
+			List<String> tmp = Files.readAllLines(JOB_COMMAND);
+			job.setCommand(String.join(getNl(),tmp));
+			tmp = Files.readAllLines(JOB_RESULT);
+			job.setResult(String.join(getNl(),tmp));
+			return job;
 		} catch (Exception e) {
 			logger.error("DeviceId:" + jobId + " " + e.getMessage(),e);
 			return null;
@@ -52,6 +62,21 @@ public class JobController extends Controller {
 	}
 	
 	public OssResponse createJob(Job job) {
+		/*
+		 * Check job parameters
+		 */
+		StringBuilder errorMessage = new StringBuilder();
+		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+		for (ConstraintViolation<Job> violation : factory.getValidator().validate(job) ) {
+			errorMessage.append(violation.getMessage()).append(getNl());
+		}
+		if( errorMessage.length() > 0 ) {
+			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+		}
+		
+		/*
+		 * Set job start time
+		 */
 		String scheduledTime = "now";
 		if( job.isPromptly() ) {
 			job.setStartTime(new Timestamp(System.currentTimeMillis()));
@@ -79,7 +104,6 @@ public class JobController extends Controller {
 		/*
 		 * Write the file
 		 */
-
 		StringBuilder path = new StringBuilder(basePath);
 		File jobDir = new File( path.toString() );
 		try {
@@ -98,7 +122,7 @@ public class JobController extends Controller {
 			logger.error("createJob" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
-		
+
 		/*
 		 * Start the job
 		 */
@@ -113,7 +137,7 @@ public class JobController extends Controller {
 		logger.debug("create job  : " + path.toString() + " : " + job.getCommand());
 		return new OssResponse(this.getSession(),"OK","Job was created successfully",job.getId());
 	}
-	
+
 	public OssResponse setExitCode(Long jobId, Integer exitCode) {
 		EntityManager em = getEntityManager();
 		Job job = this.getById(jobId);
@@ -167,7 +191,7 @@ public class JobController extends Controller {
 	public List<Job> searchJobs(String description, Timestamp after, Timestamp befor) {
 		EntityManager em = getEntityManager();
 		Query query = null;
-		if( after == befor ) {
+		if( after.equals(befor) ) {
 			query = em.createNamedQuery("Job.getByDescription").setParameter("description", description);
 		} else {
 			query = em.createNativeQuery("Job.getByDescriptionAndTime")
@@ -175,6 +199,7 @@ public class JobController extends Controller {
 					.setParameter("after", after)
 					.setParameter("befor", befor);
 		}
+		em.close();
 		return query.getResultList();
 	}
 

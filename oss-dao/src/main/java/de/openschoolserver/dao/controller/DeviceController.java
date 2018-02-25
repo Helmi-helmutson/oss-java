@@ -716,7 +716,7 @@ public class DeviceController extends Controller {
 		FQHN.append(device.getName()).append(".").append(this.getConfigValue("DOMAIN"));
 		File file;
 		String graceTime    = "0";
-		if( actionContent.containsKey("graceTime")) {
+		if( actionContent != null && actionContent.containsKey("graceTime")) {
 			graceTime = actionContent.get("graceTime");
 		}
 		String[] program    = null;

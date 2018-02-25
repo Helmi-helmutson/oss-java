@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
+import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
 
 
@@ -49,7 +50,8 @@ public class User implements Serializable {
 	@Size(max=64, message="UUID must not be longer then 64 characters.")
 	private String uuid;
 
-	@Temporal(TemporalType.DATE)	
+	@Temporal(TemporalType.DATE)
+	@Past
 	private Date birthDay;
 
 	//bi-directional many-to-one association to Alias

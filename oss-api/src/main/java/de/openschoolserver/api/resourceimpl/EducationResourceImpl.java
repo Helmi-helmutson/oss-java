@@ -7,6 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.openschoolserver.api.resources.EducationResource;
 import de.openschoolserver.api.resources.Resource;
 import de.openschoolserver.dao.Category;
@@ -19,6 +24,8 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.*;
 
 public class EducationResourceImpl implements Resource, EducationResource {
+
+	Logger logger = LoggerFactory.getLogger(EducationResourceImpl.class);
 
 	public EducationResourceImpl() {
 		// TODO Auto-generated constructor stub
@@ -55,8 +62,23 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
+	public OssResponse manageRoom(Session session, Long roomId, String action) {
+		try {
+			logger.debug("EducationResourceImpl.manageRoom:" + roomId + " action:" + action);
+		}  catch (Exception e) {
+			logger.error("EducationResourceImpl.manageRoom error:" + e.getMessage());
+		}
+		return new EducationController(session).manageRoom(roomId,action, null);
+	}
+	@Override
+
 	public OssResponse manageRoom(Session session, Long roomId, String action, Map<String, String> actionContent) {
-		return new EducationController(session).manageRoom(roomId,action,actionContent);
+		try {
+			logger.debug("EducationResourceImpl.manageRoom:" + roomId + " action:" + action);
+		}  catch (Exception e) {
+			logger.error("EducationResourceImpl.manageRoom error:" + e.getMessage());
+		}
+		return new EducationController(session).manageRoom(roomId,action, actionContent);
 	}
 
 	@Override
@@ -200,7 +222,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public PositiveList deletePositiveListById(Session session, Long positiveListId) {
+	public OssResponse deletePositiveListById(Session session, Long positiveListId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

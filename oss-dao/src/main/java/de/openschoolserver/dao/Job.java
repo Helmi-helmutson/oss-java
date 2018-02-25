@@ -6,6 +6,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import javax.validation.constraints.Size;
+import javax.validation.constraints.Future;
 
 
 /**
@@ -34,6 +35,7 @@ public class Job implements Serializable {
 	@Size(max=128, message="Description must not be longer then 128 characters.")
 	private String description;
 
+	@Future
 	private Timestamp startTime;
 	
 	private Timestamp endTime;

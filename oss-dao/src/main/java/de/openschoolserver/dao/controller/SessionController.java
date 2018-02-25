@@ -1,4 +1,4 @@
-/* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
+ /* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2017 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.dao.controller;
 
