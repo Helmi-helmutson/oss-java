@@ -57,22 +57,7 @@ public class Software implements Serializable {
 	@JsonIgnore
 	private List<Category> removedFromCategories;
 	
-	//bi-directional many-to-many association to Device
-	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JoinTable(
-			name="SoftwareRequirements",
-			joinColumns={ @JoinColumn(name="software_id")	},
-			inverseJoinColumns={ @JoinColumn(name="requirement_id") }
-	)
-	@JsonIgnore
-	private List<Software> requirements;
-
-	//bi-directional many-to-many association to Device
-	@ManyToMany(mappedBy="requirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JsonIgnore
-	private List<Software> requiredBy;
-	
-    //bi-directional many-to-one association to User
+	    //bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
 	private User creator;
@@ -128,22 +113,6 @@ public class Software implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-	
-	public List<Software> getRequirements() {
-		return this.requirements;
-	}
-
-	public void setRequirements(List<Software> requirements) {
-		this.requirements = requirements;
-	}
-
-	public List<Software> getRequiredBy() {
-		return this.requiredBy;
-	}
-
-	public void setRequiredBy(List<Software> requiredBy) {
-		this.requiredBy = requiredBy;
 	}
 
 	public List<SoftwareLicense> getSoftwareLicenses() {
