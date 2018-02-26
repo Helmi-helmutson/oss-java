@@ -1284,4 +1284,12 @@ public class SoftwareController extends Controller {
 		}
 		return softwares.toString();
 	}
+
+	public List<Software> getSoftwareStatusById(List<Long> softwareIds) {
+		List<Software> softwares = new ArrayList<Software>();
+		for( Long i : softwareIds) {
+			softwares.add(getById(i));
+		}
+		return softwares;
+	}
 }

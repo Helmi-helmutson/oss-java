@@ -68,6 +68,21 @@ public interface SoftwareResource {
 			@PathParam("softwareId") long softwareId
 			);
 	
+    /*
+   	 * POST softwares/getSoftwares
+   	 */
+       @POST
+       @Path("getSoftwares")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Gets a list of software objects to the list of softwareIds.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @PermitAll
+       List<Software> getSoftwares(
+               @ApiParam(hidden = true) @Auth Session session,
+               List<Long> softwareIds
+       );
+    
 	/*
 	 * GET softwares/search/{search}
 	 */
@@ -421,7 +436,7 @@ public interface SoftwareResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("installationId") long installationId
 	);
-	
+
 	/*
 	 * GET softwares/available
 	 */

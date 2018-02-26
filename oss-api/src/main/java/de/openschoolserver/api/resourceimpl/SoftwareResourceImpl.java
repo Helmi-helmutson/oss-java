@@ -255,5 +255,11 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public List<Category> getInstallations(Session session) {
 		return new CategoryController(session).getByType("installation");
 	}
+
+	@Override
+	public List<Software> getSoftwares(Session session, List<Long> softwareIds) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.getSoftwareStatusById(softwareIds);
+	}
 	
 }
