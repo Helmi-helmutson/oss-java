@@ -139,9 +139,12 @@ public class CategoryController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
 		EntityManager em = getEntityManager();
+		Category oldCategory = this.getById(category.getId());
+		oldCategory.setDescription(category.getDescription());
+		oldCategory.setName(category.getName());
 		try {
 			em.getTransaction().begin();
-			em.merge(category);
+			em.merge(oldCategory);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -287,66 +290,96 @@ public class CategoryController extends Controller {
 	public OssResponse addMember(Long categoryId, String objectName,Long objectId ) {
 		EntityManager em = getEntityManager();
 		Category category = this.getById(categoryId);
+		boolean changes = false;
 		try {
 			em.getTransaction().begin();
 			switch(objectName){
 			case("Device"):
 				Device device = new DeviceController(this.session).getById(objectId);
-				category.getDevices().add(device);
-				device.getCategories().add(category);
-				em.merge(device);
+				if(!category.getDevices().contains(device)) {
+					category.getDevices().add(device);
+					device.getCategories().add(category);
+					em.merge(device);
+					changes = true;
+				}
 			break;
 			case("Group"):
 				Group group = new GroupController(this.session).getById(objectId);
-				category.getGroups().add(group);
-				group.getCategories().add(category);
-				em.merge(group);
+				if(!category.getGroups().contains(group)) {
+					category.getGroups().add(group);
+					group.getCategories().add(category);
+					em.merge(group);
+					changes = true;
+				}
 			break;
 			case("HWConf"):
 				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
-				category.getHWConfs().add(hwconf);
-				hwconf.getCategories().add(category);
-				em.merge(hwconf);
+				if(!category.getHWConfs().contains(hwconf)) {
+					category.getHWConfs().add(hwconf);
+					hwconf.getCategories().add(category);
+					em.merge(hwconf);
+					changes = true;
+				}
 			break;
 			case("Room"):
 				Room room = new RoomController(this.session).getById(objectId);
-				category.getRooms().add(room);
-				room.getCategories().add(category);
-				em.merge(room);
+				if(!category.getRooms().contains(room)) {
+					category.getRooms().add(room);
+					room.getCategories().add(category);
+					em.merge(room);
+					changes = true;
+				}
 			break;
 			case("Software"):
 				Software software = new SoftwareController(this.session).getById(objectId);
-				category.getSoftwares().add(software);
-				software.getCategories().add(category);
-				em.merge(software);
+				if(!category.getSoftwares().contains(software)) {
+					category.getSoftwares().add(software);
+					software.getCategories().add(category);
+					em.merge(software);
+					changes = true;
+				}
 			break;
 			case("User"):
 				User user = new UserController(this.session).getById(objectId);
-				category.getUsers().add(user);
-				user.getCategories().add(category);
-				em.merge(user);
+				if(!category.getUsers().contains(user)) {
+					category.getUsers().add(user);
+					user.getCategories().add(category);
+					em.merge(user);
+					changes = true;
+				}
 			break;
 			case("FAQ"):
 				FAQ faq = new InformationController(this.session).getFAQById(objectId);
-				category.getFaqs().add(faq);
-				faq.getCategories().add(category);
-				em.merge(faq);
+				if(!category.getFaqs().contains(faq)) {
+					category.getFaqs().add(faq);
+					faq.getCategories().add(category);
+					em.merge(faq);
+					changes = true;
+				}
 			break;
 			case("Announcement"):
 				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
-				category.getAnnouncements().add(info);
-				info.getCategories().add(category);
-				em.merge(info);
+				if(!category.getAnnouncements().contains(info)) {
+					category.getAnnouncements().add(info);
+					info.getCategories().add(category);
+					em.merge(info);
+					changes = true;
+				}
 			break;
 			case("Contact"):
 				Contact contact = new InformationController(this.session).getContactById(objectId);
-				category.getContacts().add(contact);
-				contact.getCategories().add(category);
-				em.merge(contact);
+				if(!category.getContacts().contains(contact)) {
+					category.getContacts().add(contact);
+					contact.getCategories().add(category);
+					em.merge(contact);
+					changes = true;
+				}
 			break;
 			}
-			em.merge(category);
-			em.getTransaction().commit();
+			if( changes ) {
+				em.merge(category);
+				em.getTransaction().commit();
+			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -364,59 +397,77 @@ public class CategoryController extends Controller {
 			switch(objectName){
 			case("Device"):
 				Device device = new DeviceController(this.session).getById(objectId);
-				category.getDevices().remove(device);
-				device.getCategories().remove(category);
-				em.merge(device);
+				if(category.getDevices().contains(device)) {
+					category.getDevices().remove(device);
+					device.getCategories().remove(category);
+					em.merge(device);
+				}
 			break;
 			case("Group"):
 				Group group = new GroupController(this.session).getById(objectId);
-				category.getGroups().remove(group);
-				group.getCategories().remove(category);
-				em.merge(group);
+				if(category.getGroups().contains(group)) {
+					category.getGroups().remove(group);
+					group.getCategories().remove(category);
+					em.merge(group);
+				}
 			break;
 			case("HWConf"):
 				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
-				category.getHWConfs().remove(hwconf);
-				hwconf.getCategories().remove(category);
-				em.merge(hwconf);
+				if(category.getHWConfs().contains(hwconf)) {
+					category.getHWConfs().remove(hwconf);
+					hwconf.getCategories().remove(category);
+					em.merge(hwconf);
+				}
 			break;
 			case("Room"):
 				Room room = new RoomController(this.session).getById(objectId);
-				category.getRooms().remove(room);
-				room.getCategories().remove(category);
-				em.merge(room);
+				if(category.getRooms().contains(room)) {
+					category.getRooms().remove(room);
+					room.getCategories().remove(category);
+					em.merge(room);
+				}
 			break;
 			case("Software"):
 				Software software = new SoftwareController(this.session).getById(objectId);
-				category.getSoftwares().remove(software);
-				category.getRemovedSoftwares().add(software);
-				software.getCategories().remove(category);
-				software.getRemovedFromCategories().add(category);
-				em.merge(software);
+				if( category.getSoftwares().contains(software) ) {
+					category.getSoftwares().remove(software);
+					category.getRemovedSoftwares().add(software);
+					software.getCategories().remove(category);
+					software.getRemovedFromCategories().add(category);
+					em.merge(software);
+				}
 			break;
 			case("User"):
 				User user = new UserController(this.session).getById(objectId);
-				category.getUsers().remove(user);
-				user.getCategories().remove(category);
-				em.merge(user);
+				if( category.getUsers().contains(user)) {
+					category.getUsers().remove(user);
+					user.getCategories().remove(category);
+					em.merge(user);
+				}
 			break;
 			case("FAQ"):
 				FAQ faq = new InformationController(this.session).getFAQById(objectId);
-				category.getFaqs().remove(faq);
-				faq.getCategories().remove(category);
-				em.merge(faq);
+				if(category.getFaqs().contains(faq) ) {
+					category.getFaqs().remove(faq);
+					faq.getCategories().remove(category);
+					em.merge(faq);
+				}
 			break;
 			case("Announcement"):
 				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
-				category.getAnnouncements().remove(info);
-				info.getCategories().remove(category);
-				em.merge(info);
+				if( category.getAnnouncements().contains(info)) {
+					category.getAnnouncements().remove(info);
+					info.getCategories().remove(category);
+					em.merge(info);
+				}
 			break;
 			case("Contact"):
 				Contact contact = new InformationController(this.session).getContactById(objectId);
-				category.getContacts().remove(contact);
-				contact.getCategories().remove(category);
-				em.merge(contact);
+				if( category.getContacts().contains(contact)) {
+					category.getContacts().remove(contact);
+					contact.getCategories().remove(category);
+					em.merge(contact);
+				}
 			break;
 			}
 			em.merge(category);
