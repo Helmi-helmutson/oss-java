@@ -26,6 +26,8 @@ import java.util.List;
 public class Software implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	@Transient
+	@JsonIgnore
 	Logger logger           = LoggerFactory.getLogger(Software.class);
 
 	@Id
@@ -78,11 +80,14 @@ public class Software implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		logger.debug("hashCode was called: " + this.id + " " + result);
 		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
+		logger.debug("equals was called: " + this.id );
+
 		if (this == obj)
 			return true;
 		if (obj == null)
