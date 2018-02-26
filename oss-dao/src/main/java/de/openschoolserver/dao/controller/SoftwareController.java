@@ -419,6 +419,9 @@ public class SoftwareController extends Controller {
 		try {
 			Software s = em.find(Software.class, softwareId);
 			Category c = em.find(Category.class, categoryId);
+			if(c.getSoftwares().contains(s) ) {
+				return new OssResponse(this.getSession(),"OK","Software was alread added to the installation.");
+			}
 			s.getCategories().add(c);
 			c.getSoftwares().add(s);
 			s.getRemovedFromCategories().remove(c);
@@ -433,7 +436,7 @@ public class SoftwareController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","SoftwareState was added to category succesfully");
+		return new OssResponse(this.getSession(),"OK","Software was added to the installation succesfully.");
 	}
 	
 	public OssResponse deleteSoftwareFromCategory(Long softwareId,Long categoryId){
@@ -441,6 +444,9 @@ public class SoftwareController extends Controller {
 		try {
 			Software s = em.find(Software.class, softwareId);
 			Category c = em.find(Category.class, categoryId);
+			if(!c.getSoftwares().contains(s) ) {
+				return new OssResponse(this.getSession(),"OK","Software is not member of the installation.");
+			}
 			s.getCategories().remove(c);
 			c.getSoftwares().remove(s);
 			s.getRemovedFromCategories().add(c);
