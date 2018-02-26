@@ -420,7 +420,7 @@ public class SoftwareController extends Controller {
 			Software s = em.find(Software.class, softwareId);
 			Category c = em.find(Category.class, categoryId);
 			if(c.getSoftwares().contains(s) ) {
-				return new OssResponse(this.getSession(),"OK","Software was alread added to the installation.");
+				return new OssResponse(this.getSession(),"OK","Software was already added to the installation.");
 			}
 			s.getCategories().add(c);
 			c.getSoftwares().add(s);
