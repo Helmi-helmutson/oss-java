@@ -97,13 +97,24 @@ public class Session implements Principal {
 	
 	@Override
 	public int hashCode() {
-	    return token != null ? token.hashCode() : id;
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + id;
+		return result;
 	}
 	
 	@Override
 	public boolean equals(Object obj) {
-	    return token != null && obj != null && ((Session) obj).getToken() != null
-	            && token.equals(((Session) obj).getToken());
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Session other = (Session) obj;
+		if (id != other.id)
+			return false;
+		return true;
 	}
 	
 	@Override
