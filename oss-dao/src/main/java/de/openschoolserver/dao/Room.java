@@ -3,6 +3,7 @@ package de.openschoolserver.dao;
 
 import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.List;
@@ -139,6 +140,16 @@ public class Room implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
 
 	@Override
 	public int hashCode() {

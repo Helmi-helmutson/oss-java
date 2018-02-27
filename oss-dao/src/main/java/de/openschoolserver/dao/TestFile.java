@@ -4,6 +4,7 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -86,6 +87,16 @@ public class TestFile implements Serializable {
 	public void setUser(User user) {
 		this.user = user;
 	}
+
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
 
 	@Override
 	public int hashCode() {

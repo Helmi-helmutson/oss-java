@@ -4,6 +4,7 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 /**
  * The persistent class for the OSSConfig database table.
  *
@@ -36,6 +37,16 @@ public class OSSConfig implements Serializable {
     	@ManyToOne
     	@JsonIgnore
     	private User creator;
+
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
 
         @Override
 		public int hashCode() {

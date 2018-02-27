@@ -23,8 +23,6 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
@@ -229,7 +227,7 @@ public class EducationController extends Controller {
 		RoomController roomController = new RoomController(this.session);
 		Room room = roomController.getById(roomId);
 		try {
-			logger.debug("EducationController.getRoom:" + new ObjectMapper().writeValueAsString(room));
+			logger.debug("EducationController.getRoom:" + room);
 		}  catch (Exception e) {
 			logger.error("EducationController.getRoom error:" + e.getMessage());
 		}
@@ -298,7 +296,7 @@ public class EducationController extends Controller {
 		} else {
 			for( Device device : room.getDevices() ) {
 				try {
-					logger.debug("EducationController.getRoom:" + new ObjectMapper().writeValueAsString(device));
+					logger.debug("EducationController.getRoom:" + device );
 				}  catch (Exception e) {
 					logger.error("EducationController.getRoom error:" + e.getMessage());
 				}

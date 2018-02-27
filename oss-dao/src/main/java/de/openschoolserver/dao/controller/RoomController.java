@@ -31,8 +31,6 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.tools.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @SuppressWarnings( "unchecked" )
 public class RoomController extends Controller {
 
@@ -225,7 +223,7 @@ public class RoomController extends Controller {
 			em.getTransaction().begin();
 			em.persist(room);
 			em.getTransaction().commit();
-			logger.debug("Created Room:" + new ObjectMapper().writeValueAsString(room));
+			logger.debug("Created Room:" + room);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());

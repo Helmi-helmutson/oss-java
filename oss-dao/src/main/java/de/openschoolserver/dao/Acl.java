@@ -4,6 +4,7 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -73,6 +74,16 @@ public class Acl implements Serializable {
 			return false;
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
 
 	public Acl() {
 	}

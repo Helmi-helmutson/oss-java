@@ -5,6 +5,7 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -74,6 +75,16 @@ public class Test implements Serializable {
 		this.id = id;
 	}
 	
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

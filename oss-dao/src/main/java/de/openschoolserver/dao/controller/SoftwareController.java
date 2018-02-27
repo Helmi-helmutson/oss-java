@@ -887,7 +887,7 @@ public class SoftwareController extends Controller {
 			softwaresToRemove.put(device.getName(), toRemove);
 		}
 		try {
-			logger.debug("Software map after devices:" + new ObjectMapper().writeValueAsString(softwaresToInstall));
+			logger.debug("Software map after devices:" + softwaresToInstall);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -951,7 +951,7 @@ public class SoftwareController extends Controller {
 			}
 		}
 		try {
-			logger.debug("Software map:" + new ObjectMapper().writeValueAsString(softwaresToInstall));
+			logger.debug("Software map:" + softwaresToInstall);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;

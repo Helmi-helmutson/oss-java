@@ -13,8 +13,6 @@ import de.openschoolserver.dao.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @SuppressWarnings( "unchecked" )
 public class CategoryController extends Controller {
 
@@ -120,7 +118,7 @@ public class CategoryController extends Controller {
 			em.getTransaction().begin();
 			em.persist(category);
 			em.getTransaction().commit();
-			logger.debug("Created Category:" + new ObjectMapper().writeValueAsString(category));
+			logger.debug("Created Category:" + category );
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());

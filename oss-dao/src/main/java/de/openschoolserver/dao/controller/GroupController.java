@@ -22,8 +22,6 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @SuppressWarnings( "unchecked" )
 public class GroupController extends Controller {
 
@@ -126,7 +124,7 @@ public class GroupController extends Controller {
 			em.getTransaction().begin();
 			em.persist(group);
 			em.getTransaction().commit();
-			logger.debug("Created Group:" + new ObjectMapper().writeValueAsString(group));
+			logger.debug("Created Group:" + group);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
