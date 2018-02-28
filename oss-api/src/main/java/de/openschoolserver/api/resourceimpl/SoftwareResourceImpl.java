@@ -234,7 +234,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public OssResponse removeLicense(Session session, long licenseId) {
+	public OssResponse deleteLicense(Session session, long licenseId) {
 		// TODO Auto-generated method stub
 		return null;
 	}

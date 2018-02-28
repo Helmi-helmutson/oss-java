@@ -189,7 +189,7 @@ public interface SoftwareResource {
 	@Path("licenses/{licenseId}")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Creates licences to a software" )
+    @ApiOperation( value = "Modifies an existing license." )
     @ApiResponses(value = {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
@@ -209,12 +209,12 @@ public interface SoftwareResource {
 	@Path("licenses/{licenseId}")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Creates licences to a software" )
+    @ApiOperation( value = "Deletes an existing licence." )
     @ApiResponses(value = {
 	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
     @RolesAllowed("software.modify")
-    OssResponse removeLicense(
+    OssResponse deleteLicense(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("licenseId") long licenseId
             );
