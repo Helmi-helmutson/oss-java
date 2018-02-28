@@ -16,8 +16,11 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.SoftwareLicense;
 import de.openschoolserver.dao.SoftwareStatus;
+import de.openschoolserver.dao.SoftwareVersion;
 import de.openschoolserver.dao.controller.SoftwareController;
 import de.openschoolserver.dao.controller.CategoryController;
+
+import javax.ws.rs.WebApplicationException;
 
 public class SoftwareResourceImpl implements SoftwareResource {
 
@@ -66,12 +69,6 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		return softwareController.applySoftwareStateToHosts();
 	}
 
-	@Override
-	public OssResponse addLicenseToSoftware(Session session, long softwareId, SoftwareLicense softwareLicense,
-			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.addLicenseToSoftware(softwareLicense, softwareId, fileInputStream, contentDispositionHeader);
-	}
 
 	@Override
 	public OssResponse createInstallation(Session session, Category category) {
@@ -180,69 +177,14 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 	
 	@Override
-	public OssResponse removeSoftwares(Session session, List<String> softwares) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.removeSoftwares(softwares);
-	}
-
-	@Override
 	public List<Map<String, String>> listDownloadedSoftware(Session session) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.listDownloadedSoftware();
+		return new SoftwareController(session).listDownloadedSoftware();
 	}
 
 	@Override
 	public OssResponse setSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
 			String version) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.setSoftwareStatusOnDeviceByName(deviceName, softwareName, version, "I");
-	}
-
-	@Override
-	public OssResponse setSoftwareInstalledOnDeviceById(Session session, Long deviceId, String softwareName,
-			String version) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.setSoftwareStatusOnDeviceById(deviceId, softwareName, version, "I");
-	}
-
-	@Override
-	public OssResponse deleteSoftwareStatusFromDevice(Session session, String deviceName, String softwareName,
-			String version) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.deleteSoftwareStatusFromDeviceByName(deviceName, softwareName, version);
-	}
-
-	@Override
-	public OssResponse deleteSoftwareStatusFromDeviceById(Session session, Long deviceId, String softwareName,
-			String version) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.deleteSoftwareStatusFromDeviceById(deviceId, softwareName, version);
-	}
-
-	@Override
-	public List<SoftwareStatus> getSoftwareStatusOnDevice(Session session, String deviceName, String softwareName) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.getSoftwareStatusOnDeviceByName(deviceName, softwareName);
-	}
-
-	@Override
-	public List<SoftwareStatus> getSoftwareStatusOnDeviceById(Session session, Long deviceId, String softwareName) {
-		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.getSoftwareStatusOnDeviceById(deviceId, softwareName);
-	}
-
-	@Override
-	public String getSoftwareStatusOnDeviceByName(Session session, String DeviceName, String softwareName,
-			String version) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public String getSoftwareStatusOnDeviceById(Session session, Long deviceId, String softwareName, 
-			String version) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SoftwareController(session).setSoftwareStatusOnDeviceByName(deviceName, softwareName, version, "I");
 	}
 
 	@Override
@@ -258,8 +200,64 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public List<Software> getSoftwares(Session session, List<Long> softwareIds) {
+		return new SoftwareController(session).getSoftwareStatusById(softwareIds);
+	}
+
+	@Override
+	public OssResponse addLicenseToSoftware(
+			Session session,
+			long softwareId,
+			SoftwareLicense softwareLicense,
+			InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+
+		return new SoftwareController(session).addLicenseToSoftware(
+				softwareLicense,
+				softwareId,
+				fileInputStream,
+				contentDispositionHeader);
+	}
+
+	@Override
+	public OssResponse modifyLicense(
+			Session session,
+			long licenseId,
+			SoftwareLicense softwareLicense,
+			InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader
+		) {
+		if( licenseId != softwareLicense.getId() ) {
+			throw new WebApplicationException(404);
+		}
+		return new SoftwareController(session).modifySoftwareLIcense(
+				softwareLicense,fileInputStream,contentDispositionHeader);
+	}
+
+	@Override
+	public OssResponse removeLicense(Session session, long licenseId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<SoftwareStatus> getSoftwareStatusOnDevice(Session session, Long deviceId, Long softwareId) {
+		return new SoftwareController(session).getSoftwareStatusOnDeviceById(deviceId, softwareId);
+	}
+
+	@Override
+	public List<SoftwareStatus> getSoftwareStatus(Session session, Long softwareId) {
 		SoftwareController softwareController = new SoftwareController(session);
-		return softwareController.getSoftwareStatusById(softwareIds);
+		List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
+		Software software = softwareController.getById(softwareId);
+		for( SoftwareVersion sv : software.getSoftwareVersions() ) {
+			for( SoftwareStatus st : sv.getSoftwareStatuses() ) {
+				st.setSoftwareName(software.getName());
+				st.setDeviceName(st.getDevice().getName());
+				st.setVersion(sv.getVersion());
+				softwareStatus.add(st);
+			}
+		}
+		return softwareStatus;
 	}
 	
 }
