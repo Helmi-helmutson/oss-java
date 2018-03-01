@@ -4,6 +4,7 @@ package de.openschoolserver.dao;
 import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
@@ -192,6 +193,16 @@ public class User implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
 
 	@Override
 	public int hashCode() {

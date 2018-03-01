@@ -9,8 +9,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.openschoolserver.dao.Announcement;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Contact;
@@ -48,7 +46,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(announcement);
 			em.getTransaction().commit();
-			logger.debug("Created Announcement:" + new ObjectMapper().writeValueAsString(announcement));
+			logger.debug("Created Announcement:" + announcement);
 			return new OssResponse(this.getSession(),"OK", "Announcement was created succesfully.",announcement.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -74,7 +72,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(contact);
 			em.getTransaction().commit();
-			logger.debug("Created Contact:" + new ObjectMapper().writeValueAsString(contact));
+			logger.debug("Created Contact:" + contact);
 			return new OssResponse(this.getSession(),"OK", "Contact was created succesfully.",contact.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -100,7 +98,7 @@ public class InformationController extends Controller {
 			em.getTransaction().begin();
 			em.persist(faq);
 			em.getTransaction().commit();
-			logger.debug("Created FAQ:" + new ObjectMapper().writeValueAsString(faq));
+			logger.debug("Created FAQ:" + faq);
 			return new OssResponse(this.getSession(),"OK", "FAQ was created succesfully.",faq.getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);

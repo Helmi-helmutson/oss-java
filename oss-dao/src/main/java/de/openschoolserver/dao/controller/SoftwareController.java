@@ -83,6 +83,18 @@ public class SoftwareController extends Controller {
 		}
 	}
 
+	public SoftwareLicense getSoftwareLicenseById(long id) {
+		EntityManager em = getEntityManager();
+		try {
+			return em.find(SoftwareLicense.class, id);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
 	public List<Software> search(String search) {
 		EntityManager em = getEntityManager();
 		try {
@@ -471,7 +483,8 @@ public class SoftwareController extends Controller {
 	/*
 	 * Add a license to a software
 	 */
-	public OssResponse addLicenseToSoftware(SoftwareLicense softwareLicense, Long softwareId,
+	public OssResponse addLicenseToSoftware(SoftwareLicense softwareLicense,
+			Long softwareId,
 			InputStream fileInputStream, 
 			FormDataContentDisposition contentDispositionHeader
 			) 
@@ -490,7 +503,7 @@ public class SoftwareController extends Controller {
 			} finally {
 				em.close();
 			}
-			return this.uploadLicenseFile(softwareLicense.getId(), fileInputStream, contentDispositionHeader);
+			return this.uploadLicenseFile(softwareLicense, fileInputStream, contentDispositionHeader);
 		}
 		if(softwareLicense.getLicenseType().equals('C') && fileInputStream == null) {
 			try {
@@ -534,11 +547,42 @@ public class SoftwareController extends Controller {
 		return new OssResponse(this.getSession(),"OK","License was added to the software succesfully");
 	}
 	
-	public OssResponse uploadLicenseFile(Long licenseId, InputStream fileInputStream, 
+	/*
+	 * Modify an existing license
+	 */
+	public OssResponse modifySoftwareLIcense(
+			SoftwareLicense softwareLicense,
+			InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader
+			) {
+		SoftwareLicense oldLicense = this.getSoftwareLicenseById(softwareLicense.getId());
+		if( oldLicense == null ) {
+			throw new WebApplicationException(404);
+		}
+		oldLicense.setCount(softwareLicense.getCount());
+		oldLicense.setValue(softwareLicense.getValue());
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.merge(oldLicense);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		if( softwareLicense.getLicenseType().equals('F') && fileInputStream != null ) {
+			return this.uploadLicenseFile(softwareLicense, fileInputStream, contentDispositionHeader);
+		}
+		return new OssResponse(this.getSession(),"OK","License was modified succesfully");
+	}
+
+	public OssResponse uploadLicenseFile(
+			SoftwareLicense softwareLicense,
+			InputStream fileInputStream, 
 			FormDataContentDisposition contentDispositionHeader)
 	{
 		EntityManager em = getEntityManager();
-		SoftwareLicense softwareLicense = em.find(SoftwareLicense.class, licenseId);
 		try {
 			String fileName = contentDispositionHeader.getFileName();
 			StringBuilder newFileName = new StringBuilder(SALT_PACKAGE_DIR);
@@ -887,7 +931,7 @@ public class SoftwareController extends Controller {
 			softwaresToRemove.put(device.getName(), toRemove);
 		}
 		try {
-			logger.debug("Software map after devices:" + new ObjectMapper().writeValueAsString(softwaresToInstall));
+			logger.debug("Software map after devices:" + softwaresToInstall);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -951,7 +995,7 @@ public class SoftwareController extends Controller {
 			}
 		}
 		try {
-			logger.debug("Software map:" + new ObjectMapper().writeValueAsString(softwaresToInstall));
+			logger.debug("Software map:" + softwaresToInstall);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -1253,12 +1297,12 @@ public class SoftwareController extends Controller {
 		return this.getSoftwareStatusOnDevice(device, software, version);
 	}
 
-	public List<SoftwareStatus> getSoftwareStatusOnDevice(Device device, String softwareName) {
+	public List<SoftwareStatus> getSoftwareStatusOnDevice(Device device, Long softwareId) {
 		List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
 		for( SoftwareStatus st : device.getSoftwareStatus() ) {
 			st.setSoftwareName(st.getSoftwareVersion().getSoftware().getName());
 			st.setDeviceName(device.getName());
-			if( softwareName.equals("*") || st.getSoftwareName().equals(softwareName) ) {
+			if( softwareId < 1 || st.getSoftwareVersion().getSoftware().getId() == softwareId ) {
 				st.setVersion(st.getSoftwareVersion().getVersion());
 				st.setManually(st.getSoftwareVersion().getSoftware().getManually());
 				softwareStatus.add(st);
@@ -1267,14 +1311,9 @@ public class SoftwareController extends Controller {
 		return softwareStatus;
 	}
 
-	public List<SoftwareStatus> getSoftwareStatusOnDeviceByName(String deviceName, String softwareName) {
-		Device device = new DeviceController(this.session).getByName(deviceName);
-		return this.getSoftwareStatusOnDevice(device, softwareName);
-	}
-
-	public List<SoftwareStatus> getSoftwareStatusOnDeviceById(Long deviceId, String softwareName) {
+	public List<SoftwareStatus> getSoftwareStatusOnDeviceById(Long deviceId, Long softwareId) {
 		Device  device = new DeviceController(this.session).getById(deviceId);
-		return this.getSoftwareStatusOnDevice(device, softwareName);
+		return this.getSoftwareStatusOnDevice(device, softwareId);
 	}
 
 	public String getSoftwareLicencesOnDevice(String deviceName) {

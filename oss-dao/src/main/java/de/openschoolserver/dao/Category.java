@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -180,6 +181,16 @@ public class Category implements Serializable {
 	@Convert(converter=BooleanToStringConverter.class)
 	boolean studentsOnly;
 
+
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
 
 	@Override
 	public int hashCode() {

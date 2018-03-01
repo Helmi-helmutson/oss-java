@@ -10,8 +10,6 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.openschoolserver.api.resources.EducationResource;
 import de.openschoolserver.api.resources.Resource;
 import de.openschoolserver.dao.Category;

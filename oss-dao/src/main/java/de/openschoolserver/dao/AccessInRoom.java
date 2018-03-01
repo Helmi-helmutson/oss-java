@@ -5,6 +5,7 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -167,6 +168,16 @@ public class AccessInRoom implements Serializable {
 			return false;
 		return true;
 	}
+	
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
 
 	public Room getRoom() {
 		return this.room;

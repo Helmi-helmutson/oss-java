@@ -19,6 +19,7 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The persistent class for the RoomConfig database table.
@@ -71,6 +72,16 @@ public class RoomSmartControl implements Serializable {
 	@Column(name = "endTime")
 	private Date endTime; 
 	   
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

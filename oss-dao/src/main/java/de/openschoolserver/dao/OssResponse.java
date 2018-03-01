@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -51,6 +52,16 @@ public class OssResponse implements Serializable {
 	@Column(name="session_id", insertable = false, updatable = false)
 	private java.math.BigInteger sessionId;
 	
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
+
     @Override
 	public int hashCode() {
 		final int prime = 31;

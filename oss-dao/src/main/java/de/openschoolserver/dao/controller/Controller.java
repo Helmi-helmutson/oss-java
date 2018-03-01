@@ -8,8 +8,6 @@ import javax.persistence.EntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.persistence.Query;
 import java.util.List;
 import java.util.Locale;
@@ -281,7 +279,7 @@ public class Controller extends Config {
 				case "add_institute":
 				case "modify_institute":
 				case "delete_institue":
-					data.append(new ObjectMapper().writeValueAsString(object));
+					data.append(object);
 					break;
 				}
 			} catch (Exception e) {

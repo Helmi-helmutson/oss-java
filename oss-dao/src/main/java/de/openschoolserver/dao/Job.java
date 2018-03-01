@@ -7,6 +7,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import javax.validation.constraints.Size;
 import javax.validation.constraints.Future;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 /**
@@ -125,6 +126,16 @@ public class Job implements Serializable {
 	public void setEndTime(Timestamp endTime) {
 		this.endTime = endTime;
 	}
+
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+	
 
 	@Override
 	public int hashCode() {
