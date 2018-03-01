@@ -113,6 +113,7 @@ public class EducationController extends Controller {
 		room.setDescription(smartRoom.getDescription());
 		room.setRoomType("smartRoom");
 		room.getCategories().add(smartRoom);
+		smartRoom.setRooms(new ArrayList<Room>());
 		smartRoom.getRooms().add(room);
 		smartRoom.setOwner(owner);
 		smartRoom.setCategoryType("smartRoom");

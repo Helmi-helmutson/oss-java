@@ -5,6 +5,8 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -127,9 +129,14 @@ public class Room implements Serializable {
 	private User creator;
 
 	public Room() {
-		this.network      = "";
-		this.roomControl  = "inRoom";
-		this.startIP      = "";
+		this.network           = "";
+		this.roomControl       = "inRoom";
+		this.startIP           = "";
+		this.categories        = new ArrayList<Category>();
+		this.accessInRooms     = new ArrayList<AccessInRoom>();
+		this.availablePrinters = new ArrayList<Device>();
+		this.devices           = new ArrayList<Device>();
+		this.smartControls     = new ArrayList<RoomSmartControl>();
 	}
 
 	public Long getId() {
