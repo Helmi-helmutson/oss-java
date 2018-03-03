@@ -84,6 +84,9 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final DeviceResource devicesResource = new DeviceResourceImpl();
         environment.jersey().register(devicesResource);
         
+        final PrinterResource printerResource = new PrinterResourceImpl();
+        environment.jersey().register(printerResource);
+        
         final CloneToolResource cloneToolResource = new CloneToolResourceImpl();
         environment.jersey().register(cloneToolResource);
         

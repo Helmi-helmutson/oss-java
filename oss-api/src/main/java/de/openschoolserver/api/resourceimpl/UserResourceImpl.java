@@ -8,7 +8,6 @@ import javax.ws.rs.WebApplicationException;
 
 import de.openschoolserver.api.resources.UserResource;
 import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.OSSConfig;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.GroupController;
