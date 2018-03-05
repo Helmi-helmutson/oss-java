@@ -46,11 +46,11 @@ public interface PrinterResource {
 	@RolesAllowed("printers.manage")
 	OssResponse addPrinter(
 			@ApiParam(hidden = true) @Auth Session session,
-			@FormParam("device")        String  name,
-			@FormParam("mac")      		String  mac,
-			@FormParam("roomId")   		Long    roomId,
-			@FormParam("modell")   		String  modell,
-			@FormParam("windowsDriver") boolean windowsDriver,
+			@FormDataParam("name")          String  name,
+			@FormDataParam("mac")      		String  mac,
+			@FormDataParam("roomId")   		Long    roomId,
+			@FormDataParam("modell")   		String  modell,
+			@FormDataParam("windowsDriver") boolean windowsDriver,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 			);
