@@ -10,6 +10,16 @@ SQLPW=$( grep javax.persistence.jdbc.password= /opt/oss-java/conf/oss-api.proper
 echo "DELETE FROM Sessions WHERE IP='127.0.0.1'" | mysql -u $SQLUSER -p${SQLPW} OSS
 echo "INSERT INTO Sessions VALUES(NULL,1,NULL,NULL,NOW(),'127.0.0.1','$TOKEN')" | mysql -u $SQLUSER -p${SQLPW} OSS
 
+#Create recreate the printer driver files if neccesarry
+if [ -e /usr/share/oss/templates/printers.txt -a -e /usr/share/oss/templates/drivers.txt ]; then
+        NEWER=$( find /usr/share/cups -name '*ppd.gz' -newer /usr/share/oss/templates/printers.txt )
+        if [ "$NEWER" ]; then
+                /usr/share/oss/tools/CreatePrinterPpd.pl
+        fi
+else
+        /usr/share/oss/tools/CreatePrinterPpd.pl
+fi
+
 #Restart some scripts
 SQUIDACTIVE=$(  systemctl is-active squid.service )
 SQUIDENABLED=$(  systemctl is-enabled squid.service )

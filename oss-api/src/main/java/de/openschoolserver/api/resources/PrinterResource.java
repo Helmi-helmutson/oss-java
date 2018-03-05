@@ -2,38 +2,54 @@ package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
-
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import io.swagger.annotations.Api;
 import io.dropwizard.auth.Auth;
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.OssResponse;
-import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Session;
 
+import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 @Path("printers")
 @Api(value = "printers")
 public interface PrinterResource {
 	
-	/*
-	 * Get adhoclan/users
-	 */
+	
+	@POST
+	@Path("add")
+	@Produces(JSON_UTF8)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@ApiOperation(value = "Creates a new printer.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("printers.manage")
+	OssResponse addPrinter(
+			@ApiParam(hidden = true) @Auth Session session,
+			Printer printer,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+			);
+
 	@GET
 	@Path("all")
 	@Produces(JSON_UTF8)
@@ -41,7 +57,7 @@ public interface PrinterResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	List<Printer> getPrinters(
 			@ApiParam(hidden = true) @Auth Session session
 			);
@@ -54,7 +70,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse deletePrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")		Long printerId
@@ -68,7 +84,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse resetPrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")		Long printerId
@@ -82,7 +98,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse enablePrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")		Long printerId
@@ -96,7 +112,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse disablePrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")		Long printerId
@@ -110,7 +126,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse activateWindowsDriver(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")		Long printerId
@@ -124,7 +140,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse deletePrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
@@ -138,7 +154,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse resetPrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
@@ -152,7 +168,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse enablePrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
@@ -166,7 +182,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse disablePrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
@@ -180,10 +196,31 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("printers.manage")
 	OssResponse activateWindowsDriver(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
+			);
+	
+	/*
+	 *
+	 */
+	@GET
+	@Path("availableDrivers")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Get the list of the available drivers sorted by printer manufacturer"
+			+ "The result is a hashmap of arrays:"
+			+ "{<br>"
+			+ "&nbsp;&nbsp;&nbsp; manufacturer1: [ Model1, Model2, Model3 ],<br>"
+			+ "&nbsp;&nbsp;&nbsp; manufacturer2: [ Model4, Model5, Model6 ]<br>"
+			+ "}")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No device was found"),
+			@ApiResponse(code = 405, message = "Device is not a Printer."),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("printers.manage")
+	Map<String,String[]> getAvailableDrivers(
+			@ApiParam(hidden = true) @Auth Session session
 			);
 
 }

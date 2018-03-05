@@ -4,13 +4,29 @@ import de.openschoolserver.dao.controller.*;
 import de.openschoolserver.dao.tools.*;
 import java.util.regex.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Printer {
 	
+	/*
+	 * Variables required for creating a printer
+	 */
 	private Long      id;
 	private String    name;
+	private String    manufacturer;
+	private String    modell;
+	private String    mac;
+	private Long      roomId;
+	private boolean   windowsDriver;
+	
+	/*
+	 * State variables
+	 */
 	private String    state;
 	private boolean   acceptingJobs;
 	private int       activeJobs;
+
+	@JsonIgnore
 	private Device    device;	
 
 	public Printer() {
@@ -43,6 +59,7 @@ public class Printer {
 		OSSShellTools.exec(program, reply, stderr, null);
 		lines = reply.toString().split(deviceController.getNl());
 		this.activeJobs = lines.length-2;
+		this.windowsDriver = false;
 	}
 	
 	public Printer(String name, DeviceController deviceController) {
@@ -100,5 +117,46 @@ public class Printer {
 	public void setId(Long id) {
 		this.id = id;
 	}
+
+	public String getManufacturer() {
+		return manufacturer;
+	}
+
+	public void setManufacturer(String manufacturer) {
+		this.manufacturer = manufacturer;
+	}
+
+	public String getModell() {
+		return modell;
+	}
+
+	public void setModell(String modell) {
+		this.modell = modell;
+	}
+
+	public String getMac() {
+		return mac;
+	}
+
+	public void setMac(String mac) {
+		this.mac = mac;
+	}
+
+	public Long getRoomId() {
+		return roomId;
+	}
+
+	public void setRoomId(Long roomId) {
+		this.roomId = roomId;
+	}
+
+	public boolean isWindowsDriver() {
+		return windowsDriver;
+	}
+
+	public void setWindowsDriver(boolean windowsDriver) {
+		this.windowsDriver = windowsDriver;
+	}
+
 
 }

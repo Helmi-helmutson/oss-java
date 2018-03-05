@@ -1,11 +1,22 @@
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.*;
 
 import javax.ws.rs.WebApplicationException;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,13 +24,16 @@ import de.openschoolserver.api.resources.PrinterResource;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controller.DeviceController;
+import de.openschoolserver.dao.controller.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 public class PrinterResourceImpl implements PrinterResource {
 	
 	Logger logger = LoggerFactory.getLogger(PrinterResourceImpl.class);
+	private Path DRIVERS   = Paths.get("/usr/share/oss/templates/drivers.txt");
+	private Path PRINTERS  = Paths.get("/usr/share/oss/templates/printers.txt");
 
 	public PrinterResourceImpl() {
 		// TODO Auto-generated constructor stub
@@ -54,6 +68,11 @@ public class PrinterResourceImpl implements PrinterResource {
 				OSSShellTools.exec(program, reply, stderr, null);
 				String jobs[] = reply.toString().split(deviceController.getNl());
 				printer.setActiveJobs(jobs.length-2);
+				// Test if the windows driver was activated
+				File file = new File("/var/lib/printserver/drivers/x64/3/"+name+".ppd");
+				if( file.exists() ) {
+					printer.setWindowsDriver(true);
+				}
 				printers.add(printer);
 			}
 		}
@@ -120,8 +139,14 @@ public class PrinterResourceImpl implements PrinterResource {
 	
 	@Override
 	public OssResponse activateWindowsDriver(Session session, Long printerId) {
-		// TODO Auto-generated method stub
-		return null;
+		Device printer = new DeviceController(session).getById(printerId);
+		if( printer == null ) {
+			throw new WebApplicationException(404);
+		}
+		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+			throw new WebApplicationException(405);
+		}
+		return activateWindowsDriver( session, printer.getName() );
 	}
 
 	@Override
@@ -137,12 +162,110 @@ public class PrinterResourceImpl implements PrinterResource {
 	}
 
 
-
-
 	@Override
 	public OssResponse activateWindowsDriver(Session session, String printerName) {
-		// TODO Auto-generated method stub
-		return null;
+		//Create the windows driver
+		String[] program     = new String[6];
+		StringBuffer reply   = new StringBuffer();
+		StringBuffer stderr  = new StringBuffer();
+		program[0] = "/usr/sbin/cupsaddsmb";
+		program[1] = "-H";
+		program[2] = "printserver";
+		program[3] = "-U";
+		program[4] = "cephalix%" + new Controller(session).getProperty("de.openschoolserver.dao.User.Cephalix.Password");
+		program[5] = printerName;
+		OSSShellTools.exec(program, reply, stderr, null);
+		if( stderr.length() > 0 ) {
+			return new OssResponse(session,"ERROR", stderr.toString());
+		}
+		return new OssResponse(session,"OK","Windows driver was activated.");
 	}
 
+	@Override
+	public OssResponse addPrinter(Session session, Printer printer, InputStream fileInputStream,
+          FormDataContentDisposition contentDispositionHeader) {
+		
+		
+		//First we create a device object
+		RoomController roomController = new RoomController(session);
+		HWConf hwconf = new CloneToolController(session).getByName("Printer");
+		Device device = new Device();
+		device.setMac(printer.getMac());
+		device.setName(printer.getName());
+		device.setHwconf(hwconf);
+		List<Device> devices = new ArrayList<Device>();
+		devices.add(device);
+		
+		//Persist the device object
+		OssResponse ossResponse = roomController.addDevices(printer.getRoomId(), devices);
+		if( ossResponse.getCode().equals("ERROR")) {
+			return ossResponse;
+		}
+		
+		//Create the printer in CUPS
+		String driverFile = "";
+		if( fileInputStream != null ) {
+			File file = null;
+			try {
+				file = File.createTempFile("oss_driverFile", printer.getName(), new File("/opt/oss-java/tmp/"));
+				Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				return new OssResponse(session,"ERROR", e.getMessage());
+			}
+			driverFile = file.toPath().toString();
+		} else {
+			try {
+				for( String line : Files.readAllLines(DRIVERS) ) {
+					String[] fields = line.split("###");
+					if( fields.length == 2 && fields[0].equals(printer.getModell()) ) {
+						driverFile = fields[1];
+						break;
+					}
+				}
+			} catch (IOException e) {
+				logger.error(e.getMessage(), e);
+				return new OssResponse(session,"ERROR", e.getMessage());
+			}
+		}
+		String[] program = new String[11];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/sbin/lpadmin";
+		program[1] = "-p";
+		program[2] = printer.getName();
+		program[3] = "-P";
+		program[4] = driverFile;
+		program[5] = "-o";
+		program[6] = "printer-error-policy=abort-job";
+		program[7] = "-o";
+		program[8] = "PageSize=A4";
+		program[9] = "-v";
+		program[10]= "socket://"+ printer.getName();
+				
+		OSSShellTools.exec(program, reply, stderr, null);
+		
+		ossResponse = activateWindowsDriver(session,printer.getName());
+		if( ossResponse.getCode().equals("ERROR")) { 
+			return ossResponse;
+		}
+
+		return new OssResponse(session,"OK", "Printer was created succesfully.");
+	}
+
+	@Override
+	public Map<String,String[]> getAvailableDrivers(Session session) {
+		Map<String,String[]> drivers = new HashMap<String,String[]>(); 
+		try {
+			for( String line : Files.readAllLines(PRINTERS) ) {
+				String[] fields = line.split("###");
+				if( fields.length == 2 ) {
+					drivers.put(fields[0], fields[1].split("%%"));
+				}
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return drivers;
+	}
 }
