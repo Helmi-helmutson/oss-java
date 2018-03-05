@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.api.resources.SoftwareResource;
 import de.openschoolserver.dao.Category;
@@ -205,12 +206,18 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public OssResponse addLicenseToSoftware(
-			Session session,
-			long softwareId,
-			SoftwareLicense softwareLicense,
+			Session     session,
+			long        softwareId,
+			Character   licenseType,
+    		Integer     count,
+    		String      value,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 
+		SoftwareLicense softwareLicense = new SoftwareLicense();
+		softwareLicense.setValue(value);
+		softwareLicense.setCount(count);
+		softwareLicense.setLicenseType(licenseType);
 		return new SoftwareController(session).addLicenseToSoftware(
 				softwareLicense,
 				softwareId,
@@ -220,16 +227,20 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public OssResponse modifyLicense(
-			Session session,
-			long licenseId,
-			SoftwareLicense softwareLicense,
+			Session     session,
+			long        licenseId,
+			Character   licenseType,
+    		Integer     count,
+    		String      value,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader
 		) {
-		if( licenseId != softwareLicense.getId() ) {
-			throw new WebApplicationException(404);
-		}
-		return new SoftwareController(session).modifySoftwareLIcense(
+		SoftwareController  softwareController = new SoftwareController(session);
+		SoftwareLicense softwareLicense = softwareController.getSoftwareLicenseById(licenseId);
+		softwareLicense.setCount(count);
+		softwareLicense.setValue(value);
+		softwareLicense.setLicenseType(licenseType);
+		return softwareController.modifySoftwareLIcense(
 				softwareLicense,fileInputStream,contentDispositionHeader);
 	}
 

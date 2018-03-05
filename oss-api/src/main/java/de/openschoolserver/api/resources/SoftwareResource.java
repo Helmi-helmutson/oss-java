@@ -177,9 +177,11 @@ public interface SoftwareResource {
     OssResponse addLicenseToSoftware(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("softwareId") long softwareId,
-    		SoftwareLicense softwareLicense,
-            @FormDataParam("file") final InputStream fileInputStream,
-            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+    		@FormDataParam("licenseType") Character licenseType,
+    		@FormDataParam("count")		  Integer   count,
+    		@FormDataParam("value")       String    value,
+            @FormDataParam("file")  final InputStream fileInputStream,
+            @FormDataParam("file")  final FormDataContentDisposition contentDispositionHeader
             );
 	
 	/*
@@ -197,7 +199,9 @@ public interface SoftwareResource {
     OssResponse modifyLicense(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("licenseId") long licenseId,
-    		SoftwareLicense softwareLicense,
+    		@FormDataParam("licenseType") Character licenseType,
+    		@FormDataParam("count")		  Integer   count,
+    		@FormDataParam("value")       String    value,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
             );

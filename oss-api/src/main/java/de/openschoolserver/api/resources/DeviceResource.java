@@ -372,13 +372,12 @@ public interface DeviceResource {
     @Path("import")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( position = 1,
-    				value =	"Import devices from a CSV file. This MUST have following format:\\n"  +
-    						"* Separator is the semicolon ';'.\\n" +
-    						"* A header line must be provided.\\n" +
-    						"* The header line is case insensitive.\\n" +
-    						"* The fields Room and MAC are mandatory.\\n" +
-    						"* The import is only allowed in existing rooms\\n")
+    @ApiOperation( 	value =	"Import devices from a CSV file. This MUST have following format:\\n" ,
+    				notes = "* Separator is the semicolon ';'.<br>" +
+    						"* A header line must be provided.<br>" +
+    						"* The header line is case insensitive.<br>" +
+    						"* The fields Room and MAC are mandatory.<br>" +
+    						"* The import is only allowed in existing rooms.<br>")
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
