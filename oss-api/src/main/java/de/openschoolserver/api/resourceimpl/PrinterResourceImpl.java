@@ -81,14 +81,59 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse deletePrinter(Session session, Long printerId) {
-		// TODO Auto-generated method stub
-		return null;
+		DeviceController devcieController = new DeviceController(session);
+		Device printer = devcieController.getById(printerId);
+		if( printer == null ) {
+			throw new WebApplicationException(404);
+		}
+		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+			throw new WebApplicationException(405);
+		}
+		String[] program    = new String[3];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/sbin/lpadmin";
+		program[1] = "-x";
+		program[2] = printer.getName();
+		OSSShellTools.exec(program, reply, stderr, null);
+		return devcieController.delete(printerId, true);
+	}
+
+	@Override
+	public OssResponse deletePrinter(Session session, String printerName) {
+		Device printer = new DeviceController(session).getByName(printerName);
+		if( printer == null ) {
+			throw new WebApplicationException(404);
+		}
+		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+			throw new WebApplicationException(405);
+		}
+		return deletePrinter(session, printer.getId());
 	}
 
 	@Override
 	public OssResponse resetPrinter(Session session, Long printerId) {
-		// TODO Auto-generated method stub
-		return null;
+		Device printer = new DeviceController(session).getById(printerId);
+		if( printer == null ) {
+			throw new WebApplicationException(404);
+		}
+		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+			throw new WebApplicationException(405);
+		}
+		return resetPrinter(session, printer.getName());
+	}
+
+	@Override
+	public OssResponse resetPrinter(Session session, String printerName) {
+		String[] program = new String[2];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/bin/lprm";
+		program[1] = "-P";
+		program[2] = printerName;
+		program[3] = "-";
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new OssResponse(session,"OK","Printer was reseted succesfully.");
 	}
 
 	@Override
@@ -111,7 +156,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[0] = "/usr/sbin/cupsenable";
 		program[1] = printerName;
 		OSSShellTools.exec(program, reply, stderr, null);
-		return null;
+		return new OssResponse(session,"OK","Printer was enabled succesfully.");
 	}
 
 	@Override
@@ -134,7 +179,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[0] = "/usr/sbin/cupsdisable";
 		program[1] = printerName;
 		OSSShellTools.exec(program, reply, stderr, null);
-		return null;
+		return new OssResponse(session,"OK","Printer was disabled succesfully.");
 	}
 	
 	@Override
@@ -148,19 +193,6 @@ public class PrinterResourceImpl implements PrinterResource {
 		}
 		return activateWindowsDriver( session, printer.getName() );
 	}
-
-	@Override
-	public OssResponse deletePrinter(Session session, String printerName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public OssResponse resetPrinter(Session session, String printerName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
 
 	@Override
 	public OssResponse activateWindowsDriver(Session session, String printerName) {
@@ -186,7 +218,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			String name,
 			String mac,
 			Long roomId,
-			String modell,
+			String model,
 			boolean windowsDriver,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
@@ -224,7 +256,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			try {
 				for( String line : Files.readAllLines(DRIVERS) ) {
 					String[] fields = line.split("###");
-					if( fields.length == 2 && fields[0].equals(modell) ) {
+					if( fields.length == 2 && fields[0].equals(model) ) {
 						driverFile = fields[1];
 						break;
 					}

@@ -49,7 +49,7 @@ public interface PrinterResource {
 			@FormDataParam("name")          String  name,
 			@FormDataParam("mac")      		String  mac,
 			@FormDataParam("roomId")   		Long    roomId,
-			@FormDataParam("modell")   		String  modell,
+			@FormDataParam("model")   		String  model,
 			@FormDataParam("windowsDriver") boolean windowsDriver,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
@@ -213,12 +213,13 @@ public interface PrinterResource {
 	@GET
 	@Path("availableDrivers")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Get the list of the available drivers sorted by printer manufacturer"
-			+ "The result is a hashmap of arrays:"
+	@ApiOperation(value = "Get the list of the available drivers sorted by printer manufacturer",
+			notes = "The result is a hashmap of arrays:"
 			+ "{<br>"
 			+ "&nbsp;&nbsp;&nbsp; manufacturer1: [ Model1, Model2, Model3 ],<br>"
 			+ "&nbsp;&nbsp;&nbsp; manufacturer2: [ Model4, Model5, Model6 ]<br>"
-			+ "}")
+			+ "}<br>"
+			+ "The selected model ")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
