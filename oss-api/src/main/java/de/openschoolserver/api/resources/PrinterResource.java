@@ -8,6 +8,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -45,7 +46,11 @@ public interface PrinterResource {
 	@RolesAllowed("printers.manage")
 	OssResponse addPrinter(
 			@ApiParam(hidden = true) @Auth Session session,
-			Printer printer,
+			@FormParam("device")        String  name,
+			@FormParam("mac")      		String  mac,
+			@FormParam("roomId")   		Long    roomId,
+			@FormParam("modell")   		String  modell,
+			@FormParam("windowsDriver") boolean windowsDriver,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 			);

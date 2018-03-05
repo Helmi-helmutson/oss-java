@@ -182,22 +182,28 @@ public class PrinterResourceImpl implements PrinterResource {
 	}
 
 	@Override
-	public OssResponse addPrinter(Session session, Printer printer, InputStream fileInputStream,
-          FormDataContentDisposition contentDispositionHeader) {
+	public OssResponse addPrinter(Session session,
+			String name,
+			String mac,
+			Long roomId,
+			String modell,
+			boolean windowsDriver,
+			InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
 		
 		
 		//First we create a device object
 		RoomController roomController = new RoomController(session);
 		HWConf hwconf = new CloneToolController(session).getByName("Printer");
 		Device device = new Device();
-		device.setMac(printer.getMac());
-		device.setName(printer.getName());
+		device.setMac(mac);
+		device.setName(name);
 		device.setHwconf(hwconf);
 		List<Device> devices = new ArrayList<Device>();
 		devices.add(device);
 		
 		//Persist the device object
-		OssResponse ossResponse = roomController.addDevices(printer.getRoomId(), devices);
+		OssResponse ossResponse = roomController.addDevices(roomId, devices);
 		if( ossResponse.getCode().equals("ERROR")) {
 			return ossResponse;
 		}
@@ -207,7 +213,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( fileInputStream != null ) {
 			File file = null;
 			try {
-				file = File.createTempFile("oss_driverFile", printer.getName(), new File("/opt/oss-java/tmp/"));
+				file = File.createTempFile("oss_driverFile", name, new File("/opt/oss-java/tmp/"));
 				Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
@@ -218,7 +224,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			try {
 				for( String line : Files.readAllLines(DRIVERS) ) {
 					String[] fields = line.split("###");
-					if( fields.length == 2 && fields[0].equals(printer.getModell()) ) {
+					if( fields.length == 2 && fields[0].equals(modell) ) {
 						driverFile = fields[1];
 						break;
 					}
@@ -233,7 +239,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		StringBuffer stderr = new StringBuffer();
 		program[0] = "/usr/sbin/lpadmin";
 		program[1] = "-p";
-		program[2] = printer.getName();
+		program[2] = name;
 		program[3] = "-P";
 		program[4] = driverFile;
 		program[5] = "-o";
@@ -241,13 +247,16 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[7] = "-o";
 		program[8] = "PageSize=A4";
 		program[9] = "-v";
-		program[10]= "socket://"+ printer.getName();
+		program[10]= "socket://"+ name;
 				
 		OSSShellTools.exec(program, reply, stderr, null);
 		
-		ossResponse = activateWindowsDriver(session,printer.getName());
-		if( ossResponse.getCode().equals("ERROR")) { 
-			return ossResponse;
+		if(windowsDriver) {
+			ossResponse = activateWindowsDriver(session,name);
+
+			if( ossResponse.getCode().equals("ERROR")) { 
+				return ossResponse;
+			}
 		}
 
 		return new OssResponse(session,"OK", "Printer was created succesfully.");
@@ -268,4 +277,5 @@ public class PrinterResourceImpl implements PrinterResource {
 		}
 		return drivers;
 	}
+
 }
