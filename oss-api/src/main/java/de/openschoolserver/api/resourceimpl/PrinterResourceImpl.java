@@ -16,7 +16,6 @@ import java.util.regex.*;
 import javax.ws.rs.WebApplicationException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,10 +63,9 @@ public class PrinterResourceImpl implements PrinterResource {
 				if( matcher.find() ) {
 					printer.setAcceptingJobs(matcher.group(0).equals("true"));
 				}
-				program[2] = "get-jobs.test";
-				OSSShellTools.exec(program, reply, stderr, null);
-				String jobs[] = reply.toString().split(deviceController.getNl());
-				printer.setActiveJobs(jobs.length-2);
+				if( matcher.find() ) {
+					printer.setActiveJobs(Integer.getInteger(matcher.group(0)));
+				}
 				// Test if the windows driver was activated
 				File file = new File("/var/lib/printserver/drivers/x64/3/"+name+".ppd");
 				if( file.exists() ) {
