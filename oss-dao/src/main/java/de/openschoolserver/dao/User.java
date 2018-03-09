@@ -171,6 +171,9 @@ public class User implements Serializable {
 	@Transient
 	private String password ="";
 
+	@Transient
+	private boolean mustChange = false;
+	
 	public User() {
 		this.id  = null;
 		this.uid = "";
@@ -184,6 +187,15 @@ public class User implements Serializable {
 		this.msQuota = 0;
 		this.msQuotaUsed = 0;
 		this.birthDay = new Date(System.currentTimeMillis());
+		this.mustChange = false;
+	}
+
+	public boolean isMustChange() {
+		return mustChange;
+	}
+
+	public void setMustChange(boolean mustChange) {
+		this.mustChange = mustChange;
 	}
 
 	public Long getId() {

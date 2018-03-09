@@ -169,6 +169,7 @@ public class UserController extends Controller {
 		}
 		else
 		{
+			user.setUid(user.getUid().toLowerCase());
 			// First we check if the parameter are unique.
 			// workstation users have a user called as itself
 			if( !user.getRole().equals("workstations") && !this.isNameUnique(user.getUid())){
@@ -180,7 +181,7 @@ public class UserController extends Controller {
 			}
 		}
 		// Check the user password
-		if( user.getRole().equals("workstations")) {
+		if( user.getRole().equals("workstations") || user.getRole().equals("guest") ) {
 			user.setPassword(user.getUid());
 		} else if( user.getPassword() == null || user.getPassword().isEmpty() ) {
 			user.setPassword(UserUtil.createRandomPassword(9,"ACGqf123#"));
@@ -404,6 +405,9 @@ public class UserController extends Controller {
 
 	public List<User> getUsers(List<Long> userIds) {
 		List<User> users = new ArrayList<User>();
+		if( userIds == null ) {
+			return users;
+		}
 		for ( Long id : userIds ){
 			users.add(this.getById(id));
 		}

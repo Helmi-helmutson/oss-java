@@ -125,31 +125,13 @@ public class Controller extends Config {
 	}
 	
 	public OssResponse checkPassword(String password) {
-		List<String> error = new ArrayList<String>();
-		if( password.length() < Integer.parseInt(this.getConfigValue("MINIMAL_PASSWORD_LENGTH")) ) {
-			error.add("User password is to short.");
-		}
-		if( password.length() > Integer.parseInt(this.getConfigValue("MAXIMAL_PASSWORD_LENGTH")) ) {
-			error.add("User password is to long.");
-		}
-		if(  this.getConfigValue("CHECK_PASSWORD_QUALITY") == "yes" ) {
-			if( ! Pattern.matches("[A-Z]",password) ) {
-				error.add("User password should contains upper case letters.");
-			}
-			if(! Pattern.matches("[0-9]",password) ) {
-				error.add("User password should contains numbers.");
-			}
-			String[] program    = new String[1];
-			StringBuffer reply  = new StringBuffer();
-			StringBuffer stderr = new StringBuffer();
-			program[0] = "/usr/sbin/cracklib-check";
-			OSSShellTools.exec(program, reply, stderr, password);
-			if( ! reply.toString().startsWith(password + ": OK")) {
-				error.add(reply.toString());
-			}
-		}
-		if( error.size() > 0 ) {
-			return new OssResponse(this.getSession(),"ERROR", String.join(System.lineSeparator(), error));
+		String[] program    = new String[1];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/share/oss/tools/check_password_complexity.sh";
+		OSSShellTools.exec(program, reply, stderr, password);
+		if( reply.toString().isEmpty() ) {
+			return new OssResponse(this.getSession(),"ERROR", reply.toString() );
 		}
 		return null;
 	}
@@ -209,6 +191,9 @@ public class Controller extends Config {
 				data.append(String.format("password: %s%n", user.getPassword()));
 				data.append(String.format("uid: %s%n", user.getUid()));
 				data.append(String.format("role: %s%n", user.getRole()));
+				if( user.isMustChange() ) {
+					data.append("mpassword: yes");
+				}
 				String myGroups = "";
 				for(Group g : user.getGroups()) {
 					myGroups.concat(g.getName() + " ");

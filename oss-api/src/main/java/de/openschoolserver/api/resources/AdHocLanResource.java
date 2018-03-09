@@ -88,7 +88,7 @@ public interface AdHocLanResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("room.add")
+    @RolesAllowed("adhoclan.manage")
     OssResponse add(
             @ApiParam(hidden = true) @Auth Session session,
             Room room
@@ -105,7 +105,7 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("adhoclan.manage")
 	OssResponse turnOn(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId
@@ -122,7 +122,7 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("adhoclan.manage")
 	OssResponse putObjectIntoRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId,
@@ -154,7 +154,7 @@ public interface AdHocLanResource {
 	@GET
 	@Path("devices")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets all defined AdHocLan Devices of a user.")
+	@ApiOperation(value = "Gets all AdHocLan Devices of a user.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -169,14 +169,14 @@ public interface AdHocLanResource {
 	@DELETE
 	@Path("devices/{deviceId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Delets defined AdHocLan Devices of a user.")
+	@ApiOperation(value = "Delets an AdHocLan Devices of a user.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
 	OssResponse deleteDevice(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("deviceId")     Long deviceId
+			@PathParam("deviceId")         Long    deviceId
 			);
 
     @PUT

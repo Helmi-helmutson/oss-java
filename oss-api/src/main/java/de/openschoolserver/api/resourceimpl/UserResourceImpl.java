@@ -2,19 +2,28 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityManager;
 import javax.ws.rs.WebApplicationException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.openschoolserver.api.resources.UserResource;
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.controller.CategoryController;
 import de.openschoolserver.dao.controller.GroupController;
 import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.OssResponse;
 
 public class UserResourceImpl implements UserResource {
+	
+	Logger logger           = LoggerFactory.getLogger(UserResourceImpl.class);
 
 	@Override
 	public User getById(Session session, long userId) {
@@ -187,5 +196,95 @@ public class UserResourceImpl implements UserResource {
 			}
 			return String.join(userController.getNl(), configs);
 		}
+	}
+
+	@Override
+	public List<Category> getGuestUsers(Session session) {
+		final CategoryController categoryController= new CategoryController(session);
+		if( categoryController.isSuperuser() ) {
+			return categoryController.getByType("guestUsers");
+		}
+		List<Category> categories = new ArrayList<Category>();
+		for( Category category : categoryController.getByType("guestUsers") ) {
+			if( category.getOwner().equals(session.getUser()) ) {
+				categories.add(category);
+			}
+		}
+		return categories;
+	}
+
+	@Override
+	public Category getGuersUsersCategory(Session session, Long guestUsersId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<User> deleteGuestUsers(Session session, Long guestUsersId) {
+		final UserController     userController    = new UserController(session);
+		final CategoryController categoryController= new CategoryController(session);
+		final GroupController    groupController   = new GroupController(session);
+		Category category = categoryController.getById(guestUsersId);
+	}
+
+	@Override
+	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, 
+			int count, Date validUntil) {
+		final UserController     userController    = new UserController(session);
+		final CategoryController categoryController= new CategoryController(session);
+		final GroupController    groupController   = new GroupController(session);
+		Category category = new Category();
+		category.setCategoryType("guestUsers");
+		category.setName(name);
+		category.setDescription(description);
+		category.setValidFrom(categoryController.now());
+		category.setValidUntil(validUntil);
+		OssResponse ossResponse =  categoryController.add(category);
+		if( ossResponse.getCode().equals("ERROR")) {
+			return ossResponse;
+		}
+		category = categoryController.getById(ossResponse.getObjectId());
+		
+		Group group = new Group();
+		group.setGroupType("guest");
+		group.setName(name);
+		group.setDescription(description);
+		ossResponse = groupController.add(group);
+		if( ossResponse.getCode().equals("ERROR")) {
+			categoryController.delete(category.getId());
+			return ossResponse;
+		}
+
+		group = groupController.getById(ossResponse.getObjectId());
+		EntityManager em = groupController.getEntityManager();
+		try {
+			em.getTransaction().begin();
+			category.setGroups(new ArrayList<Group>());
+			category.getGroups().add(group);
+			group.setCategories(new ArrayList<Category>());
+			group.getCategories().add(category);
+			em.merge(category);
+			em.merge(group);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
+		for( int i = 1; i < count +1 ;  i++) {
+			String userName = String.format("%s%02d", name, i);
+			User user = new User();
+			user.setUid(userName);
+			user.setGivenName(userName);
+			user.setGivenName("GuestUser");
+			user.setRole("guest");
+			ossResponse = userController.add(user);
+			user = userController.getById(ossResponse.getId());
+			groupController.addMember(group, user);
+			categoryController.addMember(category.getId(), "user", user.getId());
+		}
+		ossResponse.setObjectId(category.getId());
+		ossResponse.setValue("Guest Users were created succesfully");
+		ossResponse.setCode("OK");
+		return ossResponse; 
 	}
 }

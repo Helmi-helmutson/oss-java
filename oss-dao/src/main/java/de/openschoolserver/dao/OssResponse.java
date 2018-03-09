@@ -175,4 +175,9 @@ public class OssResponse implements Serializable {
 		this.parameters = parameters;
 	}
 
+
+	public void setCode(String code) {
+		this.code = code;
+	}
+
 }

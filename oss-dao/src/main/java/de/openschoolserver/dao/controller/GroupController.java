@@ -114,6 +114,8 @@ public class GroupController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
+		// Group names will be converted upper case
+		group.setName(group.getName().toUpperCase());
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(group.getName())){
 			return new OssResponse(this.getSession(),"ERROR","Group name is not unique.");

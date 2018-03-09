@@ -663,7 +663,7 @@ public class RoomController extends Controller {
 			// We'll create only for fatClients workstation users
 			if( device.getHwconf() != null && 
 					device.getHwconf().getDeviceType() != null &&
-					device.getHwconf().getDeviceType().equals("fatClient"))
+					device.getHwconf().getDeviceType().equals("FatClient"))
 			{
 				User user = new User();
 				user.setUid(device.getName());

@@ -7,9 +7,16 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.*;
+
+import java.util.Date;
 import java.util.List;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
@@ -287,5 +294,66 @@ public interface UserResource {
             @PathParam("uid")  String uid,
             @PathParam("attribute") String attribute
     		);
+    
+    
+    /*
+     * Mange gast user
+     */
+     @GET
+     @Path("guestUsers")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Gets all actual gast users. Systadmins get the lists all guest users. Normal users gets the own gast users.")
+     @ApiResponses(value = {
+             @ApiResponse(code = 404, message = "User not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+     @RolesAllowed("user.manage")
+     List<Category> getGuestUsers(
+                 @ApiParam(hidden = true) @Auth Session session
+     );
+     
+     @GET
+     @Path("guestUsers/{guestUsersId}")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Gets a guest users category.")
+     @ApiResponses(value = {
+             @ApiResponse(code = 404, message = "User not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+     @RolesAllowed("user.manage")
+     Category getGuersUsersCategory(
+                 @ApiParam(hidden = true) @Auth Session session,
+                 @PathParam("guestUsersId")     Long    guestUsersId
+     );
+     
+     @DELETE
+     @Path("guestUsers/{guestUsersId}")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Delete a guest users category.")
+     @ApiResponses(value = {
+             @ApiResponse(code = 404, message = "User not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+     @RolesAllowed("user.manage")
+     OssResponse  deleteGuestUsers(
+                 @ApiParam(hidden = true) @Auth Session session,
+                 @PathParam("guestUsersId")     Long    guestUsersId
+     );
+     
+ 	@POST
+ 	@Path("add")
+ 	@Produces(JSON_UTF8)
+ 	@Consumes(MediaType.MULTIPART_FORM_DATA)
+ 	@ApiOperation(value = "Creates a new printer.")
+ 	@ApiResponses(value = {
+ 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+ 	@RolesAllowed("printers.manage")
+ 	OssResponse addGuestUsers(
+ 			@ApiParam(hidden = true) @Auth Session session,
+ 			@FormDataParam("name")          String  name,
+ 			@FormDataParam("description")   String  description,
+ 			@FormDataParam("roomId")   		Long    roomId,
+ 			@FormDataParam("count")   		int     count,
+ 			@FormDataParam("validUntil")    Date    validUntil
+ 			);
+     
+     
      
 }

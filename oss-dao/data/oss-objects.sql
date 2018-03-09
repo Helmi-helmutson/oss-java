@@ -353,7 +353,7 @@ CREATE TABLE IF NOT EXISTS SoftwareLicenses (
 	value          VARCHAR(1024) NOT NULL,
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
-        FOREIGN KEY(software_id)    REFERENCES Softwares(id)     ON DELETE CASCADE,
+        FOREIGN KEY(software_id) REFERENCES Softwares(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
@@ -427,6 +427,8 @@ CREATE TABLE IF NOT EXISTS Categories (
 	categoryType VARCHAR(16) DEFAULT NULL,
         owner_id     BIGINT UNSIGNED DEFAULT NULL,
 	studentsOnly CHAR(1) DEFAULT 'N',
+        validFrom    DATE    DEFAULT NULL,
+        validUntil   DATE    DEFAULT NULL,
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;

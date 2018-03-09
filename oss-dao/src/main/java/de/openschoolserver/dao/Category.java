@@ -8,6 +8,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +43,12 @@ public class Category implements Serializable {
 	private String name;
 
 	private String categoryType;
+	
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date validFrom;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date validUntil;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
@@ -227,6 +234,7 @@ public class Category implements Serializable {
 		this.roomIds    = new ArrayList<Long>();
 		this.softwareIds= new ArrayList<Long>();
 		this.userIds    = new ArrayList<Long>();
+		this.validFrom  = new Date(System.currentTimeMillis());
 	}
 
 	public Long getId() {
@@ -476,6 +484,65 @@ public class Category implements Serializable {
 				this.userIds.add(u.getId());
 			}
 		}
+	}
+
+	public Date getVAlidFrom() {
+		return validFrom;
+	}
+
+
+	public void setValidFrom(Date validFrom) {
+		this.validFrom = validFrom;
+	}
+
+
+	public Date getValidUntil() {
+		return validUntil;
+	}
+
+
+	public void setValidUntil(Date validUntil) {
+		this.validUntil = validUntil;
+	}
+
+
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
+	}
+
+
+	public List<HWConf> getHwconfs() {
+		return hwconfs;
+	}
+
+
+	public void setHwconfs(List<HWConf> hwconfs) {
+		this.hwconfs = hwconfs;
+	}
+
+
+	public List<Long> getHwConfIds() {
+		return hwConfIds;
+	}
+
+
+	public void setHwConfIds(List<Long> hwConfIds) {
+		this.hwConfIds = hwConfIds;
+	}
+
+
+	public List<Long> getFaqIds() {
+		return faqIds;
+	}
+
+
+	public void setFaqIds(List<Long> faqIds) {
+		this.faqIds = faqIds;
 	}
 
 
