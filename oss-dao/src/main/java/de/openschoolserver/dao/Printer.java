@@ -14,7 +14,7 @@ public class Printer {
 	private Long      id;
 	private String    name;
 	private String    manufacturer;
-	private String    modell;
+	private String    model;
 	private String    mac;
 	private Long      roomId;
 	private boolean   windowsDriver;
@@ -126,12 +126,12 @@ public class Printer {
 		this.manufacturer = manufacturer;
 	}
 
-	public String getModell() {
-		return modell;
+	public String getModel() {
+		return model;
 	}
 
-	public void setModell(String modell) {
-		this.modell = modell;
+	public void setModell(String model) {
+		this.model = model;
 	}
 
 	public String getMac() {

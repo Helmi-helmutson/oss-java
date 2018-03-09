@@ -220,11 +220,14 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public List<User> deleteGuestUsers(Session session, Long guestUsersId) {
+	public OssResponse deleteGuestUsers(Session session, Long guestUsersId) {
 		final UserController     userController    = new UserController(session);
 		final CategoryController categoryController= new CategoryController(session);
 		final GroupController    groupController   = new GroupController(session);
 		Category category = categoryController.getById(guestUsersId);
+		//Have to implement.
+		OssResponse ossResponse = new OssResponse();
+		return ossResponse;
 	}
 
 	@Override
