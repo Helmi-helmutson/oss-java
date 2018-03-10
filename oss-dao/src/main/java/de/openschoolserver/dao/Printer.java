@@ -130,7 +130,7 @@ public class Printer {
 		return model;
 	}
 
-	public void setModell(String model) {
+	public void setModel(String model) {
 		this.model = model;
 	}
 

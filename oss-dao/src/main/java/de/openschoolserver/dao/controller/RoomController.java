@@ -21,7 +21,6 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.FAQ;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
@@ -667,7 +666,8 @@ public class RoomController extends Controller {
 			{
 				User user = new User();
 				user.setUid(device.getName());
-				user.setSurName(device.getName() + "  Workstation-User");
+				user.setGivenName(device.getName());
+				user.setSurName("Workstation-User");
 				user.setRole("workstations");
 				//TODO do not ignore response.
 				OssResponse answer = userController.add(user);

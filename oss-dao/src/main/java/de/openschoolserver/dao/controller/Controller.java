@@ -130,7 +130,7 @@ public class Controller extends Config {
 		StringBuffer stderr = new StringBuffer();
 		program[0] = "/usr/share/oss/tools/check_password_complexity.sh";
 		OSSShellTools.exec(program, reply, stderr, password);
-		if( reply.toString().isEmpty() ) {
+		if( ! reply.toString().isEmpty() ) {
 			return new OssResponse(this.getSession(),"ERROR", reply.toString() );
 		}
 		return null;
