@@ -128,11 +128,14 @@ public class CloneToolController extends Controller {
 	public OssResponse addHWConf(HWConf hwconf){
 		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(hwconf.getName())){
+		if( this.getByName(hwconf.getName()) != null){
 			return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
 		}
 		try {
 			hwconf.setCreator(this.session.getUser());
+			if( hwconf.getDeviceType() == null ||  hwconf.getDeviceType().isEmpty() ) {
+				hwconf.setDeviceType("FatClient");
+			}
 			em.getTransaction().begin();
 			em.persist(hwconf);
 			em.getTransaction().commit();

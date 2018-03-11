@@ -64,7 +64,8 @@ public class PrinterResourceImpl implements PrinterResource {
 					printer.setAcceptingJobs(matcher.group(0).equals("true"));
 				}
 				if( matcher.find() ) {
-					printer.setActiveJobs(Integer.getInteger(matcher.group(0)));
+					logger.debug("Found job:" + matcher.group(0));
+					printer.setActiveJobs(Integer.parseInt(matcher.group(0)));
 				}
 				// Test if the windows driver was activated
 				File file = new File("/var/lib/printserver/drivers/x64/3/"+name+".ppd");
@@ -195,6 +196,7 @@ public class PrinterResourceImpl implements PrinterResource {
 	@Override
 	public OssResponse activateWindowsDriver(Session session, String printerName) {
 		//Create the windows driver
+		logger.debug("Activating windows driver for: " + printerName);
 		String[] program     = new String[6];
 		StringBuffer reply   = new StringBuffer();
 		StringBuffer stderr  = new StringBuffer();
@@ -222,6 +224,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			FormDataContentDisposition contentDispositionHeader) {
 		
 		
+		logger.debug("addPrinter: " + name + "#" + mac + "#" + roomId + "#" + model +"#" + ( windowsDriver ? "yes" : "no" ) );
 		//First we create a device object
 		RoomController roomController = new RoomController(session);
 		HWConf hwconf = new CloneToolController(session).getByName("Printer");
@@ -229,6 +232,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		device.setMac(mac);
 		device.setName(name);
 		device.setHwconf(hwconf);
+		logger.debug(hwconf.getName() + "#" + hwconf.getId() );
 		List<Device> devices = new ArrayList<Device>();
 		devices.add(device);
 		
@@ -264,6 +268,7 @@ public class PrinterResourceImpl implements PrinterResource {
 				return new OssResponse(session,"ERROR", e.getMessage());
 			}
 		}
+		logger.debug("Add printer/usr/sbin/lpadmin -p " + name + " -P " + driverFile + " -o printer-error-policy=abort-job -o PageSize=A4 -v socket://" + name   );
 		String[] program = new String[11];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
@@ -280,6 +285,8 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[10]= "socket://"+ name;
 				
 		OSSShellTools.exec(program, reply, stderr, null);
+		logger.debug(stderr.toString());
+		logger.debug(reply.toString());
 		
 		if(windowsDriver) {
 			ossResponse = activateWindowsDriver(session,name);

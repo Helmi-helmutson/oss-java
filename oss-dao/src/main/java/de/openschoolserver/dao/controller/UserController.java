@@ -5,6 +5,8 @@ import org.slf4j.Logger;
 
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.lang.Integer;
@@ -405,6 +407,11 @@ public class UserController extends Controller {
 
 	public List<User> getUsers(List<Long> userIds) {
 		List<User> users = new ArrayList<User>();
+		try {
+			 logger.debug(new ObjectMapper().writeValueAsString(this));
+		} catch (Exception e) {
+			logger.debug("{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }");
+		}
 		if( userIds == null ) {
 			return users;
 		}

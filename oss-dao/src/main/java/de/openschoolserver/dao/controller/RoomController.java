@@ -641,7 +641,7 @@ public class RoomController extends Controller {
 				if( device.getOwner() == null ) {
 					device.setOwner(this.session.getUser());
 				}
-				if(device.getHwconfId() == null){
+				if(device.getHwconfId() == null || device.getHwconf() == null){
 					device.setHwconf(room.getHwconf());
 				} else {
 					device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
