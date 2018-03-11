@@ -55,6 +55,21 @@ public interface PrinterResource {
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 			);
 
+	@POST
+	@Path("{printerId}/setDriver")
+	@Produces(JSON_UTF8)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@ApiOperation(value = "Creates a new printer.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("printers.manage")
+	OssResponse setDriver(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("printerId")	Long printerId,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+			);
+	
 	@GET
 	@Path("all")
 	@Produces(JSON_UTF8)

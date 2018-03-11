@@ -239,7 +239,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		}
 		
 		//Create the printer in CUPS
-		String driverFile = "";
+		String driverFile = "/usr/share/cups/model/Postscript.ppd.gz";
 		if( fileInputStream != null ) {
 			File file = null;
 			try {
@@ -306,6 +306,45 @@ public class PrinterResourceImpl implements PrinterResource {
 			logger.error(e.getMessage(), e);
 		}
 		return drivers;
+	}
+
+	@Override
+	public OssResponse setDriver(Session session, Long printerId, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		Device printer = new DeviceController(session).getById(printerId);
+		if( printer == null ) {
+			throw new WebApplicationException(404);
+		}
+		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+			throw new WebApplicationException(405);
+		}
+		File file = null;
+		try {
+			file = File.createTempFile("oss_driverFile", printer.getName(), new File("/opt/oss-java/tmp/"));
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return new OssResponse(session,"ERROR", e.getMessage());
+		}
+		String driverFile = file.toPath().toString();
+		String[] program = new String[11];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/sbin/lpadmin";
+		program[1] = "-p";
+		program[2] = printer.getName();
+		program[3] = "-P";
+		program[4] = driverFile;
+		program[5] = "-o";
+		program[6] = "printer-error-policy=abort-job";
+		program[7] = "-o";
+		program[8] = "PageSize=A4";
+		program[9] = "-v";
+		program[10]= "socket://"+ printer.getName();
+
+		OSSShellTools.exec(program, reply, stderr, null);
+		//TODO check output
+		return new OssResponse(session,"OK", "Printer driver was set succesfully.");
 	}
 
 }
