@@ -75,7 +75,9 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 
 		try {
-			return em.find(Room.class, roomId);
+			Room room = em.find(Room.class, roomId);
+			room.setHwconfId(room.getHwconf().getId());
+			return room;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -813,8 +815,9 @@ public class RoomController extends Controller {
 	public OssResponse modify(Room room){
 		EntityManager em = getEntityManager();
 		Room oldRoom = this.getById(room.getId());
+		HWConf hwconf = new CloneToolController(this.session).getById(room.getHwconfId());
 		oldRoom.setDescription(room.getDescription());
-		oldRoom.setHwconf(room.getHwconf());
+		oldRoom.setHwconf(hwconf);
 		oldRoom.setRoomType(room.getRoomType());
 		oldRoom.setRows(room.getRows());
 		oldRoom.setRoomControl(room.getRoomControl());

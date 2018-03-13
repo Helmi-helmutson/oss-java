@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.lang.Integer;
 
@@ -18,10 +19,11 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import de.extis.core.util.UserUtil;
-
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.DHCPConfig;
+import de.openschoolserver.dao.tools.OSSShellTools;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
@@ -142,6 +144,7 @@ public class UserController extends Controller {
 
 	public OssResponse add(User user){
 		EntityManager em = getEntityManager();
+		logger.debug("User to create:" + user);
 		//Check role
 		if( user.getRole() == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "You have to define the role of the user.");
@@ -419,5 +422,176 @@ public class UserController extends Controller {
 			users.add(this.getById(id));
 		}
 		return users;
+	}
+	
+	public OssResponse resetUserPassword(List<Long> userIds, String password, boolean mustChange) {
+		StringBuilder data = new StringBuilder();
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[]   program = new String[5];
+		program[0] = "/usr/bin/samba-tool";
+		program[1] = "domain";
+		program[2]  = "passwordsettings";
+		program[3]  = "set";
+		program[4]  = "--complexity=off";
+		OSSShellTools.exec(program, reply, error, data.toString());
+
+		if( mustChange ) {
+			program = new String[6];
+			program[0] = "/usr/bin/samba-tool";
+			program[5] = "--must-change-at-next-login";
+		}
+		program[1] = "user";
+		program[2] = "setpassword";
+		program[4] = "--newpassword='" + password + "'";
+			
+		for ( Long id : userIds ){
+			program[3] = this.getById(id).getUid();
+			OSSShellTools.exec(program, reply, error, data.toString());
+		}
+		if ( this.getConfigValue("CHECK_PASSWORD_QUALITY").toLowerCase().equals("yes")) {
+			program = new String[5];
+			program[0] = "/usr/bin/samba-tool";
+			program[1] = "domain";
+			program[2]  = "passwordsettings";
+			program[3]  = "set";
+			program[4]  = "--complexity=off";
+			OSSShellTools.exec(program, reply, error, data.toString());
+		}
+		return  new OssResponse(this.getSession(),"OK","The password of the selected users was reseted.");
+	}
+
+	public OssResponse disableLogin(List<Long> userIds,  boolean disable) {
+		StringBuilder data = new StringBuilder();
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[]   program = new String[4];
+		program[0] = "/usr/bin/samba-tool";
+		program[1] = "user";
+		if( disable ) {
+			program[2]  = "disable";
+		} else {
+			program[2]  = "enable";
+		}
+		for ( Long id : userIds ){
+			program[3] = this.getById(id).getUid();
+			OSSShellTools.exec(program, reply, error, data.toString());
+		}
+		if( disable ) {
+			return  new OssResponse(this.getSession(),"OK","The selected users were disabled.");
+		}
+		return  new OssResponse(this.getSession(),"OK","The selected users were enabled.");
+	}
+	
+	public OssResponse disableInternet(List<Long> userIds,  boolean disable) {
+		for ( Long userId : userIds ){
+			if(disable ) {
+				this.setConfig(this.getById(userId), "internetDisabled", "yes");
+			} else {
+				this.deleteConfig(this.getById(userId), "internetDisabled");	
+			}
+		}
+		if( disable ) {
+			return  new OssResponse(this.getSession(),"OK","The selected users were disabled.");
+		}
+		return  new OssResponse(this.getSession(),"OK","The selected users were enabled.");
+	}
+	
+	
+	/*
+	 * GuestUsers
+	 */
+	public List<Category> getGuestUsers() {
+		final CategoryController categoryController= new CategoryController(this.session);
+		if( categoryController.isSuperuser() ) {
+			return categoryController.getByType("guestUsers");
+		}
+		List<Category> categories = new ArrayList<Category>();
+		for( Category category : categoryController.getByType("guestUsers") ) {
+			if( category.getOwner().equals(session.getUser()) ) {
+				categories.add(category);
+			}
+		}
+		return categories;
+	}
+
+
+	public Category getGuestUsersCategory(Long guestUsersId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public OssResponse deleteGuestUsers(Long guestUsersId) {
+		final CategoryController categoryController= new CategoryController(this.session);
+		final GroupController    groupController   = new GroupController(this.session);
+		Category category = categoryController.getById(guestUsersId);
+		//Have to implement.
+		OssResponse ossResponse = new OssResponse();
+		return ossResponse;
+	}
+
+
+	public OssResponse addGuestUsers(
+			String name,
+			String description,
+			Long   roomId, 
+			int    count,
+			Date   validUntil) {
+		final CategoryController categoryController= new CategoryController(this.session);
+		final GroupController    groupController   = new GroupController(this.session);
+		Category category = new Category();
+		category.setCategoryType("guestUsers");
+		category.setName(name);
+		category.setDescription(description);
+		category.setValidFrom(categoryController.now());
+		category.setValidUntil(validUntil);
+		OssResponse ossResponse =  categoryController.add(category);
+		if( ossResponse.getCode().equals("ERROR")) {
+			return ossResponse;
+		}
+		category = categoryController.getById(ossResponse.getObjectId());
+		
+		Group group = new Group();
+		group.setGroupType("guest");
+		group.setName(name);
+		group.setDescription(description);
+		ossResponse = groupController.add(group);
+		if( ossResponse.getCode().equals("ERROR")) {
+			categoryController.delete(category.getId());
+			return ossResponse;
+		}
+
+		group = groupController.getById(ossResponse.getObjectId());
+		EntityManager em = groupController.getEntityManager();
+		try {
+			em.getTransaction().begin();
+			category.setGroups(new ArrayList<Group>());
+			category.getGroups().add(group);
+			group.setCategories(new ArrayList<Category>());
+			group.getCategories().add(category);
+			em.merge(category);
+			em.merge(group);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		}
+		for( int i = 1; i < count +1 ;  i++) {
+			String userName = String.format("%s%02d", name, i);
+			User user = new User();
+			user.setUid(userName);
+			user.setGivenName(userName);
+			user.setGivenName("GuestUser");
+			user.setRole("guest");
+			ossResponse = this.add(user);
+			user = this.getById(ossResponse.getId());
+			groupController.addMember(group, user);
+			categoryController.addMember(category.getId(), "user", user.getId());
+		}
+		ossResponse.setObjectId(category.getId());
+		ossResponse.setValue("Guest Users were created succesfully");
+		ossResponse.setCode("OK");
+		return ossResponse; 
 	}
 }

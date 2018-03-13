@@ -29,7 +29,6 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 public class EducationController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(EducationController.class);
-	private List<String>  parameters;
     static FileAttribute<Set<PosixFilePermission>> privatDirAttribute  = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
     static FileAttribute<Set<PosixFilePermission>> privatFileAttribute = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));
 
