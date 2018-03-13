@@ -46,7 +46,9 @@ public class DeviceController extends Controller {
 	public Device getById(long deviceId) {
 		EntityManager em = getEntityManager();
 		try {
-			return em.find(Device.class, deviceId);
+			Device device = em.find(Device.class, deviceId);
+			device.setHwconfId(device.getHwconf().getId());
+			return device;
 		} catch (Exception e) {
 			logger.error("DeviceId:" + deviceId + " " + e.getMessage(),e);
 			return null;
@@ -673,11 +675,12 @@ public class DeviceController extends Controller {
 		}
 		EntityManager em = getEntityManager();
 		try {
+			HWConf hwconf = new CloneToolController(this.session).getById(device.getHwconfId());
 			oldDevice.setMac(device.getMac());
 			oldDevice.setWlanMac(device.getWlanMac());
 			oldDevice.setPlace(device.getPlace());
 			oldDevice.setRow(device.getPlace());
-			oldDevice.setHwconf(device.getHwconf());
+			oldDevice.setHwconf(hwconf);
 			em.getTransaction().begin();
 			em.merge(oldDevice);
 			em.getTransaction().commit();
@@ -759,8 +762,9 @@ public class DeviceController extends Controller {
 		case "saveFile":
 			List<String>   fileContent =new ArrayList<String>();
 			fileContent.add(actionContent.get("content"));
+			String fileName = actionContent.get("fileName");
 			try {
-				file  = File.createTempFile("oss_", ".ossb", new File("/opt/oss-java/tmp/"));
+				file  = File.createTempFile("oss_", fileName + ".ossb", new File("/opt/oss-java/tmp/"));
 				Files.write(file.toPath(), fileContent);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);
