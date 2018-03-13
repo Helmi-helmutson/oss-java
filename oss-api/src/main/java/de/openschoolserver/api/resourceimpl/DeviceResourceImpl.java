@@ -97,9 +97,12 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public String getFirstLoggedInUser(Session session, String IP) {
-		Device device = new DeviceController(session).getByIP(IP);
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getByIP(IP);
 		if( device != null && !device.getLoggedIn().isEmpty() ) {
-			return device.getLoggedIn().get(0).getUid();
+			if( ! deviceController.checkConfig(device.getLoggedIn().get(0), "disableInternet")) {
+				return device.getLoggedIn().get(0).getUid();
+			}
 		}
 		return "";
 	}
