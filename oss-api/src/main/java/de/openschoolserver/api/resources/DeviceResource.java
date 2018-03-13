@@ -262,7 +262,7 @@ public interface DeviceResource {
     @GET
     @Path("loggedIn/{IP}")
     @Produces(TEXT)
-    @ApiOperation(value = "Get the logged on users on a device defined by IP.")
+    @ApiOperation(value = "Get the first logged on user on a device defined by IP.")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
