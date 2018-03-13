@@ -8,6 +8,7 @@ import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 import javax.annotation.security.RolesAllowed;
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import javax.ws.rs.*;
@@ -17,6 +18,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.Session;
@@ -401,12 +403,12 @@ public interface EducationResource {
      @DELETE
      @Path("groups/{groupId}")
      @Produces(JSON_UTF8)
-     @ApiOperation(value = "Modify a workgroup.")
+     @ApiOperation(value = "Delete a workgroup.")
      @ApiResponses(value = {
              @ApiResponse(code = 500, message = "Server broken, please contact administrator")
      })
      @RolesAllowed("education.groups")
-     OssResponse  removeGroup(
+     OssResponse  deleteGroup(
              @ApiParam(hidden = true) @Auth Session session,
              @PathParam("groupId") Long groupId
             );
@@ -502,7 +504,7 @@ public interface EducationResource {
     /*
      * PUT education/users/{userId}/{deviceId}/{action}
      */
-    @PUT
+    @POST
     @Path("users/{userId}/{deviceId}/{action}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Send a action to a user to a device. If the device is -1 the user gets this action on all devices. " +
@@ -534,6 +536,24 @@ public interface EducationResource {
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
             );
  
+    @POST
+    @Path("users/applyAction")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Apply an action for a lot of user once.",
+    			notes = "The following actions are available:<br>"
+    					+ "setPassword -> stringValue has to contain the password and booleanValue if the users have to reset the password after first login.<br>"
+    					+ "setFilesystemQuota -> longValue has to contain the new quota value.<br>"
+    					+ "setMailSystemQuota -> longValue has to contain the new quota value.<br>"
+    					+ "disableLogin -> booleanValue has to contain the new value.<br>"
+    					+ "disableInternet -> booleanValue has to contain the new value.")
+    @ApiResponses(value = {
+    		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    OssResponse applyAction(@ApiParam(hidden = true) @Auth Session session,
+    		OssActionMap ossActionMap
+    		);
+
+    
     /************************************************************/
     /* Actions on logged in users and smart rooms and groups. */
     /************************************************************/
@@ -560,7 +580,7 @@ public interface EducationResource {
     @PUT
     @Path("devices/{deviceId}/{action}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Manage a room. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, .")
+    @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, .")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -569,9 +589,31 @@ public interface EducationResource {
     OssResponse manageDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") Long deviceId,
+            @PathParam("action") String action
+    );
+    
+    /*
+     * POST education/rooms/{roomId}/{action}
+     */
+    @POST
+    @Path("devices/{deviceId}/actionWithMap/{action}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy."
+    		+ "This version of call allows to send a map with some parametrs:"
+    		+ "graceTime : seconds to wait befor execute action."
+    		+ "message : the message to shown befor/during execute the action.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    OssResponse manageDevice(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") Long roomId,
             @PathParam("action") String action,
             Map<String, String> actionContent
     );
+
     
     @POST
     @Path("devices/{deviceId}/upload")
@@ -771,4 +813,63 @@ public interface EducationResource {
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );
+    
+    /*
+     * Mange gast user
+     */
+     @GET
+     @Path("guestUsers")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Gets all actual gast users. Systadmins get the lists all guest users. Normal users gets the own gast users.")
+     @ApiResponses(value = {
+             @ApiResponse(code = 404, message = "User not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+     @RolesAllowed("education.guestusers")
+     List<Category> getGuestUsers(
+                 @ApiParam(hidden = true) @Auth Session session
+     );
+     
+     @GET
+     @Path("guestUsers/{guestUsersId}")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Gets a guest users category.")
+     @ApiResponses(value = {
+             @ApiResponse(code = 404, message = "User not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+     @RolesAllowed("education.guestusers")
+     Category getGuestUsersCategory(
+                 @ApiParam(hidden = true) @Auth Session session,
+                 @PathParam("guestUsersId")     Long    guestUsersId
+     );
+     
+     @DELETE
+     @Path("guestUsers/{guestUsersId}")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Delete a guest users category.")
+     @ApiResponses(value = {
+             @ApiResponse(code = 404, message = "User not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+     @RolesAllowed("education.guestusers")
+     OssResponse  deleteGuestUsers(
+                 @ApiParam(hidden = true) @Auth Session session,
+                 @PathParam("guestUsersId")     Long    guestUsersId
+     );
+     
+ 	@POST
+ 	@Path("add")
+ 	@Produces(JSON_UTF8)
+ 	@Consumes(MediaType.MULTIPART_FORM_DATA)
+ 	@ApiOperation(value = "Creates a new printer.")
+ 	@ApiResponses(value = {
+ 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+ 	@RolesAllowed("education.guestusers")
+ 	OssResponse addGuestUsers(
+ 			@ApiParam(hidden = true) @Auth Session session,
+ 			@FormDataParam("name")          String  name,
+ 			@FormDataParam("description")   String  description,
+ 			@FormDataParam("roomId")   		Long    roomId,
+ 			@FormDataParam("count")   		int     count,
+ 			@FormDataParam("validUntil")    Date    validUntil
+ 			);
+     
 }

@@ -3,6 +3,7 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -15,6 +16,7 @@ import de.openschoolserver.api.resources.Resource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.Session;
@@ -68,8 +70,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		}
 		return new EducationController(session).manageRoom(roomId,action, null);
 	}
-	@Override
 
+	@Override
 	public OssResponse manageRoom(Session session, Long roomId, String action, Map<String, String> actionContent) {
 		try {
 			logger.debug("EducationResourceImpl.manageRoom:" + roomId + " action:" + action);
@@ -90,7 +92,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse removeGroup(Session session, Long groupId) {
+	public OssResponse deleteGroup(Session session, Long groupId) {
 		return new EducationController(session).deleteGroup(groupId);
 	}
 
@@ -120,6 +122,11 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<String> getAvailableDeviceActions(Session session, Long deviceId) {
 		return new EducationController(session).getAvailableDeviceActions(deviceId);
+	}
+
+	@Override
+	public OssResponse manageDevice(Session session, Long deviceId, String action) {
+		return new DeviceController(session).manageDevice(deviceId,action,null);
 	}
 
 	@Override
@@ -296,4 +303,49 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return null;
 	}
 
+	@Override
+	public OssResponse applyAction(Session session, OssActionMap ossActionMap) {
+		UserController userController = new UserController(session);
+		switch(ossActionMap.getName()) {
+		case "setPassword":
+			return  userController.resetUserPassword(
+					ossActionMap.getUserIds(),
+					ossActionMap.getStringValue(),
+					ossActionMap.isBooleanValue());
+		case "setFilesystemQuota":
+			break;
+		case "setMailsystemQuota":
+			break;
+		case "disableLogin":
+			return  userController.disableLogin(
+					ossActionMap.getUserIds(),
+					ossActionMap.isBooleanValue());
+		case "disableInternet":
+			return  userController.disableInternet(
+					ossActionMap.getUserIds(),
+					ossActionMap.isBooleanValue());
+		}
+		return new OssResponse(session,"ERROR","Unknown action");
+	}
+	
+	@Override
+	public List<Category> getGuestUsers(Session session) {
+		return new UserController(session).getGuestUsers();
+	}
+
+	@Override
+	public Category getGuestUsersCategory(Session session, Long guestUsersId) {
+		return new UserController(session).getGuestUsersCategory(guestUsersId);
+	}
+
+	@Override
+	public OssResponse deleteGuestUsers(Session session, Long guestUsersId) {
+		return new UserController(session).deleteGuestUsers(guestUsersId);
+	}
+
+	@Override
+	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, int count,
+			Date validUntil) {
+		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
+	}
 }
