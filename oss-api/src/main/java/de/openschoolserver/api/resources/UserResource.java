@@ -306,7 +306,7 @@ public interface UserResource {
      @ApiResponses(value = {
              @ApiResponse(code = 404, message = "User not found"),
              @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-     @RolesAllowed("user.manage")
+     @RolesAllowed("user.guestusers")
      List<Category> getGuestUsers(
                  @ApiParam(hidden = true) @Auth Session session
      );
@@ -318,7 +318,7 @@ public interface UserResource {
      @ApiResponses(value = {
              @ApiResponse(code = 404, message = "User not found"),
              @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-     @RolesAllowed("user.manage")
+     @RolesAllowed("user.guestusers")
      Category getGuestUsersCategory(
                  @ApiParam(hidden = true) @Auth Session session,
                  @PathParam("guestUsersId")     Long    guestUsersId
@@ -331,7 +331,7 @@ public interface UserResource {
      @ApiResponses(value = {
              @ApiResponse(code = 404, message = "User not found"),
              @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-     @RolesAllowed("user.manage")
+     @RolesAllowed("user.guestusers")
      OssResponse  deleteGuestUsers(
                  @ApiParam(hidden = true) @Auth Session session,
                  @PathParam("guestUsersId")     Long    guestUsersId
@@ -344,7 +344,7 @@ public interface UserResource {
  	@ApiOperation(value = "Creates a new printer.")
  	@ApiResponses(value = {
  			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
- 	@RolesAllowed("user.manage")
+ 	@RolesAllowed("user.guestusers")
  	OssResponse addGuestUsers(
  			@ApiParam(hidden = true) @Auth Session session,
  			@FormDataParam("name")          String  name,
