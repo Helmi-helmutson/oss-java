@@ -569,7 +569,8 @@ public interface SoftwareResource {
 	);
 
 	/* #######################################################
-	 * Functions to set and get software installation status #
+	 * Functions for the plugin by starting the clients.     #
+	 * In this case only the device name is accessible.      #
 	 * #######################################################
 	 * 
 	 * PUT softwares/devicesByName/{deviceName}/{softwareName}/{version}
