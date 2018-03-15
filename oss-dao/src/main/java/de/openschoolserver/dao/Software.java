@@ -35,7 +35,7 @@ public class Software implements Serializable {
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean manually;
 
-	@Size(max=32, message="Name must not be longer then 32 characters.")
+	@Size(max=128, message="Name must not be longer then 128 characters.")
 	private String name;
 
 	private Integer weight;
