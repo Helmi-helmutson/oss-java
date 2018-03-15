@@ -1063,8 +1063,15 @@ public class SoftwareController extends Controller {
 				softwaresToInstall.get(device.getName()).sort((String s1, String s2) -> { return s2.compareTo(s1); });
 			}
 			//Add packages to install
-			for( String softwareKey :  softwaresToInstall.get(device.getName()) ) {		
+			List<String> normalizeSoftware = new ArrayList<String>();
+			for( String softwareKey :  softwaresToInstall.get(device.getName()) ) {
 				String softwareName = softwareKey.substring(5);
+				//Take care to install software only once
+				if( normalizeSoftware.contains(softwareName)) {
+					continue;
+				} else {
+					normalizeSoftware.add(softwareName);
+				}
 				Software software               = this.getByName(softwareName);
 				SoftwareVersion softwareVersion = null;
 				for( SoftwareVersion sv : software.getSoftwareVersions() ) {
@@ -1116,7 +1123,7 @@ public class SoftwareController extends Controller {
 			deviceSls.addAll(deviceInstall);
 			deviceSls.addAll(deviceGrains);
 			if( deviceOssInst.size() > 0 ) {
-				deviceSls.add("include");
+				deviceSls.add("include:");
 				deviceSls.addAll(deviceOssInst);
 			}
 
