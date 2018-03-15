@@ -611,6 +611,7 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomId);
 		DeviceController deviceController = new DeviceController(this.session);
 		List<String> ipAddress;
+		List<Device> newDevices = new ArrayList<Device>();
 		try {
 			for(Device device : devices) {
 				//Remove trailing and ending spaces.
@@ -643,13 +644,14 @@ public class RoomController extends Controller {
 				if( device.getOwner() == null ) {
 					device.setOwner(this.session.getUser());
 				}
-				if(device.getHwconfId() == null || device.getHwconf() == null){
-					device.setHwconf(room.getHwconf());
-				} else {
+				if(device.getHwconfId() != null ) {
 					device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
+				} else if( device.getHwconf() == null){
+					device.setHwconf(room.getHwconf());
 				}
 				room.addDevice(device);
 				em.merge(room);
+				newDevices.add(device);
 				em.getTransaction().commit();
 			}
 		} catch (Exception e) { 
@@ -659,8 +661,11 @@ public class RoomController extends Controller {
 			em.close();
 		}
 		UserController userController = new UserController(this.session);
-		for(Device device : devices) {
+		boolean needWriteSalt = false;
+		for(Device device : newDevices) {
 			this.startPlugin("add_device", device);
+			logger.debug("Created Device" + device);
+			logger.debug("HWCONF" + device.getHwconf());
 			// We'll create only for fatClients workstation users
 			if( device.getHwconf() != null && 
 					device.getHwconf().getDeviceType() != null &&
@@ -674,9 +679,13 @@ public class RoomController extends Controller {
 				//TODO do not ignore response.
 				OssResponse answer = userController.add(user);
 				logger.debug(answer.getValue());
+				needWriteSalt = true;
 			}
 		}
 		new DHCPConfig(this.session).Create();
+		if( needWriteSalt ) {
+			new SoftwareController(this.session).applySoftwareStateToHosts();
+		}
 		return new OssResponse(this.getSession(),"OK", "Devices were created succesfully." );
 	}
 
@@ -686,23 +695,28 @@ public class RoomController extends Controller {
 	public OssResponse deleteDevices(long roomId,List<Long> deviceIDs){
 		EntityManager em = getEntityManager();
 		Room room = em.find(Room.class, roomId);
-		for(Long deviceId : deviceIDs) {
-			Device device = em.find(Device.class, deviceId);
-			if( !this.mayModify(device) ) {
-				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
-			}
-			room.removeDevice(device);
-		}
+		DeviceController deviceController = new DeviceController(this.session);
+		boolean needWriteSalt = false;
 		try {
-			em.getTransaction().begin();
-			em.merge(room);
-			em.getTransaction().commit();
+			for(Long deviceId : deviceIDs) {
+				Device device = em.find(Device.class, deviceId);
+				if( room.getDevices().contains(device) ) {
+					if( device.getHwconf().getDeviceType().equals("FatClient")) {
+						needWriteSalt = true;
+					}
+					deviceController.delete(device, false);
+				}
+			}
 			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
+		}
+		new DHCPConfig(this.session).Create();
+		if( needWriteSalt ) {
+			new SoftwareController(this.session).applySoftwareStateToHosts();
 		}
 		return new OssResponse(this.getSession(),"OK ", "Devices were deleted succesfully.");
 	}

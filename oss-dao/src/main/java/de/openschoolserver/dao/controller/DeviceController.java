@@ -111,34 +111,20 @@ public class DeviceController extends Controller {
 	 */
 	public OssResponse delete(List<Long> deviceIds) {
 		EntityManager em = getEntityManager();
-		UserController userController = new UserController(this.session);
-		StringBuilder  error = new StringBuilder();
+		boolean needWriteSalt = false;
 		try {
-			em.getTransaction().begin();
 			for( Long deviceId : deviceIds) {
-				Device dev = em.find(Device.class, deviceId);
-				if( this.isProtected(dev) ) {
-					error.append("This device must not be deleted: ").append(dev.getName()).append("\\n");
-					continue;
+				Device device = em.find(Device.class, deviceId);
+				if( device.getHwconf().getDeviceType().equals("FatClient")) {
+					needWriteSalt = true;
 				}
-				if( !this.mayModify(dev) ) {
-					error.append("You must not delete this device: ").append(dev.getName()).append("\\n");
-					continue;
-				}
-				if( !em.contains(dev)) {
-					dev = em.merge(dev);
-				}
-				User user = userController.getByUid(dev.getName());
-				if( user != null ) {
-					userController.delete(user);
-				}
-				this.startPlugin("delete_device", dev);
-				em.remove(dev);
+				this.delete(device, false);
 			}
-			em.getTransaction().commit();
 			em.getEntityManagerFactory().getCache().evictAll();
-			DHCPConfig dhcpconfig = new DHCPConfig(this.session);
-			dhcpconfig.Create();
+			new DHCPConfig(this.session).Create();
+			if( needWriteSalt ) {
+				new SoftwareController(this.session).applySoftwareStateToHosts();
+			}
 			return new OssResponse(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("delete: " + e.getMessage(),e);
@@ -152,28 +138,39 @@ public class DeviceController extends Controller {
 	 * Deletes a device given by the device Ids.
 	 */
 	public OssResponse delete(Long deviceId, boolean atomic) {
+		return this.delete(this.getById(deviceId), atomic);
+	}
+	
+	public OssResponse delete(Device device, boolean atomic) {
 		EntityManager em = getEntityManager();
+		UserController userController = new UserController(this.session);
+		boolean needWriteSalt = false;
 		try {
 			em.getTransaction().begin();
-			Device dev = em.find(Device.class, deviceId);
-			if( this.isProtected(dev) ) {
+			if( this.isProtected(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","This device must not be deleted.");
 			}
-			if( !this.mayModify(dev) ) {
+			if( !this.mayModify(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
 			}
-			
-			em.remove(dev);
+			if( device.getHwconf().getDeviceType().equals("FatClient")) {
+				needWriteSalt = true;
+				User user = userController.getByUid(device.getName());
+				userController.delete(user);
+			}
+			this.startPlugin("delete_device", device);
+			em.remove(device);
 			em.getTransaction().commit();
 			if( atomic ) {
 				em.getEntityManagerFactory().getCache().evictAll();
-				this.startPlugin("delete_device", dev);
-				DHCPConfig dhcpconfig = new DHCPConfig(this.session);
-				dhcpconfig.Create();
+				new DHCPConfig(this.session).Create();
+				if( needWriteSalt ) {
+					new SoftwareController(this.session).applySoftwareStateToHosts();
+				}
 			}
 			return new OssResponse(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
-			logger.error("deviceId: " + deviceId + " " + e.getMessage(),e);
+			logger.error("device: " + device.getName() + " " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -183,7 +180,7 @@ public class DeviceController extends Controller {
 	protected String check(Device device,Room room) {
 		List<String> error = new ArrayList<String>();
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
-		
+
 		//Check the MAC address
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		String name =  this.isMacUnique(device.getMac());
@@ -625,7 +622,7 @@ public class DeviceController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR","You must not modify this device: %s",null,parameters);
 		}
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
-		if( ! oldDevice.getMac().equals(device.getMac() ) ) {
+		if( ! oldDevice.getMac().equals(device.getMac())) {
 			name =  this.isMacUnique(device.getMac());
 			if( name != "" ){
 				parameters.add(device.getMac());

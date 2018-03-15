@@ -152,7 +152,10 @@ public class CategoryController extends Controller {
 	}
 
 	public OssResponse delete(Long categoryId){
-		Category category = this.getById(categoryId);
+		return this.delete(this.getById(categoryId));
+	}
+
+	public OssResponse delete(Category category) {
 		if( this.isProtected(category)) {
 			return new OssResponse(this.getSession(),"ERROR","This category must not be deleted.");
 		}

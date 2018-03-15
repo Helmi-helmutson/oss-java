@@ -835,6 +835,22 @@ public class SoftwareController extends Controller {
 	}
 
 	/*
+	 * Checks if there is a software is installed on a device.
+	 * 
+	 * @param   d     The concerning device
+	 * @param   s     The software
+	 */
+	public boolean isSoftwareInstalledOnDevice(Device d, Software s) {
+		for( SoftwareStatus ss : d.getSoftwareStatus() ) {
+			if( ( ss.getStatus().equals("I") || ss.getStatus().equals("IM") )&& 
+				ss.getSoftwareVersion().getSoftware().equals(s)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*
 	 * Checks if there is a software version status to a given version of a software on a device.
 	 * 
 	 * @param   d     The concerning device
@@ -1036,9 +1052,9 @@ public class SoftwareController extends Controller {
 			//Remove first the softwares.
 			if( softwaresToRemove.containsKey(device.getName()) ) {
 				for( Software software : softwaresToRemove.get(device.getName()) ) {
-					deviceRemove.add("       - " + software.getName());
-					if( this.checkSoftwareStatusOnDevice(device, software, "I") ){
+					if( this.isSoftwareInstalledOnDevice(device, software) ){
 						this.setSoftwareStatusOnDevice(device, software, "", "DS");
+						deviceRemove.add("       - " + software.getName());
 					}
 					this.deleteSoftwareLicenseFromDevice(software,device);
 				}
@@ -1058,11 +1074,13 @@ public class SoftwareController extends Controller {
 					}
 				}
 				//Allocate license to device
-				if( ! this.addSoftwareLicenseToDevices(software,device).getCode().equals("OK") ) {
-					//There is no license we can not install this.
-					errorMessages.append("No license for ").append(softwareName).append(" on ").append(device.getName()).append(this.getNl());
-					this.setSoftwareStatusOnDevice(device, software, softwareVersion.getVersion(), "LM");
-					continue;
+				if( ! software.getSoftwareLicenses().isEmpty() ) {
+					if( ! this.addSoftwareLicenseToDevices(software,device).getCode().equals("OK") ) {
+						//There is no license we can not install this.
+						errorMessages.append("No license for ").append(softwareName).append(" on ").append(device.getName()).append(this.getNl());
+						this.setSoftwareStatusOnDevice(device, software, softwareVersion.getVersion(), "LM");
+						continue;
+					}
 				}
 				// Set the software version status on device if not the actual version is already installed
 				// The version status can be US or IS 
@@ -1277,6 +1295,25 @@ public class SoftwareController extends Controller {
 		return this.setSoftwareStatusOnDevice(device, softwareName, version, status);
 	}
 
+	public OssResponse cleunUpSoftwareStatusOnDevice(Device device, Software software) {
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			for(SoftwareStatus st : device.getSoftwareStatus() ) {
+				if( st.getSoftwareVersion().getSoftware().equals(software) ) {
+					em.merge(st);
+					em.remove(st);
+				}
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","All software states was removed from device.");
+	}
 	/*
 	 * Delete Software Status
 	 * 

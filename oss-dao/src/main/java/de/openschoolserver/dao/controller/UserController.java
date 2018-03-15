@@ -19,14 +19,9 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import de.extis.core.util.UserUtil;
-import de.openschoolserver.dao.Category;
-import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.controller.DHCPConfig;
 import de.openschoolserver.dao.tools.OSSShellTools;
-import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.OssResponse;
 
 @SuppressWarnings( "unchecked" )
 public class UserController extends Controller {
@@ -526,6 +521,19 @@ public class UserController extends Controller {
 		final CategoryController categoryController= new CategoryController(this.session);
 		final GroupController    groupController   = new GroupController(this.session);
 		Category category = categoryController.getById(guestUsersId);
+		for( User user : category.getUsers() ) {
+			if( user.getRole().equals("guest")) {
+			    this.delete(user);
+			}
+		}
+		for( Group group : category.getGroups() ) {
+			if( group.getGroupType().equals("guest")) {
+				groupController.delete(group);
+			}
+		}
+		for( FAQ faw : category.getFaqs() ) {
+			
+		}
 		//Have to implement.
 		OssResponse ossResponse = new OssResponse();
 		return ossResponse;

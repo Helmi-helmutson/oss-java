@@ -167,8 +167,7 @@ public class GroupController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Group was modified.");
 	}
 
-	public OssResponse delete(long groupId){
-		Group group = this.getById(groupId);
+	public OssResponse delete(Group group){
 		if( this.isProtected(group)) {
 			return new OssResponse(this.getSession(),"ERROR","This group must not be deleted.");
 		}
@@ -196,6 +195,11 @@ public class GroupController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Group was deleted.");
 	}
 
+	public OssResponse delete(long groupId){
+		Group group = this.getById(groupId);
+		return delete(group);
+	}
+	
 	public List<User> getAvailableMember(long groupId){
 		EntityManager em = getEntityManager();
 		Group group = this.getById(groupId);
