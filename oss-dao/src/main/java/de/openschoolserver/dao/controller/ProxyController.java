@@ -14,6 +14,7 @@ import javax.persistence.Query;
 
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
+import de.openschoolserver.dao.ProxyRule;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.tools.OSSShellTools;
@@ -29,8 +30,8 @@ public class ProxyController extends Controller {
 	 * Reads the default proxy acl setting
 	 * @return The default proxy acl setting
 	 */
-	public Map<String,List<String[]>> readDefaults() {
-		Map<String,List<String[]>> acls = new HashMap<>();
+	public List<ProxyRule> readDefaults(String role) {
+		List<ProxyRule> acl = new ArrayList<ProxyRule>();
 		String[] program   = new String[2];
 		program[0] = "/usr/share/oss/tools/squidGuard.pl";
 		program[1] = "read";
@@ -39,13 +40,17 @@ public class ProxyController extends Controller {
 		OSSShellTools.exec(program, reply, error, "");
 		for( String line : reply.toString().split("\\n") ) {
 			String[] values = line.split(" ");
-			List<String[]> settings = new ArrayList<String[]>();
-			for(int i=1; i < values.length; i++ ) {
-				settings.add(values[i].split(":"));
+			if( role.equals(values[0])) {
+				for(int i=1; i < values.length; i++ ) {
+					ProxyRule proxyRule = new ProxyRule(
+							values[i].split(":")[0],
+							values[i].split(":")[1].equals("true")
+							);
+					acl.add(proxyRule);
+				}
 			}
-			acls.put(values[0], settings);
 		}
-		return acls;
+		return acl;
 	}
 
 	/*
@@ -53,12 +58,16 @@ public class ProxyController extends Controller {
 	 * @param acls The list of the default acl setting
 	 * @return An OssResponse object with the result
 	 */
-	public OssResponse setDefaults(Map<String,List<String[]>> acls) {
+	public OssResponse setDefaults(String role, List<ProxyRule> acl) {
 		StringBuilder output = new StringBuilder();
-		for(String group : acls.keySet() ) {
-			for( String[] acl : acls.get(group) ) {
-				output.append(group).append(":").append(acl[0]).append(":").append(acl[1]).append("\n");
+		for(ProxyRule proxyRule : acl ) {
+			output.append(role).append(".").append(proxyRule.getName()).append(":");
+			if( proxyRule.isEnabled() ) {
+				output.append("true");
+			} else {
+				output.append("false");
 			}
+			output.append(this.getNl());
 		}
 		String[] program   = new String[2];
 		program[0] = "/usr/share/oss/tools/squidGuard.pl";

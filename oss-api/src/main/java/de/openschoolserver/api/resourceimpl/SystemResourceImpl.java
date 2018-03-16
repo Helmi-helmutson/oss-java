@@ -13,6 +13,7 @@ import de.openschoolserver.api.resources.SystemResource;
 import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.ProxyRule;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Translation;
 import de.openschoolserver.dao.controller.SystemController;
@@ -143,13 +144,13 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public  Map<String,List<String[]>> getProxyDefault(Session session) {
-		return new ProxyController(session).readDefaults();
+	public  List<ProxyRule> getProxyDefault(Session session, String role) {
+		return new ProxyController(session).readDefaults(role);
 	}
 
 	@Override
-	public OssResponse setProxyDefault(Session session, Map<String,List<String[]>> acls) {
-		return new ProxyController(session).setDefaults(acls);
+	public OssResponse setProxyDefault(Session session, String role, List<ProxyRule> acl) {
+		return new ProxyController(session).setDefaults(role, acl);
 	}
 
 	@Override

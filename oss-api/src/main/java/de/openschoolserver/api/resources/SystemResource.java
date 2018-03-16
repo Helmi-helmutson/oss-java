@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.ProxyRule;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.Translation;
@@ -29,8 +30,8 @@ public interface SystemResource {
     })
 	@RolesAllowed("system.status")
     List<Map<String, String>> getStatus(
-    		@ApiParam(hidden = true) @Auth Session session
-    		);
+		@ApiParam(hidden = true) @Auth Session session
+		);
     
     //Handling of enumerates
 
@@ -43,7 +44,7 @@ public interface SystemResource {
     })
     @PermitAll
     List<String> getEnumerates(
-    		@ApiParam(hidden = true) @Auth Session session,
+		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type
     );
 
@@ -56,7 +57,7 @@ public interface SystemResource {
     })
     @RolesAllowed("system.enumerates")
     OssResponse addEnumerate(
-    		@ApiParam(hidden = true) @Auth Session session,
+		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
             @PathParam("value") String value
     );
@@ -70,7 +71,7 @@ public interface SystemResource {
     })
     @RolesAllowed("system.enumerates")
     OssResponse deleteEnumerate(
-    		@ApiParam(hidden = true) @Auth Session session,
+		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
             @PathParam("value") String value
     );
@@ -86,8 +87,8 @@ public interface SystemResource {
     })
     @RolesAllowed("system.configuration")
     List<Map<String, String>>  getConfig(
-    		@ApiParam(hidden = true) @Auth Session session
-    		);
+		@ApiParam(hidden = true) @Auth Session session
+		);
 
     @GET
     @Path("configuration/{key}")
@@ -98,9 +99,9 @@ public interface SystemResource {
     })
     @RolesAllowed("system.configuration.read")
     String getConfig(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("key") String key
-    		);
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("key") String key
+		);
 
     @PUT
     @Path("configuration/{key}/{value}")
@@ -111,7 +112,7 @@ public interface SystemResource {
     })
     @RolesAllowed("system.configuration")
     OssResponse setConfig(
-    		@ApiParam(hidden = true) @Auth Session session,
+		@ApiParam(hidden = true) @Auth Session session,
             @PathParam("key") String key,
             @PathParam("value") String value
     );
@@ -126,8 +127,8 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     Map<String, String>  getFirewallIncomingRules(
-    		@ApiParam(hidden = true) @Auth Session session
-    		);
+		@ApiParam(hidden = true) @Auth Session session
+		);
 
     @POST
     @Path("firewall/incomingRules")
@@ -138,9 +139,9 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     OssResponse  setFirewallIncomingRules(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		Map<String, String> incomingRules
-    		);
+		@ApiParam(hidden = true) @Auth Session session,
+		Map<String, String> incomingRules
+		);
 
     @GET
     @Path("firewall/outgoingRules")
@@ -151,8 +152,8 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     List<Map<String, String>>  getFirewallOutgoingRules(
-    		@ApiParam(hidden = true) @Auth Session session
-    		);
+		@ApiParam(hidden = true) @Auth Session session
+		);
 
     @POST
     @Path("firewall/outgoingRules")
@@ -163,9 +164,9 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     OssResponse  setFirewallOutgoingRules(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		List<Map<String, String>> incomingRules
-    		);
+		@ApiParam(hidden = true) @Auth Session session,
+		List<Map<String, String>> incomingRules
+		);
 
     @GET
     @Path("firewall/remoteAccessRules")
@@ -176,8 +177,8 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     List<Map<String, String>>  getFirewallRemoteAccessRules(
-    		@ApiParam(hidden = true) @Auth Session session
-    		);
+		@ApiParam(hidden = true) @Auth Session session
+		);
 
     @POST
     @Path("firewall/remoteAccessRules")
@@ -188,9 +189,9 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     OssResponse  setFirewallRemoteAccessRules(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		List<Map<String, String>> incomingRules
-    		);
+		@ApiParam(hidden = true) @Auth Session session,
+		List<Map<String, String>> incomingRules
+		);
     
     /*
      * Translations stuff
@@ -204,8 +205,8 @@ public interface SystemResource {
     })
     @PermitAll
     String translate(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		MissedTranslation missedTranslataion
+		@ApiParam(hidden = true) @Auth Session session,
+		MissedTranslation missedTranslataion
     );
     
     @POST
@@ -217,8 +218,8 @@ public interface SystemResource {
     })
     @RolesAllowed("sysadmins.translation")
     OssResponse addTranslation(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		Translation	translation
+		@ApiParam(hidden = true) @Auth Session session,
+		Translation	translation
     );
     
     @GET
@@ -230,8 +231,8 @@ public interface SystemResource {
     })
     @RolesAllowed("sysadmins.translation")
     List<String> getMissedTranslations(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("lang") String lang
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("lang") String lang
     );
     
     /*
@@ -246,7 +247,7 @@ public interface SystemResource {
     })
     @RolesAllowed("system.register")
     OssResponse register(
-    		@ApiParam(hidden = true) @Auth Session session
+		@ApiParam(hidden = true) @Auth Session session
     );
     
     /*
@@ -259,9 +260,9 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.packages")
     List<Map<String,String>> searchPackages(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		@PathParam("filter") String filter
-    		);
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("filter") String filter
+		);
     
     @POST
     @Path("packages")
@@ -270,9 +271,9 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.packages")
     OssResponse installPackages(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		List<String> packages
-    		);
+		@ApiParam(hidden = true) @Auth Session session,
+		List<String> packages
+		);
 
     @POST
     @Path("packages/update")
@@ -281,9 +282,9 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.packages")
     OssResponse updatePackages(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		List<String> packages
-    		);
+		@ApiParam(hidden = true) @Auth Session session,
+		List<String> packages
+		);
 
 
     @PUT
@@ -293,32 +294,34 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.update")
     OssResponse updateSyste(
-    		@ApiParam(hidden = true) @Auth Session session
-    		);
+		@ApiParam(hidden = true) @Auth Session session
+		);
     
     /*
      * Proxy default handling
      */
     @GET
-    @Path("proxy/default")
+    @Path("proxy/default/{role}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Delivers the default setting for proxy.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
-    Map<String,List<String[]>> getProxyDefault(
-    		@ApiParam(hidden = true) @Auth Session session
-    		);
+    List<ProxyRule> getProxyDefault(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("role") String role
+		);
     
     @POST
-    @Path("proxy/default")
+    @Path("proxy/default/{role}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Delivers the default setting for proxy.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
     OssResponse setProxyDefault(
-    		@ApiParam(hidden = true) @Auth Session session,
-    		Map<String,List<String[]>> acls
-    		);
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("role") String role,
+		List<ProxyRule> acl
+		);
 
     /*
      * Job management
