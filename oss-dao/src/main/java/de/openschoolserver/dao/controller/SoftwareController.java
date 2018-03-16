@@ -1003,6 +1003,7 @@ public class SoftwareController extends Controller {
 
 		//Evaluate hwconf categories
 		for( HWConf hwconf : new CloneToolController(this.session).getAllHWConf() ) {
+			logger.debug("HWConfs: " + hwconf.getName() + " " + hwconf.getDeviceType());
 			if( !hwconf.getDeviceType().equals("FatClient")) {
 				continue;
 			}
@@ -1017,6 +1018,7 @@ public class SoftwareController extends Controller {
 				}
 			}
 			for( Category category : hwconf.getCategories() ) {
+				logger.debug("HWConfs Categories: " + category.getName() + " " + category.getCategoryType());
 				if( category.getCategoryType().equals("installation")) {
 					for( Software software : category.getSoftwares() ) {
 						toRemove.remove(software);

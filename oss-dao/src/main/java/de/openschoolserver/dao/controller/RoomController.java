@@ -609,6 +609,7 @@ public class RoomController extends Controller {
 	public OssResponse addDevices(long roomId,List<Device> devices){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
+		HWConf hwconf = new HWConf();
 		DeviceController deviceController = new DeviceController(this.session);
 		List<String> ipAddress;
 		List<Device> newDevices = new ArrayList<Device>();
@@ -645,11 +646,16 @@ public class RoomController extends Controller {
 					device.setOwner(this.session.getUser());
 				}
 				if(device.getHwconfId() != null ) {
-					device.setHwconf(em.find(HWConf.class,device.getHwconfId()));
+					hwconf = em.find(HWConf.class,device.getHwconfId());
 				} else if( device.getHwconf() == null){
-					device.setHwconf(room.getHwconf());
+					hwconf = room.getHwconf();
+				} else {
+					hwconf = device.getHwconf();
 				}
+				device.setHwconf(hwconf);
+				hwconf.getDevices().add(device);
 				room.addDevice(device);
+				em.merge(hwconf);
 				em.merge(room);
 				newDevices.add(device);
 				em.getTransaction().commit();

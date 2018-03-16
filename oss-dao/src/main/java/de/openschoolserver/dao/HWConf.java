@@ -5,6 +5,8 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+
+import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -96,6 +98,9 @@ public class HWConf implements Serializable {
 	}
 
 	public HWConf() {
+		this.categories = new ArrayList<Category>();
+		this.devices    = new ArrayList<Device>();
+		this.rooms      = new ArrayList<Room>();
 	}
 
 	public Long getId() {
