@@ -709,7 +709,7 @@ public class DeviceController extends Controller {
 
 	public OssResponse manageDevice(long deviceId, String action, Map<String, String> actionContent) {
 		Device device = new DeviceController(this.session).getById(deviceId);
-		if(this.session.getDevice().equals(device)) {
+		if( this.session.getDevice() != null  && this.session.getDevice().equals(device)) {
 			return new OssResponse(this.getSession(),"ERROR", "Do not control the own client.");
 		}
 		StringBuilder FQHN = new StringBuilder();
