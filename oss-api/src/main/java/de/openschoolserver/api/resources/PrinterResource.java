@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
+import de.openschoolserver.dao.PrintersOfManufacturer;
 import de.openschoolserver.dao.Session;
 
 import java.io.InputStream;
@@ -241,6 +242,28 @@ public interface PrinterResource {
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("printers.manage")
 	Map<String,String[]> getAvailableDrivers(
+			@ApiParam(hidden = true) @Auth Session session
+			);
+	
+	/*
+	 *
+	 */
+	@GET
+	@Path("getDrivers")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Get the list of the available drivers sorted by printer manufacturer",
+			notes = "The result is a hashmap of arrays:"
+			+ "{<br>"
+			+ "&nbsp;&nbsp;&nbsp; manufacturer1: [ Model1, Model2, Model3 ],<br>"
+			+ "&nbsp;&nbsp;&nbsp; manufacturer2: [ Model4, Model5, Model6 ]<br>"
+			+ "}<br>"
+			+ "The selected model ")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No device was found"),
+			@ApiResponse(code = 405, message = "Device is not a Printer."),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("printers.manage")
+	List<PrintersOfManufacturer> getDrivers(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 

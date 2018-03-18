@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 import de.openschoolserver.api.resources.PrinterResource;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
+import de.openschoolserver.dao.PrintersOfManufacturer;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Session;
@@ -316,6 +317,25 @@ public class PrinterResourceImpl implements PrinterResource {
 	}
 
 	@Override
+	public List<PrintersOfManufacturer> getDrivers(Session session) {
+		List<PrintersOfManufacturer> printers = new ArrayList<PrintersOfManufacturer>();
+		try {
+			for( String line : Files.readAllLines(PRINTERS) ) {
+				PrintersOfManufacturer printersOfManufacturer = new PrintersOfManufacturer();
+				String[] fields = line.split("###");
+				if( fields.length == 2 ) {
+					printersOfManufacturer.setName(fields[0]);
+					printersOfManufacturer.setPrinters(fields[1].split("%%"));
+					printers.add(printersOfManufacturer);
+				}
+			}
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+		return printers;
+	}
+
+	@Override
 	public OssResponse setDriver(Session session, Long printerId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		Device printer = new DeviceController(session).getById(printerId);
@@ -353,5 +373,6 @@ public class PrinterResourceImpl implements PrinterResource {
 		//TODO check output
 		return new OssResponse(session,"OK", "Printer driver was set succesfully.");
 	}
+
 
 }
