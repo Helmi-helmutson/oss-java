@@ -58,6 +58,10 @@ public class PrinterResourceImpl implements PrinterResource {
 			if( matcher.find()) {
 				String  name    = matcher.group(0);
 				Printer printer = new Printer(name,deviceController);
+				Device  device  = deviceController.getByName(name);
+				printer.setId(device.getId());
+				printer.setRoomId(device.getRoom().getId());
+				printer.setMac(device.getMac());
 				if( matcher.find() ) {
 					printer.setState(matcher.group(0));
 				}
@@ -73,6 +77,16 @@ public class PrinterResourceImpl implements PrinterResource {
 				if( file.exists() ) {
 					printer.setWindowsDriver(true);
 				}
+				program = new String[5];
+				program[0] = "/usr/bin/gawk";
+				program[1] = "-F";
+				program[2] = ":";
+				program[3] = "/*NickName/ { print $2 }";
+				program[4] = "/etc/cups/ppd/" + name + ".ppd";
+				StringBuffer reply2  = new StringBuffer();
+				logger.debug(stderr.toString());
+				OSSShellTools.exec(program, reply2, stderr, null);
+				printer.setModel(reply2.toString());
 				printers.add(printer);
 			}
 		}
@@ -133,6 +147,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[2] = printerName;
 		program[3] = "-";
 		OSSShellTools.exec(program, reply, stderr, null);
+		this.enablePrinter(session, printerName);
 		return new OssResponse(session,"OK","Printer was reseted succesfully.");
 	}
 
@@ -297,7 +312,11 @@ public class PrinterResourceImpl implements PrinterResource {
 			}
 		}
 
-		return new OssResponse(session,"OK", "Printer was created succesfully.");
+		return new OssResponse(
+				session,"OK",
+				"Printer was created succesfully.",
+				new DeviceController(session).getByName(name).getId()
+				);
 	}
 
 	@Override
