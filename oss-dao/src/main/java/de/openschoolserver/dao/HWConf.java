@@ -19,8 +19,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Entity
 @Table(name="HWConfs")
 @NamedQueries({
-	@NamedQuery(name="HWConf.findAll", query="SELECT h FROM HWConf h"),
-	@NamedQuery(name="HWConf.getByName", query="SELECT h FROM HWConf h WHERE h.name = :name")
+	@NamedQuery(name="HWConf.findAll",   query="SELECT h FROM HWConf h"),
+	@NamedQuery(name="HWConf.getByName", query="SELECT h FROM HWConf h WHERE h.name = :name"),
+	@NamedQuery(name="HWConf.getByType", query="SELECT h FROM HWConf h WHERE h.deviceType = :deviceType")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class HWConf implements Serializable {
