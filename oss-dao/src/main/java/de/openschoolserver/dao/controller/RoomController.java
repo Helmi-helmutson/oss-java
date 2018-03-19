@@ -611,6 +611,8 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomId);
 		HWConf hwconf = new HWConf();
 		DeviceController deviceController = new DeviceController(this.session);
+		CloneToolController cloneToolController = new CloneToolController(this.session);
+		HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
 		List<String> ipAddress;
 		List<Device> newDevices = new ArrayList<Device>();
 		try {
@@ -647,10 +649,12 @@ public class RoomController extends Controller {
 				}
 				if(device.getHwconfId() != null ) {
 					hwconf = em.find(HWConf.class,device.getHwconfId());
-				} else if( device.getHwconf() == null){
+				} else if( device.getHwconf() != null){
+					hwconf = device.getHwconf();
+				} else if( room.getHwconf() != null ){
 					hwconf = room.getHwconf();
 				} else {
-					hwconf = device.getHwconf();
+					hwconf = firstFatClient;
 				}
 				device.setHwconf(hwconf);
 				hwconf.getDevices().add(device);
@@ -868,12 +872,16 @@ public class RoomController extends Controller {
 	 * Control of printer in this room
 	 */
 	public OssResponse setDefaultPrinter(Long roomId, Long deviceId) {
-		EntityManager em = getEntityManager();
+
 		Room room = this.getById(roomId);
 		DeviceController deviceController = new DeviceController(session);
 		Device device = deviceController.getById(deviceId);
+		if( room.getDefaultPrinter() != null && room.getDefaultPrinter().equals(device) ) {
+			return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
+		}
 		room.setDefaultPrinter(device);
 		device.getDefaultInRooms().add(room);
+		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(room);
@@ -931,12 +939,16 @@ public class RoomController extends Controller {
 	}
 
 	public OssResponse addAvailablePrinter(long roomId, long deviceId) {
-		EntityManager em = getEntityManager();
+
 		Room room = this.getById(roomId);
 		DeviceController deviceController = new DeviceController(session);
 		Device device = deviceController.getById(deviceId);
+		if( room.getAvailablePrinters().contains(device) ) {
+			return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
+		}
 		room.getAvailablePrinters().add(device);
 		device.getAvailableInRooms().add(room);
+		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(room);
@@ -947,7 +959,7 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","The default printer of the room was set succesfully.");
+		return new OssResponse(this.getSession(),"OK","The selected printer was added to the room.");
 	}
 	
 	public OssResponse deleteAvailablePrinter(long roomId, long deviceId) {
@@ -967,7 +979,7 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","The default printer of the room was set succesfully.");
+		return new OssResponse(this.getSession(),"OK","The selected printer was removed from room.");
 	}
 
 	public OssResponse manageRoom(long roomId, String action, Map<String, String> actionContent) {
