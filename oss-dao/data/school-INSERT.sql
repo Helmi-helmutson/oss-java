@@ -29,7 +29,7 @@ INSERT INTO Partitions values(2,4,'sda2','System','Win10','Simple','partimage',N
 INSERT INTO HWConfs(5,'Win10-64-D','Win10 64Bit Domain Join','FatClient',1);
 INSERT INTO Partitions values(3,5,'sda1','Boot','WinBoot','no','partimage',NULL,1);
 INSERT INTO Partitions values(4,5,'sda2','System','Win10','Domain','partimage',NULL,1);
-INSERT INTO HWConfs(6,'Win10-64-N','Win10 64Bit No Domain Join','FatClient',1);
+INSERT INTO HWConfs(6,'Win10-64-N','Win10 64Bit No Join','FatClient',1);
 INSERT INTO Partitions values(5,6,'sda1','Boot','WinBoot','no','partimage',NULL,1);
 INSERT INTO Partitions values(6,6,'sda2','System','Win10','no','partimage',NULL,1);
 INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','technicalRoom','no',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#,6);
