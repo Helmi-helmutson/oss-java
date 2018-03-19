@@ -65,6 +65,19 @@ public class CloneToolController extends Controller {
 		}
 	}
 
+	public List<HWConf> getByType(String deviceType) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("HWConf.getByType").setParameter("deviceType",deviceType);
+			return (List<HWConf>) query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
 	public String getPartitions(Long hwconfId ) {
 		List<String> partitions = new ArrayList<String>();
 		for( Partition part : this.getById(hwconfId).getPartitions() ) {
