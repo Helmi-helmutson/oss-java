@@ -61,7 +61,7 @@ public class ProxyController extends Controller {
 	public OssResponse setDefaults(String role, List<ProxyRule> acl) {
 		StringBuilder output = new StringBuilder();
 		for(ProxyRule proxyRule : acl ) {
-			output.append(role).append(".").append(proxyRule.getName()).append(":");
+			output.append(role).append(":").append(proxyRule.getName()).append(":");
 			if( proxyRule.isEnabled() ) {
 				output.append("true");
 			} else {
@@ -74,6 +74,7 @@ public class ProxyController extends Controller {
 		program[1] = "write";
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
+		logger.debug(output.toString());
 		OSSShellTools.exec(program, reply, error, output.toString());
 		return new OssResponse(this.session,"OK","Proxy Setting was saved succesfully.");
 	}
