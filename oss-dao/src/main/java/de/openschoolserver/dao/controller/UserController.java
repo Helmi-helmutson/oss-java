@@ -406,9 +406,9 @@ public class UserController extends Controller {
 	public List<User> getUsers(List<Long> userIds) {
 		List<User> users = new ArrayList<User>();
 		try {
-			 logger.debug(new ObjectMapper().writeValueAsString(this));
+			 logger.debug(new ObjectMapper().writeValueAsString(userIds));
 		} catch (Exception e) {
-			logger.debug("{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }");
+			logger.debug("{ \"ERROR\" : \"getUsers CAN NOT MAP THE OBJECT\" }");
 		}
 		if( userIds == null ) {
 			return users;
