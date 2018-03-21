@@ -89,7 +89,7 @@ public class Controller extends Config {
 	public String getNl() {
 		return System.getProperty("line.separator");
 	}
-	
+
 	public boolean isNameUnique(String name){
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("User.getByUid");

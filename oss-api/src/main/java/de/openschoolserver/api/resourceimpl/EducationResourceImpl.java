@@ -208,7 +208,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<PositiveList> getPositiveLists(Session session) {
-		return new ProxyController(session).getAllPositiveList();
+		return new ProxyController(session).getAllPositiveLists();
 	}
 
 	@Override
@@ -228,8 +228,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse deletePositiveListById(Session session, Long positiveListId) {
-		// TODO Auto-generated method stub
-		return null;
+		return new ProxyController(session).deletePositiveList(positiveListId);
 	}
 
 	@Override

@@ -15,6 +15,7 @@ import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.ProxyRule;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 @SuppressWarnings( "unchecked" )
@@ -97,11 +98,14 @@ public class ProxyController extends Controller {
 	public OssResponse editPositiveList(PositiveList positiveList) {
 		EntityManager em = getEntityManager();
 		PositiveList oldPositiveList = this.getPositiveListById(positiveList.getId());
-
 		try {
 			positiveList.setOwner(session.getUser());
 			em.getTransaction().begin();
 			if( oldPositiveList == null ) {
+				User user = this.session.getUser();
+				int count = user.getOwnedPositiveLists().size();
+				positiveList.setName(user.getUid() + String.valueOf(count));
+				positiveList.setOwner(user);
 				em.persist(positiveList);
 			} else {
 				oldPositiveList.setDescription(positiveList.getDescription());
@@ -123,6 +127,23 @@ public class ProxyController extends Controller {
 		} finally {
 			em.close();
 		}
+	}
+
+	public OssResponse deletePositiveList(Long positiveListId) {
+		EntityManager em = getEntityManager();
+		PositiveList positiveList = this.getPositiveListById(positiveListId);
+		try {
+			Files.deleteIfExists(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains"));
+			em.getTransaction().begin();
+			em.remove(positiveList);
+			em.getTransaction().commit();
+		}  catch (Exception e) {
+			logger.error("delete " + e.getMessage(),e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK", "Postive list was deleted succesfully.");
 	}
 
 	/*
@@ -147,7 +168,7 @@ public class ProxyController extends Controller {
 	 * Reads the available positive lists
 	 * @return The list of positive lists the user can use
 	 */
-	public List<PositiveList> getAllPositiveList() {
+	public List<PositiveList> getAllPositiveLists() {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("PositiveList.findAll"); 
@@ -158,6 +179,14 @@ public class ProxyController extends Controller {
 		} finally {
 			em.close();
 		}
+	}
+
+	/*
+	 * Reads the available positive lists
+	 * @return The list of positive lists the user can use
+	 */
+	public List<PositiveList> getMyPositiveLists() {
+		return this.session.getUser().getOwnedPositiveLists();
 	}
 
 	/*
