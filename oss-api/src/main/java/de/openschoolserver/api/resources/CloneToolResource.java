@@ -196,7 +196,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.manage")
+	@PermitAll
 	String getPartitions(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
@@ -212,7 +212,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.manage")
+	@PermitAll
 	Partition getPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
@@ -230,7 +230,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.manage")
+	@PermitAll
 	String getConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,

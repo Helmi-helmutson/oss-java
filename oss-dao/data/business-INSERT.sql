@@ -2,6 +2,7 @@ INSERT INTO Users VALUES(1,'Administrator','','sysadmins','Administrator','Main'
 INSERT INTO Users VALUES(4,'tadministration','','administration','for administration','Default profile',NOW(),0,0,0,0,'',1);
 INSERT INTO Users VALUES(5,'tworkstations','','workstations','for workstations','Default profile',NOW(),0,0,0,0,'',1);
 INSERT INTO Users VALUES(6,'cephalix','','sysadmins','Administrator','Internal',NOW(),0,0,0,0,'',1);
+INSERT INTO Users VALUES(7,'register','','register','Register','Internal',NOW(),0,0,0,0,'',1);
 INSERT INTO Groups VALUES(1,'sysadmins','Sysadmins','primary',1);
 INSERT INTO Groups VALUES(4,'administration','Administration','primary',1);
 INSERT INTO Groups VALUES(5,'workstations','Workstations','primary',1);
