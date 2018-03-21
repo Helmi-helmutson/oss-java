@@ -5,11 +5,14 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
+import de.openschoolserver.dao.tools.SslCrypto;
 
 
 /**
@@ -188,6 +191,10 @@ public class User implements Serializable {
 		this.msQuotaUsed = 0;
 		this.birthDay = new Date(System.currentTimeMillis());
 		this.mustChange = false;
+		this.ownedPositiveLists = new ArrayList<PositiveList>();
+		this.ownedCategories    = new ArrayList<Category>();
+		this.ownedDevices		= new ArrayList<Device>();
+		this.ownedGroups        = new ArrayList<Group>();
 	}
 
 	public boolean isMustChange() {
@@ -539,11 +546,11 @@ public class User implements Serializable {
 	}
 
 	public String getInitialPassword() {
-		return this.initialPassword;
+		return SslCrypto.deCrypt(this.initialPassword);
 	}
 
 	public void setInitialPassword(String initialPassword) {
-		this.initialPassword = initialPassword;
+		this.initialPassword = SslCrypto.enCrypt(initialPassword);
 	}
 
 	public List<PositiveList> getOwnedPositiveLists() {
