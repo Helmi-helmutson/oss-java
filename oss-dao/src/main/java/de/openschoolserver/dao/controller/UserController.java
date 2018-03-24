@@ -465,6 +465,23 @@ public class UserController extends Controller {
 		}
 		return  new OssResponse(this.getSession(),"OK","The password of the selected users was reseted.");
 	}
+	
+	public OssResponse copyTemplate(List<Long> userIds, String stringValue) {
+		StringBuilder data = new StringBuilder();
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[]   program = new String[2];
+		if( stringValue != null ) {
+			program = new String[3];
+			program[2] = stringValue;
+		} 
+		program[0] = "/usr/sbin/oss_copy_template_home.sh";
+		for ( Long id : userIds ){
+			program[1] = this.getById(id).getUid();
+			OSSShellTools.exec(program, reply, error, data.toString());
+		}
+		return  new OssResponse(this.getSession(),"OK","The template for the selected users was copied.");
+	}
 
 	public OssResponse disableLogin(List<Long> userIds,  boolean disable) {
 		StringBuilder data = new StringBuilder();
@@ -612,4 +629,6 @@ public class UserController extends Controller {
 		ossResponse.setCode("OK");
 		return ossResponse; 
 	}
+
+
 }

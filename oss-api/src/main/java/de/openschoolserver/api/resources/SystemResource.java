@@ -8,6 +8,10 @@ import io.swagger.annotations.*;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
 import java.util.List;
 import java.util.Map;
 
@@ -323,6 +327,30 @@ public interface SystemResource {
 		@ApiParam(hidden = true) @Auth Session session,
 		@PathParam("role") String role,
 		List<ProxyRule> acl
+		);
+
+    @GET
+    @Path("proxy/custom/{list}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the custom lists of the proxy: good or bad.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    String getTheCustomList(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("list") String list
+		);
+    
+    @POST
+    @Path("proxy/custom/{list}}")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation(value = "Sets the custom lists of the proxy: good or bad.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    OssResponse setTheCustomList(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("list")        String list,
+		@FormDataParam("domains") String domains
 		);
 
     /*

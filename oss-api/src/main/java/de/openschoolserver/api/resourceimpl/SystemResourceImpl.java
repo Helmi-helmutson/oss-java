@@ -1,6 +1,9 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
@@ -150,6 +153,23 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
+	public String getTheCustomList(Session session, String list) {
+		try {
+			return	Files.readAllLines(Paths.get("/var/lib/squidGuard/db/custom/" +list + "/domains")).toString();
+		}
+		catch( IOException e ) { 
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public OssResponse setTheCustomList(Session session, String list, String domains) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public OssResponse createJob(Session session, Job job) {
 		return new JobController(session).createJob(job);
 	}
@@ -205,5 +225,7 @@ public class SystemResourceImpl implements SystemResource {
 	public OssResponse setAclOfUser(Session session, Long userId, Acl acl) {
 		return new SystemController(session).setAclToUser(userId,acl);
 	}
+
+
 
 }
