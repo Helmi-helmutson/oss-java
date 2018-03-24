@@ -88,6 +88,11 @@ public class Acl implements Serializable {
 	public Acl() {
 	}
 
+	public Acl(String name, boolean allowed) {
+		this.acl     = name;
+		this.allowed = allowed;
+	}
+
 	public Long getId() {
 		return this.id;
 	}

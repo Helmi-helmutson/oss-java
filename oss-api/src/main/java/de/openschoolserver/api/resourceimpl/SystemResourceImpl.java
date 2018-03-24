@@ -4,12 +4,8 @@ package de.openschoolserver.api.resourceimpl;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.UriInfo;
-
-import java.sql.Timestamp;
-
 import de.openschoolserver.api.resources.SystemResource;
+import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.OssResponse;
@@ -179,6 +175,35 @@ public class SystemResourceImpl implements SystemResource {
 	public OssResponse restartJob(Session session, Long jobId) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * ACL management
+	 */
+	@Override
+	public List<Acl> getAcls(Session session) {
+		return new SystemController(session).getAvailableAcls();
+	}
+
+	@Override
+	public List<Acl> getAclsOfGroup(Session session, Long groupId) {
+		return new SystemController(session).getAclsOfGroup(groupId);
+	}
+
+	@Override
+	public OssResponse setAclOfGroup(Session session, Long groupId, Acl acl) {
+		return new SystemController(session).setAclToGroup(groupId,acl);
+	}
+
+	@Override
+	public List<Acl> getAclsOfUser(Session session, Long userId) {
+		return new SystemController(session).getAclsOfUser(userId);
+	}
+
+	@Override
+	public OssResponse setAclOfUser(Session session, Long userId, Acl acl) {
+		return new SystemController(session).setAclToUser(userId,acl);
 	}
 
 }

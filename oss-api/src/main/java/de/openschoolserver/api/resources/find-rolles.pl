@@ -19,6 +19,10 @@ foreach( split /\n/, $ROLES )
 }
 foreach( sort keys %$hroles )
 {
+	print "INSERT INTO Enumerates VALUES(NULL,'apiAcl','$_',6);\n";
+}
+foreach( sort keys %$hroles )
+{
 	print "INSERT INTO Acls VALUES(NULL,NULL,1,'$_','Y',6);\n";
 }
 
