@@ -240,6 +240,11 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public OssResponse deActivatePositiveListsInRoom(Session session, Long roomId) {
 		return new ProxyController(session).deleteAclsInRoom(roomId);
 	}
+	
+	@Override
+	public List<PositiveList> getPositiveListsInRoom(Session session, Long roomId) {
+		return new ProxyController(session).getPositiveListsInRoom(roomId);
+	}
 
 	@Override
 	public Device getDefaultPrinter(Session session, Long roomId) {
@@ -347,4 +352,6 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			Date validUntil) {
 		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
 	}
+
+
 }
