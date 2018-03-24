@@ -505,7 +505,7 @@ public class RoomController extends Controller {
 	public OssResponse setAccessStatus(long roomId, AccessInRoom access) {
 		Room room = this.getById(roomId);
 		this.setAccessStatus(room, access);
-		return new OssResponse(this.getSession(),"OK", "Access state in "+room.getName()+" was set succesfully." );
+		return new OssResponse(this.getSession(),"OK", "Access state in was set succesfully." );
 	}
 
 	/*
@@ -615,6 +615,7 @@ public class RoomController extends Controller {
 		HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
 		List<String> ipAddress;
 		List<Device> newDevices = new ArrayList<Device>();
+		List<String> parameters  = new ArrayList<String>();
 		try {
 			for(Device device : devices) {
 				//Remove trailing and ending spaces.
@@ -624,7 +625,9 @@ public class RoomController extends Controller {
 				if( device.getIp().isEmpty() ){
 					if( ipAddress.isEmpty() ) {
 						em.getTransaction().rollback();
-						return new OssResponse(this.getSession(),"ERROR",device.getMac() + " " + "There are no more free ip addresses in this room.");
+						parameters.add(device.getMac());
+						return new OssResponse(this.getSession(),"ERROR",
+								"There are no more free ip addresses in this room for the MAC: %s.",room.getId(),parameters);
 					}
 					if( device.getName().isEmpty() ) {
 						device.setName(ipAddress.get(0).split(" ")[1]);
@@ -634,7 +637,9 @@ public class RoomController extends Controller {
 				if( !device.getWlanMac().isEmpty() ){
 					if( ipAddress.size() < 2 ) {
 						em.getTransaction().rollback();
-						return new OssResponse(this.getSession(),"ERROR",device.getWlanMac() + " " + "There are no more free ip addresses in this room.");
+						parameters.add(device.getWlanMac());
+						return new OssResponse(this.getSession(),"ERROR",
+								"There are no more free ip addresses in this room for the MAC: %s.",room.getId(),parameters);
 					}
 					device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 				}
