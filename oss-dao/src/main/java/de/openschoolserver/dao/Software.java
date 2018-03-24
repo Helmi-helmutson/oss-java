@@ -40,6 +40,9 @@ public class Software implements Serializable {
 
 	private Integer weight;
 	
+	@Transient
+	private boolean sourceAvailable = true;
+	
 	//bi-directional many-to-one association to SoftwareLicens
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	@JsonIgnore
@@ -59,7 +62,7 @@ public class Software implements Serializable {
 	@JsonIgnore
 	private List<Category> removedFromCategories;
 	
-	    //bi-directional many-to-one association to User
+	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
 	private User creator;
@@ -210,6 +213,14 @@ public class Software implements Serializable {
 
 	public void setCreator(User creator) {
 		this.creator = creator;
+	}
+
+	public boolean isSourceAvailable() {
+		return sourceAvailable;
+	}
+
+	public void setSourceAvailable(boolean downloaded) {
+		this.sourceAvailable = downloaded;
 	}
 
 }

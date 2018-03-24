@@ -39,6 +39,7 @@ public class SoftwareController extends Controller {
 	
 	Logger logger           = LoggerFactory.getLogger(SoftwareController.class);
 	private static String SALT_PACKAGE_DIR = "/srv/salt/packages/";
+	private static String SALT_SOURCE_DIR  = "/srv/salt/win/repo-ng/";
 
 	public SoftwareController(Session session) {
 		super(session);
@@ -195,7 +196,19 @@ public class SoftwareController extends Controller {
 	public List<Software> getAll() {
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Software.findAll");
-		return (List<Software>)query.getResultList();
+		List<Software> softwares = new ArrayList<Software>();
+		for( Software software : (List<Software>)query.getResultList() ) {
+			if( ! software.getManually() ) {
+				File f = new File(SALT_SOURCE_DIR + software.getName() );
+				if( f.exists() && f.list().length > 1 ) {
+					software.setSourceAvailable(true);
+				} else {
+					software.setSourceAvailable(false);
+				}
+				softwares.add(software);
+			}
+		}
+		return softwares;
 	}
 
 	public Software getByName(String name) {
