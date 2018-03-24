@@ -618,8 +618,7 @@ public class DeviceController extends Controller {
 		String   name = "";
 		//Check the MAC address
 		if( !this.mayModify(oldDevice) ) {
-			parameters.add(oldDevice.getName());
-			return new OssResponse(this.getSession(),"ERROR","You must not modify this device: %s",null,parameters);
+			return new OssResponse(this.getSession(),"ERROR","You must not modify this device: %s",null,oldDevice.getName());
 		}
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		if( ! oldDevice.getMac().equals(device.getMac())) {
