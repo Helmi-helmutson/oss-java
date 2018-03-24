@@ -328,6 +328,10 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			return  userController.disableInternet(
 					ossActionMap.getUserIds(),
 					ossActionMap.isBooleanValue());
+		case "copyTemplate":
+			return  userController.copyTemplate(
+					ossActionMap.getUserIds(),
+					ossActionMap.getStringValue());
 		}
 		return new OssResponse(session,"ERROR","Unknown action");
 	}

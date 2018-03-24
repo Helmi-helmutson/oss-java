@@ -545,7 +545,8 @@ public interface EducationResource {
     					+ "setFilesystemQuota -> longValue has to contain the new quota value.<br>"
     					+ "setMailSystemQuota -> longValue has to contain the new quota value.<br>"
     					+ "disableLogin -> booleanValue has to contain the new value.<br>"
-    					+ "disableInternet -> booleanValue has to contain the new value.")
+    					+ "disableInternet -> booleanValue has to contain the new value.<br>"
+    					+ "copyTemplate -> Copy the home of the template user")
     @ApiResponses(value = {
     		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
