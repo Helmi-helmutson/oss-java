@@ -127,8 +127,18 @@ public class UserController extends Controller {
 	public List<User> getAll() {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("User.findAll"); 
-			return query.getResultList();
+			Query query = em.createNamedQuery("User.findAll");
+			if( this.isAllowed("user.manage")) {
+				return query.getResultList();
+			} else {
+				List<User> users = new ArrayList<User>();
+				for( User user : (List<User>)query.getResultList() ) {
+					if( user.getRole().equals("students") ) {
+						users.add(user);
+					}
+				}
+				return users;
+			}
 		} catch (Exception e) {
 			logger.error("getAll: " + e.getMessage());
 			return new ArrayList<>();
