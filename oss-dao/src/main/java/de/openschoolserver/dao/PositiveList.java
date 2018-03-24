@@ -12,7 +12,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  */
 @Entity
-@NamedQuery(name="PositiveList.findAll", query="SELECT p FROM PositiveList p")
+@NamedQueries({
+	@NamedQuery(name="PositiveList.findAll", query="SELECT p FROM PositiveList p"),
+	@NamedQuery(name="PositiveList.byName",  query="SELECT p FROM PositiveList p WHERE p.name = :name")
+})
 public class PositiveList implements Serializable {
 	private static final long serialVersionUID = 1L;
 
