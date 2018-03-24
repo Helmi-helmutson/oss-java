@@ -274,7 +274,7 @@ public class CloneToolController extends Controller {
 		}
 		parameters.add(key);
 		parameters.add(value);
-		return new OssResponse(this.getSession(),"OK", "Partitions key: %s was set to %s.");
+		return new OssResponse(this.getSession(),"OK", "Partitions key: %s was set to %s.",partition.getId(),parameters);
 	}
 	
 	public OssResponse delete(Long hwconfId){
@@ -313,6 +313,7 @@ public class CloneToolController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
+			em.remove(partition);
 			em.merge(hwconf);
 			em.getTransaction().commit();
 			em.getEntityManagerFactory().getCache().evict(hwconf.getClass());
@@ -322,7 +323,10 @@ public class CloneToolController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Partition: " + partitionName + " was deleted from " + hwconf.getName() + " (" + hwconf.getDeviceType() + ")");
+		parameters.add(partitionName);
+		parameters.add(hwconf.getName());
+		parameters.add(hwconf.getDeviceType());
+		return new OssResponse(this.getSession(),"OK", "Partition: %s was deleted from %s (%s)",hwconfId,parameters);
 	}
 
 	public OssResponse deleteConfigurationValue(Long hwconfId, String partitionName, String key) {
@@ -431,13 +435,15 @@ public class CloneToolController extends Controller {
 		if( ERROR.length() == 0 ) {
 			return new OssResponse(this.getSession(),"OK", "Boot configuration was saved succesfully." );
 		}
-		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during saving the boot configuration:" + ERROR.toString());
+		parameters.add(ERROR.toString());
+		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during saving the boot configuration: %s",null,parameters);
 	}
 	
 	public OssResponse startCloning(Long hwconfId, Clone parameters) {
 		List<String> partitions = new ArrayList<String>();
 		List<String> pxeBoot;
 		List<String> eliloBoot;
+		List<String> responseParameters = new ArrayList<String>();
 		StringBuilder ERROR = new StringBuilder();
 		try {
 			pxeBoot   = Files.readAllLines(PXE_BOOT);
@@ -450,7 +456,8 @@ public class CloneToolController extends Controller {
 		for( Long partitionId : parameters.getPartitionIds() ) {
 			Partition partition = this.getPartitionById(partitionId);
 			if( partition == null ) {
-				return new OssResponse(this.getSession(),"ERROR", "Can not find partition with id:" + partitionId);
+				responseParameters.add(String.valueOf(partitionId));
+				return new OssResponse(this.getSession(),"ERROR", "Can not find partition with id: %s",hwconfId,responseParameters);
 			}
 			partitions.add(partition.getName());
 		}
@@ -487,7 +494,8 @@ public class CloneToolController extends Controller {
 		if( ERROR.length() == 0 ) {
 			return new OssResponse(this.getSession(),"OK", "Boot configuration was saved succesfully." );
 		}
-		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during saving the boot configuration:" + ERROR.toString());
+		responseParameters.add(ERROR.toString());
+		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during saving the boot configuration: %s",hwconfId,responseParameters);
 	}
 
 	public OssResponse stopCloning(String type, Long id) {
@@ -518,7 +526,8 @@ public class CloneToolController extends Controller {
 		if( ERROR.length() == 0 ) {
 			return new OssResponse(this.getSession(),"OK", "Boot configuration was removed succesfully." );
 		}
-		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during removing the boot configuration:" + ERROR.toString());
+		parameters.add(ERROR.toString());
+		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during removing the boot configuration: %s",null,parameters);
 	}
 
 	public String resetMinion(Long deviceId) {
