@@ -1,8 +1,6 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
-import de.openschoolserver.dao.Session;
-
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 import org.apache.http.client.fluent.*;
@@ -605,4 +603,115 @@ public class SystemController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",error.toString());	
 		}
     }
+    
+    /*
+     * Acl Management
+     */
+    public Acl getAclById(Long aclId) {
+    	EntityManager em = getEntityManager();	
+		try {
+			return em.find(Acl.class, aclId);
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			return null;
+		} finally {
+			em.close();
+		}
+    }
+
+    public List<Acl> getAvailableAcls() {
+    	List<Acl> acls = new ArrayList<Acl>();
+    	for( String aclName : 	this.getEnumerates("apiAcl") ) {
+    		acls.add(new Acl(aclName,false));
+    	}
+    	return acls;
+    }
+
+	public List<Acl> getAclsOfGroup(Long groupId) {
+		return new GroupController(session).getById(groupId).getAcls();
+	}
+
+	public List<Acl> getAclsOfUser(Long userId) {
+		User user = new UserController(session).getById(userId);
+		List<Acl> acls = new ArrayList<Acl>();
+		for( Group group : user.getGroups() ) {
+			for( Acl acl : group.getAcls() ) {
+				acls.add(acl);
+			}
+		}
+		for( Acl acl : user.getAcls() ){
+			boolean identicalByGroup = false;
+			for( Acl groupAcl : acls ) {
+				if( groupAcl.getAcl().equals(acl.getAcl()) &&
+						groupAcl.getAllowed() == acl.getAllowed() ) {
+					identicalByGroup = true;
+					break;
+				}
+			}
+			if( ! identicalByGroup ) {
+				acls.add(acl);
+			}
+		}
+		return acls;
+	}
+
+	public OssResponse setAclToGroup(Long groupId, Acl acl) {
+		Group group = new GroupController(session).getById(groupId);
+		EntityManager em = this.getEntityManager();
+		try {
+			em.getTransaction().begin();
+			Acl oldAcl = this.getAclById(acl.getId());
+			if( oldAcl != null ) {
+				if( acl.getAllowed() ) {
+					oldAcl.setAllowed(true);
+					em.merge(oldAcl);
+				} else {
+					em.merge(oldAcl);
+					em.remove(oldAcl);
+				}
+			} else {
+				acl.setGroup(group);
+				acl.setCreator(this.session.getUser());
+				em.persist(acl);
+				group.addAcl(acl);
+				em.merge(group);
+			}
+			em.getTransaction().commit();
+		} catch(Exception e) {
+			return new OssResponse(session,"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(session,"OK","ACL was set succesfully.");
+	}
+
+	public OssResponse setAclToUser(Long userId, Acl acl) {
+		User user = new UserController(session).getById(userId);
+		EntityManager em = this.getEntityManager();
+		try {
+			em.getTransaction().begin();
+			Acl oldAcl = this.getAclById(acl.getId());
+			if( oldAcl != null ) {
+				if( acl.getAllowed() ) {
+					oldAcl.setAllowed(true);
+					em.merge(oldAcl);
+				} else {
+					em.merge(oldAcl);
+					em.remove(oldAcl);
+				}
+			} else  {
+				acl.setUser(user);
+				acl.setCreator(this.session.getUser());
+				em.persist(acl);
+				user.addAcl(acl);
+				em.merge(user);
+			}
+			em.getTransaction().commit();
+		} catch(Exception e) {
+			return new OssResponse(session,"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(session,"OK","ACL was set succesfully.");
+	}
 }
