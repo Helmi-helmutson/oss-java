@@ -273,6 +273,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public List<SoftwareLicense> getSoftwareLicenses(Session session, long softwareId) {
+		//TODO implementing used!
 		return new SoftwareController(session).getById(softwareId).getSoftwareLicenses();
 	}
 	

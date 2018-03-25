@@ -31,6 +31,12 @@ public class SoftwareLicense implements Serializable {
 	private int count;
 
 	/*
+	 * The amount of the devices the license can be used for.
+	 */
+	@Transient
+	private int used;
+
+	/*
 	 * The type of the license. This can be F for licenses saved in files or C for Licenses passed by command name.
 	 */
 	private Character licenseType;
@@ -167,5 +173,15 @@ public class SoftwareLicense implements Serializable {
 
 	public void setDevices(List<Device> devices) {
 		this.devices = devices;
+	}
+
+
+	public int getUsed() {
+		return used;
+	}
+
+
+	public void setUsed(int used) {
+		this.used = used;
 	}
 }
