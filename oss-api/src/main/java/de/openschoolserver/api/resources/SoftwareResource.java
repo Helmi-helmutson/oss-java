@@ -184,6 +184,19 @@ public interface SoftwareResource {
             @FormDataParam("file")  final FormDataContentDisposition contentDispositionHeader
             );
 	
+	@GET
+	@Path("{softwareId}/license")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation( value = "Creates licences to a software" )
+    @ApiResponses(value = {
+	            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+    @RolesAllowed("software.modify")
+    List<SoftwareLicense> getSoftwareLicenses(
+    		@ApiParam(hidden = true) @Auth Session session,
+    		@PathParam("softwareId") long softwareId
+    		);
 	/*
 	 * POST softwares/{softwareId}/license
 	 */

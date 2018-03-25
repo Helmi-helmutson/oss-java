@@ -270,5 +270,10 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		}
 		return softwareStatus;
 	}
+
+	@Override
+	public List<SoftwareLicense> getSoftwareLicenses(Session session, long softwareId) {
+		return new SoftwareController(session).getById(softwareId).getSoftwareLicenses();
+	}
 	
 }
