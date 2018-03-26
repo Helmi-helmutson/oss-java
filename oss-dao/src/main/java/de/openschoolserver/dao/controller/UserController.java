@@ -263,7 +263,7 @@ public class UserController extends Controller {
 
 	public OssResponse modify(User user){
 		User oldUser = this.getById(user.getId());
-		if(!user.getPassword().isEmpty()) {
+		if(user.getPassword() !=  null && !user.getPassword().isEmpty()) {
 			OssResponse ossResponse = this.checkPassword(user.getPassword());
 			if(ossResponse != null) {
 				return ossResponse;
