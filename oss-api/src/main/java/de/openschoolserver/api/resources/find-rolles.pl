@@ -11,7 +11,7 @@ foreach( split /\n/, $ROLES )
 	{
 		my $r = $1;
 		$hroles->{$1} = 1;
-		if( $r =~ /.search/ || $r =~ /education/ ) {
+		if( $r =~ /education/ ) {
 			$forTeachers->{$r} = 1;
 		}
 	}
