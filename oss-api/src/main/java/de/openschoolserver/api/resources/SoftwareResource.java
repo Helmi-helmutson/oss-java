@@ -141,6 +141,54 @@ public interface SoftwareResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			Software software
 			);
+
+	/*
+	 * POST softwares/addRequirements { hash }
+	 */
+	@POST
+	@Path("addRequirements")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Add a software requirement by name")
+	@ApiResponses(value = {
+			// TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	//@PermitAll
+	@RolesAllowed("software.modify")
+	OssResponse addRequirements(
+			@ApiParam(hidden = true) @Auth Session session,
+			List<String> requirement
+			);
+
+	@PUT
+	@Path("{softwareId}/{requirementId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Add a software requirement to a software")
+	@ApiResponses(value = {
+			// TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("software.modify")
+	OssResponse addRequirements(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("softwareId")    long softwareId,
+			@PathParam("requirementId") long requirementId
+			);
+
+	@DELETE
+	@Path("{softwareId}/{requirementId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Remove a software requirement from a software")
+	@ApiResponses(value = {
+			// TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("software.modify")
+	OssResponse deleteRequirements(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("softwareId")    long softwareId,
+			@PathParam("requirementId") long requirementId
+			);
 	
 	/*
 	 * DELETE softwares/<softwareId>

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.api.resources.SoftwareResource;
 import de.openschoolserver.dao.Category;
@@ -20,8 +19,6 @@ import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.SoftwareVersion;
 import de.openschoolserver.dao.controller.SoftwareController;
 import de.openschoolserver.dao.controller.CategoryController;
-
-import javax.ws.rs.WebApplicationException;
 
 public class SoftwareResourceImpl implements SoftwareResource {
 
@@ -274,7 +271,27 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<SoftwareLicense> getSoftwareLicenses(Session session, long softwareId) {
 		//TODO implementing used!
-		return new SoftwareController(session).getById(softwareId).getSoftwareLicenses();
+		List<SoftwareLicense> licenses = new ArrayList<SoftwareLicense>();
+		for( SoftwareLicense license : new SoftwareController(session).getById(softwareId).getSoftwareLicenses() ) {
+			license.setUsed(license.getDevices().size());
+			licenses.add(license);
+		}
+		return licenses;
+	}
+
+	@Override
+	public OssResponse addRequirements(Session session, List<String> requirement) {
+		return new SoftwareController(session).addRequirements(requirement);
+	}
+
+	@Override
+	public OssResponse addRequirements(Session session, long softwareId, long requirementId) {
+		return new SoftwareController(session).addRequirements(softwareId,requirementId);
+	}
+
+	@Override
+	public OssResponse deleteRequirements(Session session, long softwareId, long requirementId) {
+		return new SoftwareController(session).deleteRequirements(softwareId,requirementId);
 	}
 	
 }

@@ -50,7 +50,7 @@ public class DeviceController extends Controller {
 			device.setHwconfId(device.getHwconf().getId());
 			return device;
 		} catch (Exception e) {
-			logger.error("DeviceId:" + deviceId + " " + e.getMessage(),e);
+			logger.debug("DeviceId:" + deviceId + " " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();

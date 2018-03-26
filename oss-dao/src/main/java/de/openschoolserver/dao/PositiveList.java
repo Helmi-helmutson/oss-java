@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  */
 @Entity
+@Table(name="PositiveLists")
 @NamedQueries({
 	@NamedQuery(name="PositiveList.findAll", query="SELECT p FROM PositiveList p"),
 	@NamedQuery(name="PositiveList.byName",  query="SELECT p FROM PositiveList p WHERE p.name = :name")

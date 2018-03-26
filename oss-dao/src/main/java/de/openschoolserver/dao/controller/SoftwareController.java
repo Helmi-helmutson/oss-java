@@ -51,7 +51,14 @@ public class SoftwareController extends Controller {
 	public Software getById(long softwareId) {
 		EntityManager em = getEntityManager();
 		try {
-			return em.find(Software.class, softwareId);
+			Software software =  em.find(Software.class, softwareId);
+			File f = new File(SALT_SOURCE_DIR + software.getName() );
+			if( f.exists() && f.list().length > 1 ) {
+				software.setSourceAvailable(true);
+			} else {
+				software.setSourceAvailable(false);
+			}
+			return software;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -971,6 +978,10 @@ public class SoftwareController extends Controller {
 				if( category.getCategoryType().equals("installation")) {
 					for( Software software : category.getSoftwares() ) {
 						toRemove.remove(software);
+						for(Software requirements : software.getSoftwareRequirements() ) {
+							toRemove.remove(requirements);
+							toInstall.add(String.format("%04d-%s",requirements.getWeight(),requirements.getName()));
+						}
 						toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
 					}
 				}
@@ -1000,6 +1011,10 @@ public class SoftwareController extends Controller {
 				if( category.getCategoryType().equals("installation")) {
 					for( Software software : category.getSoftwares() ) {
 						toRemove.remove(software);
+						for(Software requirements : software.getSoftwareRequirements() ) {
+							toRemove.remove(requirements);
+							toInstall.add(String.format("%04d-%s",requirements.getWeight(),requirements.getName()));
+						}
 						toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
 					}
 
@@ -1035,6 +1050,10 @@ public class SoftwareController extends Controller {
 				if( category.getCategoryType().equals("installation")) {
 					for( Software software : category.getSoftwares() ) {
 						toRemove.remove(software);
+						for(Software requirements : software.getSoftwareRequirements() ) {
+							toRemove.remove(requirements);
+							toInstall.add(String.format("%04d-%s",requirements.getWeight(),requirements.getName()));
+						}
 						toInstall.add(String.format("%04d-%s",software.getWeight(),software.getName()));
 					}
 				}
@@ -1430,5 +1449,36 @@ public class SoftwareController extends Controller {
 			softwares.add(getById(i));
 		}
 		return softwares;
+	}
+
+	public OssResponse addRequirements(Software software, Software requirement) {
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			software.getSoftwareRequirements().add(requirement);
+			software.getRequiredBy().add(software);
+			em.merge(software);
+			em.merge(requirement);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Software requirement was added successfully");
+	}
+
+	public OssResponse addRequirements(List<String> requirement) {
+		return this.addRequirements(this.getByName(requirement.get(0)), this.getByName(requirement.get(0)));
+	}
+
+	public OssResponse addRequirements(long softwareId, long requirementId) {
+		return this.addRequirements(this.getById(softwareId),this.getById(requirementId));
+	}
+
+	public OssResponse deleteRequirements(long softwareId, long requirementId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

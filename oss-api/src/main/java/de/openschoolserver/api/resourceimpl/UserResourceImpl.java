@@ -218,6 +218,4 @@ public class UserResourceImpl implements UserResource {
 			Date validUntil) {
 		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
 	}
-
-
 }
