@@ -7,8 +7,6 @@ import io.dropwizard.Configuration;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import javax.validation.Valid;
-
 public class ServerConfiguration extends Configuration {
 
     @NotEmpty
