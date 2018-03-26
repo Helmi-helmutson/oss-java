@@ -1,6 +1,8 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -40,7 +42,7 @@ public class PositiveList implements Serializable {
 	private User owner;
 	
 	@Transient
-	String domains;
+	private String domains;
 	
 	public PositiveList() {
 	}
