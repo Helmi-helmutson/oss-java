@@ -9,7 +9,8 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
@@ -21,6 +22,8 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 
 @SuppressWarnings( "unchecked" )
 public class ProxyController extends Controller {
+
+	Logger logger = LoggerFactory.getLogger(ProxyController.class); 
 
 	public ProxyController(Session session) {
 		super(session);
@@ -110,6 +113,7 @@ public class ProxyController extends Controller {
 	 */
 	public OssResponse editPositiveList(PositiveList positiveList) {
 		EntityManager em = getEntityManager();
+		logger.debug(positiveList.toString());
 		PositiveList oldPositiveList = this.getPositiveListById(positiveList.getId());
 		try {
 			positiveList.setOwner(session.getUser());
@@ -170,7 +174,10 @@ public class ProxyController extends Controller {
 		PositiveList positiveList = this.getPositiveListById(id);
 		try {
 			positiveList.setDomains(
-					Files.readAllLines(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains")).toString()
+					String.join(
+							this.getNl(),
+							Files.readAllLines(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains"))
+							)
 					);
 		}
 		catch( IOException e ) { 
