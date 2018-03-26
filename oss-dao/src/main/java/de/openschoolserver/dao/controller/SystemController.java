@@ -11,6 +11,8 @@ import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.ws.rs.WebApplicationException;
@@ -18,7 +20,6 @@ import javax.ws.rs.WebApplicationException;
 import de.openschoolserver.dao.*;
 
 import java.io.IOException;
-import java.text.DateFormat;
 import java.util.*;
 
 @SuppressWarnings( "unchecked" )
@@ -391,11 +392,17 @@ public class SystemController extends Controller {
                 String   port = rule.length > 3 ? rule[3] : "all";
                 if(host[1].equals("32")) {
                     Device device = deviceController.getByIP(host[0]);
+                    if( device == null ) {
+			continue;
+                    }
                     statusMap.put("id", Long.toString(device.getId()));
                     statusMap.put("name", device.getName());
                     statusMap.put("type", "host");
                 } else {
-                    Room room = roomController.getByIP(host[0]);
+		    Room room = roomController.getByIP(host[0]);
+		    if( room == null ) {
+			continue;
+		    }
                     statusMap.put("id", Long.toString(room.getId()));
                     statusMap.put("name", room.getName());
                     statusMap.put("type", "room" );
@@ -411,6 +418,11 @@ public class SystemController extends Controller {
     
     public OssResponse setFirewallOutgoingRules(List<Map<String, String>> firewallList) {
         List<String> fwMasqNets = new ArrayList<String>();
+		try {
+			logger.debug(new ObjectMapper().writeValueAsString(firewallList));
+		} catch (Exception e) {
+			logger.debug("{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }");
+		}
         Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
         RoomController roomController = new RoomController(this.session);
         DeviceController deviceController = new DeviceController(this.session);
@@ -420,7 +432,7 @@ public class SystemController extends Controller {
             StringBuilder data = new StringBuilder();
             if( map.get("type").equals("room")) {
                 room = roomController.getById(Long.parseLong(map.get("id")));
-                data.append(room.getNetwork()).append("/").append(String.valueOf(room.getNetMask())).append(",");
+                data.append(room.getStartIP()).append("/").append(String.valueOf(room.getNetMask())).append(",");
             } else {
                 device = deviceController.getById(Long.parseLong(map.get("id")));
                 data.append(device.getIp()).append("/32,");
