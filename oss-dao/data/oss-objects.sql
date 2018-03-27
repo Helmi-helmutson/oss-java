@@ -319,6 +319,14 @@ CREATE TABLE IF NOT EXISTS Softwares (
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
+CREATE TABLE IF NOT EXISTS SoftwareRequirements (
+        software_id		    BIGINT UNSIGNED,
+        requirement_id		    BIGINT UNSIGNED,
+        FOREIGN KEY(software_id)    REFERENCES Softwares(id) ON DELETE CASCADE,
+        FOREIGN KEY(requirement_id) REFERENCES Softwares(id) ON DELETE CASCADE,
+	PRIMARY KEY(software_id,requirement_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+
 # status C -> current this is the most recent version and does exists on the server and can be installed
 # status R -> replaced this version does not exists on the server but is installed on some clients
 # status D -> this is an older version which does exists on the server and can be installed
