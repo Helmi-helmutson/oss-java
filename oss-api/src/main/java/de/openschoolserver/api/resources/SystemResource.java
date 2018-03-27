@@ -341,7 +341,7 @@ public interface SystemResource {
 		);
     
     @POST
-    @Path("proxy/custom/{list}}")
+    @Path("proxy/custom/{list}")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation(value = "Sets the custom lists of the proxy: good or bad.")
