@@ -6,13 +6,13 @@ import static de.openschoolserver.api.resources.Resource.*;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
+
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.*;
 
 import java.util.Date;
 import java.util.List;
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.dao.User;
@@ -193,6 +193,7 @@ public interface UserResource {
             User user
     );
     
+
     /*
      * DELETE users/<userId>
      */

@@ -9,7 +9,9 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.ProxyRule;
@@ -20,6 +22,8 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 
 @SuppressWarnings( "unchecked" )
 public class ProxyController extends Controller {
+
+	Logger logger = LoggerFactory.getLogger(ProxyController.class); 
 
 	public ProxyController(Session session) {
 		super(session);
@@ -90,6 +94,18 @@ public class ProxyController extends Controller {
 		}
 	}
 
+	public PositiveList getPositiveListByName( String name ) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("PostiveList.byName").setParameter("name", name);
+			return (PositiveList) query.getResultList().get(0);
+		} catch (Exception e) {
+			return null;
+		} finally {
+			em.close();
+		}
+	}
+
 	/*
 	 * Creates or modify a positive list
 	 * @param positiveList The positive list to be saved
@@ -97,6 +113,7 @@ public class ProxyController extends Controller {
 	 */
 	public OssResponse editPositiveList(PositiveList positiveList) {
 		EntityManager em = getEntityManager();
+		logger.debug(positiveList.toString());
 		PositiveList oldPositiveList = this.getPositiveListById(positiveList.getId());
 		try {
 			positiveList.setOwner(session.getUser());
@@ -107,6 +124,8 @@ public class ProxyController extends Controller {
 				positiveList.setName(user.getUid() + String.valueOf(count));
 				positiveList.setOwner(user);
 				em.persist(positiveList);
+				user.getOwnedPositiveLists().add(positiveList);
+				em.merge(user);
 			} else {
 				oldPositiveList.setDescription(positiveList.getDescription());
 				oldPositiveList.setSubject(positiveList.getSubject());
@@ -155,7 +174,10 @@ public class ProxyController extends Controller {
 		PositiveList positiveList = this.getPositiveListById(id);
 		try {
 			positiveList.setDomains(
-					Files.readAllLines(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains")).toString()
+					String.join(
+							this.getNl(),
+							Files.readAllLines(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains"))
+							)
 					);
 		}
 		catch( IOException e ) { 
@@ -189,6 +211,25 @@ public class ProxyController extends Controller {
 		return this.session.getUser().getOwnedPositiveLists();
 	}
 
+	public List<PositiveList> getPositiveListsInRoom(Long roomId) {
+		List<PositiveList> positiveLists = new ArrayList<PositiveList>();
+		Room room  = new RoomController(session).getById(roomId);
+		String[] program   = new String[3];
+		program[0] = "/usr/share/oss/tools/squidGuard.pl";
+		program[1] = "readRoom";
+		program[2] = room.getName();
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		StringBuilder acls = new StringBuilder();
+		OSSShellTools.exec(program, reply, error, acls.toString());
+		for( String roomName : reply.toString().split(" ") ) {
+			PositiveList positiveList = this.getPositiveListByName(roomName);
+			if( positiveList != null ) {
+				positiveLists.add(positiveList);
+			}
+		}
+		return positiveLists;
+	}
 	/*
 	 * Sets positive lists in a room
 	 * @param roomId The room id.
@@ -196,18 +237,35 @@ public class ProxyController extends Controller {
 	 * @return An OssResponse object with the result
 	 */
 	public OssResponse setAclsInRoom(Long roomId, List<Long> positiveListIds) {
-		String[] program   = new String[2];
+
+		DeviceController deviceController = new DeviceController(session);
+		Room room         = new RoomController(session).getById(roomId);
+		StringBuilder ips = new StringBuilder();
+		for(List<Long> loggedOn : new EducationController(session).getRoom(roomId)) {
+			Device device = deviceController.getById(loggedOn.get(1));
+			if( device.getIp() != null && !device.getIp().isEmpty() ) {
+				ips.append(device.getIp()).append(this.getNl());
+			}
+			if( device.getWlanIp() != null && !device.getWlanIp().isEmpty() ) {
+				ips.append(device.getWlanIp()).append(this.getNl());
+			}
+		}
+		String[] program  = new String[3];
 		program[0] = "/usr/share/oss/tools/squidGuard.pl";
-		program[1] = "write";
+		program[1] = "writeIpSource";
+		program[2] = room.getName();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
+		OSSShellTools.exec(program, reply, error, ips.toString());
 		StringBuilder acls = new StringBuilder();
-		Room room  = new RoomController(session).getById(roomId);
 		for( Long id : positiveListIds ) {
 			PositiveList positiveList = this.getPositiveList(id);
 			acls.append(room.getName()).append(":").append(positiveList.getName()).append(":true\n");
 		}
 		acls.append(room.getName()).append(":all:false\n");
+		program  = new String[3];
+		program[0] = "/usr/share/oss/tools/squidGuard.pl";
+		program[1] = "write";
 		OSSShellTools.exec(program, reply, error, acls.toString());
 		return new OssResponse(this.session,"OK","Proxy Setting was saved succesfully in your room.");	
 	}

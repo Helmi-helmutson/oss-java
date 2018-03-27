@@ -116,7 +116,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.manage")
+	@RolesAllowed("hwconf.manage")
 	OssResponse setMaster(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId,
@@ -133,7 +133,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.manage")
+	@RolesAllowed("hwconf.manage")
 	OssResponse setMaster(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("isMaster") int isMaster
@@ -149,7 +149,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	List<HWConf> getAllHWConf(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
@@ -164,7 +164,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.search")
 	HWConf getById(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
@@ -180,7 +180,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.manage")
+	@RolesAllowed("hwconf.manage")
 	String getDescription(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
@@ -249,7 +249,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.manage")
+	@RolesAllowed("hwconf.manage")
 	String getRoomsToRegister(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
@@ -265,7 +265,7 @@ public interface CloneToolResource {
         @ApiResponse(code = 404, message = "There is no more IP address in this room."),
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("device.add")
+    @RolesAllowed("hwconf.add")
     String getAvailableIPAddresses(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -303,7 +303,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.add")
 	OssResponse addHWConf(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        HWConf hwconf
@@ -319,7 +319,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.add")
 	OssResponse modifyHWConf(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
@@ -337,7 +337,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	OssResponse addPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
@@ -354,7 +354,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	OssResponse addPartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
@@ -372,7 +372,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	OssResponse setConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
@@ -391,7 +391,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.delete")
+	@RolesAllowed("hwconf.manage")
 	OssResponse delete(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
@@ -407,7 +407,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.add")
 	OssResponse deletePartition(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
@@ -425,7 +425,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.modify")
 	OssResponse deleteConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
@@ -445,7 +445,7 @@ public interface CloneToolResource {
 						" partitions : [ IDs of partitions ] " +
 						" multicast  :  true/fals"
 						)
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	OssResponse startCloning(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("hwconfId") Long hwconfId,
@@ -461,7 +461,7 @@ public interface CloneToolResource {
 	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for all workstations in a hwconf." +
 						  "Multicast can be 0 or 1"
 						)
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	OssResponse startCloning(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("hwconfId")  Long hwconfId,
@@ -477,7 +477,7 @@ public interface CloneToolResource {
 	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for all workstations in a room." +
 			  			  "Multicast can be 0 or 1"
 						)
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.modify")
 	OssResponse startCloningInRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId") Long roomId,
@@ -492,7 +492,7 @@ public interface CloneToolResource {
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for a workstations"
 						)
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	OssResponse startCloningOnDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("deviceId") Long deviceId
@@ -506,7 +506,7 @@ public interface CloneToolResource {
 	@Path("{hwconfId}/cloning")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Removes the boot configuration for the automatical partitioning.")
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	OssResponse stopCloning(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("hwconfId") Long hwconfId
@@ -518,10 +518,8 @@ public interface CloneToolResource {
 	@DELETE
 	@Path("rooms/{roomId}/cloning")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for all workstations in a room." +
-			  			  "Multicast can be 0 or 1"
-						)
-	@RolesAllowed("device.add")
+	@ApiOperation(value = "Removes the boot configuration for the automatical partitioning for all workstations in a room." )
+	@RolesAllowed("hwconf.manage")
 	OssResponse stopCloningInRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId") Long roomId
@@ -535,7 +533,7 @@ public interface CloneToolResource {
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for a workstations"
 						)
-	@RolesAllowed("device.add")
+	@RolesAllowed("hwconf.manage")
 	OssResponse stopCloningOnDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("deviceId") Long deviceId

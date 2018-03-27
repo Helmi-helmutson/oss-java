@@ -5,6 +5,8 @@ package de.openschoolserver.dao;
 import java.security.Principal;
 
 import java.util.Date;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 
@@ -57,22 +59,28 @@ public class Session implements Principal {
 	@JoinColumn(name = "room_id", insertable = false, updatable = false)
 	@JsonIgnore
 	private Room room;
-	
+
 	@Transient
 	private String mac;
-	
+
 	@Transient
 	private String dnsName;
-	
+
 	@Column(name = "ip")
 	private String ip;
-	
+
 	@Column(name = "token")
 	private String token;
-	
+
 	@JsonIgnore
 	private transient Object temporaryUploadData;
-	    
+
+	@Transient
+	private List<String> acls;
+
+	@Transient
+	private String commonName;
+    
 	public Object getTemporaryUploadData() {
 		return temporaryUploadData;
 	}
@@ -251,5 +259,25 @@ public class Session implements Principal {
 	
 	public void setDNSName(String dnsName) {
 	    this.dnsName = dnsName;
+	}
+
+	public List<String> getAcls() {
+		return acls;
+	}
+
+	public void setAcls(List<String> acls) {
+		this.acls = acls;
+	}
+
+	public void setCreateDate(Date createDate) {
+		this.createDate = createDate;
+	}
+
+	public String getCommonName() {
+		return commonName;
+	}
+
+	public void setCommonName(String commonName) {
+		this.commonName = commonName;
 	}
 }

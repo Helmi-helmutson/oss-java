@@ -545,7 +545,8 @@ public interface EducationResource {
     					+ "setFilesystemQuota -> longValue has to contain the new quota value.<br>"
     					+ "setMailSystemQuota -> longValue has to contain the new quota value.<br>"
     					+ "disableLogin -> booleanValue has to contain the new value.<br>"
-    					+ "disableInternet -> booleanValue has to contain the new value.")
+    					+ "disableInternet -> booleanValue has to contain the new value.<br>"
+    					+ "copyTemplate -> Copy the home of the template user")
     @ApiResponses(value = {
     		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -749,7 +750,6 @@ public interface EducationResource {
     @POST
     @Path("proxy/positiveLists")
     @Produces(JSON_UTF8)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Creates a new positive list." )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -786,10 +786,10 @@ public interface EducationResource {
         @PathParam("positiveListId") Long positiveListId
     );
 
+    //TODO these must be safer. Only the own controlled room may be modified
     @POST
     @Path("proxy/rooms/{roomId}")
     @Produces(JSON_UTF8)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Activates positive lists in a room." )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -799,6 +799,19 @@ public interface EducationResource {
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId,
         List<Long> postiveListIds
+    );
+    
+    @GET
+    @Path("proxy/rooms/{roomId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation( value = "Activates positive lists in a room." )
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.proxy")
+    List<PositiveList> getPositiveListsInRoom(
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("roomId") Long roomId
     );
     
     @DELETE

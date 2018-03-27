@@ -1,6 +1,8 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+import java.util.List;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -12,7 +14,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * 
  */
 @Entity
-@NamedQuery(name="PositiveList.findAll", query="SELECT p FROM PositiveList p")
+@Table(name="PositiveLists")
+@NamedQueries({
+	@NamedQuery(name="PositiveList.findAll", query="SELECT p FROM PositiveList p"),
+	@NamedQuery(name="PositiveList.byName",  query="SELECT p FROM PositiveList p WHERE p.name = :name")
+})
 public class PositiveList implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -36,7 +42,7 @@ public class PositiveList implements Serializable {
 	private User owner;
 	
 	@Transient
-	String domains;
+	private String domains;
 	
 	public PositiveList() {
 	}

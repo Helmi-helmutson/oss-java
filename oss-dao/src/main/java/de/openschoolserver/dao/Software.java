@@ -8,6 +8,7 @@ import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +41,9 @@ public class Software implements Serializable {
 
 	private Integer weight;
 	
+	@Transient
+	private boolean sourceAvailable = true;
+	
 	//bi-directional many-to-one association to SoftwareLicens
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	@JsonIgnore
@@ -58,15 +62,33 @@ public class Software implements Serializable {
 	@ManyToMany(mappedBy="removedSoftwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<Category> removedFromCategories;
-	
-	    //bi-directional many-to-one association to User
+
+	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
 	private User creator;
 
+	//bi-directional many-to-many association to Device
+	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JoinTable(
+			name="SoftwareRequirements",
+			joinColumns={ @JoinColumn(name="software_id")	},
+			inverseJoinColumns={ @JoinColumn(name="requirement_id") }
+	)
+	@JsonIgnore
+	private List<Software> softwareRequirements = new ArrayList<Software>();
+	
+	//bi-directional many-to-many association to Device
+	@ManyToMany(mappedBy="softwareRequirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
+	private List<Software> requiredBy = new ArrayList<Software>();
+
+
 	public Software() {
 		this.manually = false;
 		this.weight   = 50;
+		this.softwareRequirements = new ArrayList<Software>();
+		this.requiredBy           = new ArrayList<Software>();
 	}
 
 	@Override
@@ -210,6 +232,30 @@ public class Software implements Serializable {
 
 	public void setCreator(User creator) {
 		this.creator = creator;
+	}
+
+	public boolean isSourceAvailable() {
+		return sourceAvailable;
+	}
+
+	public void setSourceAvailable(boolean downloaded) {
+		this.sourceAvailable = downloaded;
+	}
+
+	public List<Software> getSoftwareRequirements() {
+		return softwareRequirements;
+	}
+
+	public void setSoftwareRequirements(List<Software> softwareRequirements) {
+		this.softwareRequirements = softwareRequirements;
+	}
+
+	public List<Software> getRequiredBy() {
+		return requiredBy;
+	}
+
+	public void setRequiredBy(List<Software> requiredBy) {
+		this.requiredBy = requiredBy;
 	}
 
 }

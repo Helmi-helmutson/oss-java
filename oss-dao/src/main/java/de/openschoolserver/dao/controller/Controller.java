@@ -460,6 +460,36 @@ public class Controller extends Config {
 
 	}
 	
+	public List<String> allowedModules(User user) {
+		List<String> modules = new ArrayList<String>();
+		//Is it allowed by the groups.
+		for( Group group : user.getGroups() ) {
+			for( Acl acl : group.getAcls() ) {
+				if( acl.getAllowed() ) {
+					modules.add(acl.getAcl());
+				}
+			}
+		}
+		//Is it allowed by the user
+		for( Acl acl : user.getAcls() ){
+			if( acl.getAllowed() && !modules.contains(acl.getAcl())) {
+				modules.add(acl.getAcl());
+			} else if( modules.contains(acl.getAcl()) ) {
+				//It is forbidden by the user
+				modules.remove(acl.getAcl());
+			}
+		}
+		return modules;
+	}
+	
+	public boolean isAllowed(User user, String acl) {
+		return this.allowedModules(user).contains(acl);
+	}
+
+	public boolean isAllowed(String acl) {
+			return this.isAllowed(session.getUser(), acl);
+	}
+	
 	public boolean systemctl(String action, String service) {
 		 String[] program = new String[3];
 		 program[0] = "systemctl";

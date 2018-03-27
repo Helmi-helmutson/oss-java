@@ -72,6 +72,9 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final SessionsResource sessionsResource = new SessionsResourceImpl();
         environment.jersey().register(sessionsResource);
 
+        final SelfManagementResource selfManagementResource = new SelfManagementResourceImpl();
+        environment.jersey().register(selfManagementResource);
+
         final RoomResource roomsResource = new RoomRescourceImpl();
         environment.jersey().register(roomsResource);
    

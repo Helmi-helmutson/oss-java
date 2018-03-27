@@ -1,15 +1,15 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.UriInfo;
-
-import java.sql.Timestamp;
-
 import de.openschoolserver.api.resources.SystemResource;
+import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.OssResponse;
@@ -18,6 +18,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Translation;
 import de.openschoolserver.dao.controller.SystemController;
 import de.openschoolserver.dao.controller.ProxyController;
+import de.openschoolserver.dao.controller.Controller;
 import de.openschoolserver.dao.controller.JobController;
 
 public class SystemResourceImpl implements SystemResource {
@@ -154,6 +155,43 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
+	public List<String> getTheCustomListAsList(Session session, String list) {
+		try {
+			return	Files.readAllLines(Paths.get("/var/lib/squidGuard/db/custom/" +list + "/domains"));
+		}
+		catch( IOException e ) { 
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	@Override
+	public OssResponse setTheCustomListAsList(Session session, String list, List<String> domains) {
+		try {
+			Files.write(Paths.get("/var/lib/squidGuard/db/custom/" +list + "/domains"),domains);
+			new Controller(session).systemctl("restart", "squid");
+			return new OssResponse(session,"OK","Custom list was written successfully");
+		} catch( IOException e ) { 
+			e.printStackTrace();
+		}
+		return new OssResponse(session,"ERROR","Could not write custom list.");
+	}
+
+	@Override
+	public String getTheCustomList(Session session, String list) {
+		return String.join("\\n", this.getTheCustomListAsList(session, list));
+	}
+
+	@Override
+	public OssResponse setTheCustomList(Session session, String list, String domains) {
+		List<String> domainlist = new ArrayList<String>();
+		for( String line : domains.split("\\n")) {
+			domainlist.add(line);
+		}
+		return this.setTheCustomListAsList(session, list, domainlist);
+	}
+
+	@Override
 	public OssResponse createJob(Session session, Job job) {
 		return new JobController(session).createJob(job);
 	}
@@ -180,5 +218,45 @@ public class SystemResourceImpl implements SystemResource {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	/*
+	 * (non-Javadoc)
+	 * ACL management
+	 */
+	@Override
+	public List<Acl> getAcls(Session session) {
+		return new SystemController(session).getAvailableAcls();
+	}
+
+	@Override
+	public List<Acl> getAclsOfGroup(Session session, Long groupId) {
+		return new SystemController(session).getAclsOfGroup(groupId);
+	}
+
+	@Override
+	public OssResponse setAclOfGroup(Session session, Long groupId, Acl acl) {
+		return new SystemController(session).setAclToGroup(groupId,acl);
+	}
+
+	@Override
+	public List<Acl> getAvailableAclsForGroup(Session session, Long groupId) {
+		return new SystemController(session).getAvailableAclsForGroup(groupId);
+	}
+
+	@Override
+	public List<Acl> getAclsOfUser(Session session, Long userId) {
+		return new SystemController(session).getAclsOfUser(userId);
+	}
+
+	@Override
+	public OssResponse setAclOfUser(Session session, Long userId, Acl acl) {
+		return new SystemController(session).setAclToUser(userId,acl);
+	}
+
+	@Override
+	public List<Acl> getAvailableAclsForUser(Session session, Long userId) {
+		return new SystemController(session).getAvailableAclsForUser(userId);
+	}
+
 
 }

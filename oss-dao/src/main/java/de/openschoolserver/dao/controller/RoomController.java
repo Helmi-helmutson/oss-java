@@ -75,9 +75,7 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 
 		try {
-			Room room = em.find(Room.class, roomId);
-			room.setHwconfId(room.getHwconf().getId());
-			return room;
+			return em.find(Room.class, roomId);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -185,6 +183,11 @@ public class RoomController extends Controller {
 		if( room.getRoomType().equals("smartRoom") ) {
 			return new OssResponse(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
+                HWConf hwconf = new HWConf();
+                CloneToolController cloneToolController = new CloneToolController(this.session);
+                HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
+		logger.debug("First HWConf:" +  firstFatClient.toString());
+
 		//Check parameters
 		StringBuilder errorMessage = new StringBuilder();
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -218,15 +221,26 @@ public class RoomController extends Controller {
 			room.setRoomControl("inRoom");
 		}
 		EntityManager em = getEntityManager();
-		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
+		// Check HWConf
+		hwconf = em.find(HWConf.class,room.getHwconfId());
+		if( hwconf == null ) {
+			if( room.getHwconf() != null){
+				hwconf = room.getHwconf();
+			} else {
+				hwconf =  firstFatClient;
+			}
+		}
+		room.setHwconf(hwconf);
 		room.setCreator(this.session.getUser());
+		hwconf.getRooms().add(room);
 		try {
+			logger.debug("Create Room:" + room);
 			em.getTransaction().begin();
 			em.persist(room);
+			em.merge(hwconf);
 			em.getTransaction().commit();
-			logger.debug("Created Room:" + room);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Error by creating Room:" + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -239,8 +253,8 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
 		if( !this.mayModify(room) ) {
-        	return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
-        }
+			return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
+		}
 		try {
 
 			em.getTransaction().begin();
@@ -505,7 +519,7 @@ public class RoomController extends Controller {
 	public OssResponse setAccessStatus(long roomId, AccessInRoom access) {
 		Room room = this.getById(roomId);
 		this.setAccessStatus(room, access);
-		return new OssResponse(this.getSession(),"OK", "Access state in "+room.getName()+" was set succesfully." );
+		return new OssResponse(this.getSession(),"OK", "Access state in was set succesfully." );
 	}
 
 	/*
@@ -615,6 +629,7 @@ public class RoomController extends Controller {
 		HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
 		List<String> ipAddress;
 		List<Device> newDevices = new ArrayList<Device>();
+		List<String> parameters  = new ArrayList<String>();
 		try {
 			for(Device device : devices) {
 				//Remove trailing and ending spaces.
@@ -624,7 +639,9 @@ public class RoomController extends Controller {
 				if( device.getIp().isEmpty() ){
 					if( ipAddress.isEmpty() ) {
 						em.getTransaction().rollback();
-						return new OssResponse(this.getSession(),"ERROR",device.getMac() + " " + "There are no more free ip addresses in this room.");
+						parameters.add(device.getMac());
+						return new OssResponse(this.getSession(),"ERROR",
+								"There are no more free ip addresses in this room for the MAC: %s.",room.getId(),parameters);
 					}
 					if( device.getName().isEmpty() ) {
 						device.setName(ipAddress.get(0).split(" ")[1]);
@@ -634,7 +651,9 @@ public class RoomController extends Controller {
 				if( !device.getWlanMac().isEmpty() ){
 					if( ipAddress.size() < 2 ) {
 						em.getTransaction().rollback();
-						return new OssResponse(this.getSession(),"ERROR",device.getWlanMac() + " " + "There are no more free ip addresses in this room.");
+						parameters.add(device.getWlanMac());
+						return new OssResponse(this.getSession(),"ERROR",
+								"There are no more free ip addresses in this room for the MAC: %s.",room.getId(),parameters);
 					}
 					device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 				}
@@ -647,14 +666,13 @@ public class RoomController extends Controller {
 				if( device.getOwner() == null ) {
 					device.setOwner(this.session.getUser());
 				}
-				if(device.getHwconfId() != null ) {
-					hwconf = em.find(HWConf.class,device.getHwconfId());
-				} else if( device.getHwconf() != null){
-					hwconf = device.getHwconf();
-				} else if( room.getHwconf() != null ){
-					hwconf = room.getHwconf();
-				} else {
-					hwconf = firstFatClient;
+				hwconf = em.find(HWConf.class,device.getHwconfId());
+				if( hwconf == null ) {
+					if( room.getHwconf() != null ){
+						hwconf = room.getHwconf();
+					} else {
+						hwconf = firstFatClient;
+					}
 				}
 				device.setHwconf(hwconf);
 				hwconf.getDevices().add(device);

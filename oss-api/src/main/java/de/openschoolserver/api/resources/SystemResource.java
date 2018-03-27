@@ -8,8 +8,14 @@ import io.swagger.annotations.*;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+
+import org.glassfish.jersey.media.multipart.FormDataParam;
+
 import java.util.List;
 import java.util.Map;
+
+import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.ProxyRule;
@@ -323,6 +329,53 @@ public interface SystemResource {
 		List<ProxyRule> acl
 		);
 
+    @GET
+    @Path("proxy/custom/{list}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the custom lists of the proxy: good or bad.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    String getTheCustomList(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("list") String list
+		);
+    
+    @POST
+    @Path("proxy/custom/{list}")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation(value = "Sets the custom lists of the proxy: good or bad.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    OssResponse setTheCustomList(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("list")        String list,
+		@FormDataParam("domains") String domains
+		);
+    
+    @GET
+    @Path("proxy/customList/{list}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the custom lists of the proxy: good or bad.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    List<String> getTheCustomListAsList(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("list") String list
+		);
+    
+    @POST
+    @Path("proxy/customListerm/{list}}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Sets the custom lists of the proxy: good or bad.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    OssResponse setTheCustomListAsList(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("list")        String list,
+		List<String>			  domains
+		);
+
     /*
      * Job management
      */
@@ -384,6 +437,101 @@ public interface SystemResource {
     OssResponse restartJob(
 		@ApiParam(hidden = true) @Auth Session session,
 		@PathParam("jobId") Long jobId
+    );
+
+    /*
+     * Acl Management
+     */
+    @GET
+    @Path("acls")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get all existing acls.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    List<Acl> getAcls(
+		@ApiParam(hidden = true) @Auth Session session
+    );
+
+    @GET
+    @Path("acls/groups/{groupId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the acls of a group.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    List<Acl> getAclsOfGroup(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("groupId") Long groupId
+    );
+
+    @GET
+    @Path("acls/groups/{groupId}/available")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the available acls for a group.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    List<Acl> getAvailableAclsForGroup(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("groupId") Long groupId
+    );
+
+    @POST
+    @Path("acls/groups/{groupId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set an ACL of a group. This can be an existing or a new acl.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    OssResponse setAclOfGroup(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("groupId") Long groupId,
+		Acl acl
+    );
+
+    @GET
+    @Path("acls/users/{userId}/available")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the available acls for a user.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    List<Acl> getAvailableAclsForUser(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("userId") Long userId
+    );
+
+    @GET
+    @Path("acls/users/{userId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the acls of a user.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    List<Acl> getAclsOfUser(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("userId") Long userId
+    );
+
+    @POST
+    @Path("acls/users/{userId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set an ACL of a user. This can be an existing or a new acl.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    OssResponse setAclOfUser(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("userId") Long userId,
+		Acl acl
     );
 
 }

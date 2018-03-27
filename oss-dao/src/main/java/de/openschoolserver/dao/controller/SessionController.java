@@ -129,6 +129,26 @@ public class SessionController extends Controller {
 				}
 			}
 		}
+		List<String> modules = new ArrayList<String>();
+		//Is it allowed by the groups.
+		for( Group group : user.getGroups() ) {
+			for( Acl acl : group.getAcls() ) {
+				if( acl.getAllowed() ) {
+					modules.add(acl.getAcl());
+				}
+			}
+		}
+		//Is it allowed by the user
+		for( Acl acl : user.getAcls() ){
+			if( acl.getAllowed() && !modules.contains(acl.getAcl())) {
+				modules.add(acl.getAcl());
+			} else if( modules.contains(acl.getAcl()) ) {
+				//It is forbidden by the user
+				modules.remove(acl.getAcl());
+			}
+		}
+		session.setCommonName(user.getGivenName() + " " + user.getSurName());
+		session.setAcls(modules);
 		sessions.put(token, this.session);
 		save(session);
 		return this.session;
