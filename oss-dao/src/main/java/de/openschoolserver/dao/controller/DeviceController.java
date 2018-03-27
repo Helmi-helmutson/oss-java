@@ -46,9 +46,7 @@ public class DeviceController extends Controller {
 	public Device getById(long deviceId) {
 		EntityManager em = getEntityManager();
 		try {
-			Device device = em.find(Device.class, deviceId);
-			device.setHwconfId(device.getHwconf().getId());
-			return device;
+			return em.find(Device.class, deviceId);
 		} catch (Exception e) {
 			logger.debug("DeviceId:" + deviceId + " " + e.getMessage(),e);
 			return null;

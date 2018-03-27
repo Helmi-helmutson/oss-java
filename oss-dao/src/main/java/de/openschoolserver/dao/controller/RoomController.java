@@ -222,7 +222,7 @@ public class RoomController extends Controller {
 		}
 		EntityManager em = getEntityManager();
 		// Check HWConf
-		hwconf = em.find(HWConf.class,room.getHwconfId());
+		hwconf = cloneToolController.getById(room.getHwconfId());
 		if( hwconf == null ) {
 			if( room.getHwconf() != null){
 				hwconf = room.getHwconf();
@@ -666,7 +666,7 @@ public class RoomController extends Controller {
 				if( device.getOwner() == null ) {
 					device.setOwner(this.session.getUser());
 				}
-				hwconf = em.find(HWConf.class,device.getHwconfId());
+				hwconf = cloneToolController.getById(device.getHwconfId());
 				if( hwconf == null ) {
 					if( room.getHwconf() != null ){
 						hwconf = room.getHwconf();
@@ -675,16 +675,18 @@ public class RoomController extends Controller {
 					}
 				}
 				device.setHwconf(hwconf);
+				em.persist(device);
 				hwconf.getDevices().add(device);
 				room.addDevice(device);
 				em.merge(hwconf);
 				em.merge(room);
 				newDevices.add(device);
+				logger.debug(device.toString());
 				em.getTransaction().commit();
 			}
 		} catch (Exception e) { 
 			logger.error(e.getMessage());
-			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", "Error by creating the device: " + e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -810,15 +812,15 @@ public class RoomController extends Controller {
 		}
 		device.setOwner(owner);
 		device.setRoom(room);
-		room.addDevice(device);
+		logger.debug(device.toString());
 		try {
 			em.getTransaction().begin();
+			em.persist(device);
 			em.merge(room);
-			em.merge(device);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR","Error by registering: " +  e.getMessage());
 		} finally {
 			em.close();
 		}
@@ -843,8 +845,11 @@ public class RoomController extends Controller {
 	public OssResponse setHWConf(long roomId, long hwConfId) {
 		EntityManager em = getEntityManager();
 		try {
+			em.getTransaction().begin();
 			Room room = em.find(Room.class, roomId);
 			room.setHwconf(em.find(HWConf.class, hwConfId));
+			em.merge(room);
+			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
