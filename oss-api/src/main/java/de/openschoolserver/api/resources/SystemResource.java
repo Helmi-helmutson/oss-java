@@ -365,7 +365,7 @@ public interface SystemResource {
 		);
     
     @POST
-    @Path("proxy/customList/{list}}")
+    @Path("proxy/customListerm/{list}}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Sets the custom lists of the proxy: good or bad.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -453,7 +453,7 @@ public interface SystemResource {
     List<Acl> getAcls(
 		@ApiParam(hidden = true) @Auth Session session
     );
-    
+
     @GET
     @Path("acls/groups/{groupId}")
     @Produces(JSON_UTF8)
@@ -463,6 +463,19 @@ public interface SystemResource {
     })
     @RolesAllowed("system.acls")
     List<Acl> getAclsOfGroup(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("groupId") Long groupId
+    );
+
+    @GET
+    @Path("acls/groups/{groupId}/available")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the available acls for a group.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    List<Acl> getAvailableAclsForGroup(
 		@ApiParam(hidden = true) @Auth Session session,
 		@PathParam("groupId") Long groupId
     );
@@ -482,6 +495,19 @@ public interface SystemResource {
     );
 
     @GET
+    @Path("acls/users/{userId}/available")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the available acls for a user.")
+    @ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.acls")
+    List<Acl> getAvailableAclsForUser(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("userId") Long userId
+    );
+
+    @GET
     @Path("acls/users/{userId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the acls of a user.")
@@ -493,7 +519,7 @@ public interface SystemResource {
 		@ApiParam(hidden = true) @Auth Session session,
 		@PathParam("userId") Long userId
     );
- 
+
     @POST
     @Path("acls/users/{userId}")
     @Produces(JSON_UTF8)

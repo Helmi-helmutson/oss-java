@@ -239,6 +239,11 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
+	public List<Acl> getAvailableAclsForGroup(Session session, Long groupId) {
+		return new SystemController(session).getAvailableAclsForGroup(groupId);
+	}
+
+	@Override
 	public List<Acl> getAclsOfUser(Session session, Long userId) {
 		return new SystemController(session).getAclsOfUser(userId);
 	}
@@ -246,6 +251,11 @@ public class SystemResourceImpl implements SystemResource {
 	@Override
 	public OssResponse setAclOfUser(Session session, Long userId, Acl acl) {
 		return new SystemController(session).setAclToUser(userId,acl);
+	}
+
+	@Override
+	public List<Acl> getAvailableAclsForUser(Session session, Long userId) {
+		return new SystemController(session).getAvailableAclsForUser(userId);
 	}
 
 

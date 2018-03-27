@@ -84,7 +84,7 @@ public class DHCPConfig extends Controller {
 			em.close();
 		}
 	}
-	
+
 	private void WriteRoom(Room room) {
 		List<String> line = new ArrayList<String>();
 		for( Device device : room.getDevices() ){
