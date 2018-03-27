@@ -75,9 +75,7 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 
 		try {
-			Room room = em.find(Room.class, roomId);
-			room.setHwconfId(room.getHwconf().getId());
-			return room;
+			return em.find(Room.class, roomId);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -670,9 +668,7 @@ public class RoomController extends Controller {
 				}
 				hwconf = em.find(HWConf.class,device.getHwconfId());
 				if( hwconf == null ) {
-					if( device.getHwconf() != null){
-						hwconf = device.getHwconf();
-					} else if( room.getHwconf() != null ){
+					if( room.getHwconf() != null ){
 						hwconf = room.getHwconf();
 					} else {
 						hwconf = firstFatClient;
