@@ -17,6 +17,7 @@ import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.tools.OSSShellTools;
 
 @SuppressWarnings( "unchecked" )
 public class CloneToolController extends Controller {
@@ -532,10 +533,19 @@ public class CloneToolController extends Controller {
 
 	public String resetMinion(Long deviceId) {
 		StringBuilder path = new StringBuilder("/etc/salt/pki/master/minions/");
-		path.append(new DeviceController(this.session).getById(deviceId).getName()).append(".").append(this.getConfigValue("DOMAIN"));
+		String deviceName  = new DeviceController(this.session).getById(deviceId).getName();
+		path.append(deviceName).append(".").append(this.getConfigValue("DOMAIN"));
 		try {
 			Files.deleteIfExists(Paths.get(path.toString()));
 			this.systemctl("restart", "salt-master");
+			String[] program   = new String[4];
+			StringBuffer reply = new StringBuffer();
+			StringBuffer error = new StringBuffer();
+			program[0] = "/usr/bin/samba-tool";
+			program[1] = "user";
+			program[2] = "delete";
+			program[3] = deviceName;
+			OSSShellTools.exec(program, reply, error, null);
 		} catch ( IOException e ) {
 			logger.error(e.getMessage());
 			return "ERROR "+e.getMessage();

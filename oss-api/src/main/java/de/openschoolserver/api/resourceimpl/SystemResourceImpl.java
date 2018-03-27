@@ -17,6 +17,7 @@ import de.openschoolserver.dao.ProxyRule;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Translation;
 import de.openschoolserver.dao.controller.SystemController;
+import de.openschoolserver.dao.tools.OSSShellTools;
 import de.openschoolserver.dao.controller.ProxyController;
 import de.openschoolserver.dao.controller.Controller;
 import de.openschoolserver.dao.controller.JobController;
@@ -169,6 +170,15 @@ public class SystemResourceImpl implements SystemResource {
 	public OssResponse setTheCustomListAsList(Session session, String list, List<String> domains) {
 		try {
 			Files.write(Paths.get("/var/lib/squidGuard/db/custom/" +list + "/domains"),domains);
+			String[] program   = new String[5];
+			StringBuffer reply = new StringBuffer();
+			StringBuffer error = new StringBuffer();
+			program[0] = "/usr/sbin/squidGuard";
+			program[1] = "-c";
+			program[2] = "/etc/squid/squidguard.conf";
+			program[3] = "-C";
+			program[4] = "custom/" +list + "/domains";
+			OSSShellTools.exec(program, reply, error, null);
 			new Controller(session).systemctl("restart", "squid");
 			return new OssResponse(session,"OK","Custom list was written successfully");
 		} catch( IOException e ) { 
