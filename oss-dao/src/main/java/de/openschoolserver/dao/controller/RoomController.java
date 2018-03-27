@@ -185,6 +185,11 @@ public class RoomController extends Controller {
 		if( room.getRoomType().equals("smartRoom") ) {
 			return new OssResponse(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
+                HWConf hwconf = new HWConf();
+                CloneToolController cloneToolController = new CloneToolController(this.session);
+                HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
+		logger.debug("First HWConf:" +  firstFatClient.toString());
+
 		//Check parameters
 		StringBuilder errorMessage = new StringBuilder();
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -218,15 +223,26 @@ public class RoomController extends Controller {
 			room.setRoomControl("inRoom");
 		}
 		EntityManager em = getEntityManager();
-		room.setHwconf(em.find(HWConf.class,room.getHwconfId()));
+		// Check HWConf
+		hwconf = em.find(HWConf.class,room.getHwconfId());
+		if( hwconf == null ) {
+			if( room.getHwconf() != null){
+				hwconf = room.getHwconf();
+			} else {
+				hwconf =  firstFatClient;
+			}
+		}
+		room.setHwconf(hwconf);
 		room.setCreator(this.session.getUser());
+		hwconf.getRooms().add(room);
 		try {
+			logger.debug("Create Room:" + room);
 			em.getTransaction().begin();
 			em.persist(room);
+			em.merge(hwconf);
 			em.getTransaction().commit();
-			logger.debug("Created Room:" + room);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Error by creating Room:" + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
@@ -239,8 +255,8 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
 		if( !this.mayModify(room) ) {
-        	return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
-        }
+			return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
+		}
 		try {
 
 			em.getTransaction().begin();
@@ -652,14 +668,15 @@ public class RoomController extends Controller {
 				if( device.getOwner() == null ) {
 					device.setOwner(this.session.getUser());
 				}
-				if(device.getHwconfId() != null ) {
-					hwconf = em.find(HWConf.class,device.getHwconfId());
-				} else if( device.getHwconf() != null){
-					hwconf = device.getHwconf();
-				} else if( room.getHwconf() != null ){
-					hwconf = room.getHwconf();
-				} else {
-					hwconf = firstFatClient;
+				hwconf = em.find(HWConf.class,device.getHwconfId());
+				if( hwconf == null ) {
+					if( device.getHwconf() != null){
+						hwconf = device.getHwconf();
+					} else if( room.getHwconf() != null ){
+						hwconf = room.getHwconf();
+					} else {
+						hwconf = firstFatClient;
+					}
 				}
 				device.setHwconf(hwconf);
 				hwconf.getDevices().add(device);
