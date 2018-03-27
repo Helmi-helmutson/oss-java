@@ -247,7 +247,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		Device device = new Device();
 		device.setMac(mac);
 		device.setName(name);
-		device.setHwconf(hwconf);
+		device.setHwconfId(hwconf.getId());
 		logger.debug(hwconf.getName() + "#" + hwconf.getId() );
 		List<Device> devices = new ArrayList<Device>();
 		devices.add(device);
