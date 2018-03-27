@@ -544,7 +544,7 @@ public class CloneToolController extends Controller {
 			program[0] = "/usr/bin/samba-tool";
 			program[1] = "user";
 			program[2] = "delete";
-			program[3] = deviceName;
+			program[3] = deviceName + "$";
 			OSSShellTools.exec(program, reply, error, null);
 		} catch ( IOException e ) {
 			logger.error(e.getMessage());

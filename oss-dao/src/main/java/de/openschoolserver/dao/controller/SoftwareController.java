@@ -1470,7 +1470,7 @@ public class SoftwareController extends Controller {
 	}
 
 	public OssResponse addRequirements(List<String> requirement) {
-		return this.addRequirements(this.getByName(requirement.get(0)), this.getByName(requirement.get(0)));
+		return this.addRequirements(this.getByName(requirement.get(0)), this.getByName(requirement.get(1)));
 	}
 
 	public OssResponse addRequirements(long softwareId, long requirementId) {
