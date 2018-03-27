@@ -118,7 +118,7 @@ public class DeviceController extends Controller {
 				if( device.getHwconf().getDeviceType().equals("FatClient")) {
 					needWriteSalt = true;
 				}
-				this.delete(device, false);
+				this.delete(deviceId, false);
 			}
 			em.getEntityManagerFactory().getCache().evictAll();
 			new DHCPConfig(this.session).Create();
@@ -138,13 +138,10 @@ public class DeviceController extends Controller {
 	 * Deletes a device given by the device Ids.
 	 */
 	public OssResponse delete(Long deviceId, boolean atomic) {
-		return this.delete(this.getById(deviceId), atomic);
-	}
-	
-	public OssResponse delete(Device device, boolean atomic) {
 		EntityManager em = getEntityManager();
 		UserController userController = new UserController(this.session);
 		boolean needWriteSalt = false;
+		Device device = em.find(Device.class, deviceId);
 		try {
 			em.getTransaction().begin();
 			if( this.isProtected(device) ) {
@@ -156,9 +153,12 @@ public class DeviceController extends Controller {
 			if( device.getHwconf().getDeviceType().equals("FatClient")) {
 				needWriteSalt = true;
 				User user = userController.getByUid(device.getName());
-				userController.delete(user);
+				if( user != null ) {
+					userController.delete(user);
+				}
 			}
 			this.startPlugin("delete_device", device);
+			em.merge(device);
 			em.remove(device);
 			em.getTransaction().commit();
 			if( atomic ) {
@@ -177,6 +177,10 @@ public class DeviceController extends Controller {
 		}
 	}
 
+	public OssResponse delete(Device device, boolean atomic) {
+		return this.delete(device.getId(), atomic);
+	}
+	
 	protected String check(Device device,Room room) {
 		List<String> error = new ArrayList<String>();
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
