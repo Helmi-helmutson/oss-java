@@ -424,7 +424,9 @@ public class UserController extends Controller {
 			return users;
 		}
 		for ( Long id : userIds ){
-			users.add(this.getById(id));
+			if( id != null ) {
+				users.add(this.getById(id));
+			}
 		}
 		return users;
 	}
