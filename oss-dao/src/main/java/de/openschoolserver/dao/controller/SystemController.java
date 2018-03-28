@@ -623,7 +623,6 @@ public class SystemController extends Controller {
 		try {
 			return em.find(Acl.class, aclId);
 		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();
@@ -664,6 +663,7 @@ public class SystemController extends Controller {
 	public OssResponse setAclToGroup(Long groupId, Acl acl) {
 		Group group = new GroupController(session).getById(groupId);
 		EntityManager em = this.getEntityManager();
+		logger.debug("Group acl to set: " + acl);
 		try {
 			em.getTransaction().begin();
 			Acl oldAcl = this.getAclById(acl.getId());
@@ -736,10 +736,11 @@ public class SystemController extends Controller {
 	public OssResponse setAclToUser(Long userId, Acl acl) {
 		User user = new UserController(session).getById(userId);
 		EntityManager em = this.getEntityManager();
+		logger.debug("User acl to set: " + acl);
 		try {
 			em.getTransaction().begin();
 			Acl oldAcl = this.getAclById(acl.getId());
-			if( oldAcl != null ) {
+			if( oldAcl != null && oldAcl.getUser().equals(user) ) {
 				if( acl.getAllowed() ) {
 					oldAcl.setAllowed(true);
 					em.merge(oldAcl);
