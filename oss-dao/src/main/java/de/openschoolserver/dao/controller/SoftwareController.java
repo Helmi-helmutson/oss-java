@@ -945,9 +945,8 @@ public class SoftwareController extends Controller {
 		List<Software> toRemove     = new ArrayList<Software>();
 		final String domainName     = this.getConfigValue("DOMAIN");
 		StringBuilder errorMessages = new StringBuilder();
-
-		List<String>   topSls = new ArrayList<String>();
-		Path SALT_TOP_TEMPL   = Paths.get("/usr/share/oss/templates/top.sls");
+		List<String>   topSls       = new ArrayList<String>();
+		Path SALT_TOP_TEMPL         = Paths.get("/usr/share/oss/templates/top.sls");
 		if( Files.exists(SALT_TOP_TEMPL) ) {
 			try {
 				topSls = Files.readAllLines(SALT_TOP_TEMPL);
@@ -1151,6 +1150,18 @@ public class SoftwareController extends Controller {
 				}
 			}
 			List<String> deviceSls = new ArrayList<String>();
+			deviceSls.add(device.getName() + ":");
+			deviceSls.add("  system.computer_name: []");
+			for( Partition partition : device.getHwconf().getPartitions() ) {
+				if( partition.getJoinType().equals("Domain") || partition.getJoinType().equals("Simple") ) {
+					deviceSls.add(domainName + ":");
+					deviceSls.add("  system.join_domain:");
+					deviceSls.add("    - username: register");
+					deviceSls.add("    - password: register");
+					deviceSls.add("    - restart: True");
+					break;
+				}
+			}
 			if( deviceRemove.size() > 3 ) {
 				deviceSls.addAll(deviceRemove);
 			}
