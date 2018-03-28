@@ -54,6 +54,18 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	}
 
 	@Override
+	public Long getMaster(Session session, Long hwconfId) {
+		CloneToolController cloneToolController = new CloneToolController(session);
+		HWConf hwconf = cloneToolController.getById(hwconfId);
+		for( Device device : hwconf.getDevices() ) {
+			if( cloneToolController.checkConfig(device, "isMaster") ) {
+				return device.getId();
+			}
+		}
+		return null;
+	}
+
+	@Override
 	public OssResponse setMaster(Session session, Long deviceId, int isMaster) {
 		final DeviceController deviceController = new DeviceController(session);
 		Device device = deviceController.getById(deviceId);
@@ -62,6 +74,13 @@ public class CloneToolResourceImpl implements CloneToolResource {
 		}
 		if( deviceController.checkConfig(device,"isMaster" ) && isMaster == 0) {
 			return deviceController.deleteConfig(device, "isMaster");
+		}
+		if( isMaster == 1 ) {
+			for( Device dev : device.getHwconf().getDevices() ) {
+				if( !dev.equals(device) ) {
+					deviceController.deleteConfig(dev,"isMaster");
+				}
+			}
 		}
 		if( ! deviceController.checkConfig(device,"isMaster" ) && isMaster == 1 ) {
 			return deviceController.setConfig(device, "isMaster","true");
@@ -72,19 +91,7 @@ public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
 	public OssResponse setMaster(Session session, int isMaster) {
-		final DeviceController deviceController = new DeviceController(session);
-		Device device = session.getDevice();
-		if( device == null ) {
-			return new OssResponse(session,"ERRO","Device was not found.");
-		}
-		if( deviceController.checkConfig(device,"isMaster" ) && isMaster == 0) {
-			return deviceController.deleteConfig(device, "isMaster");
-		}
-		if( ! deviceController.checkConfig(device,"isMaster" ) && isMaster == 1 ) {
-			return deviceController.setConfig(device, "isMaster","true");
-		}
-
-		return new OssResponse(session,"OK","Nothing to change.");
+		return this.setMaster(session, session.getDevice().getId(), isMaster);
 	}
 
 	@Override
@@ -237,5 +244,4 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	public String resetMinion(Session session, Long deviceId) {
 		return new CloneToolController(session).resetMinion(deviceId);
 	}
-
 }

@@ -169,7 +169,23 @@ public interface CloneToolResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
 	);
-       
+
+	/*
+     * GET clonetool/{hwconfId}/master
+    */
+	@GET
+	@Path("{hwconfId}/master")
+	@Produces(TEXT)
+	@ApiOperation(value = "Delivers the id of the master device of this HWConf.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("hwconf.manage")
+	Long getMaster(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("hwconfId") Long hwconfId
+	);
+
 	/*
      * GET clonetool/{hwconfId}/description
     */
