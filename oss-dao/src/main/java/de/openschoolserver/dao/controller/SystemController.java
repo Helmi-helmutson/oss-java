@@ -662,7 +662,7 @@ public class SystemController extends Controller {
 
 	public OssResponse setAclToGroup(Long groupId, Acl acl) {
 		Group group = new GroupController(session).getById(groupId);
-		EntityManager em = this.getEntityManager();
+		EntityManager em = getEntityManager();
 		logger.debug("Group acl to set: " + acl);
 		try {
 			em.getTransaction().begin();
@@ -684,6 +684,7 @@ public class SystemController extends Controller {
 			}
 			em.getTransaction().commit();
 		} catch(Exception e) {
+			logger.debug("ERROR in setAclToGroup:" + e.getMessage());
 			return new OssResponse(session,"ERROR",e.getMessage());
 		} finally {
 			em.close();
@@ -735,12 +736,12 @@ public class SystemController extends Controller {
 
 	public OssResponse setAclToUser(Long userId, Acl acl) {
 		User user = new UserController(session).getById(userId);
-		EntityManager em = this.getEntityManager();
+		EntityManager em = getEntityManager();
 		logger.debug("User acl to set: " + acl);
 		try {
 			em.getTransaction().begin();
 			Acl oldAcl = this.getAclById(acl.getId());
-			if( oldAcl != null && oldAcl.getUser().equals(user) ) {
+			if( oldAcl != null && oldAcl.getUser() != null && oldAcl.getUser().equals(user) ) {
 				if( acl.getAllowed() ) {
 					oldAcl.setAllowed(true);
 					em.merge(oldAcl);
@@ -749,14 +750,16 @@ public class SystemController extends Controller {
 					em.remove(oldAcl);
 				}
 			} else  {
+				acl.setGroup(null);
 				acl.setUser(user);
 				acl.setCreator(this.session.getUser());
 				em.persist(acl);
 				user.addAcl(acl);
 				em.merge(user);
-			}
+				}
 			em.getTransaction().commit();
 		} catch(Exception e) {
+			logger.debug("ERROR in setAclToUser:" + e.getMessage());
 			return new OssResponse(session,"ERROR",e.getMessage());
 		} finally {
 			em.close();
