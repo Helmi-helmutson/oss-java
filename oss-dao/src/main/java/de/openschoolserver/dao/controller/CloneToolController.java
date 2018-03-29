@@ -538,6 +538,7 @@ public class CloneToolController extends Controller {
 		try {
 			Files.deleteIfExists(Paths.get(path.toString()));
 			this.systemctl("restart", "salt-master");
+			this.systemctl("restart", "oss_salt_event_watcher");
 			String[] program   = new String[4];
 			StringBuffer reply = new StringBuffer();
 			StringBuffer error = new StringBuffer();

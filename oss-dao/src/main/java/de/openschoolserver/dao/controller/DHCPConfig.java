@@ -77,7 +77,7 @@ public class DHCPConfig extends Controller {
 			}
 			Files.write(SALT_GROUPS, saltGroupFile );
 			this.systemctl("restart", "salt-master");
-			
+			this.systemctl("restart", "oss_salt_event_watcher");
 		} catch( IOException e ) { 
 			e.printStackTrace();
 		} finally { 

@@ -1195,6 +1195,7 @@ public class SoftwareController extends Controller {
 				e.printStackTrace();
 			}
 			this.systemctl("restart", "salt-master");
+			this.systemctl("restart", "oss_salt_event_watcher");
 		}
 		if( errorMessages.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR",errorMessages.toString());
