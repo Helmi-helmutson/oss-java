@@ -20,6 +20,16 @@ else
         /usr/share/oss/tools/CreatePrinterPpd.pl
 fi
 
+#Register the server if not already done
+if [ ! -e /etc/zypp/repos.d/OSS.repo -o ! -e /srv/salt/repos.d/salt-packages.repo ]; then
+        /usr/share/oss/tools/register.sh
+fi
+
+#Create lock dir if not exists
+if [ -d /run/lock/oss-api ]; then
+        mkdir -p /run/lock/oss-api
+fi
+
 #Restart some scripts
 SQUIDACTIVE=$(  systemctl is-active squid.service )
 SQUIDENABLED=$(  systemctl is-enabled squid.service )
