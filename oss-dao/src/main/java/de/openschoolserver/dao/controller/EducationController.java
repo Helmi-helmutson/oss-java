@@ -10,9 +10,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import java.nio.file.StandardCopyOption;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermission;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.nio.file.attribute.UserPrincipal;
 import java.nio.file.attribute.UserPrincipalLookupService;
 import java.util.*;
@@ -29,8 +26,6 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 public class EducationController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(EducationController.class);
-    static FileAttribute<Set<PosixFilePermission>> privatDirAttribute  = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
-    static FileAttribute<Set<PosixFilePermission>> privatFileAttribute = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));
 
 	public EducationController(Session session) {
 		super(session);
@@ -367,7 +362,7 @@ public class EducationController extends Controller {
 		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
 		try {
 			StringBuilder newFileName = new StringBuilder(this.getConfigValue("HOME_BASE"));
-			newFileName.append("/").append(user.getUid()).append("/") .append("Import").append("/");
+			newFileName.append("/").append(user.getRole()).append("/").append(user.getUid()).append("/") .append("Import").append("/");
 			// Create the directory first.
 			File importDir = new File( newFileName.toString() );
 			Files.createDirectories(importDir.toPath(), privatDirAttribute );
@@ -388,35 +383,6 @@ public class EducationController extends Controller {
 		return "";
 	}
 
-	public OssResponse collectFileFromUser(User user,String project, boolean cleanUpExport, boolean sortInDirs) {
-		String[] program = new String[11];
-		StringBuffer reply  = new StringBuffer();
-		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/sbin/oss_collect_files.sh";
-		program[1] = "-t";
-		program[2] = this.session.getUser().getUid();
-		program[3] = "-f";
-		program[4] = user.getUid();
-		program[5] = "-p";
-		program[6] = project;
-		program[7] = "-c";
-		if( cleanUpExport ) {
-			program[8] = "y";
-		} else {
-			program[8] = "n";
-		}
-		program[9] = "-d";
-		if( sortInDirs ) {
-			program[10] = "y";
-		} else {
-			program[10] = "n";
-		}
-		OSSShellTools.exec(program, reply, stderr, null);
-		if( stderr.toString().isEmpty() ) {
-			return new OssResponse(this.getSession(),"OK", "File was collected from:",null,user.getUid() );
-		}
-		return new OssResponse(this.getSession(),"ERROR", stderr.toString());
-	}
 
 	public OssResponse createGroup(Group group) {
 		GroupController groupController = new GroupController(this.session);
