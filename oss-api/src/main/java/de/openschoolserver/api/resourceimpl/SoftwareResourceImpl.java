@@ -1,8 +1,10 @@
 /* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.IOException;
 import java.io.InputStream;
-
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -293,5 +295,15 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public OssResponse deleteRequirements(Session session, long softwareId, long requirementId) {
 		return new SoftwareController(session).deleteRequirements(softwareId,requirementId);
 	}
-	
+
+	@Override
+	public String downloadStatus(Session session) {
+		try {
+			return	String.join(" ", Files.readAllLines(Paths.get("/run/lock/oss-api/oss_download_packages")));
+		}
+		catch( IOException e ) { 
+			e.printStackTrace();
+		}
+		return "";
+	}
 }

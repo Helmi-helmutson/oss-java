@@ -340,6 +340,20 @@ public interface SoftwareResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("softwareName") String softwareName
 			);
+	/*
+	 * GET softwares/downloadStatus
+	 */
+	@GET
+	@Path("downloadStatus")
+	@Produces(TEXT)
+	@ApiOperation(value = "Gets the names of the packages being dowloaded. Empty string means no download proceded.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")
+			})
+	@RolesAllowed("software.download")
+	String downloadStatus(
+			@ApiParam(hidden = true) @Auth Session session
+			);
 	
 	/*
 	 * POST softwares/listDownloadedSoftware
