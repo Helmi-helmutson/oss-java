@@ -10,8 +10,10 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +22,6 @@ import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.ProxyRule;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.Translation;
 
 @Path("system")
@@ -39,6 +40,20 @@ public interface SystemResource {
 		@ApiParam(hidden = true) @Auth Session session
 		);
     
+    //Customize the lookout of the start side
+	@POST
+	@Path("customize")
+	@Produces(JSON_UTF8)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@ApiOperation(value = "Upload picture for oss logon site.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact administrator") }
+	)
+	@RolesAllowed("system.customize")
+    OssResponse customize(@ApiParam(hidden = true) @Auth Session session,
+			@FormDataParam("file") final InputStream fileInputStream,
+			@FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+	);
     //Handling of enumerates
 
     @GET
@@ -212,7 +227,7 @@ public interface SystemResource {
     @PermitAll
     String translate(
 		@ApiParam(hidden = true) @Auth Session session,
-		MissedTranslation missedTranslataion
+		Translation translation
     );
     
     @POST
@@ -236,7 +251,7 @@ public interface SystemResource {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("sysadmins.translation")
-    List<String> getMissedTranslations(
+    List<Translation> getMissedTranslations(
 		@ApiParam(hidden = true) @Auth Session session,
 		@PathParam("lang") String lang
     );

@@ -1,17 +1,21 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+
 import de.openschoolserver.api.resources.SystemResource;
 import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.Job;
-import de.openschoolserver.dao.MissedTranslation;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.ProxyRule;
 import de.openschoolserver.dao.Session;
@@ -28,6 +32,19 @@ public class SystemResourceImpl implements SystemResource {
 	public List<Map<String, String>> getStatus(Session session) {
 		SystemController systemController = new SystemController(session);
 		return systemController.getStatus();
+	}
+
+	@Override
+	public OssResponse customize(Session session, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		String fileName = contentDispositionHeader.getFileName();
+		File file = new File("/srv/www/admin/assets/" + fileName );
+		try {
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			return new OssResponse(session,"ERROR", e.getMessage());
+		}
+		return new OssResponse(session,"OK", "File was saved succesfully.");
 	}
 
 	@Override
@@ -106,8 +123,8 @@ public class SystemResourceImpl implements SystemResource {
 		}
 
 	@Override
-	public String translate(Session session, MissedTranslation missedTranslation) {
-		return new SystemController(session).translate(missedTranslation.getLang(), missedTranslation.getString());
+	public String translate(Session session, Translation translation) {
+		return new SystemController(session).translate(translation.getLang(), translation.getString());
 	}
 
 	@Override
@@ -116,7 +133,7 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public List<String> getMissedTranslations(Session session, String lang) {
+	public List<Translation> getMissedTranslations(Session session, String lang) {
 		return new SystemController(session).getMissedTranslations(lang);
 	}
 
@@ -267,6 +284,7 @@ public class SystemResourceImpl implements SystemResource {
 	public List<Acl> getAvailableAclsForUser(Session session, Long userId) {
 		return new SystemController(session).getAvailableAclsForUser(userId);
 	}
+
 
 
 }
