@@ -11,6 +11,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static de.openschoolserver.dao.internal.OSSConstatns.*;
 import de.openschoolserver.api.resources.EducationResource;
 import de.openschoolserver.api.resources.Resource;
 import de.openschoolserver.dao.Category;
@@ -285,26 +286,42 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse collectFileFromDevice(Session session, Long deviceId, String projectName) {
-		// TODO Auto-generated method stub
-		return null;
+		Device device = new DeviceController(session).getById(deviceId);
+		return new UserController(session).collectFile(device.getLoggedIn(), projectName);
 	}
 
 	@Override
 	public OssResponse collectFileFromRoom(Session session, Long roomId, String projectName) {
-		// TODO Auto-generated method stub
-		return null;
+		UserController userController = new UserController(session);
+		List<User> users = new ArrayList<User>();
+		for( List<Long> logged : new EducationController(session).getRoom(roomId) ) {
+				users.add(userController.getById(logged.get(0)));
+		}
+		return new UserController(session).collectFile(users, projectName);
 	}
 
 	@Override
 	public OssResponse collectFileFromStudentsOfGroup(Session session, Long groupId, String projectName) {
-		// TODO Auto-generated method stub
-		return null;
+		UserController userController = new UserController(session);
+		List<User> users = new ArrayList<User>();
+		Group group        = new GroupController(session).getById(groupId);
+		for( User user : group.getUsers() ) {
+			if( user.getRole().equals(roleStudent)) {
+				users.add(user);
+			}
+		}
+		return userController.collectFile(users, projectName);
 	}
 
 	@Override
 	public OssResponse collectFileFromMembersOfGroup(Session session, Long groupId, String projectName) {
-		// TODO Auto-generated method stub
-		return null;
+		UserController userController = new UserController(session);
+		List<User> users = new ArrayList<User>();
+		Group group        = new GroupController(session).getById(groupId);
+		for( User user : group.getUsers() ) {
+			users.add(user);
+		}
+		return userController.collectFile(users, projectName);
 	}
 
 	@Override
@@ -356,6 +373,4 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			Date validUntil) {
 		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
 	}
-
-
 }
