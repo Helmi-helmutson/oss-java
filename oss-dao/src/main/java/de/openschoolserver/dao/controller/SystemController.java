@@ -47,24 +47,12 @@ public class SystemController extends Controller {
 			Translation trans = (Translation) query.getSingleResult();
 			return trans.getValue();
 		}  catch (Exception e) {
-			MissedTranslation trans = null;
-			query = em.createNamedQuery("MissedTranslation.find").setParameter("lang", lang.toUpperCase()).setParameter("string", key);
-			try {
-				trans = (MissedTranslation) query.getSingleResult();
-			}  catch (Exception f) {
-				trans = new MissedTranslation(lang.toUpperCase(),key);
-				try {
-					em.getTransaction().begin();
-					em.persist(trans);
-					em.getTransaction().commit();
-				}  catch (Exception g) {
-					logger.error(g.getMessage());
-				}
-			}
-			return key;
+			Translation newTrans = new Translation(lang,key);
+			this.addTranslation(newTrans);
 		} finally {
 			em.close();
 		}
+		return key;
 	}
 
 	/*
@@ -77,7 +65,6 @@ public class SystemController extends Controller {
 	 * 							The translated text. Must not be longer then 256 characters
 	 * @return			The result of the DB operations
 	 * @see				Translate
-	 * @see				GetMissedTranslations
 	 */
 	public OssResponse addTranslation(Translation translation) {
 		EntityManager em = getEntityManager();
@@ -109,19 +96,6 @@ public class SystemController extends Controller {
 			}
 		}
 
-		/* Delete missed translation */
-		query = em.createNamedQuery("MissedTranslation.find")
-				.setParameter("lang", translation.getLang())
-				.setParameter("string", translation.getString());
-		try {
-			MissedTranslation missedTrans = (MissedTranslation) query.getSingleResult();
-			em.getTransaction().begin();
-			em.remove(missedTrans);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-		} finally {
-			em.close();
-		}
 		return new OssResponse(this.session,"OK",responseText);
 	}
 
@@ -133,14 +107,10 @@ public class SystemController extends Controller {
 	 * @see				Translate
 	 * @see				AddTranslation
 	 */
-	public List<String> getMissedTranslations(String lang){
-		List<String> missed = new ArrayList<String>();
+	public List<Translation> getMissedTranslations(String lang){
 		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("MissedTranslation.findAll").setParameter("lang", lang.toUpperCase());
-		for(MissedTranslation missedTrans : (List<MissedTranslation>) query.getResultList() ) {
-			missed.add(missedTrans.getString());
-		}
-		return missed;
+		Query query = em.createNamedQuery("Translation.untranslated").setParameter("lang", lang.toUpperCase());
+		return query.getResultList();
 	}
 
 
