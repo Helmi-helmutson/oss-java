@@ -34,7 +34,7 @@ public class UserController extends Controller {
 	}
 
 	public User getById(long userId) {
-		EntityManager em = getEntityManager();    
+		EntityManager em = getEntityManager();
 		try {
 			return em.find(User.class, userId);
 		} catch (Exception e) {
@@ -168,7 +168,7 @@ public class UserController extends Controller {
 					user.getSurName(),
 					user.getBirthDay(),
 					true,
-					this.getConfigValue("STRING_CONVERT_TYPE") == "telex", 
+					this.getConfigValue("STRING_CONVERT_TYPE") == "telex",
 					this.getConfigValue("LOGIN_SCHEME")
 					);
 			user.setUid( this.getConfigValue("LOGIN_PREFIX") + userId );
@@ -476,7 +476,7 @@ public class UserController extends Controller {
 		if( stringValue != null ) {
 			program = new String[3];
 			program[2] = stringValue;
-		} 
+		}
 		program[0] = "/usr/sbin/oss_copy_template_home.sh";
 		for ( Long id : userIds ){
 			program[1] = this.getById(id).getUid();
@@ -506,7 +506,67 @@ public class UserController extends Controller {
 		}
 		return  new OssResponse(this.getSession(),"OK","The selected users were enabled.");
 	}
-	
+
+	public OssResponse collectFile(List<User> users,  String projectName) {
+		StringBuilder data = new StringBuilder();
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[]   program = new String[4];
+		program[0] = "/usr/sbin/oss_collect_files.sh";
+		program[1] = this.session.getUser().getUid();
+		program[3] = projectName;
+		for ( User user : users ){
+			program[2] = user.getUid();
+			OSSShellTools.exec(program, reply, error, data.toString());
+		}
+		return  new OssResponse(this.getSession(),"OK","The files from the export directories of selected users were collected.");
+	}
+
+	public OssResponse collectFileByIds(List<Long> userIds,  String projectName) {
+		StringBuilder data = new StringBuilder();
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[]   program = new String[4];
+		program[0] = "/usr/sbin/oss_collect_files.sh";
+		program[1] = this.session.getUser().getUid();
+		program[3] = projectName;
+		for ( Long id : userIds ){
+			program[2] = this.getById(id).getUid();
+			OSSShellTools.exec(program, reply, error, data.toString());
+		}
+		return  new OssResponse(this.getSession(),"OK","The files from the export directories of selected users were collected.");
+	}
+
+	public OssResponse collectFileFromUser(User user,String project, boolean cleanUpExport, boolean sortInDirs) {
+		String[] program = new String[11];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/sbin/oss_collect_files.sh";
+		program[1] = "-t";
+		program[2] = this.session.getUser().getUid();
+		program[3] = "-f";
+		program[4] = user.getUid();
+		program[5] = "-p";
+		program[6] = project;
+		program[7] = "-c";
+		if( cleanUpExport ) {
+			program[8] = "y";
+		} else {
+			program[8] = "n";
+		}
+		program[9] = "-d";
+		if( sortInDirs ) {
+			program[10] = "y";
+		} else {
+			program[10] = "n";
+		}
+		OSSShellTools.exec(program, reply, stderr, null);
+		if( stderr.toString().isEmpty() ) {
+			return new OssResponse(this.getSession(),"OK", "File was collected from:",null,user.getUid() );
+		}
+		return new OssResponse(this.getSession(),"ERROR", stderr.toString());
+	}
+
 	public OssResponse disableInternet(List<Long> userIds,  boolean disable) {
 		for ( Long userId : userIds ){
 			if(disable ) {
@@ -572,7 +632,7 @@ public class UserController extends Controller {
 	public OssResponse addGuestUsers(
 			String name,
 			String description,
-			Long   roomId, 
+			Long   roomId,
 			int    count,
 			Date   validUntil) {
 		final CategoryController categoryController= new CategoryController(this.session);
@@ -629,7 +689,7 @@ public class UserController extends Controller {
 		ossResponse.setObjectId(category.getId());
 		ossResponse.setValue("Guest Users were created succesfully");
 		ossResponse.setCode("OK");
-		return ossResponse; 
+		return ossResponse;
 	}
 
 
