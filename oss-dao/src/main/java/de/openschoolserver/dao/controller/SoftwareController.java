@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.internal.OSSConstatns.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -947,6 +948,7 @@ public class SoftwareController extends Controller {
 		StringBuilder errorMessages = new StringBuilder();
 		List<String>   topSls       = new ArrayList<String>();
 		Path SALT_TOP_TEMPL         = Paths.get("/usr/share/oss/templates/top.sls");
+		String registerPassword     = this.getProperty("de.openschoolserver.dao.User.Register.Password");
 		if( Files.exists(SALT_TOP_TEMPL) ) {
 			try {
 				topSls = Files.readAllLines(SALT_TOP_TEMPL);
@@ -1157,7 +1159,7 @@ public class SoftwareController extends Controller {
 					deviceSls.add(domainName + ":");
 					deviceSls.add("  system.join_domain:");
 					deviceSls.add("    - username: register");
-					deviceSls.add("    - password: register");
+					deviceSls.add("    - password: " + registerPassword);
 					deviceSls.add("    - restart: True");
 					break;
 				}
@@ -1181,7 +1183,8 @@ public class SoftwareController extends Controller {
 
 				Path SALT_DEV   = Paths.get("/srv/salt/oss_device_" + device.getName() + ".sls");
 				try {
-					Files.write(SALT_DEV, deviceSls );
+					Files.write(SALT_DEV, deviceSls);
+					Files.setPosixFilePermissions(SALT_DEV, groupReadDirPermission);
 				} catch( IOException e ) { 
 					logger.error(e.getMessage());
 				}
@@ -1197,6 +1200,7 @@ public class SoftwareController extends Controller {
 			this.systemctl("restart", "salt-master");
 			this.systemctl("restart", "oss_salt_event_watcher");
 		}
+		//TO SET THE RIGHTS
 		if( errorMessages.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR",errorMessages.toString());
 		}
