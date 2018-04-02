@@ -21,8 +21,8 @@ import de.openschoolserver.dao.tools.SslCrypto;
 @Entity
 @Table(name="Users")
 @NamedQueries({
-	@NamedQuery(name="User.findAll", query="SELECT u FROM User u"),
-	@NamedQuery(name="User.findAllId", query="SELECT u.id FROM User u"),
+	@NamedQuery(name="User.findAll", query="SELECT u FROM User u WHERE NOT u.role = 'internal'"),
+	@NamedQuery(name="User.findAllId", query="SELECT u.id FROM User u WHERE NOT u.role = 'internal'"),
 	@NamedQuery(name="User.findAllStudents", query="SELECT u FROM User u WHERE u.role = 'students' "),
 	@NamedQuery(name="User.findAllTeachers", query="SELECT u FROM User u WHERE u.role = 'teachers' "),
 	@NamedQuery(name="User.getByRole",  query="SELECT u FROM User u WHERE u.role = :role "),
