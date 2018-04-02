@@ -168,16 +168,23 @@ public class GroupController extends Controller {
 	}
 
 	public OssResponse delete(Group group){
+		// Remove group from GroupMember of table
+		EntityManager em = getEntityManager();
+		group = this.getById(group.getId());
 		if( this.isProtected(group)) {
 			return new OssResponse(this.getSession(),"ERROR","This group must not be deleted.");
 		}
 		if( !this.mayModify(group) ) {
         	return new OssResponse(this.getSession(),"ERROR","You must not delete this group.");
         }
+		//Primary group must not be deleted if there are member
+		if( group.getGroupType().equals("primary")) {
+			if( group.getUsers() != null  && !group.getUsers().isEmpty() ) {
+				return new OssResponse(this.getSession(),"ERROR","You must not delete this primary group because this still contains member(s).");
+			}
+		}
+		//Start the plugin
 		this.startPlugin("delete_group", group);
-
-		// Remove group from GroupMember of table
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			if( !em.contains(group)) {
