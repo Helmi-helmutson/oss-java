@@ -177,5 +177,23 @@ public class DeviceResourceImpl implements DeviceResource {
 		return new DeviceController(session).importDevices(fileInputStream, contentDispositionHeader);
 	}
 
+	@Override
+	public String getHostnameByIP(Session session, String IP) {
+		Device device = this.getByIP(session, IP);
+		if( device == null ) {
+			return "";
+		}
+		return device.getName();
+	}
+
+	@Override
+	public String getHostnameByMAC(Session session, String MAC) {
+		Device device = this.getByMAC(session, MAC);
+		if( device == null ) {
+			return "";
+		}
+		return device.getName();
+	}
+
 	
 }

@@ -61,9 +61,9 @@ public interface DeviceResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceType") String type
     );
-    
+
     /*
-	 * GET devices/byType/<deviceTyp>
+	 * GET devices/byHWConf/{hwconfId}
 	 */
     @GET
     @Path("byHWConf/{hwconfId}")
@@ -143,6 +143,22 @@ public interface DeviceResource {
     );
 
     /*
+     * GET devices/hostnameByIP/<IPAddress>
+     */
+    @GET
+    @Path("hostnameByIP/{IP}")
+    @Produces(TEXT)
+    @ApiOperation(value = "Get device by MAC address")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.search")
+    String getHostnameByIP(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP
+    );
+
+    /*
      * GET devices/byMAC/<MACAddress>
      */
     @GET
@@ -154,6 +170,22 @@ public interface DeviceResource {
     })
     @RolesAllowed("device.search")
     Device getByMAC(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("MAC") String MAC
+    );
+
+    /*
+     * GET devices/hostnameByIP/<IPAddress>
+     */
+    @GET
+    @Path("hostnameByMAC/{MAC}")
+    @Produces(TEXT)
+    @ApiOperation(value = "Get device by MAC address")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.search")
+    String getHostnameByMAC(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("MAC") String MAC
     );
