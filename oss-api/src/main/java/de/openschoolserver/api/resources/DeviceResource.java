@@ -152,7 +152,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("device.search")
+    @PermitAll
     String getHostnameByIP(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP
@@ -184,7 +184,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("device.search")
+    @PermitAll
     String getHostnameByMAC(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("MAC") String MAC
