@@ -59,6 +59,9 @@ public class PrinterResourceImpl implements PrinterResource {
 				String  name    = matcher.group(0);
 				Printer printer = new Printer(name,deviceController);
 				Device  device  = deviceController.getByName(name);
+				if( device == null ) {
+					continue;
+				}
 				printer.setId(device.getId());
 				printer.setRoomId(device.getRoom().getId());
 				printer.setMac(device.getMac());
