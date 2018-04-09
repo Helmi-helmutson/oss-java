@@ -76,7 +76,7 @@ public class Device implements Serializable {
 	@Size(max=32, message="Inventary must not be longer then 32 characters.")
 	private String inventary;
 
-	@Size(max=32, message="IP must not be longer then 32 characters.")
+	@Size(max=32, message="Locality must not be longer then 32 characters.")
 	private String locality;
 	
 	private Long   counter;
