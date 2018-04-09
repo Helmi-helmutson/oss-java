@@ -3,7 +3,6 @@ package de.openschoolserver.api.resourceimpl;
 import javax.persistence.EntityManager;
 
 import de.openschoolserver.api.resources.SelfManagementResource;
-import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -54,7 +53,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 		} else {
 			if( user.getPassword() != null && !user.getPassword().isEmpty() ) {
 				ossResponse = userController.checkPassword(user.getPassword());
-				if( ossResponse.getCode().equals("ERROR")) {
+				if( ossResponse != null  && ossResponse.getCode().equals("ERROR")) {
 					return ossResponse;
 				}
 				StringBuilder data = new StringBuilder();

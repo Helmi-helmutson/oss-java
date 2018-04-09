@@ -562,12 +562,13 @@ public class DeviceController extends Controller {
 		}
 		device.getLoggedIn().add(user);
 		user.getLoggedOn().add(device);
+		logger.debug("addLoggedInUser: " + device.toString());
+		logger.debug("addLoggedInUser: " + user.toString());
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(device);
 			em.merge(user);
-			em.flush();
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());

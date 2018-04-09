@@ -237,13 +237,11 @@ public class SessionController extends Controller {
 		Session data = null;
 		if (em != null) {
 			try {
-				em.getTransaction().begin();
 				Query q = em.createNamedQuery("Session.getByToken").setParameter("token", token).setMaxResults(1);
 				List<Session> sessions = q.getResultList();
 				if ((sessions != null) && (sessions.size() > 0)) {
 					data = sessions.get(0);
 				}
-				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {

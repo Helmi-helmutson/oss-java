@@ -23,6 +23,7 @@ import de.openschoolserver.dao.OssResponse;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import static de.openschoolserver.api.resources.Resource.*;
 
@@ -413,10 +414,68 @@ public interface DeviceResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed({"sysadmins","teachers"})
+    @RolesAllowed("device.manage")
     OssResponse uploadFileToDevice(
     		@ApiParam(hidden = true) @Auth Session session,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
     );
+    
+    /*
+    * GET devices/{deviceId}/actions
+    */
+   @GET
+   @Path("{deviceId}/actions")
+   @Produces(JSON_UTF8)
+   @ApiOperation(value = "Delivers a list of available actions for a device.")
+   @ApiResponses(value = {
+           // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+           @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+   })
+   @RolesAllowed("device.manage")
+   List<String> getAvailableDeviceActions(
+           @ApiParam(hidden = true) @Auth Session session,
+           @PathParam("deviceId") Long deviceId
+   );
+
+   /*
+    * PUT devices/{deviceId}/{action}
+    */
+   @PUT
+   @Path("{deviceId}/actions/{action}")
+   @Produces(JSON_UTF8)
+   @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, .")
+   @ApiResponses(value = {
+           // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+           @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+   })
+   @RolesAllowed("device.manage")
+   OssResponse manageDevice(
+           @ApiParam(hidden = true) @Auth Session session,
+           @PathParam("deviceId") Long deviceId,
+           @PathParam("action") String action
+   );
+   
+   /*
+    * POST education/rooms/{roomId}/{action}
+    */
+   @POST
+   @Path("{deviceId}/actionWithMap/{action}")
+   @Produces(JSON_UTF8)
+   @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy."
+   		+ "This version of call allows to send a map with some parametrs:"
+   		+ "graceTime : seconds to wait befor execute action."
+   		+ "message : the message to shown befor/during execute the action.")
+   @ApiResponses(value = {
+           // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+           @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+   })
+   @RolesAllowed("device.manage")
+   OssResponse manageDevice(
+           @ApiParam(hidden = true) @Auth Session session,
+           @PathParam("deviceId") Long deviceId,
+           @PathParam("action") String action,
+           Map<String, String> actionContent
+   );
+
 }

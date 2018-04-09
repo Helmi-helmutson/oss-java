@@ -3,7 +3,7 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.io.InputStream;
 import java.util.List;
-
+import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -15,6 +15,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DHCPConfig;
 import de.openschoolserver.dao.controller.DeviceController;
+import de.openschoolserver.dao.controller.EducationController;
 
 public class DeviceResourceImpl implements DeviceResource {
 
@@ -193,6 +194,21 @@ public class DeviceResourceImpl implements DeviceResource {
 			return "";
 		}
 		return device.getName();
+	}
+
+	@Override
+	public List<String> getAvailableDeviceActions(Session session, Long deviceId) {
+		return new EducationController(session).getAvailableDeviceActions(deviceId);
+	}
+
+	@Override
+	public OssResponse manageDevice(Session session, Long deviceId, String action) {
+		return new DeviceController(session).manageDevice(deviceId,action,null);
+	}
+
+	@Override
+	public OssResponse manageDevice(Session session, Long deviceId, String action, Map<String, String> actionContent) {
+		return new DeviceController(session).manageDevice(deviceId,action,actionContent);
 	}
 
 	

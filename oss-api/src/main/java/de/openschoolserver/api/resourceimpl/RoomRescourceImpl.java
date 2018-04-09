@@ -8,6 +8,7 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.dao.controller.DeviceController;
+import de.openschoolserver.dao.controller.EducationController;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.api.resources.RoomResource;
 
@@ -245,6 +246,21 @@ public class RoomRescourceImpl implements RoomResource {
 	@Override
 	public List<Device> getAvailablePrinters(Session session, long roomId) {
 		return new RoomController(session).getById(roomId).getAvailablePrinters();
+	}
+
+	@Override
+	public List<String> getAvailableDeviceActions(Session session, Long roomId) {
+		return new EducationController(session).getAvailableRoomActions(roomId);
+	}
+
+	@Override
+	public OssResponse manageDevice(Session session, Long roomId, String action) {
+		return new EducationController(session).manageRoom(roomId,action, null);
+	}
+
+	@Override
+	public OssResponse manageDevice(Session session, Long roomId, String action, Map<String, String> actionContent) {
+		return new EducationController(session).manageRoom(roomId,action, actionContent);
 	}
 
 }

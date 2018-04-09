@@ -129,7 +129,7 @@ public class User implements Serializable {
 	private List<Category> categories;
 		
 	//bi-directional many-to-many association to Device
-	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
+	@ManyToMany
 	@JoinTable(
 			name="LoggedOn", 
 			joinColumns={ @JoinColumn(name="user_id") },
@@ -195,6 +195,7 @@ public class User implements Serializable {
 		this.ownedCategories    = new ArrayList<Category>();
 		this.ownedDevices		= new ArrayList<Device>();
 		this.ownedGroups        = new ArrayList<Group>();
+		this.loggedOn           = new ArrayList<Device>();
 	}
 
 	public boolean isMustChange() {

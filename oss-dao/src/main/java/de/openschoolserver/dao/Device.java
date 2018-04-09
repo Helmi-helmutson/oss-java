@@ -160,7 +160,8 @@ public class Device implements Serializable {
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-many association to User
-	@ManyToMany(mappedBy="loggedOn", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	//@ManyToMany(mappedBy="loggedOn", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(mappedBy="loggedOn")
 	@JsonIgnore
 	private List<User> loggedIn;
 
@@ -173,6 +174,7 @@ public class Device implements Serializable {
 		this.wlanMac  = "";
 		this.softwareLicenses = new ArrayList<SoftwareLicense>();
 		this.softwareStatus   = new ArrayList<SoftwareStatus>();
+		this.loggedIn         = new ArrayList<User>();
 	}
 
 	public Long getId() {
