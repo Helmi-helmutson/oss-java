@@ -211,5 +211,10 @@ public class DeviceResourceImpl implements DeviceResource {
 		return new DeviceController(session).manageDevice(deviceId,action,actionContent);
 	}
 
+	@Override
+	public OssResponse cleanUpLoggedIn(Session session) {
+		return new DeviceController(session).cleanUpLoggedIn();
+	}
+
 	
 }

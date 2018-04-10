@@ -269,8 +269,11 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Long> getGroupMember(Session session, Long roomId) {
 		List<Long> memberIds = new ArrayList<Long>();
-		for ( Group member : new EducationController(session).getCategoryToRoom(roomId).getGroups() ) {
-			memberIds.add(member.getId());
+		Category category = new EducationController(session).getCategoryToRoom(roomId);
+		if( category != null ) {
+			for ( Group member : category.getGroups() ) {
+				memberIds.add(member.getId());
+			}
 		}
 		return memberIds;
 	}

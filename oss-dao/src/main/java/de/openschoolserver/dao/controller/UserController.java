@@ -562,8 +562,11 @@ public class UserController extends Controller {
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
 		if( stderr.toString().isEmpty() ) {
+			logger.debug("Collected project " + project + " from " + user.getUid());
 			return new OssResponse(this.getSession(),"OK", "File was collected from:",null,user.getUid() );
 		}
+		logger.error("Can not collect project " + project + " from " + user.getUid() + stderr.toString());
+		
 		return new OssResponse(this.getSession(),"ERROR", stderr.toString());
 	}
 
