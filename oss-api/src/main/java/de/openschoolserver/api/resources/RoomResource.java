@@ -561,14 +561,14 @@ public interface RoomResource {
            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
    })
-   @RolesAllowed("education.rooms")
-   List<String> getAvailableDeviceActions(
+   @RolesAllowed("room.manage")
+   List<String> getAvailableRoomActions(
            @ApiParam(hidden = true) @Auth Session session,
            @PathParam("roomId") Long roomId
    );
 
    /*
-    * PUT devices/{roomId}/actions/{action}
+    * PUT rooms/{roomId}/actions/{action}
     */
    @PUT
    @Path("{roomId}/actions/{action}")
@@ -578,15 +578,15 @@ public interface RoomResource {
            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
    })
-   @RolesAllowed("education.rooms")
-   OssResponse manageDevice(
+   @RolesAllowed("room.manage")
+   OssResponse manageRoom(
            @ApiParam(hidden = true) @Auth Session session,
            @PathParam("roomId") Long roomId,
            @PathParam("action") String action
    );
    
    /*
-    * POST education/rooms/{roomId}/{action}
+    * POST rooms/{roomId}/actionWithMap/{action}
     */
    @POST
    @Path("{roomId}/actionWithMap/{action}")
@@ -599,8 +599,8 @@ public interface RoomResource {
            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
    })
-   @RolesAllowed("education.rooms")
-   OssResponse manageDevice(
+   @RolesAllowed("room.manage")
+   OssResponse manageRoom(
            @ApiParam(hidden = true) @Auth Session session,
            @PathParam("roomId") Long roomId,
            @PathParam("action") String action,

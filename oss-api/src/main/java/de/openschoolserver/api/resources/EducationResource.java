@@ -307,7 +307,7 @@ public interface EducationResource {
     );
 
     /*
-     * POST education/rooms/{roomId}/{action}
+     * PUT education/rooms/{roomId}/{action}
      */
     @PUT
     @Path("rooms/{roomId}/{action}")

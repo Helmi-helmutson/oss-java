@@ -457,7 +457,7 @@ public interface DeviceResource {
    );
    
    /*
-    * POST education/rooms/{roomId}/{action}
+    * POST devices/{deviceId}/actionWithMap/{action}
     */
    @POST
    @Path("{deviceId}/actionWithMap/{action}")
