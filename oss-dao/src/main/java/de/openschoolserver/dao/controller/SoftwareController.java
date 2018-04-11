@@ -208,8 +208,15 @@ public class SoftwareController extends Controller {
 		for( Software software : (List<Software>)query.getResultList() ) {
 			if( ! software.getManually() ) {
 				File f = new File(SALT_SOURCE_DIR + software.getName() );
-				if( f.exists() && f.list().length > 1 ) {
-					software.setSourceAvailable(true);
+				if( f.exists() ) {
+					int count = 0; 
+					for( String fileName : f.list() ) {
+						if( fileName.equals("init.sls") || fileName.equals("install.xml") ) {
+							continue;
+						}
+						count++;
+					}
+					software.setSourceAvailable( count > 0);
 				} else {
 					software.setSourceAvailable(false);
 				}
