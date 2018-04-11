@@ -4,6 +4,7 @@ package de.openschoolserver.api.resourceimpl;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
+import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.*;
@@ -70,6 +72,28 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			logger.error("EducationResourceImpl.manageRoom error:" + e.getMessage());
 		}
 		return new EducationController(session).manageRoom(roomId,action, null);
+	}
+
+	@Override
+	public OssResponse downloadFilesFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs,
+			boolean cleanUpExport) {
+		Map<String, String> actionContent = new HashMap<String,String>();
+		RoomController roomController = new RoomController(session);
+		Room room = roomController.getById(roomId);
+		actionContent.put("sortInDirs", "true");
+		actionContent.put("cleanUpExport", "true");
+		if( projectName == null ) {
+			actionContent.put("projectName", roomController.nowString() + "." + room.getName() );
+		} else {
+			actionContent.put("projectName",projectName);
+		}
+		if( !sortInDirs) {
+			actionContent.put("sortInDirs", "false");
+		}
+		if( !cleanUpExport) {
+			actionContent.put("cleanUpExport", "false");
+		}
+		return this.manageRoom(session, roomId, "download", actionContent);
 	}
 
 	@Override
@@ -376,4 +400,6 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			Date validUntil) {
 		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
 	}
+
+
 }

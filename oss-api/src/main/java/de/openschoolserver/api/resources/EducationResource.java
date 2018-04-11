@@ -359,6 +359,22 @@ public interface EducationResource {
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
             );
+    
+    @POST
+    @Path("rooms/{roomId}/download")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation( value = "Puts data to te member of the smart rooms" )
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    OssResponse downloadFilesFromRoom(@ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") Long roomId,
+            @FormDataParam("projectName") String projectName,
+            @FormDataParam("sortInDirs")  boolean sortInDirs,
+            @FormDataParam("cleanUpExport") boolean cleanUpExport
+            );
+
 
     /******************************/
     /* Functions to handle groups */
