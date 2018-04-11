@@ -444,7 +444,7 @@ public interface DeviceResource {
    @PUT
    @Path("{deviceId}/actions/{action}")
    @Produces(JSON_UTF8)
-   @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, .")
+   @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, cleanUpLoggedIn.")
    @ApiResponses(value = {
            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -476,6 +476,19 @@ public interface DeviceResource {
            @PathParam("deviceId") Long deviceId,
            @PathParam("action") String action,
            Map<String, String> actionContent
+   );
+   
+   @DELETE
+   @Path("cleanUpLoggedIn")
+   @Produces(JSON_UTF8)
+   @ApiOperation(value = "Cleans up all logged in users on all devices")
+   @ApiResponses(value = {
+           // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+           @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+   })
+   @RolesAllowed("device.manage")
+   OssResponse cleanUpLoggedIn(
+           @ApiParam(hidden = true) @Auth Session session
    );
 
 }

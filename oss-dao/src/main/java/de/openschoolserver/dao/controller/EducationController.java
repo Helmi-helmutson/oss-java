@@ -360,6 +360,11 @@ public class EducationController extends Controller {
 	
 	public String saveFileToUserImport(User user, File file, String fileName) {
 		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
+		if( user == null ) {
+			return "No user defined.";
+		} else {
+			logger.debug("File " + fileName + " saved to " + user.getUid());
+		}
 		try {
 			StringBuilder newFileName = new StringBuilder(this.getConfigValue("HOME_BASE"));
 			newFileName.append("/").append(user.getRole()).append("/").append(user.getUid()).append("/") .append("Import").append("/");
@@ -449,12 +454,19 @@ public class EducationController extends Controller {
 		OssResponse ossResponse = null;
 		List<String> errors = new ArrayList<String>();
 		DeviceController dc = new DeviceController(this.session);
+		
 		logger.debug("manageRoom called " + roomId + " action:");
+		if( action.equals("download") && actionContent == null ) {
+			actionContent = new HashMap<String,String>();
+			Room room = new RoomController(this.session).getById(roomId);
+			actionContent.put("projectName", this.nowString() + "." + room.getName() );
+		}
 		for( List<Long> loggedOn : this.getRoom(roomId) ) {
 			logger.debug("manageRoom " + roomId + " user:" + loggedOn.get(0) + " device:" +  loggedOn.get(1));
 			//Do not control the own workstation
-			if( this.session.getDevice().getId().equals(loggedOn.get(1)) ||
-					this.session.getUser().getId().equals(loggedOn.get(0)) ) {
+			if( this.session.getUser().getId().equals(loggedOn.get(0)) ||
+				(this.session.getDevice() != null && this.session.getDevice().getId().equals(loggedOn.get(1)))
+				 ) {
 				continue;
 			}
 			ossResponse = dc.manageDevice(loggedOn.get(1), action, actionContent);

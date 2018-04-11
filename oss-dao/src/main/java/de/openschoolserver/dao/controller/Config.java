@@ -3,6 +3,8 @@ package de.openschoolserver.dao.controller;
 import java.util.*;
 import java.io.IOException;
 import java.nio.file.*;
+import java.text.SimpleDateFormat;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,6 +75,11 @@ public class Config {
 		return new Date(System.currentTimeMillis());
 	}
 
+	public String nowString() {
+		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
+		return  fmt.format(new Date());
+	}
+	
 	public Boolean isConfgiReadOnly(String key){
 		return readOnly.get(key);
 	}

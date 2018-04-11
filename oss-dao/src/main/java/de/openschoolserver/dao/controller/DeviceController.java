@@ -581,15 +581,19 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}
 
+	
 	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
+		User user = new UserController(this.session).getByUid(userName);
+		return this.removeLoggedInUser(device, user);
+	}
+		
+	public OssResponse removeLoggedInUser(Device device, User user) {
 		parameters = new ArrayList<String>();
 		EntityManager em = getEntityManager();
-		User user = new UserController(this.session).getByUid(userName);
 		if( !user.getLoggedOn().contains(device)) {
 			parameters.add(device.getName());
-			parameters.add(IP);
-			parameters.add(userName);
+			parameters.add(user.getUid());
 			return new OssResponse(this.getSession(),"OK", "Logged in user was already removed from this device for you:%s;%s;%s",null,parameters);
 		}
 		device.getLoggedIn().remove(user);
@@ -605,10 +609,11 @@ public class DeviceController extends Controller {
 			em.close();
 		}
 		parameters.add(device.getName());
-		parameters.add(IP);
-		parameters.add(userName);
-		return new OssResponse(this.getSession(),"OK", "Logged in user was removed succesfully:%s;%s;%s",null,parameters);
+		parameters.add(user.getUid());
+		return new OssResponse(this.getSession(),"OK", "Logged in user was removed succesfully:%s;%s",null,parameters);
 	}
+	
+	
 	
 	public OssResponse modify(Device device) {
 		Device oldDevice = this.getById(device.getId());
@@ -708,9 +713,12 @@ public class DeviceController extends Controller {
 		return hwconf.getDevices();
 	}
 	
-
 	public OssResponse manageDevice(long deviceId, String action, Map<String, String> actionContent) {
 		Device device = new DeviceController(this.session).getById(deviceId);
+		return this.manageDevice(device, action, actionContent);
+	}
+
+	public OssResponse manageDevice(Device device, String action, Map<String, String> actionContent) {
 		if( this.session.getDevice() != null  && this.session.getDevice().equals(device)) {
 			return new OssResponse(this.getSession(),"ERROR", "Do not control the own client.");
 		}
@@ -775,6 +783,37 @@ public class DeviceController extends Controller {
 			program[2] = file.toPath().toString();
 			program[3] = actionContent.get("path");
 			break;
+		case "cleanUpLoggedIn":
+			EntityManager em = getEntityManager();
+			em.getTransaction().begin();
+			for( User user : device.getLoggedIn() ) {
+				user.getLoggedOn().remove(device);
+				em.merge(user);
+			}
+			device.setLoggedIn(new ArrayList<User>());
+			em.merge(device);
+			em.getTransaction().commit();
+			break;
+		case "download":
+			UserController uc = new UserController(session);
+			boolean cleanUpExport = true;
+			boolean sortInDirs    = true;
+			String  projectName   = this.nowString();
+			if( actionContent != null ) {
+				if( actionContent.containsKey("projectName")) {
+					projectName = actionContent.get("projectName");
+				}
+				if( actionContent.containsKey("sortInDirs")) {
+					sortInDirs = actionContent.get("sortInDirs").equals("true");
+				}
+				if( actionContent.containsKey("cleanUpExport")) {
+					cleanUpExport = actionContent.get("cleanUpExport").equals("true");
+				}
+			}
+			for( User user : device.getLoggedIn() ) {
+				 uc.collectFileFromUser(user, projectName, cleanUpExport, sortInDirs);
+			}
+			return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
 		default:
 				return new OssResponse(this.getSession(),"ERROR", "Unknonw action.");	
 		}
@@ -782,5 +821,19 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
 	}
 
-
+	public OssResponse cleanUpLoggedIn() {
+		OssResponse ossResponse = new OssResponse(this.getSession(),"OK", "LoggedIn attributes was cleaned up.");
+		for( Device device : this.getAll() ) {
+			EntityManager em = getEntityManager();
+			em.getTransaction().begin();
+			for( User user : device.getLoggedIn() ) {
+				user.getLoggedOn().remove(device);
+				em.merge(user);
+			}
+			device.setLoggedIn(new ArrayList<User>());
+			em.merge(device);
+			em.getTransaction().commit();
+		}
+		return ossResponse;
+	}
 }
