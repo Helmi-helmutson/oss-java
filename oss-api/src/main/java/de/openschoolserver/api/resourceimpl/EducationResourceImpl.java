@@ -282,33 +282,42 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Long> getUserMember(Session session, Long roomId) {
-		List<Long> memberIds = new ArrayList<Long>();
-		for ( User member : new EducationController(session).getCategoryToRoom(roomId).getUsers() ) {
-			memberIds.add(member.getId());
+	public List<User> getUserMember(Session session, Long roomId) {
+		List<User> users = new ArrayList<User>();
+		Category category = new EducationController(session).getCategoryToRoom(roomId);
+		if( category != null ) {
+			for ( User member : category.getUsers() ) {
+				users.add(member);
+			}
 		}
-		return memberIds;
+		return users;
 	}
 
 	@Override
-	public List<Long> getGroupMember(Session session, Long roomId) {
-		List<Long> memberIds = new ArrayList<Long>();
+	public List<Group> getGroupMember(Session session, Long roomId) {
+		List<Group> groups = new ArrayList<Group>();
 		Category category = new EducationController(session).getCategoryToRoom(roomId);
 		if( category != null ) {
 			for ( Group member : category.getGroups() ) {
-				memberIds.add(member.getId());
+				groups.add(member);
 			}
 		}
-		return memberIds;
+		return groups;
 	}
 
 	@Override
-	public List<Long> getDeviceMember(Session session, Long roomId) {
-		List<Long> memberIds = new ArrayList<Long>();
-		for ( Device member : new EducationController(session).getCategoryToRoom(roomId).getDevices() ) {
-			memberIds.add(member.getId());
+	public List<Device> getDeviceMember(Session session, Long roomId) {
+		List<Device> devices = new ArrayList<Device>();
+		Category category  = new EducationController(session).getCategoryToRoom(roomId);
+		if( category != null ) {
+			for ( Device member : category.getDevices() ) {
+				devices.add(member);
+			}
+		} else {
+			RoomController roomController = new RoomController(session);
+			return roomController.getDevices(roomId);
 		}
-		return memberIds;
+		return devices;
 	}
 
 	@Override

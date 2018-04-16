@@ -22,6 +22,7 @@ import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Device;
 
 @Path("education")
@@ -229,12 +230,12 @@ public interface EducationResource {
     @GET
     @Path("rooms/{roomId}/users")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delivers the ids of the user members in a smart room" )
+    @ApiOperation(value = "Delivers the user members in a smart room" )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Long>  getUserMember(
+    List<User>  getUserMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId
             );
@@ -245,12 +246,12 @@ public interface EducationResource {
     @GET
     @Path("rooms/{roomId}/groups")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delivers the ids of the group members in a smart room" )
+    @ApiOperation(value = "Delivers the group members in a smart room" )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Long>  getGroupMember(
+    List<Group>  getGroupMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId
             );
@@ -261,12 +262,12 @@ public interface EducationResource {
     @GET
     @Path("rooms/{roomId}/devices")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delivers the ids of the group members in a smart room" )
+    @ApiOperation(value = "Delivers the device members in a smart room" )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Long>  getDeviceMember(
+    List<Device>  getDeviceMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId
             );
@@ -361,7 +362,7 @@ public interface EducationResource {
             );
     
     @POST
-    @Path("rooms/{roomId}/download")
+    @Path("rooms/{roomId}/collect")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Puts data to te member of the smart rooms" )
