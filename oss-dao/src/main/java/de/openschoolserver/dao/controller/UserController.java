@@ -462,7 +462,7 @@ public class UserController extends Controller {
 			program[1] = "domain";
 			program[2]  = "passwordsettings";
 			program[3]  = "set";
-			program[4]  = "--complexity=off";
+			program[4]  = "--complexity=on";
 			OSSShellTools.exec(program, reply, error, data.toString());
 		}
 		return  new OssResponse(this.getSession(),"OK","The password of the selected users was reseted.");
