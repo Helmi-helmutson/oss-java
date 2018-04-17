@@ -21,6 +21,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.PositiveList;
+import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Device;
@@ -199,7 +200,22 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Long> getMyRooms(
+    List<Long> getMyRoomsId(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+    
+    /*
+     *  GET education/rooms
+     */
+    @GET
+    @Path("myRooms")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the of the rooms the session user may control.")
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<Room> getMyRooms(
             @ApiParam(hidden = true) @Auth Session session
     );
     

@@ -2,6 +2,7 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -80,13 +81,13 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public String getDefaultPrinter(Session session, long deviceId) {
+	public Device getDefaultPrinter(Session session, long deviceId) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.getDefaultPrinter(deviceId);
 	}
 
 	@Override
-	public List<String> getAvailablePrinters(Session session, long deviceId) {
+	public List<Device> getAvailablePrinters(Session session, long deviceId) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.getAvailablePrinters(deviceId);
 	}
@@ -214,6 +215,27 @@ public class DeviceResourceImpl implements DeviceResource {
 	@Override
 	public OssResponse cleanUpLoggedIn(Session session) {
 		return new DeviceController(session).cleanUpLoggedIn();
+	}
+
+	@Override
+	public String getDefaultPrinter(Session session, String IP) {
+		DeviceController deviceController = new DeviceController(session);
+		Device printer = deviceController.getDefaultPrinter(deviceController.getByIP(IP).getId());
+		if( printer != null ) {
+			return printer.getName();
+		}
+		return "";
+	}
+
+	@Override
+	public String getAvailablePrinters(Session session, String IP) {
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getByIP(IP);
+		List<String> printers = new ArrayList<String>();
+		for( Device printer : deviceController.getAvailablePrinters(device.getId()) ) {
+			printers.add(printer.getName());
+		}
+		return String.join(" ", printers);
 	}
 
 	

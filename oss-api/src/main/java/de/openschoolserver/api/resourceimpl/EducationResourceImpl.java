@@ -50,7 +50,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Long> getMyRooms(Session session) {
+	public List<Long> getMyRoomsId(Session session) {
+		return new EducationController(session).getMyRoomsId();
+	}
+
+	@Override
+	public List<Room> getMyRooms(Session session) {
 		return new EducationController(session).getMyRooms();
 	}
 

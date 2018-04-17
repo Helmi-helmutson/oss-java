@@ -56,12 +56,12 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
-	public List<Long> getDevices(Session session) {
-		List<Long> deviceIds = new ArrayList<Long>();
+	public List<Device> getDevices(Session session) {
+		List<Device> devices = new ArrayList<Device>();
 		for( Device dev :  session.getUser().getOwnedDevices() ) {
-			deviceIds.add(dev.getId());
+			devices.add(dev);
 		}
-		return deviceIds;
+		return devices;
 	}
 
 	@Override

@@ -22,6 +22,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.apache.http.client.fluent.*;
+
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
@@ -339,30 +341,32 @@ public class DeviceController extends Controller {
 	 * Find the default printer for a device
 	 * If no printer was defined by the device find this from the room
 	 */
-	public String getDefaultPrinter(long deviceId) {
+	public Device getDefaultPrinter(long deviceId) {
 		Device device = this.getById(deviceId);
 		Device printer = device.getDefaultPrinter();
-		if( printer != null)
-			return printer.getName();
+		if( printer != null) {
+			return printer;
+		}
 		printer = device.getRoom().getDefaultPrinter();
-		if( printer != null)
-			return printer.getName();
-		return "";
+		if( printer != null) {
+			return printer;
+		}
+		return null;
 	}
 
 	/*
 	 * Find the available printer for a device
 	 * If no printer was defined by the device find these from the room
 	 */
-	public List<String> getAvailablePrinters(long deviceId) {
+	public List<Device> getAvailablePrinters(long deviceId) {
 		Device device = this.getById(deviceId);
-		List<String> printers   = new ArrayList<String>();
+		List<Device> printers   = new ArrayList<Device>();
 		for( Device printer : device.getAvailablePrinters() ) {
-			printers.add(printer.getName());
+			printers.add(printer);
 		}
 		if( printers.isEmpty() ){
 			for(Device printer : device.getRoom().getAvailablePrinters()){
-				printers.add(printer.getName());
+				printers.add(printer);
 			}
 		}
 		return printers;
@@ -748,14 +752,24 @@ public class DeviceController extends Controller {
 			program[3] = graceTime;
 			break;
 		case "logout":
-			//TODO
-			break;
+			//TODO das ist falsh
+			Request.Get("http://" + device.getIp() + "");
+			if( device.getWlanIp() != null && !device.getWlanIp().isEmpty() ) {
+				Request.Get("http://" + device.getWlanIp() + "/?action=locScreen");
+			}
+			return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
 		case "close":
-			//TODO
-			break;
+			Request.Get("http://" + device.getIp() + "");
+			if( device.getWlanIp() != null && !device.getWlanIp().isEmpty() ) {
+				Request.Get("http://" + device.getWlanIp() + "/?action=lockScreen");
+			}
+			return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
 		case "open":
-			//TODO
-			break;
+			Request.Get("http://" + device.getIp() + "");
+			if( device.getWlanIp() != null && !device.getWlanIp().isEmpty() ) {
+				Request.Get("http://" + device.getWlanIp() + "/?action=enableScreen");
+			}
+			return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
 		case "wol":
 			program = new String[4];
 			program[0] = "/usr/bin/wol";

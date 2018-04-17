@@ -218,11 +218,27 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    String getDefaultPrinter(
+    Device getDefaultPrinter(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
     );
     
+    /*
+     * GET devices/{deviceId}/defaultPrinter
+     */
+    @GET
+    @Path("byIP/{IP}/defaultPrinter")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get default printer Name")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    String getDefaultPrinter(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP
+    );
+
     /*
      * PUT devices/{deviceId}/defaultPrinter/{defaultPrinterId}
      */
@@ -239,7 +255,7 @@ public interface DeviceResource {
             @PathParam("deviceId") long deviceId,
             @PathParam("defaulPrinterId") long defaultPrinterId
     );
-    
+
     /*
      * GET devices/{deviceId}/availablePrinters
      */
@@ -251,9 +267,25 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    List<String> getAvailablePrinters(
+    List<Device> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
+    );
+    
+    /*
+     * GET devices/{deviceId}/availablePrinters
+     */
+    @GET
+    @Path("byIP/{IP}/availablePrinters")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of name of the available printers")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    String getAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("IP") String IP
     );
     
     /*

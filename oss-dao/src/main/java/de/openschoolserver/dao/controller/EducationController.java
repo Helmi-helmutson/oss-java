@@ -58,8 +58,8 @@ public class EducationController extends Controller {
 	/*
 	 * Return the list of ids of rooms in which a user may actually control the access.
 	 */
-	public List<Long> getMyRooms() {
-		List<Long> rooms = new ArrayList<Long>();
+	public List<Room> getMyRooms() {
+		List<Room> rooms = new ArrayList<Room>();
 		if( this.session.getRoom() == null || this.session.getRoom().getRoomControl().equals("no")){
 			for( Room room : new RoomController(this.session).getAll() ) {
 				switch(room.getRoomControl()) {
@@ -67,25 +67,33 @@ public class EducationController extends Controller {
 				case "inRoom":
 					break;
 				case "allTeachers":
-					rooms.add(room.getId());
+					rooms.add(room);
 					break;
 				case "teachers":
 					if( this.checkMConfig(room, "teachers", Long.toString((this.session.getUserId())))) {
-						rooms.add(room.getId());
+						rooms.add(room);
 					}
 				}
 			}
 		} else {
-			rooms.add(this.session.getRoomId());
+			rooms.add(this.session.getRoom());
 		}
 		for( Category category : this.session.getUser().getCategories() ) {
 			for( Room room : category.getRooms() ) {
 				if( room.getRoomType().equals("smartRoom")) {
-					rooms.add(room.getId());
+					rooms.add(room);
 				}
 			}
 		}
 		return rooms;
+	}
+
+	public List<Long> getMyRoomsId(){
+		List<Long> roomIds = new ArrayList<Long>();
+		for( Room room : this.getMyRooms()) {
+			roomIds.add(room.getId());
+		}
+		return roomIds;
 	}
 
 	/*
@@ -104,6 +112,8 @@ public class EducationController extends Controller {
 		room.setName(smartRoom.getName());
 		room.setDescription(smartRoom.getDescription());
 		room.setRoomType("smartRoom");
+		room.setRows(10);
+		room.setPlaces(10);
 		room.getCategories().add(smartRoom);
 		smartRoom.setRooms(new ArrayList<Room>());
 		smartRoom.getRooms().add(room);

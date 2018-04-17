@@ -50,6 +50,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[1] = "ipp://localhost/printers/";
 		program[2] = "get-printers.test";
 		OSSShellTools.exec(program, reply, stderr, null);
+		logger.debug(stderr.toString());
 		String[] lines = reply.toString().split(deviceController.getNl());
 		Pattern pattern = Pattern.compile("\\S+");
 		for( int i=2 ; i < lines.length; i ++) {
