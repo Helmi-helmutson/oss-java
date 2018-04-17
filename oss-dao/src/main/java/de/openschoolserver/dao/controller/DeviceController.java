@@ -22,8 +22,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
-import org.apache.http.client.fluent.*;
-
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
@@ -752,30 +750,28 @@ public class DeviceController extends Controller {
 			program[3] = graceTime;
 			break;
 		case "logout":
-			//TODO das ist falsh
-			Request.Get("http://" + device.getIp() + "");
-			if( device.getWlanIp() != null && !device.getWlanIp().isEmpty() ) {
-				Request.Get("http://" + device.getWlanIp() + "/?action=locScreen");
-			}
-			return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
+			program = new String[3];
+			program[0] = "/usr/sbin/oss_control_client.sh";
+			program[1] = device.getIp();
+			program[2] = "logOut";
+			break;
 		case "close":
-			Request.Get("http://" + device.getIp() + "");
-			if( device.getWlanIp() != null && !device.getWlanIp().isEmpty() ) {
-				Request.Get("http://" + device.getWlanIp() + "/?action=lockScreen");
-			}
-			return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
+			program = new String[3];
+			program[0] = "/usr/sbin/oss_control_client.sh";
+			program[1] = device.getIp();
+			program[2] = "lockScreen";
+			break;
 		case "open":
-			Request.Get("http://" + device.getIp() + "");
-			if( device.getWlanIp() != null && !device.getWlanIp().isEmpty() ) {
-				Request.Get("http://" + device.getWlanIp() + "/?action=enableScreen");
-			}
-			return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
+			program = new String[3];
+			program[0] = "/usr/sbin/oss_control_client.sh";
+			program[1] = device.getIp();
+			program[2] = "enableScreen";
+			break;
 		case "wol":
-			program = new String[4];
-			program[0] = "/usr/bin/wol";
-			program[1] = "-i";
+			program = new String[3];
+			program[0] = "/usr/sbin/oss_wol.sh";
+			program[1] = device.getMac();
 			program[2] = device.getIp();
-			program[3] = device.getMac();
 			break;
 		case "controlProxy":
 			//TODO
