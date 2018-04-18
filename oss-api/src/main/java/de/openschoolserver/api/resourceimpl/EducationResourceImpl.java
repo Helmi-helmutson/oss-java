@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import static de.openschoolserver.dao.internal.OSSConstatns.*;
 import de.openschoolserver.api.resources.EducationResource;
 import de.openschoolserver.api.resources.Resource;
+import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
@@ -368,6 +369,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public OssResponse applyAction(Session session, OssActionMap ossActionMap) {
 		UserController userController = new UserController(session);
+		logger.debug(ossActionMap.toString());
 		switch(ossActionMap.getName()) {
 		case "setPassword":
 			return  userController.resetUserPassword(
@@ -458,6 +460,16 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public OssResponse addMember(Session session, long groupId, long userId) {
 		return new GroupController(session).addMember(groupId, userId);
+	}
+
+	@Override
+	public AccessInRoom getAccessStatus(Session session, long roomId) {
+		return new RoomController(session).getAccessStatus(roomId);
+	}
+
+	@Override
+	public OssResponse setAccessStatus(Session session, long roomId, AccessInRoom access) {
+		return new RoomController(session).setAccessStatus(roomId, access);
 	}
 
 

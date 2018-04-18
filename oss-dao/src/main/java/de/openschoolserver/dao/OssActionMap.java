@@ -2,6 +2,8 @@ package de.openschoolserver.dao;
 
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class OssActionMap {
 
 	private List<Long> userIds;
@@ -10,6 +12,15 @@ public class OssActionMap {
 	private Long       longValue;
 	private boolean    booleanValue;
 	
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+
 	public OssActionMap() {
 		// TODO Auto-generated constructor stub
 	}

@@ -564,6 +564,8 @@ public class RoomController extends Controller {
 
 		// Portal Access
 		program[2] = "portal";
+		reply = new StringBuffer();
+		error = new StringBuffer();
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
 			access.setPortal(true);
@@ -572,6 +574,8 @@ public class RoomController extends Controller {
 
 		// Proxy Access
 		program[2] = "proxy";
+		reply = new StringBuffer();
+		error = new StringBuffer();
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
 			access.setProxy(true);
@@ -580,6 +584,8 @@ public class RoomController extends Controller {
 
 		// Printing Access
 		program[2] = "printing";
+		reply = new StringBuffer();
+		error = new StringBuffer();
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
 			access.setPrinting(true);
@@ -588,6 +594,8 @@ public class RoomController extends Controller {
 
 		// Login
 		program[2] = "login";
+		reply = new StringBuffer();
+		error = new StringBuffer();
 		OSSShellTools.exec(program, reply, error, null);
 		if( reply.toString().equals("1") )
 			access.setLogin(true);
