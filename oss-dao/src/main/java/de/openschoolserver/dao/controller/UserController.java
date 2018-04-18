@@ -432,6 +432,7 @@ public class UserController extends Controller {
 	}
 	
 	public OssResponse resetUserPassword(List<Long> userIds, String password, boolean mustChange) {
+		logger.debug("resetUserPassword: " + password );
 		StringBuilder data = new StringBuilder();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();

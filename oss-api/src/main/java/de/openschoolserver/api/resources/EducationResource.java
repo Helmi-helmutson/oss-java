@@ -33,7 +33,7 @@ public interface EducationResource {
     /******************************/
     /* Functions to handle rooms  */
     /******************************/
-    
+
     /*
      * POST education/rooms
      */
@@ -68,7 +68,7 @@ public interface EducationResource {
             @PathParam("roomId") Long roomId,
             Category smartRoom
             );
-    
+
     /*
      *  PUT education/rooms/{roomId}/users/{userId}
      */
@@ -120,7 +120,7 @@ public interface EducationResource {
             @PathParam("groupId") Long roupId
             );
 
-   
+
     /*
      *  DELETE education/rooms/{roomId}/users/{userId}
      */
@@ -188,7 +188,7 @@ public interface EducationResource {
             @PathParam("roomId") Long roomId
             );
 
-    
+
     /*
      *  GET education/rooms
      */
@@ -203,7 +203,7 @@ public interface EducationResource {
     List<Long> getMyRoomsId(
             @ApiParam(hidden = true) @Auth Session session
     );
-    
+
     /*
      *  GET education/rooms
      */
@@ -218,17 +218,15 @@ public interface EducationResource {
     List<Room> getMyRooms(
             @ApiParam(hidden = true) @Auth Session session
     );
-    
+
     /*
      * GET education/rooms/{roomId}
      */
     @GET
     @Path("rooms/{roomId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the state of a smart room. This call delivers a list of map with the logged in users. " +
-                          "A logged in user map has the format: { deviceId => <deviceId> , userId => <userId> } " +
-                          "The response contains a list of maps with userId and deviceId: " +
-                          "[ { userId => UID1, deviceId => DID1 } ,  { userId => UID2, deviceId => DID2 } ]"
+    @ApiOperation(value = "Gets the state of a room. This call delivers a list of list with the logged in users. " +
+                          "A logged in user list has the format: [ userId , deviceId ] "
                 )
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -255,7 +253,7 @@ public interface EducationResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId
             );
- 
+
     /*
      * GET education/rooms/{roomId}/groups
      */
@@ -348,9 +346,9 @@ public interface EducationResource {
     @Path("rooms/{roomId}/actionWithMap/{action}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Manage a room. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy."
-    		+ "This version of call allows to send a map with some parametrs:"
-    		+ "graceTime : seconds to wait befor execute action."
-    		+ "message : the message to shown befor/during execute the action.")
+                    + "This version of call allows to send a map with some parametrs:"
+                    + "graceTime : seconds to wait befor execute action."
+                    + "message : the message to shown befor/during execute the action.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -376,7 +374,7 @@ public interface EducationResource {
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
             );
-    
+
     @POST
     @Path("rooms/{roomId}/collect")
     @Produces(JSON_UTF8)
@@ -396,7 +394,7 @@ public interface EducationResource {
     /******************************/
     /* Functions to handle groups */
     /******************************/
-    
+
     /*
      * POST education/groups
      */
@@ -429,7 +427,103 @@ public interface EducationResource {
             @PathParam("groupId") Long groupId,
             Group group
             );
-    
+
+    /*
+     * GET education/groups/{groupId}
+     */
+    @GET
+    @Path("groups/{groupId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets a workgroup.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.groups")
+    Group  getGroup(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("groupId") Long groupId
+            );
+
+    /*
+     * GET education/groups
+     */
+    @GET
+    @Path("groups")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the workgroups of a usrer.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.groups")
+    List<Group>  getMyGroups(
+            @ApiParam(hidden = true) @Auth Session session
+            );
+
+        /*
+            * GET groups/<groupId>/availableMembers
+            */
+        @GET
+        @Path("groups/{groupId}/availableMembers")
+        @Produces(JSON_UTF8)
+        @ApiOperation(value = "Get users which are not member in this group.")
+        @ApiResponses(value = {
+                @ApiResponse(code = 404, message = "Group not found"),
+                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+        @RolesAllowed("group.manage")
+        List<User> getAvailableMembers(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("groupId") long groupId
+        );
+
+
+    /*
+            * GET groups/<groupId>/members
+            */
+       @GET
+       @Path("groups/{groupId}/members")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Get users which are member in this group.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 404, message = "Group not found"),
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("group.manage")
+       List<User> getMembers(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("groupId") long groupId
+       );
+
+       /*
+        * DELETE groups/<groupId>/<userId>
+        */
+       @DELETE
+       @Path("groups/{groupId}/{userId}")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Deletes a member of a group by userId.")
+       @ApiResponses(value = {
+           @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("group.search")
+       OssResponse removeMember(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("groupId") long groupId,
+               @PathParam("userId") long userId
+       );
+
+       /*
+        * PUT groups/<groupId>/<userId>
+        */
+       @PUT
+       @Path("groups/{groupId}/{userId}")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Add a member to a group by userId.")
+       @ApiResponses(value = {
+           @ApiResponse(code = 404, message = "Group not found"),
+           @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("group.manage")
+       OssResponse addMember(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("groupId") long groupId,
+               @PathParam("userId") long userId
+       );
     /*
       * DELETE education/groups/{groupId}
       */
@@ -445,7 +539,7 @@ public interface EducationResource {
              @ApiParam(hidden = true) @Auth Session session,
              @PathParam("groupId") Long groupId
             );
-     
+
      @POST
      @Path("groups/{groupId}/upload")
      @Produces(JSON_UTF8)
@@ -459,11 +553,25 @@ public interface EducationResource {
              @FormDataParam("file") final InputStream fileInputStream,
              @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
              );
-  
+
 
     /************************************************************/
     /* Actions on logged in users and smart rooms and groups. */
     /************************************************************/
+
+     @GET
+     @Path("users")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Gets a list of users by the userids." )
+     @ApiResponses(value = {
+             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+     })
+     @RolesAllowed("education.users")
+     List<User> getUsersById(
+                     @ApiParam(hidden = true) @Auth Session session,
+                     List<Long> userIds
+                     );
     /*
      * DELETE education/users/{userId}/{deviceId}
      */
@@ -481,7 +589,7 @@ public interface EducationResource {
             @PathParam("userId") Long userId,
             @PathParam("deviceId") Long deviceId
             );
-    
+
     /*
      * PUT education/users/{userId}/{deviceId}
      */
@@ -568,26 +676,26 @@ public interface EducationResource {
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
             );
- 
+
     @POST
     @Path("users/applyAction")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Apply an action for a lot of user once.",
-    			notes = "The following actions are available:<br>"
-    					+ "setPassword -> stringValue has to contain the password and booleanValue if the users have to reset the password after first login.<br>"
-    					+ "setFilesystemQuota -> longValue has to contain the new quota value.<br>"
-    					+ "setMailSystemQuota -> longValue has to contain the new quota value.<br>"
-    					+ "disableLogin -> booleanValue has to contain the new value.<br>"
-    					+ "disableInternet -> booleanValue has to contain the new value.<br>"
-    					+ "copyTemplate -> Copy the home of the template user")
+                            notes = "The following actions are available:<br>"
+                                            + "setPassword -> stringValue has to contain the password and booleanValue if the users have to reset the password after first login.<br>"
+                                            + "setFilesystemQuota -> longValue has to contain the new quota value.<br>"
+                                            + "setMailSystemQuota -> longValue has to contain the new quota value.<br>"
+                                            + "disableLogin -> booleanValue has to contain the new value.<br>"
+                                            + "disableInternet -> booleanValue has to contain the new value.<br>"
+                                            + "copyTemplate -> Copy the home of the template user")
     @ApiResponses(value = {
-    		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+                    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     OssResponse applyAction(@ApiParam(hidden = true) @Auth Session session,
-    		OssActionMap ossActionMap
-    		);
+                    OssActionMap ossActionMap
+                    );
 
-    
+
     /************************************************************/
     /* Actions on logged in users and smart rooms and groups. */
     /************************************************************/
@@ -625,7 +733,7 @@ public interface EducationResource {
             @PathParam("deviceId") Long deviceId,
             @PathParam("action") String action
     );
-    
+
     /*
      * POST education/rooms/{roomId}/{action}
      */
@@ -633,9 +741,9 @@ public interface EducationResource {
     @Path("devices/{deviceId}/actionWithMap/{action}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy."
-    		+ "This version of call allows to send a map with some parametrs:"
-    		+ "graceTime : seconds to wait befor execute action."
-    		+ "message : the message to shown befor/during execute the action.")
+                    + "This version of call allows to send a map with some parametrs:"
+                    + "graceTime : seconds to wait befor execute action."
+                    + "message : the message to shown befor/during execute the action.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -648,7 +756,7 @@ public interface EducationResource {
             Map<String, String> actionContent
     );
 
-    
+
     @POST
     @Path("devices/{deviceId}/upload")
     @Produces(JSON_UTF8)
@@ -663,7 +771,7 @@ public interface EducationResource {
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
     );
-    
+
     @GET
     @Path("devices/{deviceId}/collect/{projectName}")
     @Produces(JSON_UTF8)
@@ -751,8 +859,8 @@ public interface EducationResource {
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );
-    
-    
+
+
     /*******************************************/
     /* Functions to handle proxy settings.     */
     /*******************************************/
@@ -767,7 +875,7 @@ public interface EducationResource {
     List<PositiveList> getPositiveLists(
         @ApiParam(hidden = true) @Auth Session session
     );
-    
+
     @GET
     @Path("proxy/myPositiveLists")
     @Produces(JSON_UTF8)
@@ -779,7 +887,7 @@ public interface EducationResource {
     List<PositiveList> getMyPositiveLists(
         @ApiParam(hidden = true) @Auth Session session
     );
-    
+
     @POST
     @Path("proxy/positiveLists")
     @Produces(JSON_UTF8)
@@ -792,7 +900,7 @@ public interface EducationResource {
         @ApiParam(hidden = true) @Auth Session session,
         PositiveList positiveList
     );
-    
+
     @GET
     @Path("proxy/positiveLists/{positiveListId}")
     @Produces(JSON_UTF8)
@@ -805,7 +913,7 @@ public interface EducationResource {
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("positiveListId") Long positiveListId
     );
-    
+
     @DELETE
     @Path("proxy/positiveLists/{positiveListId}")
     @Produces(JSON_UTF8)
@@ -833,7 +941,7 @@ public interface EducationResource {
         @PathParam("roomId") Long roomId,
         List<Long> postiveListIds
     );
-    
+
     @GET
     @Path("proxy/rooms/{roomId}")
     @Produces(JSON_UTF8)
@@ -846,7 +954,7 @@ public interface EducationResource {
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );
-    
+
     @DELETE
     @Path("proxy/rooms/{roomId}")
     @Produces(JSON_UTF8)
@@ -859,7 +967,7 @@ public interface EducationResource {
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );
-    
+
     /*
      * Mange gast user
      */
@@ -874,7 +982,7 @@ public interface EducationResource {
      List<Category> getGuestUsers(
                  @ApiParam(hidden = true) @Auth Session session
      );
-     
+
      @GET
      @Path("guestUsers/{guestUsersId}")
      @Produces(JSON_UTF8)
@@ -887,7 +995,7 @@ public interface EducationResource {
                  @ApiParam(hidden = true) @Auth Session session,
                  @PathParam("guestUsersId")     Long    guestUsersId
      );
-     
+
      @DELETE
      @Path("guestUsers/{guestUsersId}")
      @Produces(JSON_UTF8)
@@ -900,22 +1008,22 @@ public interface EducationResource {
                  @ApiParam(hidden = true) @Auth Session session,
                  @PathParam("guestUsersId")     Long    guestUsersId
      );
-     
- 	@POST
- 	@Path("add")
- 	@Produces(JSON_UTF8)
- 	@Consumes(MediaType.MULTIPART_FORM_DATA)
- 	@ApiOperation(value = "Creates a new printer.")
- 	@ApiResponses(value = {
- 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
- 	@RolesAllowed("education.guestusers")
- 	OssResponse addGuestUsers(
- 			@ApiParam(hidden = true) @Auth Session session,
- 			@FormDataParam("name")          String  name,
- 			@FormDataParam("description")   String  description,
- 			@FormDataParam("roomId")   		Long    roomId,
- 			@FormDataParam("count")   		int     count,
- 			@FormDataParam("validUntil")    Date    validUntil
- 			);
-     
+
+         @POST
+         @Path("guestUsers/add")
+         @Produces(JSON_UTF8)
+         @Consumes(MediaType.MULTIPART_FORM_DATA)
+         @ApiOperation(value = "Creates a new guest users accounts.")
+         @ApiResponses(value = {
+                         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+         @RolesAllowed("education.guestusers")
+         OssResponse addGuestUsers(
+                         @ApiParam(hidden = true) @Auth Session session,
+                         @FormDataParam("name")          String  name,
+                         @FormDataParam("description")   String  description,
+                         @FormDataParam("roomId")                   Long    roomId,
+                         @FormDataParam("count")                   int     count,
+                         @FormDataParam("validUntil")    Date    validUntil
+                         );
+
 }

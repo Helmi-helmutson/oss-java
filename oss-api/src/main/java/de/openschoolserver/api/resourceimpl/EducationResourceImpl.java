@@ -415,5 +415,50 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
 	}
 
+	@Override
+	public List<User> getUsersById(Session session, List<Long> userIds) {
+		return new UserController(session).getUsers(userIds);
+	}
+
+	@Override
+	public Group getGroup(Session session, Long groupId) {
+		Group group = new GroupController(session).getById(groupId);
+		if(group.getGroupType().equals("workgroup")) {
+			return group;
+		}
+		return null;
+	}
+
+	@Override
+	public List<Group> getMyGroups(Session session) {
+		List<Group> groups = new ArrayList<Group>();
+		for( Group group : new GroupController(session).getAll() ) {
+			if(group.getOwner().equals(session.getUser())) {
+				groups.add(group);
+			}
+		}
+		return groups;
+	}
+
+	@Override
+	public List<User> getAvailableMembers(Session session, long groupId) {
+		return new GroupController(session).getAvailableMember(groupId);
+	}
+
+	@Override
+	public List<User> getMembers(Session session, long groupId) {
+		return new GroupController(session).getMembers(groupId);
+	}
+
+	@Override
+	public OssResponse removeMember(Session session, long groupId, long userId) {
+		return new GroupController(session).removeMember(groupId, userId);
+	}
+
+	@Override
+	public OssResponse addMember(Session session, long groupId, long userId) {
+		return new GroupController(session).addMember(groupId, userId);
+	}
+
 
 }
