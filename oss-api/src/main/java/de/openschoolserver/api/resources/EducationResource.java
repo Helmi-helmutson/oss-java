@@ -540,6 +540,24 @@ public interface EducationResource {
              @PathParam("groupId") Long groupId
             );
 
+
+     /*
+      * GET education/groups/{groupId}/actions
+      */
+     @GET
+     @Path("groups/{groupId}/actions")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Delivers a list of available actions for a user.")
+     @ApiResponses(value = {
+             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+     })
+     @RolesAllowed("education.groups")
+     List<String> getAvailableGroupActions(
+             @ApiParam(hidden = true) @Auth Session session,
+             @PathParam("groupId") Long groupId
+     );
+
      @POST
      @Path("groups/{groupId}/upload")
      @Produces(JSON_UTF8)
@@ -554,6 +572,34 @@ public interface EducationResource {
              @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
              );
 
+
+     @GET
+     @Path("groups/{groupId}/collect/{projectName}/")
+     @Produces(JSON_UTF8)
+     @ApiOperation( value = "Collects data from the students member of the corresponding group." )
+     @ApiResponses(value = {
+                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+     })
+     @RolesAllowed("education.groups")
+     OssResponse collectFileFromStudentsOfGroup(
+         @ApiParam(hidden = true) @Auth Session session,
+         @PathParam("groupId")     Long groupId,
+         @PathParam("projectName") String projectName
+     );
+
+     @GET
+     @Path("groups/{groupId}/collect/{projectName}/all")
+     @Produces(JSON_UTF8)
+     @ApiOperation( value = "Collects data from the all member of the corresponding group." )
+     @ApiResponses(value = {
+                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+     })
+     @RolesAllowed("education.groups")
+     OssResponse collectFileFromMembersOfGroup(
+         @ApiParam(hidden = true) @Auth Session session,
+         @PathParam("groupId")     Long groupId,
+         @PathParam("projectName") String projectName
+     );
 
     /************************************************************/
     /* Actions on logged in users and smart rooms and groups. */
@@ -624,44 +670,6 @@ public interface EducationResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") Long userId
     );
-
-    /*
-     * GET education/groups/{groupId}/actions
-     */
-    @GET
-    @Path("groups/{groupId}/actions")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delivers a list of available actions for a user.")
-    @ApiResponses(value = {
-            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
-            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @RolesAllowed("education.groups")
-    List<String> getAvailableGroupActions(
-            @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("groupId") Long groupId
-    );
-
-    /*
-     * PUT education/users/{userId}/{deviceId}/{action}
-     */
-    @POST
-    @Path("users/{userId}/{deviceId}/{action}")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Send a action to a user to a device. If the device is -1 the user gets this action on all devices. " +
-                          "Depending on the action an arbitary map can be sent in the body.")
-    @ApiResponses(value = {
-            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
-            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @RolesAllowed("education.users")
-    OssResponse manageUSer(
-            @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("userId") Long userId,
-            @PathParam("deviceId") Long deviceId,
-            @PathParam("action") String action,
-            Map<String, String> actionContent
-            );
 
     @POST
     @Path("users/{userId}/upload")
@@ -800,35 +808,7 @@ public interface EducationResource {
         @PathParam("projectName") String projectName
     );
 
-    @GET
-    @Path("groups/{groupId}/collect/{projectName}/")
-    @Produces(JSON_UTF8)
-    @ApiOperation( value = "Collects data from the students member of the corresponding group." )
-    @ApiResponses(value = {
-                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @RolesAllowed("education.rooms")
-    OssResponse collectFileFromStudentsOfGroup(
-        @ApiParam(hidden = true) @Auth Session session,
-        @PathParam("groupId")     Long groupId,
-        @PathParam("projectName") String projectName
-    );
-
-    @GET
-    @Path("groups/{groupId}/collect/{projectName}/all")
-    @Produces(JSON_UTF8)
-    @ApiOperation( value = "Collects data from the students member of the corresponding group." )
-    @ApiResponses(value = {
-                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @RolesAllowed("education.rooms")
-    OssResponse collectFileFromMembersOfGroup(
-        @ApiParam(hidden = true) @Auth Session session,
-        @PathParam("groupId")     Long groupId,
-        @PathParam("projectName") String projectName
-    );
-
-    /*
+ /*
      * Get informations from the printers in the room
      */
     @GET
