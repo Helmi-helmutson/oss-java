@@ -231,11 +231,6 @@ public class EducationController extends Controller {
 		List<Long> loggedOn;
 		RoomController roomController = new RoomController(this.session);
 		Room room = roomController.getById(roomId);
-		try {
-			logger.debug("EducationController.getRoom:" + room);
-		}  catch (Exception e) {
-			logger.error("EducationController.getRoom error:" + e.getMessage());
-		}
 		User me   = this.session.getUser();
 		if( room.getRoomType().equals("smartRoom")) {
 			Category category = room.getCategories().get(0);
@@ -300,11 +295,6 @@ public class EducationController extends Controller {
 			}
 		} else {
 			for( Device device : room.getDevices() ) {
-				try {
-					logger.debug("EducationController.getRoom:" + device );
-				}  catch (Exception e) {
-					logger.error("EducationController.getRoom error:" + e.getMessage());
-				}
 				/*
 				 * If nobody is logged in set user id to 0L
 				 */
@@ -343,31 +333,45 @@ public class EducationController extends Controller {
 		switch(what) {
 		case "user":
 			User user = new UserController(this.session).getById(objectId);
-			error.append(this.saveFileToUserImport(user, file, fileName));
+			if( user != null ) {
+				error.append(this.saveFileToUserImport(user, file, fileName));
+			} else {
+				error.append("User does not exists.");
+			}
 			break;
 		case "group":
 			Group group = new GroupController(this.session).getById(objectId);
-			for( User myUser : group.getUsers() ) {
-				error.append(this.saveFileToUserImport(myUser, file, fileName));
+			if( group != null ) {
+				for( User myUser : group.getUsers() ) {
+					error.append(this.saveFileToUserImport(myUser, file, fileName));
+				}
+			} else {
+				error.append("User does not exists.");
 			}
 			break;
 		case "device":
 			Device device = new DeviceController(this.session).getById(objectId);
-			for( User myUser : device.getLoggedIn() ) {
-				error.append(this.saveFileToUserImport(myUser, file, fileName));
+			if( device != null ) {
+				for( User myUser : device.getLoggedIn() ) {
+					error.append(this.saveFileToUserImport(myUser, file, fileName));
+				}
+			} else {
+				error.append("Device does not exists.");
 			}
 			break;
 		case "room":
 			UserController userController = new UserController(this.session);
 			for( List<Long> loggedOn : this.getRoom(objectId) ) {
 				User myUser = userController.getById(loggedOn.get(0));
-				error.append(this.saveFileToUserImport(myUser, file, fileName));
+				if( myUser != null ) {
+					error.append(this.saveFileToUserImport(myUser, file, fileName));
+				}
 			}
 		}
 		file.delete();
 		return new OssResponse(this.getSession(),"OK", "File was copied succesfully.");
 	}
-	
+
 	public String saveFileToUserImport(User user, File file, String fileName) {
 		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
 		if( user == null ) {
@@ -391,6 +395,17 @@ public class EducationController extends Controller {
 			UserPrincipal owner = lookupService.lookupPrincipalByName(user.getUid());
 			Files.setOwner(importDir.toPath(), owner);
 			Files.setOwner(newFile.toPath(), owner);
+
+			//Clean up export of target
+			//TODO MAKE IT BOOLEAN
+			StringBuilder export = new StringBuilder(this.getConfigValue("HOME_BASE"));
+			export.append("/").append(user.getRole()).append("/").append(user.getUid()).append("/") .append("Export").append("/");
+			File exportDir = new File( export.toString() );
+			Files.createDirectories(exportDir.toPath(), privatDirAttribute );
+			Files.setOwner(exportDir.toPath(), owner);
+			for( String mist : exportDir.list() ) {
+				new File(mist).delete();
+			}
 		} catch (IOException e) {
 			logger.error(e.getMessage());
 			return e.getMessage() + System.lineSeparator();
