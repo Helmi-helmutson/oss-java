@@ -548,7 +548,6 @@ public class DeviceController extends Controller {
 
 	public OssResponse addLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
-		parameters = new ArrayList<String>();
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP: %s",null,IP);
 		}
@@ -556,10 +555,26 @@ public class DeviceController extends Controller {
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
 		}
+		return this.addLoggedInUser(device, user);
+	}
+	public OssResponse addLoggedInUser(Long deviceId, Long userId) {
+		Device device = this.getById(deviceId);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with ID: %s",null,String.valueOf(deviceId));
+		}
+		User user = new UserController(this.session).getById(userId);
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,String.valueOf(userId));
+		}
+		return this.addLoggedInUser(device, user);
+	}
+	public OssResponse addLoggedInUser(Device device, User user) {
+
+		parameters = new ArrayList<String>();
+		parameters.add(device.getName());
+		parameters.add(device.getIp());
+		parameters.add(user.getUid());
 		if( user.getLoggedOn().contains(device)) {
-			parameters.add(device.getName());
-			parameters.add(IP);
-			parameters.add(userName);
 			return new OssResponse(this.getSession(),"OK", "Logged in user was already added on this device for you:%s;%s;%s",null,parameters);
 		}
 		device.getLoggedIn().add(user);
@@ -577,9 +592,6 @@ public class DeviceController extends Controller {
 		} finally {
 			em.close();
 		}
-		parameters.add(device.getName());
-		parameters.add(IP);
-		parameters.add(userName);
 		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}
 
@@ -587,9 +599,19 @@ public class DeviceController extends Controller {
 	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		User user = new UserController(this.session).getByUid(userName);
+		if( device == null  || user == null ) {
+			return new OssResponse(this.getSession(),"ERROR","Can not find user or device");
+		}
 		return this.removeLoggedInUser(device, user);
 	}
-		
+	public OssResponse removeLoggedInUser(Long deviceId, Long userId) {
+		Device device = this.getById(deviceId);
+		User   user   = new UserController(this.session).getById(userId);
+		if( device == null  || user == null ) {
+			return new OssResponse(this.getSession(),"ERROR","Can not find user or device");
+		}
+		return this.removeLoggedInUser(device, user);
+	}
 	public OssResponse removeLoggedInUser(Device device, User user) {
 		parameters = new ArrayList<String>();
 		EntityManager em = getEntityManager();
@@ -614,9 +636,7 @@ public class DeviceController extends Controller {
 		parameters.add(user.getUid());
 		return new OssResponse(this.getSession(),"OK", "Logged in user was removed succesfully:%s;%s",null,parameters);
 	}
-	
-	
-	
+
 	public OssResponse modify(Device device) {
 		Device oldDevice = this.getById(device.getId());
 		List<String> error = new ArrayList<String>();
