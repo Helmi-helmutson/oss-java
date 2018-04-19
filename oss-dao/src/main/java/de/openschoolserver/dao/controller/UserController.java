@@ -512,12 +512,18 @@ public class UserController extends Controller {
 		StringBuilder data = new StringBuilder();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
-		String[]   program = new String[4];
+		String[]   program = new String[11];
 		program[0] = "/usr/sbin/oss_collect_files.sh";
-		program[1] = this.session.getUser().getUid();
-		program[3] = projectName;
+		program[1] = "-t";
+		program[2] = this.session.getUser().getUid();
+		program[3] = "-f";
+		program[5] = "-p";
+		program[6] = projectName;
+		program[7] = "-c";
+		program[8] = "y";
+		program[10] = "y";
 		for ( User user : users ){
-			program[2] = user.getUid();
+			program[4] = user.getUid();
 			OSSShellTools.exec(program, reply, error, data.toString());
 		}
 		return  new OssResponse(this.getSession(),"OK","The files from the export directories of selected users were collected.");
@@ -527,12 +533,18 @@ public class UserController extends Controller {
 		StringBuilder data = new StringBuilder();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
-		String[]   program = new String[4];
+		String[]   program = new String[11];
 		program[0] = "/usr/sbin/oss_collect_files.sh";
-		program[1] = this.session.getUser().getUid();
-		program[3] = projectName;
+		program[1] = "-t";
+		program[2] = this.session.getUser().getUid();
+		program[3] = "-f";
+		program[5] = "-p";
+		program[6] = projectName;
+		program[7] = "-c";
+		program[8] = "y";
+		program[10] = "y";
 		for ( Long id : userIds ){
-			program[2] = this.getById(id).getUid();
+			program[4] = this.getById(id).getUid();
 			OSSShellTools.exec(program, reply, error, data.toString());
 		}
 		return  new OssResponse(this.getSession(),"OK","The files from the export directories of selected users were collected.");
