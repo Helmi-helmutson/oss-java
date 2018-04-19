@@ -1255,11 +1255,12 @@ public class SoftwareController extends Controller {
 		}
 
 		//Search for the real software version
-		try {
+/*		try {
 			logger.debug("Software versions:" + new ObjectMapper().writeValueAsString(software.getSoftwareVersions()));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
+*/
 		for( SoftwareVersion sv :  software.getSoftwareVersions() ) {
 			if( sv.getVersion().equals(version)) {
 				softwareVersion = this.getSoftwareVersionById(sv.getId());
@@ -1286,11 +1287,12 @@ public class SoftwareController extends Controller {
 
 		//We are searching for the status of this version of the software on the device.
 		List<SoftwareStatus> softwareStatusToRemove = new ArrayList<SoftwareStatus>();
-		try {
-			//logger.debug("Software Status on Device:" + new ObjectMapper().writeValueAsString(device.getSoftwareStatus()));
+/*		try {
+			logger.debug("Software Status on Device:" + new ObjectMapper().writeValueAsString(device.getSoftwareStatus()));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
+*/
 		for( SoftwareStatus st : device.getSoftwareStatus() ) {
 			//logger.debug("Software Status of " + st.getSoftwareVersion().getSoftware().getName());
 			if( st.getSoftwareVersion().equals(softwareVersion) ) {
