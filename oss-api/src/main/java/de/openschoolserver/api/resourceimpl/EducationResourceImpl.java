@@ -128,14 +128,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse logOut(Session session, Long userId, Long deviceId) {
-		// TODO Auto-generated method stub
-		return null;
+		return new DeviceController(session).removeLoggedInUser(deviceId, userId);
 	}
 
 	@Override
-	public OssResponse logIn(Session session, Long userId, Long roomId) {
-		// TODO Auto-generated method stub
-		return null;
+	public OssResponse logIn(Session session, Long userId, Long deviceId) {
+		return new DeviceController(session).addLoggedInUser(deviceId, userId);
 	}
 
 	@Override
@@ -143,12 +141,6 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return new EducationController(session).getAvailableUserActions(userId);
 	}
 
-	@Override
-	public OssResponse manageUSer(Session session, Long userId, Long deviceId, String action,
-			Map<String, String> actionContent) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	@Override
 	public List<String> getAvailableDeviceActions(Session session, Long deviceId) {
 		return new EducationController(session).getAvailableDeviceActions(deviceId);
