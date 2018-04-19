@@ -1287,12 +1287,12 @@ public class SoftwareController extends Controller {
 		//We are searching for the status of this version of the software on the device.
 		List<SoftwareStatus> softwareStatusToRemove = new ArrayList<SoftwareStatus>();
 		try {
-			logger.debug("Software Status on Device:" + new ObjectMapper().writeValueAsString(device.getSoftwareStatus()));
+			//logger.debug("Software Status on Device:" + new ObjectMapper().writeValueAsString(device.getSoftwareStatus()));
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
 		for( SoftwareStatus st : device.getSoftwareStatus() ) {
-			logger.debug("Software Status of " + st.getSoftwareVersion().getSoftware().getName());
+			//logger.debug("Software Status of " + st.getSoftwareVersion().getSoftware().getName());
 			if( st.getSoftwareVersion().equals(softwareVersion) ) {
 				logger.debug("equal:" +st.getSoftwareVersion().getVersion());
 				softwareStatus = st;

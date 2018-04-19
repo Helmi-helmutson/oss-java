@@ -451,11 +451,12 @@ public class UserController extends Controller {
 		}
 		program[1] = "user";
 		program[2] = "setpassword";
-		program[4] = "--newpassword='" + password + "'";
+		program[4] = "--newpassword="+password;
 			
 		for ( Long id : userIds ){
 			program[3] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, data.toString());
+			OSSShellTools.exec(program, reply, error, null);
+			logger.debug(program[0] + " " + program[1] + " " + program[2] +" "+program[3] +" "+ program[4]+ " R:" + reply.toString() + " E:"+ error.toString());
 		}
 		if ( this.getConfigValue("CHECK_PASSWORD_QUALITY").toLowerCase().equals("yes")) {
 			program = new String[5];
