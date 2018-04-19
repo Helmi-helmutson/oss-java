@@ -194,7 +194,7 @@ public class UserController extends Controller {
 		if( user.getRole().equals("workstations") || user.getRole().equals("guest") ) {
 			user.setPassword(user.getUid());
 		} else if( user.getPassword() == null || user.getPassword().isEmpty() ) {
-			user.setPassword(UserUtil.createRandomPassword(9,"ACGqf123#"));
+			user.setPassword(UserUtil.createRandomPassword(9,"XYqr45"));
 		}
 		else
 		{
