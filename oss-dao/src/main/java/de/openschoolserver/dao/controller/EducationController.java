@@ -479,7 +479,14 @@ public class EducationController extends Controller {
 		OssResponse ossResponse = null;
 		List<String> errors = new ArrayList<String>();
 		DeviceController dc = new DeviceController(this.session);
-		
+
+		/*
+		* This is a very special action
+		*/		
+		if( action.equals("organizeRoom")) {
+			return new RoomController(session).organizeRoom(roomId);
+		}
+
 		logger.debug("manageRoom called " + roomId + " action:");
 		if( action.equals("download") && actionContent == null ) {
 			actionContent = new HashMap<String,String>();

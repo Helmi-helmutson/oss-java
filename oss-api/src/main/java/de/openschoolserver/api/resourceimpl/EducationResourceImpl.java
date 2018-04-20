@@ -464,5 +464,20 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return new RoomController(session).setAccessStatus(roomId, access);
 	}
 
+	@Override
+	public List<Device> getDevicesById(Session session, List<Long> deviceIds) {
+		return new DeviceController(session).getDevices(deviceIds); 
+	}
+
+	@Override
+	public User getUserById(Session session, Long userId) {
+		return new UserController(session).getById(userId);
+	}
+
+	@Override
+	public Device getDeviceById(Session session, Long deviceId) {
+		return new DeviceController(session).getById(deviceId);
+	}
+
 
 }

@@ -158,7 +158,7 @@ public interface RoomResource {
     );
     
     /*
-     * SET rooms/{roomId}/hwConf
+     * SET rooms/{roomId}/{hwConfId}
      */
     @PUT
     @Path("{roomId}/{hwConfId}")
@@ -568,7 +568,7 @@ public interface RoomResource {
    );
 
    /*
-    * PUT rooms/{roomId}/actions/{action}
+    *   rooms/{roomId}/actions/{action}
     */
    @PUT
    @Path("{roomId}/actions/{action}")

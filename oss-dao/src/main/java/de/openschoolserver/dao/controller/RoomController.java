@@ -682,6 +682,13 @@ public class RoomController extends Controller {
 						hwconf = firstFatClient;
 					}
 				}
+				if( hwconf.getDeviceType().equals("FatClient") && this.getDevicesOnMyPlace(room, device).size() > 0 ) {
+					List<Integer> coordinates = this.getNextFreePlace(room);
+					if( !coordinates.isEmpty() ) {
+						device.setPlace(coordinates.get(0));
+						device.setRow(coordinates.get(1));
+					}
+				}
 				device.setHwconf(hwconf);
 				em.persist(device);
 				hwconf.getDevices().add(device);
@@ -1034,5 +1041,76 @@ public class RoomController extends Controller {
 		}
 		return null;
 	}
-
+	
+	public OssResponse organizeRoom(long roomId) {
+		Room room = this.getById(roomId);
+		if( room.getRoomType().equals("smartRoom")) {
+			return new OssResponse(this.getSession(),"OK", "RSmart room can not get reorganized");
+		}
+		EntityManager em = getEntityManager();
+		boolean changed  = false;
+		List<Integer> coordinates;
+		int availablePlaces  = room.getPlaces() * room.getRows();
+		int workstationCount = room.getDevices().size();
+		while( workstationCount > availablePlaces ) {
+			room.setPlaces(room.getPlaces()+1);
+			room.setRows(room.getRows()+1);
+			availablePlaces  = room.getPlaces() * room.getRows();
+			changed = true;
+		}
+		if( changed ) {
+			try {
+				em.getTransaction().begin();
+				em.merge(room);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			}
+		}
+		for( Device device : room.getDevices() ) {
+			if( this.getDevicesOnMyPlace(room, device).size() > 1) {
+				coordinates = this.getNextFreePlace(room);
+				device.setRow(coordinates.get(0));
+				device.setPlace(coordinates.get(1));
+				try {
+					em.getTransaction().begin();
+					em.merge(device);
+					em.getTransaction().commit();
+				} catch (Exception e) {
+					return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+				}
+			}
+		}
+		return new OssResponse(this.getSession(),"OK", "Room was reorganized");
+	}
+	
+	public List<Device> getDevicesOnMyPlace(Room room, Device device) {
+		return this.getDevicesByCoordinates(room, device.getRow(), device.getPlace());
+	}
+	public List<Device> getDevicesByCoordinates(Room room, int row, int place) {
+		List<Device> devices = new ArrayList<Device>();
+		for(Device device: room.getDevices()) {
+			if( device.getRow() == row && device.getPlace() == place ) {
+				devices.add(device);
+			}
+		}
+		return devices;
+	}
+	
+	public List<Integer> getNextFreePlace(Room room) {
+		List<Integer> coordinates = new ArrayList<Integer>();
+		int row   = 1;
+		int place = 1;
+		while( this.getDevicesByCoordinates(room, row, place).size() > 0 ) {
+			if( place < room.getPlaces() ) {
+				place++;
+			} else {
+				place = 1;
+				row ++;
+			}
+		}
+		coordinates.add(row);
+		coordinates.add(place);
+		return coordinates;
+	}
 }

@@ -512,7 +512,7 @@ public interface EducationResource {
         );
 
 
-    /*
+        /*
             * GET groups/<groupId>/members
             */
        @GET
@@ -641,7 +641,7 @@ public interface EducationResource {
     /* Actions on logged in users and smart rooms and groups. */
     /************************************************************/
 
-     @GET
+     @POST
      @Path("users")
      @Produces(JSON_UTF8)
      @ApiOperation(value = "Gets a list of users by the userids." )
@@ -654,6 +654,24 @@ public interface EducationResource {
                      @ApiParam(hidden = true) @Auth Session session,
                      List<Long> userIds
                      );
+
+     /*
+      * GET education/users/{userId}
+      */
+     @GET
+     @Path("users/{userId}")
+     @Produces(JSON_UTF8)
+     @ApiOperation(value = "Delivers a user by id.")
+     @ApiResponses(value = {
+             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+     })
+     @RolesAllowed("education.users")
+     User getUserById(
+             @ApiParam(hidden = true) @Auth Session session,
+             @PathParam("userId") Long userId
+     );
+
     /*
      * DELETE education/users/{userId}/{deviceId}
      */
@@ -740,12 +758,40 @@ public interface EducationResource {
                     );
 
 
-    /************************************************************/
-    /* Actions on logged in users and smart rooms and groups. */
-    /************************************************************/
+    /****************************/
+    /* Actions on devices       */
+    /****************************/
      /*
-     * GET education/devices/{deviceId}/actions
+     * POST education/devices
      */
+    @POST
+    @Path("devices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers a list of available actions for a device.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<Device> getDevicesById(
+            @ApiParam(hidden = true) @Auth Session session,
+            List<Long> deviceIds
+    );
+
+    @GET
+    @Path("devices/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers a device by id.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    Device getDeviceById(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") Long deviceId
+    );
+
     @GET
     @Path("devices/{deviceId}/actions")
     @Produces(JSON_UTF8)
