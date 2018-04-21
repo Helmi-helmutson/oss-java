@@ -12,11 +12,13 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.File;
-
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.UserPrincipalLookupService;
+import java.nio.file.attribute.UserPrincipal;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -963,6 +965,14 @@ public class SoftwareController extends Controller {
 		List<String>   topSls       = new ArrayList<String>();
 		Path SALT_TOP_TEMPL         = Paths.get("/usr/share/oss/templates/top.sls");
 		String registerPassword     = this.getProperty("de.openschoolserver.dao.User.Register.Password");
+		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
+		UserPrincipal saltPrincipial = null;
+		try {
+			saltPrincipial = lookupService.lookupPrincipalByName("salt");
+		} catch (IOException e) {
+			logger.error(e.getMessage());
+			return new OssResponse(session,"ERROR","Can not get salt's user principal.");
+		}
 		if( Files.exists(SALT_TOP_TEMPL) ) {
 			try {
 				topSls = Files.readAllLines(SALT_TOP_TEMPL);
@@ -1199,6 +1209,7 @@ public class SoftwareController extends Controller {
 				try {
 					Files.write(SALT_DEV, deviceSls);
 					Files.setPosixFilePermissions(SALT_DEV, groupReadDirPermission);
+					Files.setOwner(SALT_DEV, saltPrincipial);
 				} catch( IOException e ) { 
 					logger.error(e.getMessage());
 				}
