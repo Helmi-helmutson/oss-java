@@ -412,7 +412,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("room.manage")
+    @RolesAllowed("room.search")
     List<Device> getDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
@@ -544,7 +544,7 @@ public interface RoomResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @RolesAllowed("room.manage")
+    @RolesAllowed("room.search")
     List<Device> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId

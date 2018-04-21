@@ -149,7 +149,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("hwconf.manage")
+	@RolesAllowed("hwconf.search")
 	List<HWConf> getAllHWConf(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
