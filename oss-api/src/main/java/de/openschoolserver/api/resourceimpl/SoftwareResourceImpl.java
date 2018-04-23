@@ -251,7 +251,15 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public List<SoftwareStatus> getSoftwareStatusOnDevice(Session session, Long deviceId, Long softwareId) {
+		if( softwareId == null) {
+			return this.getAllSoftwareStatusOnDevice(session, deviceId);
+		}
 		return new SoftwareController(session).getSoftwareStatusOnDeviceById(deviceId, softwareId);
+	}
+
+	@Override
+	public List<SoftwareStatus> getAllSoftwareStatusOnDevice(Session session, Long deviceId) {
+		return new SoftwareController(session).getAllSoftwareStatusOnDeviceById(deviceId);
 	}
 
 	@Override
