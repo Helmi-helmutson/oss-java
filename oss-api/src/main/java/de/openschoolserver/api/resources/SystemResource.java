@@ -7,8 +7,11 @@ import io.dropwizard.auth.Auth;
 import io.swagger.annotations.*;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -27,7 +30,20 @@ import de.openschoolserver.dao.Translation;
 @Path("system")
 @Api(value = "system")
 public interface SystemResource {
-    
+
+    @GET
+    @Path("name")
+    @Produces(TEXT)
+    @ApiOperation(value = "Gets the name of the institute.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 401, message = "No regcode was found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    String validateRegcode(
+            @Context UriInfo ui,
+            @Context HttpServletRequest req
+    );
+
     @GET
     @Path("status")
     @Produces(JSON_UTF8)
@@ -35,25 +51,25 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-	@RolesAllowed("system.status")
+    @RolesAllowed("system.status")
     List<Map<String, String>> getStatus(
-		@ApiParam(hidden = true) @Auth Session session
-		);
-    
+        @ApiParam(hidden = true) @Auth Session session
+        );
+
     //Customize the lookout of the start side
-	@POST
-	@Path("customize")
-	@Produces(JSON_UTF8)
-	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	@ApiOperation(value = "Upload picture for oss logon site.")
-	@ApiResponses(value = {
-			@ApiResponse(code = 500, message = "Server broken, please contact administrator") }
-	)
-	@RolesAllowed("system.customize")
+    @POST
+    @Path("customize")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation(value = "Upload picture for oss logon site.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator") }
+    )
+    @RolesAllowed("system.customize")
     OssResponse customize(@ApiParam(hidden = true) @Auth Session session,
-			@FormDataParam("file") final InputStream fileInputStream,
-			@FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
-	);
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+    );
     //Handling of enumerates
 
     @GET
@@ -65,7 +81,7 @@ public interface SystemResource {
     })
     @PermitAll
     List<String> getEnumerates(
-		@ApiParam(hidden = true) @Auth Session session,
+        @ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type
     );
 
@@ -78,7 +94,7 @@ public interface SystemResource {
     })
     @RolesAllowed("system.enumerates")
     OssResponse addEnumerate(
-		@ApiParam(hidden = true) @Auth Session session,
+        @ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
             @PathParam("value") String value
     );
@@ -92,13 +108,13 @@ public interface SystemResource {
     })
     @RolesAllowed("system.enumerates")
     OssResponse deleteEnumerate(
-		@ApiParam(hidden = true) @Auth Session session,
+        @ApiParam(hidden = true) @Auth Session session,
             @PathParam("type") String type,
             @PathParam("value") String value
     );
-    
+
     // Global Configuration
-    
+
     @GET
     @Path("configuration")
     @Produces(JSON_UTF8)
@@ -108,8 +124,8 @@ public interface SystemResource {
     })
     @RolesAllowed("system.configuration")
     List<Map<String, String>>  getConfig(
-		@ApiParam(hidden = true) @Auth Session session
-		);
+        @ApiParam(hidden = true) @Auth Session session
+        );
 
     @GET
     @Path("configuration/{key}")
@@ -120,9 +136,9 @@ public interface SystemResource {
     })
     @RolesAllowed("system.configuration.read")
     String getConfig(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("key") String key
-		);
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("key") String key
+        );
 
     @PUT
     @Path("configuration/{key}/{value}")
@@ -133,11 +149,11 @@ public interface SystemResource {
     })
     @RolesAllowed("system.configuration")
     OssResponse setConfig(
-		@ApiParam(hidden = true) @Auth Session session,
+        @ApiParam(hidden = true) @Auth Session session,
             @PathParam("key") String key,
             @PathParam("value") String value
     );
-    
+
     // Firewall configuration
     @GET
     @Path("firewall/incomingRules")
@@ -148,8 +164,8 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     Map<String, String>  getFirewallIncomingRules(
-		@ApiParam(hidden = true) @Auth Session session
-		);
+        @ApiParam(hidden = true) @Auth Session session
+        );
 
     @POST
     @Path("firewall/incomingRules")
@@ -160,9 +176,9 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     OssResponse  setFirewallIncomingRules(
-		@ApiParam(hidden = true) @Auth Session session,
-		Map<String, String> incomingRules
-		);
+        @ApiParam(hidden = true) @Auth Session session,
+        Map<String, String> incomingRules
+        );
 
     @GET
     @Path("firewall/outgoingRules")
@@ -173,8 +189,8 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     List<Map<String, String>>  getFirewallOutgoingRules(
-		@ApiParam(hidden = true) @Auth Session session
-		);
+        @ApiParam(hidden = true) @Auth Session session
+        );
 
     @POST
     @Path("firewall/outgoingRules")
@@ -185,9 +201,9 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     OssResponse  setFirewallOutgoingRules(
-		@ApiParam(hidden = true) @Auth Session session,
-		List<Map<String, String>> incomingRules
-		);
+        @ApiParam(hidden = true) @Auth Session session,
+        List<Map<String, String>> incomingRules
+        );
 
     @GET
     @Path("firewall/remoteAccessRules")
@@ -198,8 +214,8 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     List<Map<String, String>>  getFirewallRemoteAccessRules(
-		@ApiParam(hidden = true) @Auth Session session
-		);
+        @ApiParam(hidden = true) @Auth Session session
+        );
 
     @POST
     @Path("firewall/remoteAccessRules")
@@ -210,10 +226,10 @@ public interface SystemResource {
     })
     @RolesAllowed("system.firewall")
     OssResponse  setFirewallRemoteAccessRules(
-		@ApiParam(hidden = true) @Auth Session session,
-		List<Map<String, String>> incomingRules
-		);
-    
+        @ApiParam(hidden = true) @Auth Session session,
+        List<Map<String, String>> incomingRules
+        );
+
     /*
      * Translations stuff
      */
@@ -226,10 +242,10 @@ public interface SystemResource {
     })
     @PermitAll
     String translate(
-		@ApiParam(hidden = true) @Auth Session session,
-		Translation translation
+        @ApiParam(hidden = true) @Auth Session session,
+        Translation translation
     );
-    
+
     @POST
     @Path("translations")
     @Produces(JSON_UTF8)
@@ -239,10 +255,10 @@ public interface SystemResource {
     })
     @RolesAllowed("sysadmins.translation")
     OssResponse addTranslation(
-		@ApiParam(hidden = true) @Auth Session session,
-		Translation	translation
+        @ApiParam(hidden = true) @Auth Session session,
+        Translation    translation
     );
-    
+
     @GET
     @Path("missedTranslations/{lang}")
     @Produces(JSON_UTF8)
@@ -252,10 +268,10 @@ public interface SystemResource {
     })
     @RolesAllowed("sysadmins.translation")
     List<Translation> getMissedTranslations(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("lang") String lang
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("lang") String lang
     );
-    
+
     /*
      * Registration
      */
@@ -268,9 +284,9 @@ public interface SystemResource {
     })
     @RolesAllowed("system.register")
     OssResponse register(
-		@ApiParam(hidden = true) @Auth Session session
+        @ApiParam(hidden = true) @Auth Session session
     );
-    
+
     /*
      * Package handling
      */
@@ -281,10 +297,10 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.packages")
     List<Map<String,String>> searchPackages(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("filter") String filter
-		);
-    
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("filter") String filter
+        );
+
     @POST
     @Path("packages")
     @Produces(JSON_UTF8)
@@ -292,9 +308,9 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.packages")
     OssResponse installPackages(
-		@ApiParam(hidden = true) @Auth Session session,
-		List<String> packages
-		);
+        @ApiParam(hidden = true) @Auth Session session,
+        List<String> packages
+        );
 
     @POST
     @Path("packages/update")
@@ -303,9 +319,9 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.packages")
     OssResponse updatePackages(
-		@ApiParam(hidden = true) @Auth Session session,
-		List<String> packages
-		);
+        @ApiParam(hidden = true) @Auth Session session,
+        List<String> packages
+        );
 
 
     @PUT
@@ -315,9 +331,9 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.update")
     OssResponse updateSyste(
-		@ApiParam(hidden = true) @Auth Session session
-		);
-    
+        @ApiParam(hidden = true) @Auth Session session
+        );
+
     /*
      * Proxy default handling
      */
@@ -328,10 +344,10 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
     List<ProxyRule> getProxyDefault(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("role") String role
-		);
-    
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("role") String role
+        );
+
     @POST
     @Path("proxy/default/{role}")
     @Produces(JSON_UTF8)
@@ -339,10 +355,10 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
     OssResponse setProxyDefault(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("role") String role,
-		List<ProxyRule> acl
-		);
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("role") String role,
+        List<ProxyRule> acl
+        );
 
     @GET
     @Path("proxy/custom/{list}")
@@ -351,10 +367,10 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
     String getTheCustomList(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("list") String list
-		);
-    
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("list") String list
+        );
+
     @POST
     @Path("proxy/custom/{list}")
     @Produces(JSON_UTF8)
@@ -363,11 +379,11 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
     OssResponse setTheCustomList(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("list")        String list,
-		@FormDataParam("domains") String domains
-		);
-    
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("list")        String list,
+        @FormDataParam("domains") String domains
+        );
+
     @GET
     @Path("proxy/customList/{list}")
     @Produces(JSON_UTF8)
@@ -375,10 +391,10 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
     List<String> getTheCustomListAsList(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("list") String list
-		);
-    
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("list") String list
+        );
+
     @POST
     @Path("proxy/customListerm/{list}}")
     @Produces(JSON_UTF8)
@@ -386,10 +402,10 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
     OssResponse setTheCustomListAsList(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("list")        String list,
-		List<String>			  domains
-		);
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("list")        String list,
+        List<String>              domains
+        );
 
     /*
      * Job management
@@ -401,8 +417,8 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.jobs")
     OssResponse createJob(
-		@ApiParam(hidden = true) @Auth Session session,
-		Job job
+        @ApiParam(hidden = true) @Auth Session session,
+        Job job
     );
 
     @POST
@@ -412,10 +428,10 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.jobs")
     List<Job> searchJob(
-		@ApiParam(hidden = true) @Auth Session session,
-		Job job
+        @ApiParam(hidden = true) @Auth Session session,
+        Job job
     );
-    
+
     @GET
     @Path("jobs/{jobId}")
     @Produces(JSON_UTF8)
@@ -423,8 +439,8 @@ public interface SystemResource {
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.jobs")
     Job getJob(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("jobId") Long jobId
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("jobId") Long jobId
     );
 
     @PUT
@@ -432,13 +448,13 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Set the exit value of a job.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.jobs")
     OssResponse setJobExitValue(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("jobId") Long jobId,
-		@PathParam("exitValue") Integer exitValue
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("jobId") Long jobId,
+        @PathParam("exitValue") Integer exitValue
     );
 
     @PUT
@@ -446,12 +462,12 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Set the exit value of a job.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.jobs")
     OssResponse restartJob(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("jobId") Long jobId
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("jobId") Long jobId
     );
 
     /*
@@ -462,11 +478,11 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get all existing acls.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.acls")
     List<Acl> getAcls(
-		@ApiParam(hidden = true) @Auth Session session
+        @ApiParam(hidden = true) @Auth Session session
     );
 
     @GET
@@ -474,12 +490,12 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the acls of a group.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.acls")
     List<Acl> getAclsOfGroup(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("groupId") Long groupId
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("groupId") Long groupId
     );
 
     @GET
@@ -487,12 +503,12 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the available acls for a group.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.acls")
     List<Acl> getAvailableAclsForGroup(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("groupId") Long groupId
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("groupId") Long groupId
     );
 
     @POST
@@ -500,13 +516,13 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Set an ACL of a group. This can be an existing or a new acl.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.acls")
     OssResponse setAclOfGroup(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("groupId") Long groupId,
-		Acl acl
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("groupId") Long groupId,
+        Acl acl
     );
 
     @GET
@@ -514,12 +530,12 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the available acls for a user.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.acls")
     List<Acl> getAvailableAclsForUser(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("userId") Long userId
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("userId") Long userId
     );
 
     @GET
@@ -527,12 +543,12 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get the acls of a user.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.acls")
     List<Acl> getAclsOfUser(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("userId") Long userId
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("userId") Long userId
     );
 
     @POST
@@ -540,13 +556,13 @@ public interface SystemResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Set an ACL of a user. This can be an existing or a new acl.")
     @ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("system.acls")
     OssResponse setAclOfUser(
-		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("userId") Long userId,
-		Acl acl
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("userId") Long userId,
+        Acl acl
     );
 
 }

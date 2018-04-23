@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.UriInfo;
+
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.SystemResource;
@@ -23,6 +26,7 @@ import de.openschoolserver.dao.Translation;
 import de.openschoolserver.dao.controller.SystemController;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import de.openschoolserver.dao.controller.ProxyController;
+import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.controller.Controller;
 import de.openschoolserver.dao.controller.JobController;
 
@@ -283,6 +287,12 @@ public class SystemResourceImpl implements SystemResource {
 	@Override
 	public List<Acl> getAvailableAclsForUser(Session session, Long userId) {
 		return new SystemController(session).getAvailableAclsForUser(userId);
+	}
+
+	@Override
+	public String validateRegcode(UriInfo ui, HttpServletRequest req) {
+		Session session  = new SessionController().getLocalhostSession();
+		return new SystemController(session).getConfigValue("NAME");
 	}
 
 
