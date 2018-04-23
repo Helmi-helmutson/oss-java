@@ -1458,11 +1458,31 @@ public class SoftwareController extends Controller {
 		for( SoftwareStatus st : device.getSoftwareStatus() ) {
 			st.setSoftwareName(st.getSoftwareVersion().getSoftware().getName());
 			st.setDeviceName(device.getName());
+			logger.debug("SoftwareStatus" + st);
+			logger.debug("SoftwareVersion" + st.getSoftwareVersion());
+			logger.debug("SoftwareVersion" + st.getSoftwareVersion().getSoftware());
 			if( softwareId < 1 || st.getSoftwareVersion().getSoftware().getId() == softwareId ) {
 				st.setVersion(st.getSoftwareVersion().getVersion());
 				st.setManually(st.getSoftwareVersion().getSoftware().getManually());
 				softwareStatus.add(st);
 			}
+		}
+		return softwareStatus;
+	}
+	public List<SoftwareStatus> getAllSoftwareStatusOnDeviceById(Long deviceId) {
+		return getAllSoftwareStatusOnDevice(new DeviceController(this.session).getById(deviceId));
+	}
+	public List<SoftwareStatus> getAllSoftwareStatusOnDevice(Device device) {
+		List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
+		for( SoftwareStatus st : device.getSoftwareStatus() ) {
+			st.setSoftwareName(st.getSoftwareVersion().getSoftware().getName());
+			st.setDeviceName(device.getName());
+			logger.debug("SoftwareStatus" + st);
+			logger.debug("SoftwareVersion" + st.getSoftwareVersion());
+			logger.debug("SoftwareVersion" + st.getSoftwareVersion().getSoftware());
+			st.setVersion(st.getSoftwareVersion().getVersion());
+			st.setManually(st.getSoftwareVersion().getSoftware().getManually());
+			softwareStatus.add(st);
 		}
 		return softwareStatus;
 	}

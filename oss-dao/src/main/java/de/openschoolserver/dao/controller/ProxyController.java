@@ -263,7 +263,7 @@ public class ProxyController extends Controller {
 			acls.append(room.getName()).append(":").append(positiveList.getName()).append(":true\n");
 		}
 		acls.append(room.getName()).append(":all:false\n");
-		program  = new String[3];
+		program  = new String[2];
 		program[0] = "/usr/share/oss/tools/squidGuard.pl";
 		program[1] = "write";
 		OSSShellTools.exec(program, reply, error, acls.toString());

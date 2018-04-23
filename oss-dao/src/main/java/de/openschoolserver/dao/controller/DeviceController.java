@@ -787,13 +787,13 @@ public class DeviceController extends Controller {
 			program[1] = device.getIp();
 			program[2] = "enableScreen";
 			break;
-		case "closeKeyboard":
+		case "lockInput":
 			program = new String[3];
 			program[0] = "/usr/sbin/oss_control_client.sh";
 			program[1] = device.getIp();
 			program[2] = "lockKeyboard";
 			break;
-		case "openKeyboard":
+		case "unlockInput":
 			program = new String[3];
 			program[0] = "/usr/sbin/oss_control_client.sh";
 			program[1] = device.getIp();
