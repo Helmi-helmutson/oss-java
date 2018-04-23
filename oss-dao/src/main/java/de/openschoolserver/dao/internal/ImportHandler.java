@@ -197,17 +197,11 @@ public class ImportHandler {
 		return "";
 	}
 
-	private String extractPW(String value) {
-		if (value != null) {
-			int inx = value.indexOf("password: '");
-			if (inx >= 0) {
-				int inx2 = value.indexOf("'", inx + 11);
-				if (inx2 > inx) {
-					return value.substring(inx + 11, inx2);
-				}
-			}
+	private String extractPW(OssResponse res) {
+		if (res.getParameters()!=null && res.getParameters().size()>=4) {
+			return res.getParameters().get(3);
 		}
-		return value;
+		return "";
 	}
 
 	private void appendUserAddLog(Importer i, ImportOrder o, OssResponse res, User newUser, boolean create) {
@@ -219,7 +213,7 @@ public class ImportHandler {
 			String classes = getCSVClasses(newUser);
 			buf.append(newUser.getUid()).append(CSVSEP).append(normalizeValue(newUser.getGivenName())).append(CSVSEP)
 					.append(normalizeValue(newUser.getSurName())).append(CSVSEP).append(birthday).append(CSVSEP)
-					.append(normalizeValue(classes)).append(CSVSEP).append(res != null ? extractPW(res.getValue()) : "")
+					.append(normalizeValue(classes)).append(CSVSEP).append(res != null ? extractPW(res) : "")
 					.append(LINESEP);
 			useraddLogfile.write(buf.toString().getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
