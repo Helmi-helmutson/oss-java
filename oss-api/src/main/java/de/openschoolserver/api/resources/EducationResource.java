@@ -256,6 +256,23 @@ public interface EducationResource {
             );
 
     /*
+     * GET education/rooms/{roomId}/users
+     * Delivers the list of the member users of a smart room
+     */
+    @GET
+    @Path("rooms/{roomId}/users/available")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the user members in a smart room" )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<User>  getAvailableUserMember(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") Long roomId
+            );
+
+    /*
      * GET education/rooms/{roomId}/groups
      */
     @GET
@@ -272,6 +289,22 @@ public interface EducationResource {
             );
 
     /*
+     * GET education/rooms/{roomId}/groups/available
+     */
+    @GET
+    @Path("rooms/{roomId}/groups/available")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the group members in a smart room" )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<Group>  getAvailableGroupMember(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") Long roomId
+            );
+    
+    /*
      * GET education/rooms/{roomId}/devices
      */
     @GET
@@ -283,6 +316,22 @@ public interface EducationResource {
     })
     @RolesAllowed("education.rooms")
     List<Device>  getDeviceMember(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") Long roomId
+            );
+
+    /*
+     * GET education/rooms/{roomId}/devices/available
+     */
+    @GET
+    @Path("rooms/{roomId}/devices/available")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the device members in a smart room" )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    List<Device>  getAvailableDeviceMember(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId
             );
@@ -363,7 +412,7 @@ public interface EducationResource {
     @PUT
     @Path("rooms/{roomId}/{action}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Manage a room. Valid actions are download, open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, .")
+    @ApiOperation(value = "Manage a room. Valid actions are download, open, close, reboot, shutdown, wol, logout, lockInput, unlockInput, .")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")

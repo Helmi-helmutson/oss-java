@@ -479,5 +479,41 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return new DeviceController(session).getById(deviceId);
 	}
 
+	@Override
+	public List<User> getAvailableUserMember(Session session, Long roomId) {
+		List<User> members = this.getUserMember(session, roomId);
+		List<User> availableMembers = new ArrayList<User>();
+		for( User user : new UserController(session).getAll() ) {
+			if(!members.contains(user)) {
+				availableMembers.add(user);
+			}
+		}
+		return availableMembers;
+	}
+
+	@Override
+	public List<Group> getAvailableGroupMember(Session session, Long roomId) {
+		List<Group> members = this.getGroupMember(session, roomId);
+		List<Group> availableMembers = new ArrayList<Group>();
+		for( Group group : new GroupController(session).getAll() ) {
+			if( !members.contains(group)) {
+				availableMembers.add(group);
+			}
+		}
+		return availableMembers;
+	}
+
+	@Override
+	public List<Device> getAvailableDeviceMember(Session session, Long roomId) {
+		List<Device> members = this.getDeviceMember(session, roomId);
+		List<Device> availableMembers = new ArrayList<Device>();
+		for( Device device : new DeviceController(session).getAll() ) {
+			if( !members.contains(device)) {
+				availableMembers.add(device);
+			}
+		}
+		return availableMembers;
+	}
+
 
 }
