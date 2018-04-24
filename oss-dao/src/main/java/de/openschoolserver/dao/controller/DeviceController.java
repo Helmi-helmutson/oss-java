@@ -638,7 +638,9 @@ public class DeviceController extends Controller {
 	}
 
 	public OssResponse modify(Device device) {
+		logger.debug("modify new device: " + device);
 		Device oldDevice = this.getById(device.getId());
+		logger.debug("modify old device: " + oldDevice);
 		List<String> error = new ArrayList<String>();
 		parameters = new ArrayList<String>();
 		/*
@@ -705,7 +707,7 @@ public class DeviceController extends Controller {
 			oldDevice.setMac(device.getMac());
 			oldDevice.setWlanMac(device.getWlanMac());
 			oldDevice.setPlace(device.getPlace());
-			oldDevice.setRow(device.getPlace());
+			oldDevice.setRow(device.getRow());
 			oldDevice.setHwconf(hwconf);
 			em.getTransaction().begin();
 			em.merge(oldDevice);
@@ -877,5 +879,18 @@ public class DeviceController extends Controller {
 			em.getTransaction().commit();
 		}
 		return ossResponse;
+	}
+
+	public List<Device> getDevicesOnMyPlace(Device device) {
+		List<Device> devices = new ArrayList<Device>();
+		for(Device dev: device.getRoom().getDevices()) {
+			if( dev.getId() == device.getId() ) {
+				continue;
+			}
+			if( device.getRow() == dev.getRow() && device.getPlace() == dev.getPlace() ) {
+				devices.add(device);
+			}
+		}
+		return devices;
 	}
 }

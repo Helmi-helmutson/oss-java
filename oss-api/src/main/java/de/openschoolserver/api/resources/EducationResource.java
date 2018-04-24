@@ -827,6 +827,24 @@ public interface EducationResource {
             List<Long> deviceIds
     );
 
+    /*
+     * POST education/devices/{deviceId}
+     */
+    @POST
+    @Path("devices/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Updates a device. Only row and place can be changed here.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    OssResponse modifyDevice(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") Long deviceId,
+            Device device
+    );
+
     @GET
     @Path("devices/{deviceId}")
     @Produces(JSON_UTF8)

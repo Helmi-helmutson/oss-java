@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
-import static de.openschoolserver.dao.internal.OSSConstatns.*;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -769,26 +769,26 @@ public class SoftwareController extends Controller {
 		}
 	}
 
+	public List<SoftwareStatus> getSoftwareStatusListFromDevice(Device d, Software s,  String version) {
+		List<SoftwareStatus> lss = new ArrayList<SoftwareStatus>();
+		for( SoftwareStatus ss : d.getSoftwareStatus() ) {
+			if( ss.getSoftwareVersion().getSoftware().equals(s) ) {
+				if( version.isEmpty() || ss.getSoftwareVersion().getVersion().equals(version) ) {
+					lss.add(ss);
+				}
+			}
+		}
+		return lss;
+	}
+
 	/*
 	 * Modify the software status on a device. If there is no status nothing will be happenend.
 	 */
 	public void modifySoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
 		EntityManager em = getEntityManager();
-		Query query;
-		if( version.isEmpty() ) {
-			query = em.createNamedQuery("SoftwareStatus.get")
-					.setParameter("SOFTWARE", s.getId())
-					.setParameter("DEVICE", d.getId());
-		} else {
-			query = em.createNamedQuery("SoftwareStatus.get")
-					.setParameter("SOFTWARE", s.getId())
-					.setParameter("DEVICE", d.getId())
-					.setParameter("VERSION", version);
-		}
-		List<SoftwareStatus> lss = query.getResultList();
 		try {
 			em.getTransaction().begin();
-			for( SoftwareStatus ss : lss ) {
+			for( SoftwareStatus ss : this.getSoftwareStatusListFromDevice(d, s, version) ) {
 					ss.setStatus(status);
 					em.merge(ss);
 			}
@@ -805,21 +805,9 @@ public class SoftwareController extends Controller {
 	 */
 	public void removeSoftwareStatusOnDevice(Device d, Software s,  String version) {
 		EntityManager em = getEntityManager();
-		Query query;
-		if( version.isEmpty() ) {
-			query = em.createNamedQuery("SoftwareStatus.get")
-					.setParameter("SOFTWARE", s.getId())
-					.setParameter("DEVICE", d.getId());
-		} else {
-			query = em.createNamedQuery("SoftwareStatus.get")
-					.setParameter("SOFTWARE", s.getId())
-					.setParameter("DEVICE", d.getId())
-					.setParameter("VERSION", version);
-		}
-		List<SoftwareStatus> lss = query.getResultList();
 		try {
 			em.getTransaction().begin();
-			for( SoftwareStatus ss : lss ) {
+			for( SoftwareStatus ss : this.getSoftwareStatusListFromDevice(d, s, version) ) {
 					em.remove(ss);
 			}
 			em.getTransaction().commit();
@@ -834,20 +822,7 @@ public class SoftwareController extends Controller {
 	 * Reads the software status to a given version of a software on a device.
 	 */
 	public String getSoftwareStatusOnDevice(Device d, Software s,  String version) {
-		EntityManager em = getEntityManager();
-		Query query;
-		if( version.isEmpty() ) {
-			query = em.createNamedQuery("SoftwareStatus.get")
-					.setParameter("SOFTWARE", s.getId())
-					.setParameter("DEVICE", d.getId());
-		} else {
-			query = em.createNamedQuery("SoftwareStatus.get")
-					.setParameter("SOFTWARE", s.getId())
-					.setParameter("DEVICE", d.getId())
-					.setParameter("VERSION", version);
-		}
-		List<SoftwareStatus> lss = query.getResultList();
-		em.close();
+		List<SoftwareStatus> lss = this.getSoftwareStatusListFromDevice(d, s, version);
 		if( lss.isEmpty() ) {
 			return "";
 		}
@@ -908,12 +883,7 @@ public class SoftwareController extends Controller {
 	 * Checks if there is a software status to a given version of a software on a device.
 	 */
 	public boolean getSoftwareVersionOnDevice(Device d, Software s) {
-		//TODO Does not works.
-		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("SoftwareStatus.getForOne")
-					.setParameter("SOFTWARE", s.getId())
-					.setParameter("DEVICE", d.getId());
-		return ! query.getResultList().isEmpty();
+		return !this.getSoftwareStatusListFromDevice(d, s, "").isEmpty();
 	}
 
 	/*

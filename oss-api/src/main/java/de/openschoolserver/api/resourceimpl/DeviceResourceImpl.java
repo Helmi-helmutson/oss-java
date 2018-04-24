@@ -153,8 +153,7 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public OssResponse modify(Session session, Device device) {
-		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.modify(device);
+		return new DeviceController(session).modify(device);
 	}
 
 	@Override
