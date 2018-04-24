@@ -20,7 +20,8 @@ import java.util.List;
 @NamedQueries({
 	@NamedQuery(name="Software.findAll",   query="SELECT s FROM Software s"),
 	@NamedQuery(name="Software.findAllId", query="SELECT s.id FROM Software s"),
-	@NamedQuery(name="Software.getByName", query="SELECT s FROM Software s WHERE s.name = :name")
+	@NamedQuery(name="Software.getByName", query="SELECT s FROM Software s WHERE s.name = :name"),
+	@NamedQuery(name="Software.getByNameOrDescription", query="SELECT s FROM Software s WHERE s.name = :name OR s.description = :desc")
 })
 public class Software implements Serializable {
 	private static final long serialVersionUID = 1L;

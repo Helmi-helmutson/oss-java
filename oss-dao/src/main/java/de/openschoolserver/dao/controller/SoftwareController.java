@@ -237,13 +237,24 @@ public class SoftwareController extends Controller {
 
 	public Software getByName(String name) {
 		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("Software.getByName").setParameter("name", name);
+		Query query = em.createNamedQuery("Software.getByName")
+				.setParameter("name", name);
 		if( query.getResultList().isEmpty() ) {
 			return null;
 		}
 		return (Software) query.getResultList().get(0);
 	}
 	
+	public Software getByNameOrDescription(String name) {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Software.getByNameOrDescription")
+				.setParameter("name", name)
+				.setParameter("desc", name);
+		if( query.getResultList().isEmpty() ) {
+			return null;
+		}
+		return (Software) query.getResultList().get(0);
+	}
 	public List<SoftwareVersion> getAllVersion() {
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("SoftwareVersion.findAll");
@@ -1213,7 +1224,7 @@ public class SoftwareController extends Controller {
 	 */
 	public OssResponse setSoftwareStatusOnDevice(Device device, String softwareName, String version, String status) {
 		SoftwareStatus  softwareStatus  = null;
-		Software        software        = this.getByName(softwareName);
+		Software        software        = this.getByNameOrDescription(softwareName);
 		SoftwareVersion softwareVersion = null;
 		EntityManager em = getEntityManager();
 		logger.debug("setSoftwareStatusOnDevice called: " + softwareName + " ## " + version +" ## " + status);
@@ -1338,14 +1349,12 @@ public class SoftwareController extends Controller {
 	}
 
 	public OssResponse setSoftwareStatusOnDeviceById(Long deviceId, String softwareName, String version, String status) {
-		DeviceController deviceController = new DeviceController(this.session);
-		Device          device          =  deviceController.getById(deviceId);
+		Device device = new DeviceController(this.session).getById(deviceId);
 		return this.setSoftwareStatusOnDevice(device, softwareName, version, status);
 	}
 	
 	public OssResponse setSoftwareStatusOnDeviceByName(String deviceName, String softwareName, String version, String status) {
-		DeviceController deviceController = new DeviceController(this.session);
-		Device          device            =  deviceController.getByName(deviceName);
+		Device device =  new DeviceController(this.session).getByName(deviceName);
 		return this.setSoftwareStatusOnDevice(device, softwareName, version, status);
 	}
 
