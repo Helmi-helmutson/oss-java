@@ -8,6 +8,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -515,5 +517,25 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		return availableMembers;
 	}
 
-
+	@Override
+	public OssResponse modifyDevice(Session session, Long deviceId, Device device) {
+		DeviceController deviceConrtoller = new DeviceController(session);
+		Device oldDevice = deviceConrtoller.getById(deviceId);
+		oldDevice.setRow(device.getRow());
+		oldDevice.setPlace(device.getPlace());
+		if( deviceConrtoller.getDevicesOnMyPlace(device).size() > 0 ) {
+			return new OssResponse(session,"ERROR","Place is already occupied.");
+		}
+		EntityManager em = deviceConrtoller.getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.merge(oldDevice);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(session,"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(session,"OK","Device was repositioned.");
+	}
 }
