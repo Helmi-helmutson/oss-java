@@ -663,27 +663,32 @@ public class SystemController extends Controller {
 	}
 
 	public List<Acl> getAclsOfUser(Long userId) {
-		User user = new UserController(session).getById(userId);
-		List<Acl> acls = new ArrayList<Acl>();
+		User         user     = new UserController(session).getById(userId);
+		List<Acl>    acls     = user.getAcls();
+		List<String> aclNames = new ArrayList<String>();
+		for( Acl acl : user.getAcls() ){
+			aclNames.add(acl.getAcl());
+		}
 		for( Group group : user.getGroups() ) {
 			for( Acl acl : group.getAcls() ) {
-				acls.add(acl);
-			}
-		}
-		for( Acl acl : user.getAcls() ){
-			boolean identicalByGroup = false;
-			for( Acl groupAcl : acls ) {
-				if( groupAcl.getAcl().equals(acl.getAcl()) &&
-						groupAcl.getAllowed() == acl.getAllowed() ) {
-					identicalByGroup = true;
-					break;
+				if( !aclNames.contains(acl.getAcl())) {
+					acls.add(acl);
 				}
-			}
-			if( ! identicalByGroup ) {
-				acls.add(acl);
 			}
 		}
 		return acls;
+	}
+
+	public boolean hasUsersGroupAcl(User user, Acl acl ) {
+		for( Group group : user.getGroups() ) {
+			for( Acl groupAcl : group.getAcls() ) {
+				if( acl.getAcl().equals(groupAcl.getAcl()) &&
+					( acl.getAllowed() == groupAcl.getAllowed() ) ) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	public List<Acl> getAvailableAclsForUser(Long userId) {
@@ -705,28 +710,35 @@ public class SystemController extends Controller {
 	}
 
 	public OssResponse setAclToUser(Long userId, Acl acl) {
-		User user = new UserController(session).getById(userId);
+		User user   = new UserController(session).getById(userId);
+		Acl oldAcl  = null;
 		EntityManager em = getEntityManager();
 		logger.debug("User acl to set: " + acl);
 		try {
+			oldAcl = em.find(Acl.class, acl.getId());
+		} catch(Exception e) {
+			oldAcl = null;
+		}
+		try {
 			em.getTransaction().begin();
-			Acl oldAcl = this.getAclById(acl.getId());
 			if( oldAcl != null && oldAcl.getUser() != null && oldAcl.getUser().equals(user) ) {
-				if( acl.getAllowed() ) {
-					oldAcl.setAllowed(true);
-					em.merge(oldAcl);
-				} else {
+				logger.debug("User old to modify: " + oldAcl);
+				if( this.hasUsersGroupAcl(user,acl)) {
 					em.merge(oldAcl);
 					em.remove(oldAcl);
+				} else {
+					oldAcl.setAllowed(acl.getAllowed());
+					em.merge(oldAcl);
 				}
 			} else  {
+				logger.debug("This is a new acl.");
 				acl.setGroup(null);
 				acl.setUser(user);
 				acl.setCreator(this.session.getUser());
 				em.persist(acl);
 				user.addAcl(acl);
 				em.merge(user);
-				}
+			}
 			em.getTransaction().commit();
 		} catch(Exception e) {
 			logger.debug("ERROR in setAclToUser:" + e.getMessage());

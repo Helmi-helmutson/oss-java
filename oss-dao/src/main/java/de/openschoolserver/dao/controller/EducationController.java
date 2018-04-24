@@ -4,7 +4,7 @@ package de.openschoolserver.dao.controller;
 import java.io.File;
 
 
-import static de.openschoolserver.dao.internal.OSSConstatns.*;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;

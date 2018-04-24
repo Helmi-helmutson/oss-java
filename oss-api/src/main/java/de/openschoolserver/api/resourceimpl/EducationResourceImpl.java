@@ -14,7 +14,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static de.openschoolserver.dao.internal.OSSConstatns.*;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 import de.openschoolserver.api.resources.EducationResource;
 import de.openschoolserver.api.resources.Resource;
 import de.openschoolserver.dao.AccessInRoom;
@@ -523,7 +523,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		Device oldDevice = deviceConrtoller.getById(deviceId);
 		oldDevice.setRow(device.getRow());
 		oldDevice.setPlace(device.getPlace());
-		if( deviceConrtoller.getDevicesOnMyPlace(device).size() > 0 ) {
+		if( deviceConrtoller.getDevicesOnMyPlace(oldDevice).size() > 0 ) {
 			return new OssResponse(session,"ERROR","Place is already occupied.");
 		}
 		EntityManager em = deviceConrtoller.getEntityManager();

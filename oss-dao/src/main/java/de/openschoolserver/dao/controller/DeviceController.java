@@ -638,7 +638,9 @@ public class DeviceController extends Controller {
 	}
 
 	public OssResponse modify(Device device) {
+		logger.debug("modify new device: " + device);
 		Device oldDevice = this.getById(device.getId());
+		logger.debug("modify old device: " + oldDevice);
 		List<String> error = new ArrayList<String>();
 		parameters = new ArrayList<String>();
 		/*

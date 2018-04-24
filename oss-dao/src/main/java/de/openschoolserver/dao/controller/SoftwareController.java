@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
-import static de.openschoolserver.dao.internal.OSSConstatns.*;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 

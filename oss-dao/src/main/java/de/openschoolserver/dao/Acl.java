@@ -156,6 +156,4 @@ public class Acl implements Serializable {
 	public void setGroupId(Long groupId) {
 		this.groupId = groupId;
 	}
-
-	
 }
