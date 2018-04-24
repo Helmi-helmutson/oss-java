@@ -123,7 +123,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+		if( ! printer.getHwconf().getDeviceType().equals("Printer")) {
 			throw new WebApplicationException(405);
 		}
 		return deletePrinter(session, printer.getId());
@@ -135,7 +135,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+		if( ! printer.getHwconf().getDeviceType().equals("Printer")) {
 			throw new WebApplicationException(405);
 		}
 		return resetPrinter(session, printer.getName());
@@ -161,7 +161,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+		if( ! printer.getHwconf().getDeviceType().equals("Printer")) {
 			throw new WebApplicationException(405);
 		}
 		return enablePrinter(session, printer.getName());
@@ -184,7 +184,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+		if( !printer.getHwconf().getDeviceType().equals("Printer")) {
 			throw new WebApplicationException(405);
 		}
 		return disablePrinter(session, printer.getName());
@@ -207,7 +207,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+		if( !printer.getHwconf().getDeviceType().equals("Printer")) {
 			throw new WebApplicationException(405);
 		}
 		return activateWindowsDriver( session, printer.getName() );
@@ -365,7 +365,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( printer.getHwconf().getDeviceType().equals("Printer")) {
+		if( !printer.getHwconf().getDeviceType().equals("Printer")) {
 			throw new WebApplicationException(405);
 		}
 		File file = null;
