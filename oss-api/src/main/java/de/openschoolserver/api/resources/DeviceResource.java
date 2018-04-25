@@ -476,7 +476,7 @@ public interface DeviceResource {
    @PUT
    @Path("{deviceId}/actions/{action}")
    @Produces(JSON_UTF8)
-   @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, cleanUpLoggedIn.")
+   @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, unlockInput, lockInput, cleanUpLoggedIn.")
    @ApiResponses(value = {
            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -494,7 +494,7 @@ public interface DeviceResource {
    @POST
    @Path("{deviceId}/actionWithMap/{action}")
    @Produces(JSON_UTF8)
-   @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy."
+   @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout."
    		+ "This version of call allows to send a map with some parametrs:"
    		+ "graceTime : seconds to wait befor execute action."
    		+ "message : the message to shown befor/during execute the action.")

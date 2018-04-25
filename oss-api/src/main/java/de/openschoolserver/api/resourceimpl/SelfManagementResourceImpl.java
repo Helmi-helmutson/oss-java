@@ -16,7 +16,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 	}
 
 	@Override
-	public User getById(Session session) {
+	public User getBySession(Session session) {
 		return session.getUser();
 	}
 

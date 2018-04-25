@@ -24,7 +24,7 @@ public interface SelfManagementResource {
 	
 	
 	/*
-	 * GET users/<userId>
+	 * GET selfmanagement/me
 	 */
     @GET
     @Path("me")
@@ -34,7 +34,7 @@ public interface SelfManagementResource {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("myself.search")
-    User getById(
+    User getBySession(
             @ApiParam(hidden = true) @Auth Session session
     );
 
