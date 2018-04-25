@@ -45,6 +45,9 @@ public class SystemController extends Controller {
 		Query query = em.createNamedQuery("Translation.find").setParameter("lang", lang.toUpperCase()).setParameter("string", key);
 		try {
 			Translation trans = (Translation) query.getSingleResult();
+			if( trans.getValue().isEmpty() ) {
+				return key;
+			}
 			return trans.getValue();
 		}  catch (Exception e) {
 			Translation newTrans = new Translation(lang,key);
