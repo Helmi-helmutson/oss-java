@@ -130,7 +130,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse deleteHWConfFromInstalation(Session session, long installationId, long hwconfId) {
 		CategoryController categoryController = new CategoryController(session);
-		return categoryController.addMember(installationId, "HWCconf", hwconfId);
+		return categoryController.deleteMember(installationId, "HWCconf", hwconfId);
 	}
 
 	@Override
