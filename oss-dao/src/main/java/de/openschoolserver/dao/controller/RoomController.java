@@ -460,7 +460,7 @@ public class RoomController extends Controller {
 	 */
 	public void setAccessStatus(Room room, AccessInRoom access) {
 		String[] program = new String[4];
-		program[0] = "/usr/sbin/oss-set-access-state.sh";
+		program[0] = "/usr/sbin/oss_set_access_state.sh";
 		program[2] = room.getStartIP() + "/" + room.getNetMask();
 		access.setRoom(room);
 		StringBuffer reply = new StringBuffer();
@@ -548,7 +548,7 @@ public class RoomController extends Controller {
 		access.setRoomId(room.getId());
 		
 		String[] program = new String[3];
-		program[0] = "/usr/sbin/oss-get-access-state.sh";
+		program[0] = "/usr/sbin/oss_get_access_state.sh";
 		program[1] = room.getStartIP() + "/" + room.getNetMask();
 		access.setRoom(room);
 		StringBuffer reply = new StringBuffer();
