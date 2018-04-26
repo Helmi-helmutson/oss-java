@@ -13,7 +13,10 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.SoftwareResource;
 import de.openschoolserver.dao.Category;
+import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.SoftwareLicense;
@@ -21,6 +24,8 @@ import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.SoftwareVersion;
 import de.openschoolserver.dao.controller.SoftwareController;
 import de.openschoolserver.dao.controller.CategoryController;
+import de.openschoolserver.dao.controller.CloneToolController;
+import de.openschoolserver.dao.controller.RoomController;
 
 public class SoftwareResourceImpl implements SoftwareResource {
 
@@ -313,5 +318,27 @@ public class SoftwareResourceImpl implements SoftwareResource {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	@Override
+	public List<SoftwareStatus> getRoomsStatus(Session session, Long roomId) {
+		List<SoftwareStatus> ss = new ArrayList<SoftwareStatus>();
+		Room room = new RoomController(session).getById(roomId);
+		SoftwareController sc = new SoftwareController(session);
+		for( Device device : room.getDevices() ) {
+			ss.addAll(sc.getAllSoftwareStatusOnDevice(device));
+		}
+		return ss;
+	}
+
+	@Override
+	public List<SoftwareStatus> getHWConsStatus(Session session, Long hwconfId) {
+		List<SoftwareStatus> ss = new ArrayList<SoftwareStatus>();
+		SoftwareController sc = new SoftwareController(session);
+		HWConf hwconf = new CloneToolController(session).getById(hwconfId);
+		for( Device device : hwconf.getDevices() ) {
+			ss.addAll(sc.getAllSoftwareStatusOnDevice(device));
+		}
+		return ss;
 	}
 }

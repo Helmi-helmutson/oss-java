@@ -680,8 +680,11 @@ public interface SoftwareResource {
             );
 
 
-    /*
-     * GET softwares/devices/{deviceId}/{softwareName}
+    /* ##########################################
+     * Functions to get the installation status  
+     * ##########################################
+     *
+     * GET softwares/devices/{deviceId}
      */
     @GET
     @Path("devices/{deviceId}")
@@ -751,7 +754,7 @@ public interface SoftwareResource {
             );
 
     /*
-     * GET softwares/devices/{deviceId}/{softwareName}
+     * GET softwares/{softwareId}/{softwareName}
      */
     @GET
     @Path("{softwareId}/status")
@@ -783,4 +786,72 @@ public interface SoftwareResource {
             @ApiParam(value = "ID of the software",required = true) @PathParam("softwareId") Long softwareId
             );
 
+    /*
+     * GET softwares/rooms/{roomId}
+     */
+    @GET
+    @Path("rooms/{roomId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "the state of the installation status in a room.",
+              notes = "The delivered list has following format:<br>"
+                + "[ {<br>"
+                + "&nbsp;&nbsp;&nbsp;softwareName : Name of the software<br>"
+                + "&nbsp;&nbsp;&nbsp;deviceName   : Name of the device<br>"
+                + "&nbsp;&nbsp;&nbsp;softwareversionId : Id of the SoftwareVersion<br>"
+                + "&nbsp;&nbsp;&nbsp;version    : Version of the software<br>"
+                + "&nbsp;&nbsp;&nbsp;status     : Installation status of this version<br>"
+                + "&nbsp;&nbsp;&nbsp;manually   : Was the softwar installed manually<br>"
+                + "} ]<br>"
+                + "There are following installation states:<br>"
+                + "I  -> installed<br>"
+                + "IS -> installation scheduled<br>"
+                + "MD -> manuell deinstalled<br>"
+                + "DS -> deinstallation scheduled<br>"
+                + "DF -> deinstallation failed<br>"
+                + "IF -> installation failed"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No category was found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<SoftwareStatus> getRoomsStatus(
+            @ApiParam(hidden = true) @Auth Session session,
+            @ApiParam(value = "ID of the software",required = true) @PathParam("roomId") Long roomId
+            );
+
+    /*
+     * GET softwares/hwconfs/{hwconfId}
+     */
+    @GET
+    @Path("hwconfs/{hwconfId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "the state of the installation status of a hwconf.",
+              notes = "The delivered list has following format:<br>"
+                + "[ {<br>"
+                + "&nbsp;&nbsp;&nbsp;softwareName : Name of the software<br>"
+                + "&nbsp;&nbsp;&nbsp;deviceName   : Name of the device<br>"
+                + "&nbsp;&nbsp;&nbsp;softwareversionId : Id of the SoftwareVersion<br>"
+                + "&nbsp;&nbsp;&nbsp;version    : Version of the software<br>"
+                + "&nbsp;&nbsp;&nbsp;status     : Installation status of this version<br>"
+                + "&nbsp;&nbsp;&nbsp;manually   : Was the softwar installed manually<br>"
+                + "} ]<br>"
+                + "There are following installation states:<br>"
+                + "I  -> installed<br>"
+                + "IS -> installation scheduled<br>"
+                + "MD -> manuell deinstalled<br>"
+                + "DS -> deinstallation scheduled<br>"
+                + "DF -> deinstallation failed<br>"
+                + "IF -> installation failed"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No category was found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<SoftwareStatus> getHWConsStatus(
+            @ApiParam(hidden = true) @Auth Session session,
+            @ApiParam(value = "ID of the software",required = true) @PathParam("hwconfId") Long hwconfId
+            );
+
+    
+    
 }

@@ -427,7 +427,7 @@ public interface DeviceResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("device.modify")
+    @RolesAllowed("device.delete")
     OssResponse delete(
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("deviceId") long deviceId
