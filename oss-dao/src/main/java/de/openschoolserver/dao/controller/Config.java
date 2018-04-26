@@ -16,6 +16,7 @@ public class Config {
 	private String prefix = "SCHOOL_";
 	private Map<String,String>   config;
 	private Map<String,String>   configPath;
+	private Map<String,String>   configType;
 	private Map<String,Boolean>  readOnly;
 	private List<String>         configFile;
 	
@@ -33,6 +34,7 @@ public class Config {
 		config     = new HashMap<>();
 		readOnly   = new HashMap<>();
 		configPath = new HashMap<>();
+		configType = new HashMap<>();
 		try {
 			configFile = Files.readAllLines(this.OSS_CONFIG);
 		}
@@ -41,14 +43,22 @@ public class Config {
 		}
 		Boolean ro = false;
 		String  path = "Backup";
+		String  type = "string";
 		for ( String line : configFile ){
 			if( line.startsWith("#") && line.contains("readonly")) {
 				ro = true;
 			}
 			if( line.startsWith("## Path:")) {
 				String[] l = line.split("\\/");
-				if( l.length == 3 )
+				if( l.length == 3 ) {
 				  path = l[2];
+				}
+			}
+			if( line.startsWith("## Type:")) {
+				String[] l = line.split("\\s+");
+				if( l.length >= 3 ) {
+				  type = l[2];
+				}
 			}
 			if( !line.startsWith("#") ) {
 				String[] sline = line.split("=", 2);
@@ -65,6 +75,7 @@ public class Config {
 					readOnly.put(key,  ro);
 					config.put(key,    value);
 					configPath.put(key,path);
+					configType.put(key,type);
 					ro = false;
 				}
 			}
@@ -92,6 +103,10 @@ public class Config {
 		return configPath.get(key);
 	}
 	
+	public String getConfigType(String key){
+		return configType.get(key);
+	}
+
 	public List<String> getConfigPaths() {
  		List<String> paths = new ArrayList<String>();
 		for ( String path : configPath.values() )
@@ -145,6 +160,7 @@ public class Config {
 			configMap.put("key",      key);
 			configMap.put("path",     configPath.get(key));
 			configMap.put("value",    config.get(key));
+			configMap.put("type",     configType.get(key));
 			configMap.put("readOnly", readOnly.get(key) ? "yes" : "no" );
 			configs.add(configMap);
 		}
