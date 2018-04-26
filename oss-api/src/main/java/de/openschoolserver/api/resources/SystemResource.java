@@ -253,7 +253,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins.translation")
+    @RolesAllowed("system.translation")
     OssResponse addTranslation(
         @ApiParam(hidden = true) @Auth Session session,
         Translation    translation
@@ -266,7 +266,7 @@ public interface SystemResource {
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("sysadmins.translation")
+    @RolesAllowed("system.translation")
     List<Translation> getMissedTranslations(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("lang") String lang
