@@ -752,20 +752,30 @@ public class DeviceController extends Controller {
 		FQHN.append(device.getName()).append(".").append(this.getConfigValue("DOMAIN"));
 		File file;
 		String graceTime    = "0";
-		if( actionContent != null && actionContent.containsKey("graceTime")) {
-			graceTime = actionContent.get("graceTime");
+		String message      = "";
+		if( actionContent != null ) {
+			if( actionContent.containsKey("graceTime")) {
+				graceTime = actionContent.get("graceTime");
+			}
+			if( actionContent.containsKey("message")) {
+				message = actionContent.get("message");
+			}
 		}
 		String[] program    = null;
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
 		switch(action) {
 		case "shutDown":
-			program = new String[5];
+			if( message.isEmpty() ) {
+				message = "System will shutdown in " + graceTime + "minutes";
+			}
+			program = new String[6];
 			program[0] = "/usr/bin/salt";
 			program[1] = "--async";
 			program[2] = FQHN.toString();
 			program[3] = "system.shutdown";
-			program[4] = graceTime;
+			program[4] = message;
+			program[5] = graceTime;
 			break;
 		case "reboot":
 			program = new String[5];
