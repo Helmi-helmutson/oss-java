@@ -441,7 +441,7 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("hwconf.modify")
+	@RolesAllowed("hwconf.manage")
 	OssResponse deleteConfigurationValue(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId,
@@ -493,7 +493,7 @@ public interface CloneToolResource {
 	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for all workstations in a room." +
 			  			  "Multicast can be 0 or 1"
 						)
-	@RolesAllowed("hwconf.modify")
+	@RolesAllowed("hwconf.manage")
 	OssResponse startCloningInRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId") Long roomId,
