@@ -782,6 +782,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
+    @RolesAllowed("education.users")
     OssResponse uploadFileToUser(@ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId")   Long  userId,
             @FormDataParam("file") final InputStream fileInputStream,
@@ -802,6 +803,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
+    @RolesAllowed("education.users")
     OssResponse applyAction(@ApiParam(hidden = true) @Auth Session session,
                     OssActionMap ossActionMap
                     );
@@ -816,7 +818,7 @@ public interface EducationResource {
     @POST
     @Path("devices")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delivers a list of available actions for a device.")
+    @ApiOperation(value = "Delivers a list of devices asked by the device ids.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
