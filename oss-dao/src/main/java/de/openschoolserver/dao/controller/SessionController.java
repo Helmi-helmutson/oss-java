@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import io.dropwizard.auth.AuthenticationException;
 
 @SuppressWarnings("unchecked")
 public class SessionController extends Controller {
@@ -253,7 +254,7 @@ public class SessionController extends Controller {
 		return data;
 	}
 
-	public Session validateToken(String token) {
+	public Session validateToken(String token) throws AuthenticationException {
 		Session session = sessions.get(token);
 		if (session == null) {
 			session = getByToken(token);
@@ -261,16 +262,46 @@ public class SessionController extends Controller {
 				sessions.put(token, session);
 			}
 		}
+		if( !isSuperuser(session)) {
+			Long timeout = 90L;
+			try {
+				timeout = Long.valueOf(this.getConfigValue("SESSION_TIMEOUT"));
+			} catch (Exception e) {
+				logger.error(e.getMessage());
+			}
+			timeout = timeout * 60000;
+			if( (now().getTime() - session.getCreateDate().getTime())  > timeout ) {
+				logger.info("Session was timed out." + session);
+				deleteSession(session);
+				//throw new AuthenticationException("Session expired.");
+				return null;
+			} else {
+				updateSession(session);
+			}
+		}
 		return session; // todo handle correct validation
 	}
 
+	public void updateSession(Session session) {
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			session.setCreateDate(now());
+			em.merge(session);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			em.close();
+		}
+	}
+
 	public boolean authorize(Session session, String requiredRole){
+
 		//The simply way
 		if( session.getUser().getRole().contains(requiredRole)) {
 			return true;
 		}
-
-
 		//Is it allowed by the user
 		for( Acl acl : session.getUser().getAcls() ){
 			if( acl.getAcl().equals(requiredRole)) {
