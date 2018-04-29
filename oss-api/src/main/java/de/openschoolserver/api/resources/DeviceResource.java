@@ -96,6 +96,23 @@ public interface DeviceResource {
     );
     
     /*
+     * GET devices/getAll
+     */
+    @GET
+    @Path("allUsedDevices/{saltClientOnly}")
+    @Produces(TEXT)
+    @ApiOperation(value = "Get the FQHNs of all devices on which a user is logged in. If saltClientOnly set 1 only salt clients will be listed.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.manage")
+    String getAllUsedDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("saltClientOnly") Long saltClientOnly
+    );
+
+    /*
      * GET search/{search}
      */
     @GET

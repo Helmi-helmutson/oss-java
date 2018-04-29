@@ -238,5 +238,10 @@ public class DeviceResourceImpl implements DeviceResource {
 		return String.join(" ", printers);
 	}
 
+	@Override
+	public String getAllUsedDevices(Session session, Long saltClientOnly) {
+		return new DeviceController(session).getAllUsedDevices(saltClientOnly);
+	}
+
 	
 }

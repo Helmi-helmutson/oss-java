@@ -33,7 +33,6 @@ public class OSSTokenAuthenticator implements Authenticator<String, Session> {
             logger.debug("authentication failed!");
             return Optional.empty();
         }
-
     }
 
 }

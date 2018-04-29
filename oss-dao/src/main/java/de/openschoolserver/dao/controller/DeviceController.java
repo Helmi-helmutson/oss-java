@@ -2,9 +2,11 @@
  * (c) 2017 EXTIS GmbH www.extis.de - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.io.File;
+import static java.nio.file.LinkOption.NOFOLLOW_LINKS;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -758,48 +760,55 @@ public class DeviceController extends Controller {
 		StringBuffer stderr = new StringBuffer();
 		switch(action) {
 		case "shutDown":
-			program = new String[4];
+			program = new String[5];
 			program[0] = "/usr/bin/salt";
-			program[1] = FQHN.toString();
-			program[2] = "system.shutdown";		
-			program[3] = graceTime;
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "system.shutdown";
+			program[4] = graceTime;
 			break;
 		case "reboot":
-			program = new String[4];
+			program = new String[5];
 			program[0] = "/usr/bin/salt";
-			program[1] = FQHN.toString();
-			program[2] = "system.reboot";
-			program[3] = graceTime;
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "system.reboot";
+			program[4] = graceTime;
 			break;
 		case "logout":
-			program = new String[3];
-			program[0] = "/usr/sbin/oss_control_client.sh";
-			program[1] = device.getIp();
-			program[2] = "logOut";
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "oss_client.logout";
 			break;
 		case "close":
-			program = new String[3];
-			program[0] = "/usr/sbin/oss_control_client.sh";
-			program[1] = device.getIp();
-			program[2] = "lockScreen";
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "oss_client.lockClient";
 			break;
 		case "open":
-			program = new String[3];
-			program[0] = "/usr/sbin/oss_control_client.sh";
-			program[1] = device.getIp();
-			program[2] = "enableScreen";
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "oss_client.unLockClient";
 			break;
 		case "lockInput":
-			program = new String[3];
-			program[0] = "/usr/sbin/oss_control_client.sh";
-			program[1] = device.getIp();
-			program[2] = "lockKeyboard";
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "oss_client.blockInput";
 			break;
 		case "unlockInput":
-			program = new String[3];
-			program[0] = "/usr/sbin/oss_control_client.sh";
-			program[1] = device.getIp();
-			program[2] = "enableSKeyboard";
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "oss_client.unBlockInput";
 			break;
 		case "wol":
 			program = new String[3];
@@ -892,5 +901,25 @@ public class DeviceController extends Controller {
 			}
 		}
 		return devices;
+	}
+
+	public String getAllUsedDevices(Long saltClientOnly) {
+		List<String> devices = new ArrayList<String>();
+		String domainName    = "." + this.getConfigValue("DOMAIN");
+		for( Device device : this.getAll() ) {
+			if( !device.getLoggedIn().isEmpty() ) {
+				if( saltClientOnly == 0 ) {
+					devices.add(device.getName() + domainName );
+				}
+				else {
+					StringBuilder path = new StringBuilder("/etc/salt/pki/master/minions/");
+					path.append(device.getName()).append(".").append(this.getConfigValue("DOMAIN"));
+					if( Files.exists(Paths.get(path.toString()), NOFOLLOW_LINKS) ) {
+						devices.add(device.getName() + domainName );
+					}
+				}
+			}
+		}
+		return String.join(",", devices);
 	}
 }
