@@ -325,6 +325,23 @@ public class Controller extends Config {
 		return false;
 	}
 
+	public boolean isSuperuser(Session session) {
+		if(properties.containsKey("de.openschoolserver.dao.Session.superusers")){
+			for( String s : properties.get("de.openschoolserver.dao.Session.superusers").split(",") ){
+				if( s.startsWith("@") ) {
+					for( Group g: session.getUser().getGroups() ) {
+						if( g.getName().equals(s.substring(1))) {
+							return true;
+						}
+					}
+				} else if( s.equals(session.getUser().getUid())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public boolean mayModify(Object object) {
 		if( this.session.getUser().getId() == 0 ) {
 			return true;
