@@ -249,7 +249,7 @@ public interface GroupResource {
        @ApiOperation(value = "Deletes a member of a group by userId.")
        @ApiResponses(value = {
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @RolesAllowed("group.search")
+       @RolesAllowed("group.manage")
        OssResponse removeMember(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
