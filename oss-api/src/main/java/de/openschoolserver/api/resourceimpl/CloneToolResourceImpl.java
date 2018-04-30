@@ -18,6 +18,9 @@ import de.openschoolserver.api.resources.CloneToolResource;
 
 import javax.ws.rs.WebApplicationException;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -243,5 +246,19 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	@Override
 	public String resetMinion(Session session, Long deviceId) {
 		return new CloneToolController(session).resetMinion(deviceId);
+	}
+
+	@Override
+	public OssResponse stopCloningOnDevice(Session session, String deviceIP) {
+		Device device = new DeviceController(session).getByIP(deviceIP);
+		String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
+		String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
+		try {
+			Files.deleteIfExists(Paths.get(pathPxe));
+			Files.deleteIfExists(Paths.get(pathElilo));
+		}catch( IOException e ) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

@@ -112,7 +112,7 @@ public interface CloneToolResource {
 	@PUT
 	@Path("devices/{deviceId}/setMaster/{isMaster}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Returns 'true' if the workstation of the session is master. Returns empty if not.")
+	@ApiOperation(value = "Sets or resets master marking on a workstation. isMaster can be 1 or 0.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -553,6 +553,20 @@ public interface CloneToolResource {
 	OssResponse stopCloningOnDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("deviceId") Long deviceId
+			);
+
+	/*
+	 * Delete the boot configurations for autocloning.
+	 */
+	@DELETE
+	@Path("devicesByIP/{deviceIP}/cloning")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Deletes the boot configuration for the automatical partitioning for a workstations"
+						)
+	@RolesAllowed("hwconf.manage")
+	OssResponse stopCloningOnDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("deviceIP") String deviceIP
 			);
 
 

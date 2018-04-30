@@ -766,6 +766,7 @@ public class DeviceController extends Controller {
 		StringBuffer stderr = new StringBuffer();
 		switch(action) {
 		case "shutDown":
+		case "shutdown":
 			if( message.isEmpty() ) {
 				message = "System will shutdown in " + graceTime + "minutes";
 			}
