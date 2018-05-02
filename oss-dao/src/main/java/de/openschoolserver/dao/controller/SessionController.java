@@ -74,8 +74,7 @@ public class SessionController extends Controller {
 			Files.write(file.toPath(), credentials);
 			program[4] = file.getAbsolutePath();
 			OSSShellTools.exec(program, reply, error, null);
-			//TODO
-			//Files.delete(file.toPath());
+			Files.delete(file.toPath());
 			if( reply.toString().contains("NT_STATUS_")) {
 				return null;
 			}
