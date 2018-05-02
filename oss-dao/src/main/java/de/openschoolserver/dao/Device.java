@@ -139,6 +139,9 @@ public class Device implements Serializable {
 	@JsonIgnore
 	private Room room;
 
+	@Column(name="room_id", insertable=false, updatable=false)
+	private Long roomId;
+
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
@@ -441,5 +444,13 @@ public class Device implements Serializable {
 
 	public void setCounter(Long counter) {
 		this.counter = counter;
+	}
+
+	public Long getRoomId() {
+		return roomId;
+	}
+
+	public void setRoomId(Long roomId) {
+		this.roomId = roomId;
 	}
 }
