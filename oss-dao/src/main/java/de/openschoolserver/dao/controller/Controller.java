@@ -131,7 +131,10 @@ public class Controller extends Config {
 		program[0] = "/usr/share/oss/tools/check_password_complexity.sh";
 		OSSShellTools.exec(program, reply, stderr, password);
 		if( ! reply.toString().isEmpty() ) {
-			return new OssResponse(this.getSession(),"ERROR", reply.toString() );
+			List<String> parameters = new ArrayList<String>();
+			String[] error = reply.toString().split("##");
+			parameters.add(error[1]);
+			return new OssResponse(this.getSession(),"ERROR", error[0], null, parameters );
 		}
 		return null;
 	}

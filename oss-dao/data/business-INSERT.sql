@@ -85,6 +85,11 @@ INSERT INTO GroupInCategories Values(4,5);
 INSERT INTO GroupInCategories Values(4,10);
 INSERT INTO GroupInCategories Values(4,15);
 
+#Standard ACLs
+INSERT INTO Enumerates VALUES(NULL,'apiAcl','myself.manage',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'myself.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,4,'myself.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,4,'myself.search','Y',6);
 #ACLS
 INSERT INTO Enumerates VALUES(NULL,'apiAcl','adhoclan.manage',6);
 INSERT INTO Enumerates VALUES(NULL,'apiAcl','adhoclan.search',6);
