@@ -15,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.api.resources.SystemResource;
 import de.openschoolserver.dao.Acl;
@@ -31,6 +33,8 @@ import de.openschoolserver.dao.controller.Controller;
 import de.openschoolserver.dao.controller.JobController;
 
 public class SystemResourceImpl implements SystemResource {
+
+	Logger logger = LoggerFactory.getLogger(SystemResourceImpl.class);
 
 	@Override
 	public List<Map<String, String>> getStatus(Session session) {
@@ -177,7 +181,7 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public List<String> getTheCustomListAsList(Session session, String list) {
+	public List<String> getTheCustomList(Session session, String list) {
 		try {
 			return	Files.readAllLines(Paths.get("/var/lib/squidGuard/db/custom/" +list + "/domains"));
 		}
@@ -188,7 +192,7 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public OssResponse setTheCustomListAsList(Session session, String list, List<String> domains) {
+	public OssResponse setTheCustomList(Session session, String list, List<String> domains) {
 		try {
 			Files.write(Paths.get("/var/lib/squidGuard/db/custom/" +list + "/domains"),domains);
 			String[] program   = new String[5];
@@ -206,20 +210,6 @@ public class SystemResourceImpl implements SystemResource {
 			e.printStackTrace();
 		}
 		return new OssResponse(session,"ERROR","Could not write custom list.");
-	}
-
-	@Override
-	public String getTheCustomList(Session session, String list) {
-		return String.join("\\n", this.getTheCustomListAsList(session, list));
-	}
-
-	@Override
-	public OssResponse setTheCustomList(Session session, String list, String domains) {
-		List<String> domainlist = new ArrayList<String>();
-		for( String line : domains.split("\\n")) {
-			domainlist.add(line);
-		}
-		return this.setTheCustomListAsList(session, list, domainlist);
 	}
 
 	@Override

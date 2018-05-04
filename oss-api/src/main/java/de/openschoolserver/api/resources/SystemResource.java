@@ -366,7 +366,7 @@ public interface SystemResource {
     @ApiOperation(value = "Delivers the custom lists of the proxy: good or bad.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
-    String getTheCustomList(
+    List<String> getTheCustomList(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("list") String list
         );
@@ -374,37 +374,13 @@ public interface SystemResource {
     @POST
     @Path("proxy/custom/{list}")
     @Produces(JSON_UTF8)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation(value = "Sets the custom lists of the proxy: good or bad.")
     @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     @RolesAllowed("system.proxy")
     OssResponse setTheCustomList(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("list")        String list,
-        @FormDataParam("domains") String domains
-        );
-
-    @GET
-    @Path("proxy/customList/{list}")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Delivers the custom lists of the proxy: good or bad.")
-    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    @RolesAllowed("system.proxy")
-    List<String> getTheCustomListAsList(
-        @ApiParam(hidden = true) @Auth Session session,
-        @PathParam("list") String list
-        );
-
-    @POST
-    @Path("proxy/customListerm/{list}}")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Sets the custom lists of the proxy: good or bad.")
-    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    @RolesAllowed("system.proxy")
-    OssResponse setTheCustomListAsList(
-        @ApiParam(hidden = true) @Auth Session session,
-        @PathParam("list")        String list,
-        List<String>              domains
+        List<String> domains
         );
 
     /*
