@@ -886,23 +886,13 @@ public class DeviceController extends Controller {
 	}
 
 	public OssResponse cleanUpLoggedIn() {
-		OssResponse ossResponse = new OssResponse(this.getSession(),"OK", "LoggedIn attributes was cleaned up.");
 		for( Device device : this.getAll() ) {
-			EntityManager em = getEntityManager();
-			em.getTransaction().begin();
-			for( User user : device.getLoggedIn() ) {
-				user.getLoggedOn().remove(device);
-				em.merge(user);
-			}
-			device.setLoggedIn(new ArrayList<User>());
-			em.merge(device);
-			em.getTransaction().commit();
+			cleanUpLoggedIn(device);
 		}
-		return ossResponse;
+		return new OssResponse(this.getSession(),"OK", "LoggedIn attributes was cleaned up.");
 	}
 	
 	public OssResponse cleanUpLoggedIn(Device device) {
-		OssResponse ossResponse = new OssResponse(this.getSession(),"OK", "LoggedIn attributes was cleaned up.");
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
@@ -914,11 +904,12 @@ public class DeviceController extends Controller {
 			em.merge(device);
 			em.getTransaction().commit();
 		} catch (Exception e) {
+			logger.debug("cleanUpLoggedIn: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return ossResponse;
+		return new OssResponse(this.getSession(),"OK", "LoggedIn attributes was cleaned up.");
 	}
 
 	public List<Device> getDevicesOnMyPlace(Device device) {
