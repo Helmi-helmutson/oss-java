@@ -900,6 +900,26 @@ public class DeviceController extends Controller {
 		}
 		return ossResponse;
 	}
+	
+	public OssResponse cleanUpLoggedIn(Device device) {
+		OssResponse ossResponse = new OssResponse(this.getSession(),"OK", "LoggedIn attributes was cleaned up.");
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			for( User user : device.getLoggedIn() ) {
+				user.getLoggedOn().remove(device);
+				em.merge(user);
+			}
+			device.setLoggedIn(new ArrayList<User>());
+			em.merge(device);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return ossResponse;
+	}
 
 	public List<Device> getDevicesOnMyPlace(Device device) {
 		List<Device> devices = new ArrayList<Device>();
@@ -943,7 +963,7 @@ public class DeviceController extends Controller {
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
 		}
-		return this.addLoggedInUser(device, user);
+		return this.setLoggedInUsers(device, user);
 	}
 	public OssResponse setLoggedInUsers(Long deviceId, Long userId) {
 		Device device = this.getById(deviceId);
@@ -954,25 +974,22 @@ public class DeviceController extends Controller {
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,String.valueOf(userId));
 		}
-		return this.addLoggedInUser(device, user);
+		return this.setLoggedInUsers(device, user);
 	}
 	public OssResponse setLoggedInUsers(Device device, User user) {
 
 		parameters = new ArrayList<String>();
 		parameters.add(device.getName());
 		parameters.add(device.getIp());
-		parameters.add(user.getUid());
-		if( user.getLoggedOn().contains(device)) {
-			return new OssResponse(this.getSession(),"OK", "Logged in user was already added on this device for you:%s;%s;%s",null,parameters);
-		}
-		device.setLoggedIn(new ArrayList<User>());
-		device.getLoggedIn().add(user);
-		user.getLoggedOn().add(device);
+		parameters.add(user.getUid());;
 		logger.debug("addLoggedInUser: " + device.toString());
 		logger.debug("addLoggedInUser: " + user.toString());
+		cleanUpLoggedIn(device);
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
+			device.getLoggedIn().add(user);
+			user.getLoggedOn().add(device);
 			em.merge(device);
 			em.merge(user);
 			em.getTransaction().commit();
