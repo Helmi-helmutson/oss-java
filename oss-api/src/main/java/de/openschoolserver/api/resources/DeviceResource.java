@@ -359,12 +359,12 @@ public interface DeviceResource {
     @PUT
     @Path("loggedInUsers/{IP}/{userName}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Set the logged on users on a device defined by IP.")
+    @ApiOperation(value = "Set the logged on user on a device defined by IP. All other users logged on users will be removed.")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.manage")
-    OssResponse addLoggedInUser(
+    OssResponse setLoggedInUsers(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP,
             @PathParam("userName") String userName

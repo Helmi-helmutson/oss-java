@@ -129,9 +129,9 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse addLoggedInUser(Session session, String IP, String userName) {
+	public OssResponse setLoggedInUsers(Session session, String IP, String userName) {
 		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.addLoggedInUser(IP, userName);
+		return deviceController.setLoggedInUsers(IP, userName);
 	}
 
 	@Override

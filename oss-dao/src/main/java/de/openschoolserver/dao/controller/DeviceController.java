@@ -933,4 +933,56 @@ public class DeviceController extends Controller {
 		}
 		return String.join(",", devices);
 	}
+
+	public OssResponse setLoggedInUsers(String IP, String userName) {
+		Device device = this.getByIP(IP);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP: %s",null,IP);
+		}
+		User user = new UserController(this.session).getByUid(userName);
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
+		}
+		return this.addLoggedInUser(device, user);
+	}
+	public OssResponse setLoggedInUsers(Long deviceId, Long userId) {
+		Device device = this.getById(deviceId);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with ID: %s",null,String.valueOf(deviceId));
+		}
+		User user = new UserController(this.session).getById(userId);
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,String.valueOf(userId));
+		}
+		return this.addLoggedInUser(device, user);
+	}
+	public OssResponse setLoggedInUsers(Device device, User user) {
+
+		parameters = new ArrayList<String>();
+		parameters.add(device.getName());
+		parameters.add(device.getIp());
+		parameters.add(user.getUid());
+		if( user.getLoggedOn().contains(device)) {
+			return new OssResponse(this.getSession(),"OK", "Logged in user was already added on this device for you:%s;%s;%s",null,parameters);
+		}
+		device.setLoggedIn(new ArrayList<User>());
+		device.getLoggedIn().add(user);
+		user.getLoggedOn().add(device);
+		logger.debug("addLoggedInUser: " + device.toString());
+		logger.debug("addLoggedInUser: " + user.toString());
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			em.merge(device);
+			em.merge(user);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
+	}
+
+
 }
