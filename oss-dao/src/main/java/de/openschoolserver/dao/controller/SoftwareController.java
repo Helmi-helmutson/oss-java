@@ -230,11 +230,38 @@ public class SoftwareController extends Controller {
 					software.setSourceAvailable(false);
 				}
 				softwares.add(software);
+			} else {
+				software.setSourceAvailable(false);
+				softwares.add(software);
 			}
 		}
 		return softwares;
 	}
 
+	public List<Software> getAllInstallable() {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Software.findAll");
+		List<Software> softwares = new ArrayList<Software>();
+		for( Software software : (List<Software>)query.getResultList() ) {
+			if( ! software.getManually() ) {
+				File f = new File(SALT_SOURCE_DIR + software.getName() );
+				if( f.exists() ) {
+					int count = 0;
+					for( String fileName : f.list() ) {
+						if( fileName.equals("init.sls") || fileName.equals("install.xml") ) {
+							continue;
+						}
+						count++;
+					}
+					if( count > 0 ) {
+						software.setSourceAvailable(true);
+						softwares.add(software);
+					}
+				}
+			}
+		}
+		return softwares;
+	}
 	public Software getByName(String name) {
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Software.getByName")

@@ -57,6 +57,21 @@ public interface SoftwareResource {
             );
 
     /*
+    * Get softwares/allInstallable
+    */
+   @GET
+   @Path("allInstallable")
+   @Produces(JSON_UTF8)
+   @ApiOperation(value = "Gets all Softwares.")
+   @ApiResponses(value = {
+           @ApiResponse(code = 404, message = "No category was found"),
+           @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+   @PermitAll
+   List<Software> getAllInstallable(
+           @ApiParam(hidden = true) @Auth Session session
+           );
+
+    /*
      * GET softwares/<softwareId>
      */
     @GET

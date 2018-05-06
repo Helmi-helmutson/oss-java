@@ -39,6 +39,12 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
+	public List<Software> getAllInstallable(Session session) {
+		SoftwareController softwareController = new SoftwareController(session);
+		return softwareController.getAllInstallable();
+	}
+
+	@Override
 	public Software getById(Session session, long softwareId) {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.getById(softwareId);
@@ -277,6 +283,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 				st.setSoftwareName(software.getName());
 				st.setDeviceName(st.getDevice().getName());
 				st.setVersion(sv.getVersion());
+				st.setManually(software.getManually());
 				softwareStatus.add(st);
 			}
 		}
