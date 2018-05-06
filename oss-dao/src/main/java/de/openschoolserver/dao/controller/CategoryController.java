@@ -182,6 +182,9 @@ public class CategoryController extends Controller {
 	public List<Long> getAvailableMembers(Long categoryId, String objectName ) {
 		Category c = this.getById(categoryId);
 		List<Long> objectIds = new ArrayList<Long>();
+		if( c == null ) {
+			return objectIds;
+		}
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery(objectName + ".findAllId");
 		for(Long l : (List<Long>) query.getResultList() ) {
@@ -239,6 +242,9 @@ public class CategoryController extends Controller {
 	public List<Long> getMembers(Long categoryId, String objectName ) {
 		Category c = this.getById(categoryId);
 		List<Long> objectIds = new ArrayList<Long>();
+		if( c == null ) {
+			return objectIds;
+		}
 		switch(objectName){
 		case("Device"):
 			for(Device d : c.getDevices()) {
