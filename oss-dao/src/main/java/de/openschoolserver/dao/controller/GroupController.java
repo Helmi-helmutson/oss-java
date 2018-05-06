@@ -239,6 +239,10 @@ public class GroupController extends Controller {
 			}
 		}
 		for( User user : group.getUsers() ) {
+			if(! user.getRole().equals(group.getName()) ) {
+				//User must not be removed from it's primary group.
+				continue;
+			}
 			if(! users.contains(user)) {
 				usersToRemove.add(user);
 			}
@@ -309,6 +313,9 @@ public class GroupController extends Controller {
         	return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
         }
 		User  user  = em.find(User.class, userId);
+		if( user.getRole().equals(group.getName()) ) {
+			return new OssResponse(this.getSession(),"ERROR","User must not be removed from it's primary group.");
+		}
 		group.getUsers().remove(user);
 		user.getGroups().remove(group);
 		try {

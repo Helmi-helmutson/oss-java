@@ -111,8 +111,7 @@ public class UserResourceImpl implements UserResource {
 	
 	@Override
 	public OssResponse setMembers(Session session, long userId, List<Long> groupIds) {
-		final UserController userController = new UserController(session);
-		return userController.setGroups(userId,groupIds);
+		return new UserController(session).setGroups(userId,groupIds);
 	}
 	
 	@Override
