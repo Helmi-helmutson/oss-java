@@ -42,6 +42,7 @@ public class ImportHandler {
 
 				// handle data
 				object = importer.getNextObject();
+
 				if (object != null) {
 					String objectMsg = object.getObjectMessage();
 					o.setPercentCompleted((100 / importer.getNumberOfObjects()) * ctr);
@@ -57,6 +58,7 @@ public class ImportHandler {
 							appendLog(importer, o, "Import " + object.getObjectMessage() + ": OK");
 						}
 					} else if (object instanceof de.claxss.importlib.Person) {
+
 						if (!doCompareAndImportUser(session, (de.claxss.importlib.Person) object, o, importer,
 								responseString)) {
 
@@ -242,6 +244,12 @@ public class ImportHandler {
 					+ person.getLoginId() + " " + person.getBirthday());
 		}
 		if (existingUser == null) {
+			if (o.getRequestedUserRole() != null && o.getRequestedUserRole().length() > 0
+					&& o.getRequestedUserRole().equals("students")) {
+				person.setPersonType(Person.PersonType.STUDENT);
+				;
+			}
+
 			existingUser = ImporterUtil.findUser(o, oldUserList, person); // TODO
 																			// handle
 																			// whether
