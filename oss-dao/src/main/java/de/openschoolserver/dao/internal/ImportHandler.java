@@ -1,3 +1,5 @@
+/* (c) 2017 EXTIS GmbH - all rights reserved  */
+
 package de.openschoolserver.dao.internal;
 
 import java.io.File;
@@ -326,7 +328,7 @@ public class ImportHandler {
 			}
 			OssResponse useraddRes = null;
 			if (!o.isTestOnly()) {
-				useraddRes = userController.add(newUser);
+				useraddRes = userController.add(newUser, false);
 				newUser = userController.getById(useraddRes.getObjectId());
 				// appendUserAddLog(importer, o, res, newUser, true);
 			} else {
