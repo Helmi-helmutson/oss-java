@@ -260,3 +260,4 @@ INSERT INTO Acls VALUES(NULL,NULL,2,'myself.search','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,2,'room.search','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,2,'software.search','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,2,'user.search','Y',6);
+INSERT INTO Acls VALUES(NULL,1,NULL,'printers.add','Y',6);

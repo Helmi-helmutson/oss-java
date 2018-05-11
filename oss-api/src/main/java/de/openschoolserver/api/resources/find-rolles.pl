@@ -10,6 +10,7 @@ foreach( split /\n/, $ROLES )
 	if(	/\@RolesAllowed\("(.*)"\)/ )
 	{
 		my $r = $1;
+		next if( $r eq "printers.add" );
 		$hroles->{$1} = 1;
 		if( $r =~ /.search/ || $r =~ /education/ ) {
 			$forTeachers->{$r} = 1;
@@ -30,4 +31,5 @@ foreach( sort keys %$forTeachers )
 {
 	print "INSERT INTO Acls VALUES(NULL,NULL,2,'$_','Y',6);\n";
 }
+print "INSERT INTO Acls VALUES(NULL,1,NULL,'printers.add','Y',6);\n";
 

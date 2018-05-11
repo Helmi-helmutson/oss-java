@@ -44,7 +44,7 @@ public interface PrinterResource {
 	@ApiOperation(value = "Creates a new printer.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("printers.manage")
+	@RolesAllowed("printers.add")
 	OssResponse addPrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@FormDataParam("name")          String  name,
@@ -63,7 +63,7 @@ public interface PrinterResource {
 	@ApiOperation(value = "Creates a new printer.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("printers.manage")
+	@RolesAllowed("printers.add")
 	OssResponse setDriver(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")	Long printerId,
@@ -91,7 +91,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("printers.manage")
+	@RolesAllowed("printers.add")
 	OssResponse deletePrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")		Long printerId
@@ -147,7 +147,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("printers.manage")
+	@RolesAllowed("printers.add")
 	OssResponse activateWindowsDriver(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")		Long printerId
@@ -161,7 +161,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("printers.manage")
+	@RolesAllowed("printers.add")
 	OssResponse deletePrinter(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
@@ -217,7 +217,7 @@ public interface PrinterResource {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 405, message = "Device is not a Printer."),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("printers.manage")
+	@RolesAllowed("printers.add")
 	OssResponse activateWindowsDriver(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
