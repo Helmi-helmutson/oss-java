@@ -224,7 +224,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[1] = "-H";
 		program[2] = "printserver";
 		program[3] = "-U";
-		program[4] = "register%" + new Controller(session).getProperty("de.openschoolserver.dao.User.Register.Password");
+		program[4] = "Administrator%" + session.getPassword();
 		program[5] = printerName;
 		OSSShellTools.exec(program, reply, stderr, null);
 		if( stderr.length() > 0 ) {
