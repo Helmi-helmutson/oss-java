@@ -45,6 +45,8 @@ public class SessionsResourceImpl implements SessionsResource {
 		session = sessionController.createSessionWithUser(username, password, device);
 		if( session != null ) {
 			logger.debug(session.toString());
+		} else {
+			throw new WebApplicationException(401);
 		}
 		return session;
 	}
@@ -67,7 +69,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public String createToken(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
-		Session session = createSession(ui, username,password, device, req);
+		Session session = createSession(ui, username, password, device, req);
 		if( session == null) {
 			return "";
 		} else {
