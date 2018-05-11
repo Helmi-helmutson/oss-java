@@ -149,6 +149,7 @@ public class SessionController extends Controller {
 		}
 		session.setCommonName(user.getGivenName() + " " + user.getSurName());
 		session.setAcls(modules);
+		session.setPassword(password);
 		sessions.put(token, this.session);
 		save(session);
 		return this.session;
