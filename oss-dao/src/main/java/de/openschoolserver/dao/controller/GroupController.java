@@ -18,6 +18,7 @@ import javax.validation.ValidatorFactory;
 
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Category;
+import de.openschoolserver.dao.Enumerate;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
@@ -124,6 +125,10 @@ public class GroupController extends Controller {
 		group.setOwner(this.session.getUser());
 		try {
 			em.getTransaction().begin();
+			if( group.getGroupType().equals("primary")) {
+				Enumerate enumerate = new Enumerate("role",group.getName());
+				em.persist(enumerate);
+			}
 			em.persist(group);
 			em.getTransaction().commit();
 			logger.debug("Created Group:" + group);
