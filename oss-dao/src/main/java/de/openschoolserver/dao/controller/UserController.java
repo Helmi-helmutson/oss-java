@@ -151,10 +151,6 @@ public class UserController extends Controller {
 	}
 
 	public OssResponse add(User user) {
-		return add(user, true);
-	}
-
-	public OssResponse add(User user, boolean usePasswordCheck) {
 		EntityManager em = getEntityManager();
 		logger.debug("User to create:" + user);
 		// Check role
@@ -195,7 +191,7 @@ public class UserController extends Controller {
 			user.setPassword(user.getUid());
 		} else if (user.getPassword() == null || user.getPassword().isEmpty()) {
 			user.setPassword(UserUtil.createRandomPassword(9, "XYqr45"));
-		} else if (usePasswordCheck) {
+		} else {
 			OssResponse ossResponse = this.checkPassword(user.getPassword());
 			if (ossResponse != null) {
 				return ossResponse;
