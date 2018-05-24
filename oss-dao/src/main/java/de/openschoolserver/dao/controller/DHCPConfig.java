@@ -30,6 +30,7 @@ public class DHCPConfig extends Controller {
 	private Path DHCP_TEMPLATE = Paths.get("/usr/share/oss/templates/dhcpd.conf");
 	private List<String>       dhcpConfigFile;
 	private List<String>       saltGroupFile;
+	final String domainName     = "." + getConfigValue("DOMAIN");
 	
 	public DHCPConfig(Session session) {
 		super(session);
@@ -54,8 +55,9 @@ public class DHCPConfig extends Controller {
 		for( Room room : (List<Room>) query.getResultList() ) {
 			Query subQuery = em.createNamedQuery("Room.getDeviceCount");
 			subQuery.setParameter("id", room.getId());
-			if( (Long) subQuery.getSingleResult() < 1)
+			if( (Long) subQuery.getSingleResult() < 1) {
 				continue;
+			}
 			dhcpConfigFile.add("group {");
 			dhcpConfigFile.add("  #Room" + room.getName());
 			//TODO add dhcp options and statements from RoomConfig
@@ -70,10 +72,11 @@ public class DHCPConfig extends Controller {
 			for( HWConf hwconf : (List<HWConf>) query.getResultList() ) {
 				List<String> line = new ArrayList<String>();
 				for( Device device : hwconf.getDevices() ) {
-					line.add(device.getName());
+					line.add(device.getName() + domainName);
 				}
-				if(!line.isEmpty())
-					saltGroupFile.add("  " + hwconf.getName() + ": 'L@" + String.join(",",line) + "'");
+				if(!line.isEmpty()) {
+					saltGroupFile.add("  hwconf-" + hwconf.getName() + ": 'L@" + String.join(",",line) + "'");
+				}
 			}
 			Files.write(SALT_GROUPS, saltGroupFile );
 			this.systemctl("restart", "salt-master");
@@ -92,7 +95,7 @@ public class DHCPConfig extends Controller {
 			if( device.getMac().isEmpty() )
 				continue;
 			
-			line.add(device.getName());
+			line.add(device.getName() + domainName);
 			dhcpConfigFile.add("    host " + device.getName() + " {");
 			dhcpConfigFile.add("      hardware ethernet " + device.getMac() + ";");
 			dhcpConfigFile.add("      fixed-address " + device.getIp() + ";");
@@ -104,10 +107,11 @@ public class DHCPConfig extends Controller {
 				dhcpConfigFile.add("      fixed-address " + device.getWlanIp() + ";");
 				//TODO add dhcp options and statements from DeviceConfig
 				dhcpConfigFile.add("    }");
-				line.add(device.getName() + "-wlan" );
+				line.add(device.getName() + "-wlan"+ domainName );
 			}
 		}
-		if( !line.isEmpty())
-			saltGroupFile.add("  " + room.getName() + ": 'L@" + String.join(",",line) + "'");
+		if( !line.isEmpty()) {
+			saltGroupFile.add("  room-" + room.getName() + ": 'L@" + String.join(",",line) + "'");
+		}
 	}
 }
