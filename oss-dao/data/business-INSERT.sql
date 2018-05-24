@@ -201,3 +201,4 @@ INSERT INTO Acls VALUES(NULL,NULL,1,'user.guestusers','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,1,'user.manage','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,1,'user.modify','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,1,'user.search','Y',6);
+INSERT INTO Acls VALUES(NULL,1,NULL,'printers.add','Y',6);
