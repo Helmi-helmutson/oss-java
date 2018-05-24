@@ -133,8 +133,12 @@ public class Controller extends Config {
 		if( ! reply.toString().isEmpty() ) {
 			List<String> parameters = new ArrayList<String>();
 			String[] error = reply.toString().split("##");
-			parameters.add(error[1]);
-			return new OssResponse(this.getSession(),"ERROR", error[0], null, parameters );
+			if( error.length > 1 ) {
+				parameters.add(error[1]);
+				return new OssResponse(this.getSession(),"ERROR", error[0], null, parameters );
+			} else {
+				return new OssResponse(this.getSession(),"ERROR",reply.toString());
+			}
 		}
 		return null;
 	}
