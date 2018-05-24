@@ -1,3 +1,5 @@
+/* (c) 2017 EXTIS GmbH - all rights reserved  */
+
 package de.openschoolserver.dao.internal;
 
 import java.io.File;
@@ -31,7 +33,7 @@ public class ImportHandler {
 	private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ImportHandler.class);
 
 	public String handleObjects(Session session, Importer importer, ImportOrder o) {
-		
+
 		ImporterObject object;
 		StringBuilder responseString = new StringBuilder();
 		int ctr = 0;
@@ -40,26 +42,30 @@ public class ImportHandler {
 
 				// handle data
 				object = importer.getNextObject();
+
 				if (object != null) {
 					String objectMsg = object.getObjectMessage();
 					o.setPercentCompleted((100 / importer.getNumberOfObjects()) * ctr);
 					ctr++;
 					LOG.debug("found object: " + object.getClass());
 					if (object instanceof de.claxss.importlib.SchoolClass) {
-						if (!doCompareAndImportSchoolClass(session, (de.claxss.importlib.SchoolClass) object, o, responseString)) {
-							appendLog(importer,o,"Import " + object.getObjectMessage() + ": FAILED");
+						if (!doCompareAndImportSchoolClass(session, (de.claxss.importlib.SchoolClass) object, o,
+								responseString)) {
+							appendLog(importer, o, "Import " + object.getObjectMessage() + ": FAILED");
 
 						} else {
 
-							appendLog(importer,o,"Import " + object.getObjectMessage() + ": OK");
+							appendLog(importer, o, "Import " + object.getObjectMessage() + ": OK");
 						}
 					} else if (object instanceof de.claxss.importlib.Person) {
-						if (!doCompareAndImportUser(session, (de.claxss.importlib.Person) object, o,importer, responseString)) {
 
-							appendLog(importer,o,"Import " + objectMsg + ": FAILED");
+						if (!doCompareAndImportUser(session, (de.claxss.importlib.Person) object, o, importer,
+								responseString)) {
+
+							appendLog(importer, o, "Import " + objectMsg + ": FAILED");
 						} else {
 
-							appendLog(importer,o,"Import " + objectMsg + ": OK");
+							appendLog(importer, o, "Import " + objectMsg + ": OK");
 						}
 					}
 				}
@@ -67,7 +73,7 @@ public class ImportHandler {
 		} finally {
 			closeLogfiles();
 		}
-		
+
 		return responseString.toString();
 	}
 
@@ -153,7 +159,7 @@ public class ImportHandler {
 	}
 
 	private void appendLog(Importer i, ImportOrder o, String msg) {
-		createLogfiles(i,o);
+		createLogfiles(i, o);
 		try {
 			logfile.write(msg.getBytes("UTF-8"));
 			logfile.write(LINESEP.getBytes());
@@ -185,11 +191,11 @@ public class ImportHandler {
 			int i = 0;
 			for (Group group : user.getGroups()) {
 				if ("class".equals(group.getGroupType())) {
-				if (i > 0) {
-					b.append(CLASSESSEP);
-				}
-				b.append(group.getName());
-				i++;
+					if (i > 0) {
+						b.append(CLASSESSEP);
+					}
+					b.append(group.getName());
+					i++;
 				}
 			}
 			return b.toString();
@@ -198,21 +204,21 @@ public class ImportHandler {
 	}
 
 	private String extractPW(OssResponse res) {
-		if (res.getParameters()!=null && res.getParameters().size()>=4) {
+		if (res.getParameters() != null && res.getParameters().size() >= 4) {
 			return res.getParameters().get(3);
 		}
 		return "";
 	}
 
 	private void appendUserAddLog(Importer i, ImportOrder o, OssResponse res, User newUser, boolean create) {
-		createLogfiles(i,o);
+		createLogfiles(i, o);
 		try {
 			StringBuilder buf = new StringBuilder();
 			SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
 			String birthday = newUser.getBirthDay() != null ? fmt.format(newUser.getBirthDay()) : "";
 			String classes = getCSVClasses(newUser);
-			buf.append(newUser.getUid()).append(CSVSEP).append(normalizeValue(newUser.getGivenName())).append(CSVSEP)
-					.append(normalizeValue(newUser.getSurName())).append(CSVSEP).append(birthday).append(CSVSEP)
+			buf.append(newUser.getUid()).append(CSVSEP).append(normalizeValue(newUser.getSurName())).append(CSVSEP)
+					.append(normalizeValue(newUser.getGivenName())).append(CSVSEP).append(birthday).append(CSVSEP)
 					.append(normalizeValue(classes)).append(CSVSEP).append(res != null ? extractPW(res) : "")
 					.append(LINESEP);
 			useraddLogfile.write(buf.toString().getBytes("UTF-8"));
@@ -224,7 +230,8 @@ public class ImportHandler {
 
 	}
 
-	protected boolean doCompareAndImportUser(Session session, Person person, ImportOrder o, Importer importer, StringBuilder responseString) {
+	protected boolean doCompareAndImportUser(Session session, Person person, ImportOrder o, Importer importer,
+			StringBuilder responseString) {
 		final UserController userController = new UserController(session);
 		final GroupController groupController = new GroupController(session);
 		Person existingUser = null;
@@ -237,7 +244,26 @@ public class ImportHandler {
 					+ person.getLoginId() + " " + person.getBirthday());
 		}
 		if (existingUser == null) {
-			existingUser = ImporterUtil.findUser(o, oldUserList, person); //TODO handle whether to ignore birthday or not (additional boolean parameter provided by lib)
+			if (o.getRequestedUserRole() != null && o.getRequestedUserRole().length() > 0
+					&& o.getRequestedUserRole().equals("students")) {
+				person.setPersonType(Person.PersonType.STUDENT);
+				;
+			}
+
+			existingUser = ImporterUtil.findUser(o, oldUserList, person); // TODO
+																			// handle
+																			// whether
+																			// to
+																			// ignore
+																			// birthday
+																			// or
+																			// not
+																			// (additional
+																			// boolean
+																			// parameter
+																			// provided
+																			// by
+																			// lib)
 		}
 		if (existingUser == null) {
 			LOG.error("user not found: " + person.getFirstname() + " " + person.getName() + " " + person.getLoginId()
@@ -267,9 +293,9 @@ public class ImportHandler {
 			}
 			if (change && !o.isTestOnly()) {
 				OssResponse res = userController.modify(ossUser);
-				appendUserAddLog(importer,o,res, ossUser, false);
+				appendUserAddLog(importer, o, res, ossUser, false);
 			} else if (!o.isTestOnly()) {
-				appendUserAddLog(importer,o,null, ossUser, false);
+				appendUserAddLog(importer, o, null, ossUser, false);
 			}
 			if (person.getSchoolClasses() != null && person.getSchoolClasses().size() > 0) {
 				// use new classes
@@ -291,7 +317,8 @@ public class ImportHandler {
 						}
 					}
 				}
-				responseString.append("Benutzer wird umgezogen: ").append(existingUser.getName() ).append(", ").append(existingUser.getFirstname()).append(" ").append(bclasses.toString()).append(LINESEP);
+				responseString.append("Benutzer wird umgezogen: ").append(existingUser.getName()).append(", ")
+						.append(existingUser.getFirstname()).append(" ").append(bclasses.toString()).append(LINESEP);
 			}
 			if (change && !o.isTestOnly()) {
 				userController.modify(ossUser);
@@ -304,23 +331,25 @@ public class ImportHandler {
 			newUser.setSurName(person.getName());
 			newUser.setRole(o.getRequestedUserRole() != null ? o.getRequestedUserRole() : getOSSRole(person));
 			newUser.setBirthDay(person.getBirthday());
-			if (person.getPassword()!=null && person.getPassword().length()>0) {
-			  newUser.setPassword(person.getPassword());
-			} 
-			if (!o.isTestOnly()) {
-				OssResponse res = userController.add(newUser);
-				newUser = userController.getById(res.getObjectId());
-				appendUserAddLog(importer,o,res, newUser, true);
-			} else {
-				appendUserAddLog(importer,o,null, newUser, true);
+			if (person.getPassword() != null && person.getPassword().length() > 0) {
+				newUser.setPassword(person.getPassword());
 			}
-			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName() ).append(", ").append(newUser.getGivenName()).append(LINESEP);
+			OssResponse useraddRes = null;
+			if (!o.isTestOnly()) {
+				useraddRes = userController.add(newUser, false);
+				newUser = userController.getById(useraddRes.getObjectId());
+				// appendUserAddLog(importer, o, res, newUser, true);
+			} else {
+				// appendUserAddLog(importer, o, null, newUser, true);
+			}
+			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName()).append(", ")
+					.append(newUser.getGivenName()).append(LINESEP);
 			if (newUser != null && !o.isTestOnly()) {
 				if (person.getSchoolClasses() != null) {
 					for (SchoolClass schoolClass : person.getSchoolClasses()) {
 						Group group = groupController.getByName(schoolClass.getNormalizedName());
 						if (group != null) {
-							LOG.debug("Add user to classes" + newUser.getUid() + " " + group.getName() );
+							LOG.debug("Add user to classes" + newUser.getUid() + " " + group.getName());
 							groupController.addMember(group.getId(), newUser.getId());
 						} else {
 							LOG.error("Group not found: " + schoolClass.getNormalizedName());
@@ -328,7 +357,13 @@ public class ImportHandler {
 					}
 				}
 			}
-
+			if (!o.isTestOnly()) {
+				// done here to get the classnames of the user
+				newUser = userController.getById(useraddRes.getObjectId());
+				appendUserAddLog(importer, o, useraddRes, newUser, true);
+			} else {
+				appendUserAddLog(importer, o, null, newUser, true);
+			}
 		}
 		// TODO handle old users
 		return true;
@@ -382,7 +417,7 @@ public class ImportHandler {
 
 	protected boolean doCompareAndImportSchoolClass(Session session, de.claxss.importlib.SchoolClass schoolClass,
 			ImportOrder o, StringBuilder responseString) {
-		//LOG.error("importing group: " + schoolClass.getNormalizedName());
+		// LOG.error("importing group: " + schoolClass.getNormalizedName());
 		if (schoolClass != null && schoolClass.getNormalizedName() != null) {
 			final GroupController groupController = new GroupController(session);
 			final Group existingClass = groupController.getByName(schoolClass.getNormalizedName());
@@ -393,7 +428,7 @@ public class ImportHandler {
 				newClass.setDescription(schoolClass.getLongName() != null ? schoolClass.getLongName()
 						: schoolClass.getNormalizedName());
 				newClass.setGroupType("class");
-				
+
 				if (!o.isTestOnly()) {
 					groupController.add(newClass);
 				}
