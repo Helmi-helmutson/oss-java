@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.*;
+import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -230,6 +231,13 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( stderr.length() > 0 ) {
 			return new OssResponse(session,"ERROR", stderr.toString());
 		}
+		program[0] = "/usr/bin/rpcclient";
+		program[1] = "-U";
+		program[2] = "Administrator%" + session.getPassword();
+		program[3] = "printserver";
+		program[4] = "-c";
+		program[5] = "\'setdriver " + printerName + " " + "\"" + printerName +"\"\'";
+		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(session,"OK","Windows driver was activated.");
 	}
 
@@ -307,6 +315,26 @@ public class PrinterResourceImpl implements PrinterResource {
 		OSSShellTools.exec(program, reply, stderr, null);
 		logger.debug(stderr.toString());
 		logger.debug(reply.toString());
+		roomController.systemctl("restart", "samba-printserver");
+		//Now we have to check if the printer is already visible in samba
+		int tries = 6;
+		program = new String[6];
+		program[0] = "/usr/bin/rpcclient";
+		program[1] = "-U";
+		program[2] = "Administrator%" + session.getPassword();
+		program[3] = "printserver";
+		program[4] = "-c";
+		program[5] = "\"getprinter "+name+ "\"";
+		do {
+			try {
+				TimeUnit.SECONDS.sleep(1);
+			} catch (Exception e) {
+				logger.error(e.getMessage(), e);
+			}
+			reply   = new StringBuffer();
+			stderr  = new StringBuffer();
+			OSSShellTools.exec(program, reply, stderr, null);
+		} while( !stderr.toString().isEmpty() && tries > -1  );
 		
 		if(windowsDriver) {
 			ossResponse = activateWindowsDriver(session,name);
