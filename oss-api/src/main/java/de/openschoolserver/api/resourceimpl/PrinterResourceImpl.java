@@ -176,6 +176,9 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[0] = "/usr/sbin/cupsenable";
 		program[1] = printerName;
 		OSSShellTools.exec(program, reply, stderr, null);
+		program[0] = "/usr/sbin/cupsaccept";
+		program[1] = printerName;
+		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(session,"OK","Printer was enabled succesfully.");
 	}
 
@@ -197,6 +200,9 @@ public class PrinterResourceImpl implements PrinterResource {
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
 		program[0] = "/usr/sbin/cupsdisable";
+		program[1] = printerName;
+		OSSShellTools.exec(program, reply, stderr, null);
+		program[0] = "/usr/sbin/cupsreject";
 		program[1] = printerName;
 		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(session,"OK","Printer was disabled succesfully.");
@@ -343,6 +349,7 @@ public class PrinterResourceImpl implements PrinterResource {
 				return ossResponse;
 			}
 		}
+		enablePrinter(session,name);
 
 		return new OssResponse(
 				session,"OK",
