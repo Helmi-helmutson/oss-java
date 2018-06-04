@@ -144,7 +144,7 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse resetPrinter(Session session, String printerName) {
-		String[] program = new String[2];
+		String[] program = new String[4];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
 		program[0] = "/usr/bin/lprm";
