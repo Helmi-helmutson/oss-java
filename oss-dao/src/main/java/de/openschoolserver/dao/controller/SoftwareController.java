@@ -262,6 +262,7 @@ public class SoftwareController extends Controller {
 		}
 		return softwares;
 	}
+
 	public Software getByName(String name) {
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Software.getByName")
