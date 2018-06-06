@@ -44,6 +44,16 @@ public class InformationResourceImpl implements InformationResource {
 	}
 
 	@Override
+	public List<Announcement> getNewAnnouncements(Session session) {
+		return new InformationController(session).getNewAnnouncements();
+	}
+
+	@Override
+	public OssResponse setAnnouncementHaveSeen(Session session, Long announcementId) {
+		return new InformationController(session).setAnnouncementHaveSeen(announcementId);
+	}
+
+	@Override
 	public List<Contact> getContacts(Session session) {
 		InformationController infoController = new InformationController(session);
 		return infoController.getContacts();
@@ -74,24 +84,6 @@ public class InformationResourceImpl implements InformationResource {
 	}
 
 	@Override
-	public List<Category> getAnnouncementCategories(Session session) {
-		InformationController infoController = new InformationController(session);
-		return infoController.getInfoCategories("announcements");
-	}
-
-	@Override
-	public List<Category> getContactsCategories(Session session) {
-		InformationController infoController = new InformationController(session);
-		return infoController.getInfoCategories("contacts");
-	}
-
-	@Override
-	public List<Category> getFAQCategories(Session session) {
-		InformationController infoController = new InformationController(session);
-		return infoController.getInfoCategories("faqs");
-	}
-
-	@Override
 	public OssResponse modifyAnnouncement(Session session, Long announcementId, Announcement announcement) {
 		InformationController infoController = new InformationController(session);
 		announcement.setId(announcementId);
@@ -112,4 +104,25 @@ public class InformationResourceImpl implements InformationResource {
 		return infoController.modifyFAQ(faq);
 	}
 
+	@Override
+	public List<Announcement> getMyAnnouncements(Session session) {
+		return session.getUser().getMyAnnouncements();
+	}
+
+	@Override
+	public List<Contact> getMyContacts(Session session) {
+		return session.getUser().getMyContacts();
+	}
+
+	@Override
+	public List<FAQ> getMyFAQs(Session session) {
+		return session.getUser().getMyFAQs();
+	}
+
+	@Override
+	public List<Category> getInformationCategories(Session session) {
+		return new InformationController(session).getInfoCategories();
+	}
+
+	
 }

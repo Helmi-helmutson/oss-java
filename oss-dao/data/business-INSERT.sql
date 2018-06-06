@@ -63,27 +63,13 @@ INSERT INTO Enumerates VALUES(NULL,'categoryType','software',1);
 INSERT INTO Enumerates VALUES(NULL,'categoryType','virtualRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'network','#SCHOOL_NETWORK#/#SCHOOL_NETMASK#',1);
 #Categories
-INSERT INTO Categories Values(1, 'Announcements for all','','announcements','1','N',NOW(),NULL);
-INSERT INTO Categories Values(2, 'Announcements for sysadmins','','announcements','1','N',NOW(),NULL);
-INSERT INTO Categories Values(5, 'Announcements for administration','','announcements','1','N',NOW(),NULL);
-INSERT INTO Categories Values(6, 'Contacts for all','','contacts','1','N',NOW(),NULL);
-INSERT INTO Categories Values(7, 'Contacts for sysadmins','','contacts','1','N',NOW(),NULL);
-INSERT INTO Categories Values(10,'Contacts for administration','','contacts','1','N',NOW(),NULL);
-INSERT INTO Categories Values(11,'FAQs for all','','faqs','1','N',NOW(),NULL);
-INSERT INTO Categories Values(12,'FAQs for sysadmins','','faqs','1','N',NOW(),NULL);
-INSERT INTO Categories Values(15,'FAQs for administration','','faqs','1','N',NOW(),NULL);
+INSERT INTO Categories Values(1, 'Informations for all','','informations','1','N',NOW(),NULL);
+INSERT INTO Categories Values(2, 'Informations for sysadmins','','informations','1','N',NOW(),NULL);
+INSERT INTO Categories Values(5, 'Informations for administration','','informations','1','N',NOW(),NULL);
 INSERT INTO GroupInCategories Values(1,1);
 INSERT INTO GroupInCategories Values(4,1);
-INSERT INTO GroupInCategories Values(1,6);
-INSERT INTO GroupInCategories Values(4,6);
-INSERT INTO GroupInCategories Values(1,11);
-INSERT INTO GroupInCategories Values(4,11);
 INSERT INTO GroupInCategories Values(1,2);
-INSERT INTO GroupInCategories Values(1,7);
-INSERT INTO GroupInCategories Values(1,12);
 INSERT INTO GroupInCategories Values(4,5);
-INSERT INTO GroupInCategories Values(4,10);
-INSERT INTO GroupInCategories Values(4,15);
 
 #Standard ACLs
 INSERT INTO Enumerates VALUES(NULL,'apiAcl','myself.manage',6);

@@ -17,7 +17,9 @@ import java.util.List;
  */
 @Entity
 @Table(name="FAQs")
-@NamedQuery(name="FAQ.findAll", query="SELECT f FROM FAQ f")
+@NamedQueries({
+	@NamedQuery(name="FAQ.findAll", query="SELECT f FROM FAQ f")
+})
 public class FAQ implements Serializable {
 	private static final long serialVersionUID = 1L;
 

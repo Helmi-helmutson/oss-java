@@ -9,6 +9,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -73,7 +74,7 @@ public interface InformationResource {
 	@GET
 	@Path("announcements")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the contacts corresponding to an user.")
+	@ApiOperation(value = "Gets the announcements corresponding to an user.")
 	@ApiResponses(value = {
 		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
@@ -82,6 +83,31 @@ public interface InformationResource {
 		@ApiParam(hidden = true) @Auth Session session
 	);
 
+	@GET
+	@Path("newAnnouncements")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the announcements corresponding to an user.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@PermitAll
+	List<Announcement> getNewAnnouncements(
+		@ApiParam(hidden = true) @Auth Session session
+	);
+	
+	@PUT
+	@Path("announcements/{announcementId}/seem")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Mark the announcement for the user as have seen.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@PermitAll
+	OssResponse setAnnouncementHaveSeen(
+		@ApiParam(hidden = true)      @Auth Session session,
+		@PathParam("announcementId")  Long announcementId
+	);
+	
 	@GET
 	@Path("contacts")
 	@Produces(JSON_UTF8)
@@ -103,6 +129,42 @@ public interface InformationResource {
 	})
 	@PermitAll
 	List<FAQ> getFAQs(
+		@ApiParam(hidden = true) @Auth Session session
+	);
+
+	@GET
+	@Path("my/announcements")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the announcements of an user.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("information.add")
+	List<Announcement> getMyAnnouncements(
+		@ApiParam(hidden = true) @Auth Session session
+	);
+
+	@GET
+	@Path("my/contacts")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the contacts of an user.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("information.add")
+	List<Contact> getMyContacts(
+		@ApiParam(hidden = true) @Auth Session session
+	);
+
+	@GET
+	@Path("my/faqs")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the FAQs of an user.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("information.add")
+	List<FAQ> getMyFAQs(
 		@ApiParam(hidden = true) @Auth Session session
 	);
 
@@ -188,38 +250,14 @@ public interface InformationResource {
 	);
 
 	@GET
-	@Path("announcements/categories")
+	@Path("categories")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets the contacts corresponding to an user.")
 	@ApiResponses(value = {
 		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@PermitAll
-	List<Category> getAnnouncementCategories(
-		@ApiParam(hidden = true) @Auth Session session
-	);
-
-	@GET
-	@Path("contacts/categories")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the contacts corresponding to an user.")
-	@ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
-	})
-	@PermitAll
-	List<Category> getContactsCategories(
-		@ApiParam(hidden = true) @Auth Session session
-	);
-
-	@GET
-	@Path("faqs/cagegories")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the FAQs corresponding to an user.")
-	@ApiResponses(value = {
-		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
-	})
-	@PermitAll
-	List<Category> getFAQCategories(
+	List<Category> getInformationCategories(
 		@ApiParam(hidden = true) @Auth Session session
 	);
 }

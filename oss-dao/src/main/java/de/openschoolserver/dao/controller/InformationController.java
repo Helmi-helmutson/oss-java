@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
@@ -115,6 +116,24 @@ public class InformationController extends Controller {
 			for(Category category : group.getCategories() ) {
 				for(Announcement announcement : category.getAnnouncements() ) {
 					if( announcement.getValidFrom().after(this.now()) &&
+						announcement.getValidUntil().before(this.now())
+						) 
+					{
+						announcements.add(announcement);
+					}
+				}
+			}
+		}
+		return announcements;
+	}
+	
+	public List<Announcement> getNewAnnouncements() {
+		List<Announcement> announcements = new ArrayList<Announcement>();
+		User user = this.session.getUser();
+		for(Group group : user.getGroups() ) {
+			for(Category category : group.getCategories() ) {
+				for(Announcement announcement : category.getAnnouncements() ) {
+					if( announcement.getValidFrom().after(this.now()) &&
 						announcement.getValidUntil().before(this.now()) &&
 						! user.getReadAnnouncements().contains(announcement) ) 
 					{
@@ -125,7 +144,27 @@ public class InformationController extends Controller {
 		}
 		return announcements;
 	}
-	
+
+	public OssResponse setAnnouncementHaveSeen(Long announcementId) {
+		EntityManager em = getEntityManager();
+		try {
+			Announcement announcement = em.find(Announcement.class, announcementId);
+			User user = this.session.getUser();
+			announcement.getHaveSeenUsers().add(user);
+			user.getReadAnnouncements().add(announcement);
+			em.getTransaction().begin();
+			em.merge(user);
+			em.merge(announcement);
+			em.getTransaction().commit();
+		}catch (Exception e) {
+			logger.error("setAnnouncementHaveSeen:" + this.getSession().getUserId() + " " + e.getMessage(),e);
+			return new OssResponse(this.getSession(),"ERROR","Annoncement could not be set as seen.");
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Annoncement was set as seen.");
+	}
+
 	public List<FAQ> getFAQs() {
 		List<FAQ> faqs = new ArrayList<FAQ>();
 		User user = this.session.getUser();
@@ -336,18 +375,20 @@ public class InformationController extends Controller {
 	}
 
 
-	public List<Category> getInfoCategories(String search) {
+	public List<Category> getInfoCategories() {
+		CategoryController categoryController = new CategoryController(this.session);
 		if( this.isSuperuser() ) {
-			CategoryController categoryController = new CategoryController(this.session);
-			return categoryController.getByType(search);
+			return categoryController.getByType("informations");
 		}
-		List<Category> categories = new ArrayList<Category>();
-		for(Category category : this.session.getUser().getCategories() ) {
-			if(category.getCategoryType().equals(search)) {
+		List<Category> categories = this.session.getUser().getCategories();
+		for(Category category : categoryController.getByType("informations") ) {
+			if( category.getOwner().getId() == 1L ) {
 				categories.add(category);
 			}
 		}
 		return categories;
 	}
+
+	
 
 }

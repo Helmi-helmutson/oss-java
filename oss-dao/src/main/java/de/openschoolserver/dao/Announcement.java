@@ -7,6 +7,7 @@ import javax.persistence.*;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.validation.constraints.Size;
@@ -18,7 +19,9 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name="Announcements")
-@NamedQuery(name="Announcement.findAll", query="SELECT a FROM Announcement a")
+@NamedQueries({
+	@NamedQuery(name="Announcement.findAll", query="SELECT a FROM Announcement a")
+})
 public class Announcement implements Serializable {
 	private static final long serialVersionUID = 1L;
 
@@ -69,8 +72,9 @@ public class Announcement implements Serializable {
 	private Long ownerId;
 
 	public Announcement() {
+		this.haveSeenUsers = new ArrayList<User>();
 	}
-
+	
 	public Long getId() {
 		return this.id;
 	}

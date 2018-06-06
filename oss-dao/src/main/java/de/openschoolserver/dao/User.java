@@ -196,6 +196,8 @@ public class User implements Serializable {
 		this.ownedDevices		= new ArrayList<Device>();
 		this.ownedGroups        = new ArrayList<Group>();
 		this.loggedOn           = new ArrayList<Device>();
+		this.readAnnouncements  = new ArrayList<Announcement>();
+		this.categories         = new ArrayList<Category>();
 	}
 
 	public boolean isMustChange() {
