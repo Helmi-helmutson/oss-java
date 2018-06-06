@@ -28,13 +28,13 @@ public class FAQ implements Serializable {
 
 	@Lob
 	@Column(name="abstract")
-	private byte[] abstract_;
+	private String abstract_;
 
 	@Size(max=128, message="Issue must not be longer then 128 characters.")
 	private String issue;
 
 	@Lob
-	private byte[] text;
+	private String text;
 
 	@Size(max=128, message="Title must not be longer then 128 characters.")
 	private String title;
@@ -64,11 +64,11 @@ public class FAQ implements Serializable {
 		this.id = id;
 	}
 
-	public byte[] getAbstract_() {
+	public String getAbstract_() {
 		return this.abstract_;
 	}
 
-	public void setAbstract_(byte[] abstract_) {
+	public void setAbstract_(String abstract_) {
 		this.abstract_ = abstract_;
 	}
 
@@ -80,11 +80,11 @@ public class FAQ implements Serializable {
 		this.issue = issue;
 	}
 
-	public byte[] getText() {
+	public String getText() {
 		return this.text;
 	}
 
-	public void setText(byte[] text) {
+	public void setText(String text) {
 		this.text = text;
 	}
 

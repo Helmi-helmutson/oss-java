@@ -29,7 +29,7 @@ public class Announcement implements Serializable {
 
 	@Lob
 	@Column(name="abstract")
-	private byte[] abstract_;
+	private String abstract_;
 
 	@Size(max=128, message="Issue must not be longer then 64 characters.")
 	private String issue;
@@ -38,7 +38,7 @@ public class Announcement implements Serializable {
 	private String keywords;
 
 	@Lob
-	private byte[] text;
+	private String text;
 
 	@Size(max=128, message="Title must not be longer then 64 characters.")
 	private String title;
@@ -79,11 +79,11 @@ public class Announcement implements Serializable {
 		this.id = id;
 	}
 
-	public byte[] getAbstract_() {
+	public String getAbstract_() {
 		return this.abstract_;
 	}
 
-	public void setAbstract_(byte[] abstract_) {
+	public void setAbstract_(String abstract_) {
 		this.abstract_ = abstract_;
 	}
 
@@ -103,11 +103,11 @@ public class Announcement implements Serializable {
 		this.keywords = keywords;
 	}
 
-	public byte[] getText() {
+	public String getText() {
 		return this.text;
 	}
 
-	public void setText(byte[] text) {
+	public void setText(String text) {
 		this.text = text;
 	}
 
