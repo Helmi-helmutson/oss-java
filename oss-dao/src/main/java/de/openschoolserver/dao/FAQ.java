@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * The persistent class for the FAQs database table.
- * 
+ *
  */
 @Entity
 @Table(name="FAQs")
@@ -28,14 +28,9 @@ public class FAQ implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="FAQS_ID_GENERATOR")
 	private Long id;
 
-	@Lob
-	@Column(name="abstract")
-	private String abstract_;
-
 	@Size(max=128, message="Issue must not be longer then 128 characters.")
 	private String issue;
 
-	@Lob
 	private String text;
 
 	@Size(max=128, message="Title must not be longer then 128 characters.")
@@ -46,6 +41,9 @@ public class FAQ implements Serializable {
 	@JoinColumn(name="id")
 	@JsonIgnore
 	private List<Category> categories;
+
+	@Transient
+	private List<Long> categoryIds;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
@@ -64,14 +62,6 @@ public class FAQ implements Serializable {
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getAbstract_() {
-		return this.abstract_;
-	}
-
-	public void setAbstract_(String abstract_) {
-		this.abstract_ = abstract_;
 	}
 
 	public String getIssue() {
@@ -121,7 +111,6 @@ public class FAQ implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
 
 	@Override
 	public int hashCode() {
@@ -146,5 +135,21 @@ public class FAQ implements Serializable {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	public List<Long> getCategoryIds() {
+		return categoryIds;
+	}
+
+	public void setCategoryIds(List<Long> categoryIds) {
+		this.categoryIds = categoryIds;
+	}
+
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
 	}
 }

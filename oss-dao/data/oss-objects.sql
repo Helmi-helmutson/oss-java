@@ -396,8 +396,7 @@ CREATE TABLE IF NOT EXISTS Announcements (
         validUntil TIMESTAMP,
         keywords   VARCHAR(128) NOT NULL,
         title      VARCHAR(128) NOT NULL,
-        abstract   BLOB,
-        text       BLOB,
+        text       MEDIUMTEXT,
         issue      VARCHAR(128),
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
         PRIMARY KEY  (id)
@@ -416,8 +415,7 @@ CREATE TABLE IF NOT EXISTS FAQs (
         owner_id   BIGINT UNSIGNED DEFAULT NULL,
         issue      VARCHAR(128) default NULL,
         title      VARCHAR(128) NOT NULL,
-        abstract   BLOB,
-        text       BLOB,
+        text       MEDIUMTEXT,
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE SET NULL,
         PRIMARY KEY  (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;

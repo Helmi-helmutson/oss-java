@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
 
 /**
  * The persistent class for the Announcements database table.
- * 
+ *
  */
 @Entity
 @Table(name="Announcements")
@@ -30,17 +30,12 @@ public class Announcement implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ANNOUNCEMENTS_ID_GENERATOR")
 	private Long id;
 
-	@Lob
-	@Column(name="abstract")
-	private String abstract_;
-
 	@Size(max=128, message="Issue must not be longer then 64 characters.")
 	private String issue;
 
 	@Size(max=128, message="Keywords must not be longer then 64 characters.")
 	private String keywords;
 
-	@Lob
 	private String text;
 
 	@Size(max=128, message="Title must not be longer then 64 characters.")
@@ -62,7 +57,10 @@ public class Announcement implements Serializable {
 	@JoinColumn(name="id")
 	@JsonIgnore
 	private List<Category> categories;
-	
+
+	@Transient
+	private List<Long> categoryIds;
+
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
@@ -74,21 +72,13 @@ public class Announcement implements Serializable {
 	public Announcement() {
 		this.haveSeenUsers = new ArrayList<User>();
 	}
-	
+
 	public Long getId() {
 		return this.id;
 	}
 
 	public void setId(Long id) {
 		this.id = id;
-	}
-
-	public String getAbstract_() {
-		return this.abstract_;
-	}
-
-	public void setAbstract_(String abstract_) {
-		this.abstract_ = abstract_;
 	}
 
 	public String getIssue() {
@@ -163,6 +153,22 @@ public class Announcement implements Serializable {
 		this.owner = owner;
 	}
 
+	public List<Long> getCategoryIds() {
+		return categoryIds;
+	}
+
+	public void setCategoryIds(List<Long> categoryIds) {
+		this.categoryIds = categoryIds;
+	}
+
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
+	}
+
 	@Override
 	public String toString() {
 		try {
@@ -171,7 +177,6 @@ public class Announcement implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
 
 	@Override
 	public int hashCode() {

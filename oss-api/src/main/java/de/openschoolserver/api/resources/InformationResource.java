@@ -96,7 +96,7 @@ public interface InformationResource {
 	);
 	
 	@PUT
-	@Path("announcements/{announcementId}/seem")
+	@Path("announcements/{announcementId}/seen")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Mark the announcement for the user as have seen.")
 	@ApiResponses(value = {

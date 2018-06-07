@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * The persistent class for the Contacts database table.
- * 
+ *
  */
 @Entity
 @Table(name="Contacts")
@@ -49,6 +49,9 @@ public class Contact implements Serializable {
 	@JoinColumn(name="id")
 	@JsonIgnore
 	private List<Category> categories;
+
+	@Transient
+	private List<Long> categoryIds;
 
 	//bi-directional many-to-one association to User
 	@ManyToOne
@@ -109,7 +112,7 @@ public class Contact implements Serializable {
 		this.title = title;
 	}
 
-	
+
 	public List<Category> getCategories() {
 		return this.categories;
 	}
@@ -133,7 +136,6 @@ public class Contact implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
 
 	@Override
 	public int hashCode() {
@@ -158,5 +160,21 @@ public class Contact implements Serializable {
 		} else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	public List<Long> getCategoryIds() {
+		return categoryIds;
+	}
+
+	public void setCategoryIds(List<Long> categoryIds) {
+		this.categoryIds = categoryIds;
+	}
+
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
 	}
 }

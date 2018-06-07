@@ -43,8 +43,19 @@ public class InformationController extends Controller {
 		}
 		EntityManager em = getEntityManager();
 		announcement.setOwner(this.session.getUser());
+		Category category;
 		try {
 			em.getTransaction().begin();
+			for( Long categoryId : announcement.getCategoryIds() ) {
+				try {
+					category = em.find(Category.class, categoryId);
+					category.getAnnouncements().add(announcement);
+					announcement.getCategories().add(category);
+					em.merge(category);
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
 			em.persist(announcement);
 			em.getTransaction().commit();
 			logger.debug("Created Announcement:" + announcement);
@@ -69,8 +80,19 @@ public class InformationController extends Controller {
 		}
 		EntityManager em = getEntityManager();
 		contact.setOwner(this.session.getUser());
+		Category category;
 		try {
 			em.getTransaction().begin();
+			for( Long categoryId : contact.getCategoryIds() ) {
+				try {
+					category = em.find(Category.class, categoryId);
+					category.getContacts().add(contact);
+					contact.getCategories().add(category);
+					em.merge(category);
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
 			em.persist(contact);
 			em.getTransaction().commit();
 			logger.debug("Created Contact:" + contact);
@@ -95,8 +117,19 @@ public class InformationController extends Controller {
 		}
 		EntityManager em = getEntityManager();
 		faq.setOwner(this.session.getUser());
+		Category category;
 		try {
 			em.getTransaction().begin();
+			for( Long categoryId : faq.getCategoryIds() ) {
+				try {
+					category = em.find(Category.class, categoryId);
+					category.getFaqs().add(faq);
+					faq.getCategories().add(category);
+					em.merge(category);
+				} catch (Exception e) {
+					logger.error(e.getMessage());
+				}
+			}
 			em.persist(faq);
 			em.getTransaction().commit();
 			logger.debug("Created FAQ:" + faq);
@@ -117,7 +150,7 @@ public class InformationController extends Controller {
 				for(Announcement announcement : category.getAnnouncements() ) {
 					if( announcement.getValidFrom().after(this.now()) &&
 						announcement.getValidUntil().before(this.now())
-						) 
+						)
 					{
 						announcements.add(announcement);
 					}
@@ -126,7 +159,7 @@ public class InformationController extends Controller {
 		}
 		return announcements;
 	}
-	
+
 	public List<Announcement> getNewAnnouncements() {
 		List<Announcement> announcements = new ArrayList<Announcement>();
 		User user = this.session.getUser();
@@ -135,7 +168,7 @@ public class InformationController extends Controller {
 				for(Announcement announcement : category.getAnnouncements() ) {
 					if( announcement.getValidFrom().after(this.now()) &&
 						announcement.getValidUntil().before(this.now()) &&
-						! user.getReadAnnouncements().contains(announcement) ) 
+						! user.getReadAnnouncements().contains(announcement) )
 					{
 						announcements.add(announcement);
 					}
@@ -254,7 +287,7 @@ public class InformationController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	public OssResponse modifyContact(Contact contact) {
 		//Check parameters
 		StringBuilder errorMessage = new StringBuilder();
@@ -388,7 +421,5 @@ public class InformationController extends Controller {
 		}
 		return categories;
 	}
-
-	
 
 }
