@@ -43,6 +43,7 @@ public class InformationController extends Controller {
 		}
 		EntityManager em = getEntityManager();
 		announcement.setOwner(this.session.getUser());
+		announcement.setCategories( new ArrayList<Category>() );
 		Category category;
 		try {
 			em.getTransaction().begin();

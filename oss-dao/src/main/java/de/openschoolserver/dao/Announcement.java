@@ -53,8 +53,7 @@ public class Announcement implements Serializable {
 	private List<User> haveSeenUsers;
 
 	//bi-directional many-to-many association to Category
-	@ManyToMany
-	@JoinColumn(name="id")
+	@ManyToMany(mappedBy="announcements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<Category> categories;
 

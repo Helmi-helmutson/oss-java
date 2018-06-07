@@ -37,8 +37,7 @@ public class FAQ implements Serializable {
 	private String title;
 
 	//bi-directional many-to-many association to Category
-	@ManyToMany
-	@JoinColumn(name="id")
+	@ManyToMany(mappedBy="faqs",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
 	private List<Category> categories;
 
