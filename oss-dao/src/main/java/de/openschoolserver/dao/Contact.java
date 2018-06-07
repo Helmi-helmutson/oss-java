@@ -46,7 +46,6 @@ public class Contact implements Serializable {
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="contacts",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JsonIgnore
 	private List<Category> categories;
 
 	@Transient

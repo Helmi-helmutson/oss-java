@@ -149,9 +149,9 @@ public class InformationController extends Controller {
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
 				for(Announcement announcement : category.getAnnouncements() ) {
-					if( announcement.getValidFrom().after(this.now()) &&
-						announcement.getValidUntil().before(this.now())
-						)
+					if( announcement.getValidFrom().before(this.now()) &&
+					    announcement.getValidUntil().after(this.now())
+					)
 					{
 						announcements.add(announcement);
 					}
