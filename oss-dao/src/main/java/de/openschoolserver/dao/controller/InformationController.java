@@ -347,7 +347,13 @@ public class InformationController extends Controller {
 
 	public OssResponse deleteAnnouncement(Long announcementId) {
 		EntityManager em = getEntityManager();
-		Announcement announcement = this.getAnnouncementById(announcementId);
+		Announcement announcement;
+		try {
+			announcement = em.find(Announcement.class, announcementId);
+		} catch (Exception e) {
+			logger.error("add " + e.getMessage(),e);
+			return null;
+		}
 		if( !this.mayModify(announcement) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this Announcement");
@@ -355,6 +361,10 @@ public class InformationController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.merge(announcement);
+			for( Category category : announcement.getCategories() ) {
+				category.getAnnouncements().remove(announcement);
+				em.merge(category);
+			}
 			em.remove(announcement);
 			em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "Announcement was deleted succesfully.");
@@ -368,7 +378,13 @@ public class InformationController extends Controller {
 
 	public OssResponse deleteContact(Long contactId) {
 		EntityManager em = getEntityManager();
-		Contact contact = this.getContactById(contactId);
+		Contact contact;
+		try {
+			contact = em.find(Contact.class, contactId);
+		} catch (Exception e) {
+			logger.error("add " + e.getMessage(),e);
+			return null;
+		}
 		if( !this.mayModify(contact) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this contact");
@@ -376,6 +392,10 @@ public class InformationController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.merge(contact);
+			for( Category category : contact.getCategories() ) {
+				category.getContacts().remove(contact);
+				em.merge(category);
+			}
 			em.remove(contact);
 			em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "Contact was deleted succesfully.");
@@ -389,7 +409,13 @@ public class InformationController extends Controller {
 
 	public OssResponse deleteFAQ(Long faqId) {
 		EntityManager em = getEntityManager();
-		FAQ faq = this.getFAQById(faqId);
+		FAQ faq;
+		try {
+			faq = em.find(FAQ.class, faqId);
+		} catch (Exception e) {
+			logger.error("add " + e.getMessage(),e);
+			return null;
+		}
 		if( !this.mayModify(faq) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this FAQ");
@@ -397,6 +423,10 @@ public class InformationController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.merge(faq);
+			for( Category category : faq.getCategories() ) {
+				category.getFaqs().remove(faq);
+				em.merge(category);
+			}
 			em.remove(faq);
 			em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "FAQ was deleted succesfully.");
