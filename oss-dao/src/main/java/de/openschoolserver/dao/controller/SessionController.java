@@ -130,6 +130,8 @@ public class SessionController extends Controller {
 			}
 		}
 		List<String> modules = new ArrayList<String>();
+		//Modules with right permit all is allowed for all authorized users.
+		modules.add("permitall");
 		//Is it allowed by the groups.
 		for( Group group : user.getGroups() ) {
 			for( Acl acl : group.getAcls() ) {
