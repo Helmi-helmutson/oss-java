@@ -41,23 +41,27 @@ public class InformationController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
+		User user = this.session.getUser();
 		EntityManager em = getEntityManager();
-		announcement.setOwner(this.session.getUser());
+		announcement.setOwner(user);
 		announcement.setCategories( new ArrayList<Category>() );
 		Category category;
 		try {
 			em.getTransaction().begin();
+			em.persist(announcement);
+			user.getMyAnnouncements().add(announcement);
+			em.merge(user);
 			for( Long categoryId : announcement.getCategoryIds() ) {
 				try {
 					category = em.find(Category.class, categoryId);
 					category.getAnnouncements().add(announcement);
 					announcement.getCategories().add(category);
 					em.merge(category);
+					em.merge(announcement);
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
 			}
-			em.persist(announcement);
 			em.getTransaction().commit();
 			logger.debug("Created Announcement:" + announcement);
 			return new OssResponse(this.getSession(),"OK", "Announcement was created succesfully.",announcement.getId());
@@ -79,22 +83,26 @@ public class InformationController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
+		User user = this.session.getUser();
 		EntityManager em = getEntityManager();
-		contact.setOwner(this.session.getUser());
+		contact.setOwner(user);
 		Category category;
 		try {
 			em.getTransaction().begin();
+			em.persist(contact);
+			user.getMyContacts().add(contact);
+			em.merge(user);
 			for( Long categoryId : contact.getCategoryIds() ) {
 				try {
 					category = em.find(Category.class, categoryId);
 					category.getContacts().add(contact);
 					contact.getCategories().add(category);
 					em.merge(category);
+					em.merge(contact);
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
 			}
-			em.persist(contact);
 			em.getTransaction().commit();
 			logger.debug("Created Contact:" + contact);
 			return new OssResponse(this.getSession(),"OK", "Contact was created succesfully.",contact.getId());
@@ -116,22 +124,26 @@ public class InformationController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
+		User user = this.session.getUser();
 		EntityManager em = getEntityManager();
-		faq.setOwner(this.session.getUser());
+		faq.setOwner(user);
 		Category category;
 		try {
 			em.getTransaction().begin();
+			em.persist(faq);
+			user.getMyFAQs().add(faq);
+			em.merge(user);
 			for( Long categoryId : faq.getCategoryIds() ) {
 				try {
 					category = em.find(Category.class, categoryId);
 					category.getFaqs().add(faq);
 					faq.getCategories().add(category);
 					em.merge(category);
+					em.merge(faq);
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
 			}
-			em.persist(faq);
 			em.getTransaction().commit();
 			logger.debug("Created FAQ:" + faq);
 			return new OssResponse(this.getSession(),"OK", "FAQ was created succesfully.",faq.getId());
