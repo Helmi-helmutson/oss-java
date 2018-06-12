@@ -488,17 +488,23 @@ public class SoftwareController extends Controller {
         return statusMap;
 	}
 
+	/**
+	 * Return a list of all SofwareStatus objects to a given installation status.
+	 * @param installationStatus The installation status searching for.
+	 * @return The list of searched SofwareStatus.
+	 * @see SoftwareStatus
+	 */
 	public List<SoftwareStatus> getAllStatus(String installationStatus) {
 		EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS",installationStatus);
         return (List<SoftwareStatus>) query.getResultList();
 	}
 
-	/*
+	/**
 	 * This is the first step to start the installation. An installation category will be created
 	 * 
 	 *  @param		category A category object containing the name and description of the category
-	 *  @return		Returns the id of the created new category
+	 *  @return		The result in a OssResult.
 	 */
 	public OssResponse createInstallationCategory(Category category) {
 		CategoryController categoryController = new CategoryController(this.session);
@@ -506,6 +512,12 @@ public class SoftwareController extends Controller {
 		return categoryController.add(category);
 	}
 
+	/**
+	 * Add a software to an installation set (category with categoryType installation)
+	 * @param softwareId The technical id of the software.
+	 * @param categoryId The technical if of the installation set.
+	 * @return The result in a OssResult.
+	 */
 	public OssResponse addSoftwareToCategory(Long softwareId,Long categoryId){
 		EntityManager em = getEntityManager();
 		try {
@@ -531,6 +543,12 @@ public class SoftwareController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Software was added to the installation succesfully.");
 	}
 	
+	/**
+	 * Delete a software from an installation set (category with categoryType installation)
+	 * @param softwareId The technical id of the software.
+	 * @param categoryId The technical if of the installation set.
+	 * @return The result in a OssResult.
+	 */
 	public OssResponse deleteSoftwareFromCategory(Long softwareId,Long categoryId){
 		EntityManager em = getEntityManager();
 		try {
@@ -560,8 +578,13 @@ public class SoftwareController extends Controller {
 		return new OssResponse(this.getSession(),"OK","SoftwareState was added to category succesfully");
 	}
 	
-	/*
-	 * Add a license to a software
+	/**
+	 * Add a software license to a software
+	 * @param softwareLicense The software license to be created.
+	 * @param softwareId The technical id of the software.
+	 * @param fileInputStream If licenseType is C this contains a list of licenses. If licenseType is F this contains the license file.
+	 * @param contentDispositionHeader If licenseType is F this contains the name of the license file.
+	 * @return The result in a OssResult.
 	 */
 	public OssResponse addLicenseToSoftware(SoftwareLicense softwareLicense,
 			Long softwareId,

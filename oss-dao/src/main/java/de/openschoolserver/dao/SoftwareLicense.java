@@ -25,23 +25,23 @@ public class SoftwareLicense implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARELICENSES_ID_GENERATOR")
 	private Long id;
 
-	/*
+	/**
 	 * The amount of the devices the license can be used for.
 	 */
 	private int count;
 
-	/*
+	/**
 	 * The amount of the devices the license can be used for.
 	 */
 	@Transient
 	private int used;
 
-	/*
-	 * The type of the license. This can be F for licenses saved in files or C for Licenses passed by command name.
+	/**
+	 * The type of the license. This can be F for licenses saved in files or C for Licenses passed by command line.
 	 */
 	private Character licenseType;
 
-	/*
+	/**
 	 * By C licenses this is the value of the license.
 	 * By F licenses this is the name of the file in which the license was saved.
 	 */

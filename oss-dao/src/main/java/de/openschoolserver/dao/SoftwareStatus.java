@@ -29,12 +29,29 @@ public class SoftwareStatus implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARESTATUS_ID_GENERATOR")
 	private Long id;
 	
+	/**
+	 * The state of the installation can have following values:<br>
+	 * I  -> installed<br>
+	 * IS -> installation scheduled<br>
+ 	 * US -> update scheduled<br>
+	 * MD -> manuell deinstalled<br>
+	 * DS -> deinstallation scheduled<br>
+     * DF -> deinstallation failed<br>
+     * IF -> installation failed<br>
+     * FR -> installed version is frozen: This must not be updated.<br>
+	 */
 	private String status;
 
+	/**
+	 * Bidirectional many to one association to a software version object.
+	 */
 	@ManyToOne
 	@JsonIgnore
 	private SoftwareVersion softwareVersion;
 
+	/**
+	 * Bidirectional many to one read only association to a software version object.ZZZZZ
+	 */
 	@Column(name = "softwareversion_id", insertable = false, updatable = false)
 	private Long softwareversionId;
 
