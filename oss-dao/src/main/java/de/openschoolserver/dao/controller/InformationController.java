@@ -458,7 +458,9 @@ public class InformationController extends Controller {
 		}
 		List<Category> categories = this.session.getUser().getCategories();
 		for(Category category : categoryController.getByType("informations") ) {
-			if( category.getOwner().getId() == 1L ) {
+			//TODO Clarify public categories
+			if( category.getOwner().getId() == 1L  || 
+				category.getOwner().getId() == 6L	) {
 				categories.add(category);
 			}
 		}
