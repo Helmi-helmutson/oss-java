@@ -155,16 +155,23 @@ public class InformationController extends Controller {
 		}
 	}
 
+	/**
+	 * Delivers the valid announcements corresponding to the session user.
+	 * @return
+	 */
 	public List<Announcement> getAnnouncements() {
 		List<Announcement> announcements = new ArrayList<Announcement>();
 		User user = this.session.getUser();
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
+				List<Category> categories = new ArrayList<Category>();
+				categories.add(category);
 				for(Announcement announcement : category.getAnnouncements() ) {
 					if( announcement.getValidFrom().before(this.now()) &&
 					    announcement.getValidUntil().after(this.now())
 					)
 					{
+						announcement.setCategories(categories);
 						announcements.add(announcement);
 					}
 				}
@@ -178,11 +185,14 @@ public class InformationController extends Controller {
 		User user = this.session.getUser();
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
+				List<Category> categories = new ArrayList<Category>();
+				categories.add(category);
 				for(Announcement announcement : category.getAnnouncements() ) {
 					if( announcement.getValidFrom().after(this.now()) &&
 						announcement.getValidUntil().before(this.now()) &&
 						! user.getReadAnnouncements().contains(announcement) )
 					{
+						announcement.setCategories(categories);
 						announcements.add(announcement);
 					}
 				}
@@ -211,26 +221,41 @@ public class InformationController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Annoncement was set as seen.");
 	}
 
+	/**
+	 * Delivers the list of FAQs corresponding to the session user.
+	 * @return
+	 */
 	public List<FAQ> getFAQs() {
 		List<FAQ> faqs = new ArrayList<FAQ>();
 		User user = this.session.getUser();
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
+				List<Category> categories = new ArrayList<Category>();
+				categories.add(category);
 				for(FAQ faq : category.getFaqs() ) {
-						faqs.add(faq);
+					faq.setCategories(categories);
+					faqs.add(faq);
 				}
 			}
 		}
 		return faqs;
 	}
 
+
+	/**
+	 * Delivers the list of contacts corresponding to the session user
+	 * @return
+	 */
 	public List<Contact> getContacts() {
 		List<Contact> contacts = new ArrayList<Contact>();
 		User user = this.session.getUser();
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
+				List<Category> categories = new ArrayList<Category>();
+				categories.add(category);
 				for(Contact contact : category.getContacts() ) {
-						contacts.add(contact);
+					contact.setCategories(categories);
+					contacts.add(contact);
 				}
 			}
 		}
@@ -357,6 +382,11 @@ public class InformationController extends Controller {
 		}
 	}
 
+	/**
+	 * Remove a announcement.
+	 * @param faqId The technical id of the announcement.
+	 * @return The result in form of OssResponse
+	 */
 	public OssResponse deleteAnnouncement(Long announcementId) {
 		EntityManager em = getEntityManager();
 		Announcement announcement;
@@ -388,6 +418,11 @@ public class InformationController extends Controller {
 		}
 	}
 
+	/**
+	 * Remove a contact.
+	 * @param faqId The technical id of the contact.
+	 * @return The result in form of OssResponse
+	 */
 	public OssResponse deleteContact(Long contactId) {
 		EntityManager em = getEntityManager();
 		Contact contact;
@@ -419,6 +454,11 @@ public class InformationController extends Controller {
 		}
 	}
 
+	/**
+	 * Remove a FAQ.
+	 * @param faqId The technical id of the faq.
+	 * @return The result in form of OssResponse
+	 */
 	public OssResponse deleteFAQ(Long faqId) {
 		EntityManager em = getEntityManager();
 		FAQ faq;
@@ -451,6 +491,11 @@ public class InformationController extends Controller {
 	}
 
 
+	/**
+	 * Get the list of information categories, the user have access on it.
+	 * These are the own categories and the public categories by type informations.
+	 * @return The list of the found categories.
+	 */
 	public List<Category> getInfoCategories() {
 		CategoryController categoryController = new CategoryController(this.session);
 		if( this.isSuperuser() ) {
@@ -459,7 +504,7 @@ public class InformationController extends Controller {
 		List<Category> categories = this.session.getUser().getCategories();
 		for(Category category : categoryController.getByType("informations") ) {
 			//TODO Clarify public categories
-			if( category.getOwner().getId() == 1L  || 
+			if( category.getOwner().getId() == 1L  ||
 				category.getOwner().getId() == 6L	) {
 				categories.add(category);
 			}
