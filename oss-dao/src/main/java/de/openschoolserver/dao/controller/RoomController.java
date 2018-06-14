@@ -87,7 +87,7 @@ public class RoomController extends Controller {
 	public List<Room> getAll() {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Room.findAllToUse"); 
+			Query query = em.createNamedQuery("Room.findAllToUse");
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -96,11 +96,11 @@ public class RoomController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	public Room getByIP(String ip) {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Room.getByIp").setParameter("ip", ip); 
+			Query query = em.createNamedQuery("Room.getByIp").setParameter("ip", ip);
 			return (Room) query.getResultList().get(0);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -113,7 +113,7 @@ public class RoomController extends Controller {
 	public Room getByName(String name) {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("Room.getByName").setParameter("name", name); 
+			Query query = em.createNamedQuery("Room.getByName").setParameter("name", name);
 			return (Room) query.getResultList().get(0);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -125,16 +125,16 @@ public class RoomController extends Controller {
 
 	/*
 	 * Return a list the rooms in which the session user can register devices
-	 * 
+	 *
 	 * @return For super user all rooms will be returned
-	 *         For normal user the list his AdHocAccess rooms of those of his groups 
+	 *         For normal user the list his AdHocAccess rooms of those of his groups
 	 */
 	public List<Room> getAllToRegister() {
 		EntityManager em = getEntityManager();
 		Room room  = null;
 		try {
 			if( this.isSuperuser() ) {
-				Query query = em.createNamedQuery("Room.findAllToRegister"); 
+				Query query = em.createNamedQuery("Room.findAllToRegister");
 				return query.getResultList();
 			} else {
 				List<Room> rooms = new ArrayList<Room>();
@@ -161,7 +161,7 @@ public class RoomController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	/*
 	 * Search devices given by a substring
 	 */
@@ -288,7 +288,7 @@ public class RoomController extends Controller {
 		this.startPlugin("delete_room", room);
 		return new OssResponse(this.getSession(),"OK", "Room was removed successfully.");
 	}
-	
+
 
 	/*
 	 * Return the list of the available adresses in the room
@@ -346,6 +346,15 @@ public class RoomController extends Controller {
 	 * Delivers the next room IP address in a given subnet with the given netmask.
 	 * If the subnet is "" the default school network is meant.
 	 */
+
+	/**
+	 * Delivers the next room IP address in a given subnet with the given netmask.
+	 *
+	 * @param subnet The subnet in which we need the new room. If the subnet is empty use the default network this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK)
+	 * @param roomNetMask The network mask of the new room. This determines how much devices can be registered in this room.
+	 * @return The start IP address which found. If there is no more free place in the network, an empty string will be returned.
+	 * @throws NumberFormatException
+	 */
 	public String getNextRoomIP( String subnet, int roomNetMask ) throws NumberFormatException {
 		if( subnet == null || subnet.isEmpty() ){
 			subnet = this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK");
@@ -354,18 +363,24 @@ public class RoomController extends Controller {
 		if(roomNetMask < subNetwork.getNetmaskNumeric() ) {
 			throw new NumberFormatException("The network netmask must be less then the room netmask:" + roomNetMask + ">" + subNetwork.getNetmaskNumeric() );
 		}
-		
+
 		List<String>  startIPAddresses   = new ArrayList<String>();
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Room.findAll");
 		for( Room room : (List<Room>) query.getResultList() ) {
-			if( !subNetwork.contains(room.getStartIP()))
+			if( !subNetwork.contains(room.getStartIP()) ||
+					room.getId() < 3L ) {
 				continue;
+			}
 			startIPAddresses.add(room.getStartIP());
 		}
-		// When no room was found in this network we return the network address of the network.
-		if( startIPAddresses.isEmpty() )
+		// When no room was found in this network we return the FIRST_ROOM network address of the network.
+		if( startIPAddresses.isEmpty() ) {
+			if( subNetwork.contains(this.getConfigValue("FIRST_ROOM"))) {
+				return this.getConfigValue("FIRST_ROOM");
+			}
 			return subNetwork.getBase();
+		}
 
 		List<String> sortedIPAddresses = IPv4.sortIPAddresses(startIPAddresses);
 		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
@@ -374,7 +389,7 @@ public class RoomController extends Controller {
 		query = em.createQuery("SELECT r FROM Room r WHERE r.startIP = :startIP",Room.class);
 		query.setParameter("startIP", lastNetworkIP);
 		Room lastRoom = (Room)query.getSingleResult();
-		int lastNetMask = lastRoom.getNetMask(); 
+		int lastNetMask = lastRoom.getNetMask();
 		//Find the next free net with the network mask of the last room
 		IPv4Net net = new IPv4Net( lastNetworkIP + "/" + lastNetMask );
 		String nextNet = net.getNext();
@@ -395,6 +410,7 @@ public class RoomController extends Controller {
 		String lastIP = net.getNext();
 		if( ! subNetwork.contains(lastIP) )
 		{
+			//TODO What should happened when no more IP-address is available!?
 			return "";
 		}
 		return nextNet;
@@ -467,7 +483,7 @@ public class RoomController extends Controller {
 		StringBuffer error = new StringBuffer();
 
 		if(access.getAccessType().equals("ACT") ) {
-			//TODO 	
+			//TODO 
 		}
 		else
 		{
@@ -505,7 +521,7 @@ public class RoomController extends Controller {
 
 			// Login
 			program[3] = "login";
-			if( access.getLogin() ) 
+			if( access.getLogin() )
 				program[1] = "1";
 			else
 				program[1] = "0";
@@ -514,7 +530,7 @@ public class RoomController extends Controller {
 	}
 
 	/*
-	 * Sets the actual access status in a room 
+	 * Sets the actual access status in a room
 	 */
 	public OssResponse setAccessStatus(long roomId, AccessInRoom access) {
 		Room room = this.getById(roomId);
@@ -546,7 +562,7 @@ public class RoomController extends Controller {
 		AccessInRoom access = new AccessInRoom();
 		access.setAccessType("FW");
 		access.setRoomId(room.getId());
-		
+
 		String[] program = new String[3];
 		program[0] = "/usr/sbin/oss_get_access_state.sh";
 		program[1] = room.getStartIP() + "/" + room.getNetMask();
@@ -612,7 +628,7 @@ public class RoomController extends Controller {
 		Room room = this.getById(roomId);
 		return this.getAccessStatus(room);
 	}
-	
+
 	/*
 	 * Sets the actual access status in all rooms.
 	 * Room is given by roomId
@@ -624,7 +640,7 @@ public class RoomController extends Controller {
 		}
 		return accesses;
 	}
-	
+
 	/*
 	 * Creates new devices in the room
 	 */
@@ -699,7 +715,7 @@ public class RoomController extends Controller {
 				logger.debug(device.toString());
 				em.getTransaction().commit();
 			}
-		} catch (Exception e) { 
+		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", "Error by creating the device: " + e.getMessage());
 		} finally {
@@ -712,7 +728,7 @@ public class RoomController extends Controller {
 			logger.debug("Created Device" + device);
 			logger.debug("HWCONF" + device.getHwconf());
 			// We'll create only for fatClients workstation users
-			if( device.getHwconf() != null && 
+			if( device.getHwconf() != null &&
 					device.getHwconf().getDeviceType() != null &&
 					device.getHwconf().getDeviceType().equals("FatClient"))
 			{
@@ -775,7 +791,7 @@ public class RoomController extends Controller {
 		List<String> ipAddress = this.getAvailableIPAddresses(roomId, 1);
 		if( ipAddress.isEmpty() ){
 			return new OssResponse(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
-		} 
+		}
 		EntityManager em = getEntityManager();
 		Device device = new Device();
 		Room   room   = em.find(Room.class, roomId);
@@ -796,7 +812,7 @@ public class RoomController extends Controller {
 			}
 			if( allowed ) {
 				HWConf hwconf = room.getHwconf();
-				if( hwconf == null ) { 
+				if( hwconf == null ) {
 					Query query = em.createNamedQuery("HWConf.getByName");
 					query.setParameter("name", "BYOD");
 					hwconf = (HWConf) query.getResultList().get(0);
@@ -873,7 +889,7 @@ public class RoomController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK","The hardware configuration of the room was set succesfully.");
 	}
-	
+
 	public OssResponse modify(Room room){
 		EntityManager em = getEntityManager();
 		Room oldRoom = this.getById(room.getId());
@@ -894,7 +910,7 @@ public class RoomController extends Controller {
 			em.close();
 		}
 		this.startPlugin("modify_room", oldRoom);
-		
+
 		return new OssResponse(this.getSession(),"OK","The room was modified succesfully.");
 	}
 
@@ -967,7 +983,7 @@ public class RoomController extends Controller {
 			room.setAvailablePrinters(deviceController.getDevices(deviceIds));
 			em.merge(room);
 			em.getTransaction().commit();
-			
+
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -999,7 +1015,7 @@ public class RoomController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK","The selected printer was added to the room.");
 	}
-	
+
 	public OssResponse deleteAvailablePrinter(long roomId, long deviceId) {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
@@ -1041,7 +1057,7 @@ public class RoomController extends Controller {
 		}
 		return null;
 	}
-	
+
 	public OssResponse organizeRoom(long roomId) {
 		Room room = this.getById(roomId);
 		if( room.getRoomType().equals("smartRoom")) {
@@ -1083,7 +1099,7 @@ public class RoomController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK", "Room was reorganized");
 	}
-	
+
 	public List<Device> getDevicesOnMyPlace(Room room, Device device) {
 		return this.getDevicesByCoordinates(room, device.getRow(), device.getPlace());
 	}
@@ -1096,7 +1112,7 @@ public class RoomController extends Controller {
 		}
 		return devices;
 	}
-	
+
 	public List<Integer> getNextFreePlace(Room room) {
 		List<Integer> coordinates = new ArrayList<Integer>();
 		int row   = 1;
