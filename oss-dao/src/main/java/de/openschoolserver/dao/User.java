@@ -86,7 +86,7 @@ public class User implements Serializable {
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
-	private List<Category> ownedCategories;
+	private List<Category> ownedCategories = new ArrayList<Category>();
 
 	//bi-directional many-to-one association to TestFile
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
@@ -126,7 +126,7 @@ public class User implements Serializable {
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="users", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JsonIgnore
-	private List<Category> categories;
+	private List<Category> categories = new ArrayList<Category>();
 		
 	//bi-directional many-to-many association to Device
 	@ManyToMany
@@ -338,10 +338,6 @@ public class User implements Serializable {
 		return this.ownedCategories;
 	}
 
-	public void setOwnedCagegories(List<Category> ownedCategories) {
-		this.ownedCategories = ownedCategories;
-	}
-	
 	public List<Device> getOwnedDevices() {
 		return this.ownedDevices;
 	}
