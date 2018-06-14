@@ -262,6 +262,8 @@ public class SessionController extends Controller {
 			session = getByToken(token);
 			if (session != null) {
 				sessions.put(token, session);
+			} else {
+				return null;
 			}
 		}
 		if( !isSuperuser(session)) {
