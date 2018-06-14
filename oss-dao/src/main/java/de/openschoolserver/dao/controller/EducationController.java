@@ -55,8 +55,14 @@ public class EducationController extends Controller {
 		return null;
 	}
 
-	/*
-	 * Return the list of ids of rooms in which a user may actually control the access.
+	/**
+	 * Return the list of rooms in which a user may actually control the access.<br>
+	 * A superuser may control all rooms except of smartRooms of the teachers and rooms with no control. Normal teachers may control:
+	 * <li>the room in which he is actual logged in if this room may be controlled.
+	 * <li>rooms with allTeachers control.
+	 * <li>rooms with teachers control if he is in the list of the controller.
+	 * <li>the own smartRooms
+	 * @return The list of the found rooms.
 	 */
 	public List<Room> getMyRooms() {
 		List<Room> rooms = new ArrayList<Room>();
@@ -88,6 +94,11 @@ public class EducationController extends Controller {
 		return rooms;
 	}
 
+	/**
+	 * Return the list of room ids in which a user may actually control the access.<br>
+	 * @return The list of the ids of the found rooms.
+	 * @see getMyRooms
+	 */
 	public List<Long> getMyRoomsId(){
 		List<Long> roomIds = new ArrayList<Long>();
 		for( Room room : this.getMyRooms()) {
