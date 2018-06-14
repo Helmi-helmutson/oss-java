@@ -374,10 +374,10 @@ public class RoomController extends Controller {
 			}
 			startIPAddresses.add(room.getStartIP());
 		}
-		// When no room was found in this network we return the FIRST_ROOM network address of the network.
+		// When no room was found in this network we return the FIRST_ROOM_NET network address of the network.
 		if( startIPAddresses.isEmpty() ) {
-			if( subNetwork.contains(this.getConfigValue("FIRST_ROOM"))) {
-				return this.getConfigValue("FIRST_ROOM");
+			if( subNetwork.contains(this.getConfigValue("FIRST_ROOM_NET"))) {
+				return this.getConfigValue("FIRST_ROOM_NET");
 			}
 			return subNetwork.getBase();
 		}
