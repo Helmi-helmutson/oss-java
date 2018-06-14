@@ -10,6 +10,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.openschoolserver.dao.Announcement;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Contact;
@@ -501,7 +503,17 @@ public class InformationController extends Controller {
 		if( this.isSuperuser() ) {
 			return categoryController.getByType("informations");
 		}
-		List<Category> categories = this.session.getUser().getCategories();
+		try {
+			logger.debug("User getCategories:" +new ObjectMapper().writeValueAsString(this.session.getUser().getCategories()));
+			logger.debug("User getOwnedCategories:" +new ObjectMapper().writeValueAsString(this.session.getUser().getOwnedCategories()));
+			logger.debug("Information Categories:" +new ObjectMapper().writeValueAsString(categoryController.getByType("informations")));
+		} catch (Exception e) {
+			logger.debug( "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }" );
+		}
+		List<Category> categories = new ArrayList<Category>();
+		for(Category category : this.session.getUser().getOwnedCategories() ) {
+			categories.add(category);
+		}
 		for(Category category : categoryController.getByType("informations") ) {
 			//TODO Clarify public categories
 			if( category.getOwner().getId() == 1L  ||
