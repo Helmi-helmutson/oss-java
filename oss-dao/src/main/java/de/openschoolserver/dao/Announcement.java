@@ -14,7 +14,8 @@ import javax.validation.constraints.Size;
 
 
 /**
- * The persistent class for the Announcements database table.
+ * The persistent class of the table Announcements
+ * @author varkoly
  *
  */
 @Entity
@@ -25,17 +26,29 @@ import javax.validation.constraints.Size;
 public class Announcement implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The technical id of the announcement
+	 */
 	@Id
 	@SequenceGenerator(name="ANNOUNCEMENTS_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="ANNOUNCEMENTS_ID_GENERATOR")
 	private Long id;
 
+	/**
+	 * The issue of the announcement. The maximal length is 128
+	 */
 	@Size(max=128, message="Issue must not be longer then 64 characters.")
 	private String issue;
 
+	/*+
+	 * Keywords to the announcement.
+	 */
 	@Size(max=128, message="Keywords must not be longer then 64 characters.")
 	private String keywords;
 
+	/**
+	 * The content of the announcement. Maximal length is 16MB
+	 */
 	private String text;
 
 	@Size(max=128, message="Title must not be longer then 64 characters.")
