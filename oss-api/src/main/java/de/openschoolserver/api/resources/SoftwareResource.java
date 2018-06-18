@@ -51,7 +51,7 @@ public interface SoftwareResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No category was found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+    @RolesAllowed("software.manage")
     List<Software> getAll(
             @ApiParam(hidden = true) @Auth Session session
             );
@@ -66,7 +66,7 @@ public interface SoftwareResource {
    @ApiResponses(value = {
            @ApiResponse(code = 404, message = "No category was found"),
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-   @PermitAll
+   @RolesAllowed("software.manage")
    List<Software> getAllInstallable(
            @ApiParam(hidden = true) @Auth Session session
            );
@@ -81,7 +81,7 @@ public interface SoftwareResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @RolesAllowed("software.search")
+    @RolesAllowed("software.manage")
     Software getById(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("softwareId") long softwareId
@@ -96,7 +96,7 @@ public interface SoftwareResource {
        @ApiOperation(value = "Gets a list of software objects to the list of softwareIds.")
        @ApiResponses(value = {
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @PermitAll
+       @RolesAllowed("software.manage")
        List<Software> getSoftwares(
                @ApiParam(hidden = true) @Auth Session session,
                List<Long> softwareIds
@@ -113,8 +113,7 @@ public interface SoftwareResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    //@PermitAll
-    @RolesAllowed("software.search")
+    @RolesAllowed("software.manage")
     List<Software> search(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("search") String search
@@ -133,7 +132,6 @@ public interface SoftwareResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    //@PermitAll
     @RolesAllowed("software.add")
     OssResponse add(
             @ApiParam(hidden = true) @Auth Session session,
@@ -168,7 +166,6 @@ public interface SoftwareResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    //@PermitAll
     @RolesAllowed("software.modify")
     OssResponse addRequirements(
             @ApiParam(hidden = true) @Auth Session session,
