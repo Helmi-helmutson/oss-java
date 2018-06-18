@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 import javax.persistence.EntityManager;
-import javax.persistence.Query;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
@@ -33,6 +32,12 @@ public class InformationController extends Controller {
 		super(session);
 	}
 
+	/**
+	 * Creates a new announcement
+	 * @param announcement
+	 * @return The result in form of OssResponse
+	 * @see Announcement
+	 */
 	public OssResponse addAnnouncement(Announcement announcement) {
 		//Check parameters
 		StringBuilder errorMessage = new StringBuilder();
@@ -75,6 +80,12 @@ public class InformationController extends Controller {
 		}
 	}
 
+	/**
+	 * Creates a new contact
+	 * @param contact 
+	 * @return The result in form of OssResponse
+	 * @see Contact
+	 */
 	public OssResponse addContact(Contact contact) {
 		//Check parameters
 		StringBuilder errorMessage = new StringBuilder();
@@ -116,6 +127,12 @@ public class InformationController extends Controller {
 		}
 	}
 
+	/**
+	 * Creates a new FAQ
+	 * @param faq 
+	 * @return The result in form of OssResponse
+	 * @see FAQ
+	 */
 	public OssResponse addFAQ(FAQ faq) {
 		//Check parameters
 		StringBuilder errorMessage = new StringBuilder();
@@ -160,10 +177,21 @@ public class InformationController extends Controller {
 	/**
 	 * Delivers the valid announcements corresponding to the session user.
 	 * @return
+	 * @see Announcement
 	 */
 	public List<Announcement> getAnnouncements() {
 		List<Announcement> announcements = new ArrayList<Announcement>();
-		User user = this.session.getUser();
+		User user;
+		EntityManager em = getEntityManager();
+		try {
+			user = em.find(User.class, this.session.getUser().getId());
+		} catch (Exception e) {
+			logger.error("add " + e.getMessage(),e);
+			em.close();
+			return null;
+		} finally {
+			em.close();
+		}
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
 				List<Category> categories = new ArrayList<Category>();
@@ -174,17 +202,29 @@ public class InformationController extends Controller {
 					)
 					{
 						announcement.setCategories(categories);
+						announcement.setText("");
 						announcements.add(announcement);
 					}
 				}
 			}
 		}
+		
 		return announcements;
 	}
 
 	public List<Announcement> getNewAnnouncements() {
 		List<Announcement> announcements = new ArrayList<Announcement>();
-		User user = this.session.getUser();
+		User user;
+		EntityManager em = getEntityManager();
+		try {
+			user = em.find(User.class, this.session.getUser().getId());
+		} catch (Exception e) {
+			logger.error("add " + e.getMessage(),e);
+			em.close();
+			return null;
+		} finally {
+			em.close();
+		}
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
 				List<Category> categories = new ArrayList<Category>();
@@ -229,13 +269,24 @@ public class InformationController extends Controller {
 	 */
 	public List<FAQ> getFAQs() {
 		List<FAQ> faqs = new ArrayList<FAQ>();
-		User user = this.session.getUser();
+		User user;
+		EntityManager em = getEntityManager();
+		try {
+			user = em.find(User.class, this.session.getUser().getId());
+		} catch (Exception e) {
+			logger.error("add " + e.getMessage(),e);
+			em.close();
+			return null;
+		} finally {
+			em.close();
+		}
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
 				List<Category> categories = new ArrayList<Category>();
 				categories.add(category);
 				for(FAQ faq : category.getFaqs() ) {
 					faq.setCategories(categories);
+					faq.setText("");
 					faqs.add(faq);
 				}
 			}
@@ -250,7 +301,17 @@ public class InformationController extends Controller {
 	 */
 	public List<Contact> getContacts() {
 		List<Contact> contacts = new ArrayList<Contact>();
-		User user = this.session.getUser();
+		User user;
+		EntityManager em = getEntityManager();
+		try {
+			user = em.find(User.class, this.session.getUser().getId());
+		} catch (Exception e) {
+			logger.error("add " + e.getMessage(),e);
+			em.close();
+			return null;
+		} finally {
+			em.close();
+		}
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
 				List<Category> categories = new ArrayList<Category>();
