@@ -91,6 +91,9 @@ public class Controller extends Config {
 	}
 
 	public boolean isNameUnique(String name){
+		if( this.getConfigValue("WORKGROUP").equals(name)) {
+			return false;
+		}
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("User.getByUid");
 		query.setParameter("uid", name);
@@ -633,7 +636,7 @@ public class Controller extends Config {
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
-		case "de.openschoolserver.dao.Group":
+		case "Group":
 			 query.setParameter("type","Group");
 			 id    = ((Group) object ).getId();
 			 break;
