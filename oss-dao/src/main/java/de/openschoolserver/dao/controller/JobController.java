@@ -25,9 +25,6 @@ import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
 
 public class JobController extends Controller {
 	
@@ -61,19 +58,17 @@ public class JobController extends Controller {
 		}
 	}
 	
+	/**
+	 * Creates a new job
+	 * @param job The job to be created.
+	 * @return The result in an OssResponse object
+	 * @see OssResponse
+	 */
 	public OssResponse createJob(Job job) {
-		/*
-		 * Check job parameters
-		 */
-		StringBuilder errorMessage = new StringBuilder();
-		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-		for (ConstraintViolation<Job> violation : factory.getValidator().validate(job) ) {
-			errorMessage.append(violation.getMessage()).append(getNl());
+
+		if( job.getDescription().length() > 128 ) {
+			job.setDescription(job.getDescription().substring(0, 127));
 		}
-		if( errorMessage.length() > 0 ) {
-			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
-		}
-		
 		/*
 		 * Set job start time
 		 */
@@ -114,7 +109,7 @@ public class JobController extends Controller {
 			tmp.add("( /usr/share/oss/tools/oss_date.sh");
 			tmp.add(job.getCommand());
 			tmp.add("E=$?");
-			tmp.add("oss_api.sh PUT system/jobs/"+String.valueOf(job.getId())+"/exitCode/$E");
+			tmp.add("oss_api.sh PUT system/jobs/"+String.valueOf(job.getId())+"/exit/$E");
 			tmp.add("echo $E");
 			tmp.add("/usr/share/oss/tools/oss_date.sh) &> " + path.toString()+ ".log");
 			Files.write(jobFile, tmp );
@@ -140,11 +135,8 @@ public class JobController extends Controller {
 
 	public OssResponse setExitCode(Long jobId, Integer exitCode) {
 		EntityManager em = getEntityManager();
-		Job job = this.getById(jobId);
-		if( job == null ) {
-			return new OssResponse(this.getSession(),"ERROR", "Job was not found.");
-		}
 		try {
+			Job job = em.find(Job.class, jobId);
 			job.setExitCode(exitCode);
 			job.setEndTime(new Timestamp(System.currentTimeMillis()));
 			em.getTransaction().begin();
@@ -161,11 +153,8 @@ public class JobController extends Controller {
 
 	public OssResponse restartJob(Long jobId) {
 		EntityManager em = getEntityManager();
-		Job job = this.getById(jobId);
-		if( job == null ) {
-			return new OssResponse(this.getSession(),"ERROR", "Job was not found.");
-		}
 		try {
+			Job job = em.find(Job.class, jobId);
 			job.setStartTime(new Timestamp(System.currentTimeMillis()));
 			em.getTransaction().begin();
 			em.merge(job);

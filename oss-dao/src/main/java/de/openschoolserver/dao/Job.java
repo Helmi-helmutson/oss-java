@@ -33,10 +33,8 @@ public class Job implements Serializable {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="CEPHALIXJOBS_ID_GENERATOR")
 	private Long id;
 
-	@Size(max=128, message="Description must not be longer then 128 characters.")
 	private String description;
 
-	@Future
 	private Timestamp startTime;
 	
 	private Timestamp endTime;
