@@ -186,7 +186,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		SoftwareController softwareController = new SoftwareController(session);
 		return softwareController.downloadSoftwares(softwares);
 	}
-	
+
 	@Override
 	public List<Map<String, String>> listDownloadedSoftware(Session session) {
 		return new SoftwareController(session).listDownloadedSoftware();
@@ -320,11 +320,9 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public String downloadStatus(Session session) {
 		try {
 			return	String.join(" ", Files.readAllLines(Paths.get("/run/lock/oss-api/oss_download_packages")));
+		} catch( IOException e ) {
+			return "";
 		}
-		catch( IOException e ) { 
-			e.printStackTrace();
-		}
-		return "";
 	}
 
 	@Override
