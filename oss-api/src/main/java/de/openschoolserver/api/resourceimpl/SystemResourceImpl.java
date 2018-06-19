@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -88,10 +87,25 @@ public class SystemResourceImpl implements SystemResource {
 	@Override
 	public OssResponse setConfig(Session session, String key, String value) {
 		SystemController systemController = new SystemController(session);
-		if( systemController.setConfigValue(key, value) )
-			return new OssResponse(session,"OK","Global configuration value was set succesfully."); 
-		else
+		if( systemController.setConfigValue(key, value) ) {
+			return new OssResponse(session,"OK","Global configuration value was set succesfully.");
+		} else {
 			return new OssResponse(session,"ERROR","Global configuration value could not be set.");
+		}
+	}
+
+	@Override
+	public OssResponse setConfig(Session session, Map<String, String> config) {
+		SystemController systemController = new SystemController(session);
+		try {
+			if( systemController.setConfigValue(config.get("key"), config.get("value")) ) {
+				return new OssResponse(session,"OK","Global configuration value was set succesfully.");
+			} else {
+				return new OssResponse(session,"ERROR","Global configuration value could not be set.");
+			}
+		} catch(Exception e) {
+			return new OssResponse(session,"ERROR","Global configuration value could not be set.");
+		}
 	}
 
 	@Override
@@ -185,7 +199,7 @@ public class SystemResourceImpl implements SystemResource {
 		try {
 			return	Files.readAllLines(Paths.get("/var/lib/squidGuard/db/custom/" +list + "/domains"));
 		}
-		catch( IOException e ) { 
+		catch( IOException e ) {
 			e.printStackTrace();
 		}
 		return null;
@@ -206,7 +220,7 @@ public class SystemResourceImpl implements SystemResource {
 			OSSShellTools.exec(program, reply, error, null);
 			new Controller(session).systemctl("restart", "squid");
 			return new OssResponse(session,"OK","Custom list was written successfully");
-		} catch( IOException e ) { 
+		} catch( IOException e ) {
 			e.printStackTrace();
 		}
 		return new OssResponse(session,"ERROR","Could not write custom list.");
@@ -224,20 +238,17 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public Job getJob(Session session, Long jobId) {
-		// TODO Auto-generated method stub
-		return null;
+		return new JobController(session).getById(jobId);
 	}
 
 	@Override
 	public OssResponse setJobExitValue(Session session, Long jobId, Integer exitValue) {
-		// TODO Auto-generated method stub
-		return null;
+		return new JobController(session).setExitCode(jobId, exitValue);
 	}
 
 	@Override
 	public OssResponse restartJob(Session session, Long jobId) {
-		// TODO Auto-generated method stub
-		return null;
+		return new JobController(session).restartJob(jobId);
 	}
 
 	/*
@@ -284,7 +295,4 @@ public class SystemResourceImpl implements SystemResource {
 		Session session  = new SessionController().getLocalhostSession();
 		return new SystemController(session).getConfigValue("NAME");
 	}
-
-
-
 }

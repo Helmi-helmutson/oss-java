@@ -118,7 +118,9 @@ public interface SystemResource {
     @GET
     @Path("configuration")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the whole system configuration.")
+    @ApiOperation(value = "* Gets the whole system configuration in a list of maps."
+  + "* A map has folloing format:"
+  + "* {\"path\":\"Basic\",\"readOnly\":\"yes\",\"type\":\"string\",\"value\":\"DE\",\"key\":\"CCODE\"}")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -152,6 +154,21 @@ public interface SystemResource {
         @ApiParam(hidden = true) @Auth Session session,
             @PathParam("key") String key,
             @PathParam("value") String value
+    );
+
+    @POST
+    @Path("configuration")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Sets a system configuration in a map."
+	+ "* The map must have following format:"
+	+ "* {key:<key>,value:<value>}")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.configuration")
+    OssResponse setConfig(
+        @ApiParam(hidden = true) @Auth Session session,
+       Map<String, String> config
     );
 
     // Firewall configuration
