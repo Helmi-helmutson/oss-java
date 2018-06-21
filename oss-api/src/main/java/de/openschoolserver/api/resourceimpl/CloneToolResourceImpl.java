@@ -60,6 +60,9 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	public Long getMaster(Session session, Long hwconfId) {
 		CloneToolController cloneToolController = new CloneToolController(session);
 		HWConf hwconf = cloneToolController.getById(hwconfId);
+		if( hwconf == null ) {
+			return null;
+		}
 		for( Device device : hwconf.getDevices() ) {
 			if( cloneToolController.checkConfig(device, "isMaster") ) {
 				return device.getId();

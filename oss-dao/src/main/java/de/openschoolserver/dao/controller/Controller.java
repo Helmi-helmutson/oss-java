@@ -723,7 +723,7 @@ public class Controller extends Config {
 			em.persist(mconfig);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("addMConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
@@ -763,7 +763,7 @@ public class Controller extends Config {
 			em.persist(config);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("addConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
@@ -777,13 +777,14 @@ public class Controller extends Config {
 		}
 		EntityManager em = this.getEntityManager();
 		OSSConfig config = this.getConfigObject(object, key);
-		config.setValue(value);
 		try {
+			config = em.find(OSSConfig.class, config.getId());
+			config.setValue(value);
 			em.getTransaction().begin();
 			em.merge(config);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("setConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
@@ -799,11 +800,12 @@ public class Controller extends Config {
 		EntityManager em = this.getEntityManager();
 		try {
 			em.getTransaction().begin();
+			config = em.find(OSSConfig.class, config.getId());
 			em.merge(config);
 			em.remove(config);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("deleteConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
@@ -819,11 +821,12 @@ public class Controller extends Config {
 		EntityManager em = this.getEntityManager();
 		try {
 			em.getTransaction().begin();
+			config = em.find(OSSMConfig.class, config.getId());
 			em.merge(config);
 			em.remove(config);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("deleteMConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
