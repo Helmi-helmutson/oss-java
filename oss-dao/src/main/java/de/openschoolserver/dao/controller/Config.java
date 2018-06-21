@@ -135,7 +135,7 @@ public class Config {
 		config.put(key, value);
 		List<String> tmpConfig =  new ArrayList<String>();
 		for ( String line : configFile ){
-			if(line.startsWith(this.prefix + key)){
+			if(line.startsWith(this.prefix + key + "=")){
 				tmpConfig.add( this.prefix + key + "=\"" + value + "\"" );  
 			}
 			else{
