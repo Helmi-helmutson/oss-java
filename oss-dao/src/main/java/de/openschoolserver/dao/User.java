@@ -168,7 +168,6 @@ public class User implements Serializable {
 	@Column(name = "creator_id")
 	private Long creatorId;
 
-	@JsonIgnore
 	private String initialPassword;
 
 	@Transient

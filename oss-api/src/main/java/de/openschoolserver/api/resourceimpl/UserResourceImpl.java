@@ -1,29 +1,40 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.EntityManager;
 import javax.ws.rs.WebApplicationException;
 
+import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.openschoolserver.api.resources.UserResource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.controller.CategoryController;
+import de.openschoolserver.dao.UserImport;
+import de.openschoolserver.dao.controller.Controller;
 import de.openschoolserver.dao.controller.GroupController;
 import de.openschoolserver.dao.controller.UserController;
+import de.openschoolserver.dao.tools.OSSShellTools;
 import de.openschoolserver.dao.OssResponse;
 
 public class UserResourceImpl implements UserResource {
-	
-	Logger logger           = LoggerFactory.getLogger(UserResourceImpl.class);
+
+	Logger logger = LoggerFactory.getLogger(UserResourceImpl.class);
 
 	@Override
 	public User getById(Session session, long userId) {
@@ -44,7 +55,7 @@ public class UserResourceImpl implements UserResource {
 		}
 		return users;
 	}
-	
+
 	@Override
 	public List<User> getAll(Session session) {
 		final UserController userController = new UserController(session);
@@ -108,16 +119,16 @@ public class UserResourceImpl implements UserResource {
 		}
 		return groups;
 	}
-	
+
 	@Override
 	public OssResponse setMembers(Session session, long userId, List<Long> groupIds) {
 		return new UserController(session).setGroups(userId,groupIds);
 	}
-	
+
 	@Override
 	public OssResponse removeMember(Session session, long groupId, long userId) {
 		final GroupController groupController = new GroupController(session);
-		return groupController.removeMember(groupId,userId);	
+		return groupController.removeMember(groupId,userId);
 	}
 
 	@Override
@@ -183,7 +194,7 @@ public class UserResourceImpl implements UserResource {
 					if( config != null ) {
 						configs.add(config);
 					}
-				}	
+				}
 			}
 			if( userController.getConfig(user, attribute) != null ) {
 				configs.add(userController.getConfig(user, attribute));
@@ -216,5 +227,205 @@ public class UserResourceImpl implements UserResource {
 	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, int count,
 			Date validUntil) {
 		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
+	}
+
+	@Override
+	public String getGroups(Session session, String userName) {
+		return new UserController(session).getGroupsOfUser(userName,"workgroup");
+	}
+
+	@Override
+	public String getClasses(Session session, String userName) {
+		return new UserController(session).getGroupsOfUser(userName,"class");
+	}
+
+	@Override
+	public String addToGroup(Session session, String userName, String groupName) {
+		return new GroupController(session).addMember(groupName, userName).getCode();
+	}
+
+	@Override
+	public String removeFromGroup(Session session, String userName, String groupName) {
+		return new GroupController(session).removeMember(groupName, userName).getCode();
+	}
+
+	@Override
+	public String delete(Session session, String userName) {
+		return new UserController(session).delete(userName).getCode();
+	}
+
+	@Override
+	public String createUid(Session session, String givenName, String surName) {
+		return null;
+	}
+
+	@Override
+	public OssResponse importUser(Session session, String role, String lang, String idetntifier, boolean test,
+			String password, boolean mustchange, boolean full, boolean allClasses, boolean cleanClassDirs,
+			boolean resetPassword, InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
+		File file = null;
+		try {
+			file = File.createTempFile("oss", "importUser", new File("/opt/oss-java/tmp/"));
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return new OssResponse(session,"ERROR", "Import file can not be saved" + e.getMessage());
+		}
+		List<String> parameters = new ArrayList<String>();
+		parameters.add("/usr/sbin/oss_import_user_list.pl");
+		parameters.add("--input");
+		parameters.add(file.getAbsolutePath());
+		parameters.add("--role");
+		parameters.add(role);
+		parameters.add("--lang");
+		parameters.add(lang);
+		if( idetntifier != null && !idetntifier.isEmpty() ) {
+			parameters.add("--idetntifier");
+			parameters.add(idetntifier);
+		}
+		if( test ) {
+			parameters.add("--test");
+		}
+		if( password != null && ! password.isEmpty() ) {
+			parameters.add("--password");
+			parameters.add(password);
+		}
+		if( mustchange ) {
+			parameters.add("--mustchange");
+		}
+		if( full ) {
+			parameters.add("--full");
+		}
+		if( allClasses ) {
+			parameters.add("--allClasses");
+		}
+		if( cleanClassDirs ) {
+			parameters.add("--cleanClassDirs");
+		}
+		if( resetPassword ) {
+			parameters.add("--resetPassword");
+		}
+		String[] program = new String[parameters.size()];
+		program = parameters.toArray(program);
+
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new OssResponse(session,"OK", "Import was started.");
+	}
+
+	@Override
+	public List<UserImport> getImports(Session session) {
+		Controller controller    = new Controller(session);
+		StringBuilder importDir  = controller.getImportDir("");
+		List<UserImport> imports = new ArrayList<UserImport>();
+		File importDirObject = new File(importDir.toString());
+		for( String file :  importDirObject.list() ) {
+				imports.add(getImport(session,file.replaceAll(importDir.append("/").toString(), "")));
+		}
+		return imports;
+	}
+
+	@Override
+	public UserImport getImport(Session session, String startTime) {
+		Controller controller    = new Controller(session);
+		String content;
+		UserImport userImport;
+		String importLog  = controller.getImportDir(startTime).append("/import.log").toString();
+		String importJson = controller.getImportDir(startTime).append("/parameters.json").toString();
+		ObjectMapper mapper = new ObjectMapper();
+		logger.debug("getImport 1:"+ startTime);
+		try {
+			content = String.join("", Files.readAllLines(Paths.get(importJson)));
+			userImport =  mapper.readValue(IOUtils.toInputStream(content, "UTF-8"),UserImport.class);
+		} catch( IOException e ) {
+			logger.debug("getImport 2:"+ e.getMessage());
+			return null;
+		}
+		try {
+			content = String.join("", Files.readAllLines(Paths.get(importLog),Charset.forName("UTF-8")));
+			userImport.setResult(content);
+		} catch( IOException e ) {
+			logger.debug("getImport 3:"+ importLog + " " + content + "####" + e.getMessage());
+		}
+		return userImport;
+	}
+
+	@Override
+	public OssResponse restartImport(Session session, String startTime) {
+		UserImport userImport = getImport(session, startTime);
+		if( userImport != null ) {
+			Controller controller    = new Controller(session);
+			StringBuilder importFile = controller.getImportDir(startTime);
+			importFile.append("/userlist.txt");
+			List<String> parameters = new ArrayList<String>();
+			parameters.add("/usr/sbin/oss_import_user_list.pl");
+			parameters.add("--input");
+			parameters.add(importFile.toString());
+			parameters.add("--role");
+			parameters.add(userImport.getRole());
+			parameters.add("--lang");
+			parameters.add(userImport.getLang());
+			parameters.add("--idetntifier");
+			parameters.add(userImport.getIdentifier());
+			if( ! userImport.getPassword().isEmpty() ) {
+				parameters.add("--password");
+				parameters.add(userImport.getPassword());
+			}
+			if( userImport.isMustchange()  ) {
+				parameters.add("--mustchange");
+			}
+			if( userImport.isFull() ) {
+				parameters.add("--full");
+			}
+			if( userImport.isFull() ) {
+				parameters.add("--allClasses");
+			}
+			if( userImport.isCleanClassDirs() ) {
+				parameters.add("--cleanClassDirs");
+			}
+			if( userImport.isResetPassword() ) {
+				parameters.add("--resetPassword");
+			}
+			String[] program = new String[parameters.size()];
+			program = parameters.toArray(program);
+
+			StringBuffer reply  = new StringBuffer();
+			StringBuffer stderr = new StringBuffer();
+			OSSShellTools.exec(program, reply, stderr, null);
+			return new OssResponse(session,"OK", "Import was started.");
+		}
+		return new OssResponse(session,"ERROR", "CAn not find the import.");
+	}
+
+	@Override
+	public OssResponse deleteImport(Session session, String startTime) {
+		Controller controller    = new Controller(session);
+		StringBuilder importDir  = controller.getImportDir(startTime);
+		if( startTime == null || startTime.isEmpty() ) {
+			return new OssResponse(session,"ERROR", "Invalid import name.");
+		}
+		String[] program = new String[3];
+		program[0] = "rm";
+		program[1] = "-rf";
+		program[2] = importDir.toString();
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new OssResponse(session,"OK", "Import was deleted.");
+	}
+
+	@Override
+	public UserImport getRunningImport(Session session) {
+		List<String> runningImport;
+		try {
+			runningImport = Files.readAllLines(Paths.get("/run/oss_import_user"));
+			if( !runningImport.isEmpty() ) {
+				return getImport(session,runningImport.get(0));
+			}
+		} catch( IOException e ) {
+			return null;
+		}
+		return null;
 	}
 }

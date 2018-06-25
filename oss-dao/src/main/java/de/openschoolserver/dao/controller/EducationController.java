@@ -544,7 +544,7 @@ public class EducationController extends Controller {
 		}
 	}
 
-	/*
+	/**
 	 * getRoomControl
 	 * @param roomId	The roomId which should be controlled
 	 * @param minutes   How long do you want to control the room

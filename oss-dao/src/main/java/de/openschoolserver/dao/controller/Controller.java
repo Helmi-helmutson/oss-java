@@ -661,6 +661,11 @@ public class Controller extends Config {
 		return values;
 	}
 	
+	public StringBuilder getImportDir(String startTime) {
+		StringBuilder importDir = new StringBuilder();
+		importDir.append(getConfigValue("HOME_BASE")).append("/groups/SYSADMINS/userimports/").append(startTime);
+		return importDir;
+	}
 	public String getConfig(Object object, String key) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();

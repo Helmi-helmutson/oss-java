@@ -293,12 +293,17 @@ public class UserController extends Controller {
 		return this.delete(this.getById(userId));
 	}
 
+	public OssResponse delete(String uid) {
+		return this.delete(this.getByUid(uid));
+	}
+
 	public OssResponse delete(User user) {
 		if (this.isProtected(user)) {
 			return new OssResponse(this.getSession(), "ERROR", "This user must not be deleted.");
 		}
 		this.startPlugin("delete_user", user);
 		EntityManager em = getEntityManager();
+		user = em.find(User.class, user.getId());
 		List<Device> devices = user.getOwnedDevices();
 		boolean restartDHCP = !devices.isEmpty();
 		em.getTransaction().begin();
@@ -698,6 +703,20 @@ public class UserController extends Controller {
 		ossResponse.setValue("Guest Users were created succesfully");
 		ossResponse.setCode("OK");
 		return ossResponse;
+	}
+
+	public String getGroupsOfUser(String userName, String groupType) {
+		User user = this.getByUid(userName);
+		if( user ==  null ) {
+			return "";
+		}
+		List<String> groups = new ArrayList<String>();
+		for(Group group : user.getGroups() ) {
+			if( group.getGroupType().equals(groupType)) {
+				groups.add(group.getName());
+			}
+		}
+		return String.join(this.getNl(), groups);
 	}
 
 }

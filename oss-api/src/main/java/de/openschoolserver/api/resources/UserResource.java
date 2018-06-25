@@ -11,11 +11,16 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.*;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.UserImport;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
@@ -123,10 +128,10 @@ public interface UserResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("search") String search
     );
-    
+
     /*
-   	 * POST user/getUsers
-   	 */
+   * POST user/getUsers
+   */
        @POST
        @Path("getUsers")
        @Produces(JSON_UTF8)
@@ -156,7 +161,7 @@ public interface UserResource {
             @ApiParam(hidden = true) @Auth Session session,
             User user
     );
-    
+
     /*
      * POST users/add [ { hash }, { user } ]
      */
@@ -174,7 +179,7 @@ public interface UserResource {
             @ApiParam(hidden = true) @Auth Session session,
             List<User> users
     );
-    
+
     /*
      * POST users/modify { hash }
      */
@@ -192,7 +197,7 @@ public interface UserResource {
             @ApiParam(hidden = true) @Auth Session session,
             User user
     );
-    
+
 
     /*
      * DELETE users/<userId>
@@ -209,10 +214,10 @@ public interface UserResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("userId") long userId
     );
-    
+
     /*
-   	 * POST users/<userId>/groups
-   	 */
+   * POST users/<userId>/groups
+   */
        @POST
        @Path("{userId}/groups")
        @Produces(JSON_UTF8)
@@ -226,8 +231,8 @@ public interface UserResource {
                @PathParam("userId") long userId,
                List<Long> groups
        );
-       
-    
+
+
     /*
      * DELETE users/<userId>/<groupId>
      */
@@ -244,7 +249,7 @@ public interface UserResource {
             @PathParam("groupId") long groupId,
             @PathParam("userId") long userId
     );
-    
+
     /*
      * PUT users/<groupId>/<userId>
      */
@@ -261,7 +266,7 @@ public interface UserResource {
             @PathParam("groupId") long groupId,
             @PathParam("userId") long userId
     );
-    
+
     /*
      * POST syncFsQuotas
      */
@@ -277,10 +282,10 @@ public interface UserResource {
                 @ApiParam(hidden = true) @Auth Session session,
                 List<List<String>> Quotas
     );
-    
+
     /*
      * GET users/byUid/{uid}/{attribute}
-     * Get's an attribute from a user 
+     * Get's an attribute from a user
      */
     @GET
     @Path("byUid/{uid}/{attribute}")
@@ -291,12 +296,12 @@ public interface UserResource {
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
      @RolesAllowed("user.search")
      String getUserAttribute(
-    		@ApiParam(hidden = true) @Auth Session session,
+  @ApiParam(hidden = true) @Auth Session session,
             @PathParam("uid")  String uid,
             @PathParam("attribute") String attribute
-    		);
-    
-    
+  );
+
+
     /*
      * Mange gast user
      */
@@ -311,7 +316,7 @@ public interface UserResource {
      List<Category> getGuestUsers(
                  @ApiParam(hidden = true) @Auth Session session
      );
-     
+
      @GET
      @Path("guestUsers/{guestUsersId}")
      @Produces(JSON_UTF8)
@@ -324,7 +329,7 @@ public interface UserResource {
                  @ApiParam(hidden = true) @Auth Session session,
                  @PathParam("guestUsersId")     Long    guestUsersId
      );
-     
+
      @DELETE
      @Path("guestUsers/{guestUsersId}")
      @Produces(JSON_UTF8)
@@ -337,24 +342,204 @@ public interface UserResource {
                  @ApiParam(hidden = true) @Auth Session session,
                  @PathParam("guestUsersId")     Long    guestUsersId
      );
-     
- 	@POST
- 	@Path("add")
- 	@Produces(JSON_UTF8)
- 	@Consumes(MediaType.MULTIPART_FORM_DATA)
- 	@ApiOperation(value = "Creates a new printer.")
- 	@ApiResponses(value = {
- 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
- 	@RolesAllowed("user.guestusers")
- 	OssResponse addGuestUsers(
- 			@ApiParam(hidden = true) @Auth Session session,
- 			@FormDataParam("name")          String  name,
- 			@FormDataParam("description")   String  description,
- 			@FormDataParam("roomId")   		Long    roomId,
- 			@FormDataParam("count")   		int     count,
- 			@FormDataParam("validUntil")    Date    validUntil
- 			);
-     
-     
-     
+
+@POST
+@Path("add")
+@Produces(JSON_UTF8)
+@Consumes(MediaType.MULTIPART_FORM_DATA)
+@ApiOperation(value = "Creates a new printer.")
+@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+@RolesAllowed("user.guestusers")
+OssResponse addGuestUsers(
+		@ApiParam(hidden = true) @Auth Session session,
+		@FormDataParam("name")          String  name,
+		@FormDataParam("description")   String  description,
+		@FormDataParam("roomId") Long    roomId,
+		@FormDataParam("count") int     count,
+		@FormDataParam("validUntil")    Date    validUntil
+		);
+
+/*
+ * Some api calls with text arguments
+ */
+@DELETE
+@Path("texte/{userName}")
+@Produces(TEXT)
+@ApiOperation(value = "Delets a user presented by name.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.delete")
+    String  delete(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("userName")     String    userName
+    );
+
+@GET
+@Path("text/{userName}/groups")
+@Produces(TEXT)
+@ApiOperation(value = "Delivers a new line separated list of group of the user.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    String  getGroups(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("userName")     String    userName
+    );
+
+@GET
+@Path("text/{userName}/classes")
+@Produces(TEXT)
+@ApiOperation(value = "Delivers a new line separated list of classes of the user.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    String  getClasses(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("userName")     String    userName
+    );
+
+@PUT
+@Path("text/{userName}/groups/{groupName}")
+@Produces(TEXT)
+@ApiOperation(value = "Add a user to a group.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    String  addToGroup(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("userName")     String    userName,
+                @PathParam("groupName")    String    groupName
+    );
+
+@DELETE
+@Path("text/{userName}/groups/{groupName}")
+@Produces(TEXT)
+@ApiOperation(value = "Removes a user from a group.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    String removeFromGroup(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("userName")     String    userName,
+                @PathParam("groupName")    String    groupName
+    );
+
+@GET
+@Path("text/createUid/{givenName}/{surName}")
+@Produces(TEXT)
+@ApiOperation(value = "Delivers a comma separated list of group of the user.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    String createUid(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("givenName")  String    givenName,
+                @PathParam("surName")    String    surName
+    );
+
+@POST
+	@Path("imports")
+	@Produces(JSON_UTF8)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@ApiOperation(value = "Import a list of users. The parameters:"
+			+ "* role The role of the users to import."
+			+ "* lang The language of the header."
+			+ "* identifier The attribute tu identify the user: sn-gn-bd, uid, uuid"
+			+ "* test Test run only."
+			+ "* password Set this a password for all new user."
+			+ "* mustChange New user has to change the password by first login."
+			+ "* The next parameters has onyl effect when role == students"
+			+ "* full Does this file contains all students."
+			+ "* allClasses Classes which are not in the list must be deleted."
+			+ "* cleanClassDirs Clean all class directories."
+			+ "* resetPassword Also old user will get new password.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("user.add")
+	OssResponse importUser(
+			@ApiParam(hidden = true) @Auth   Session session,
+			@FormDataParam("role")           String  role,
+			@FormDataParam("lang")      String  lang,
+			@FormDataParam("idetntifier")  String  idetntifier,
+			@FormDataParam("test")  boolean test,
+			@FormDataParam("password")       String  password,
+			@FormDataParam("mustchange")     boolean mustchange,
+			@FormDataParam("full")  boolean full,
+			@FormDataParam("allClasses")     boolean allClasses,
+			@FormDataParam("cleanClassDirs") boolean cleanClassDirs,
+			@FormDataParam("resetPassword")  boolean resetPassword,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+			);
+
+@GET
+@Path("imports")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of imports.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.search")
+    List<UserImport> getImports(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+
+@GET
+@Path("imports/{startTime}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of imports.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.search")
+    UserImport getImport(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("startTime")  String    startTime
+    );
+
+@PUT
+@Path("imports/{startTime}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of imports.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.search")
+    OssResponse restartImport(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("startTime")  String    startTime
+    );
+
+@DELETE
+@Path("imports/{startTime}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of imports.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.search")
+    OssResponse deleteImport(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("startTime")  String    startTime
+    );
+
+@GET
+@Path("imports/running")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of imports.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.search")
+    UserImport getRunningImport(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+
 }
