@@ -188,6 +188,23 @@ public class Category implements Serializable {
 	@Convert(converter=BooleanToStringConverter.class)
 	boolean studentsOnly;
 
+	@Convert(converter=BooleanToStringConverter.class)
+	boolean publicAccess;
+	
+	public boolean isPublicAccess() {
+		return publicAccess;
+	}
+
+
+	public void setPublicAccess(boolean publicAccess) {
+		this.publicAccess = publicAccess;
+	}
+
+
+	public Date getValidFrom() {
+		return validFrom;
+	}
+
 
 	@Override
 	public String toString() {
