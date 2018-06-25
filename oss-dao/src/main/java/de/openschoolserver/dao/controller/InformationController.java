@@ -576,9 +576,7 @@ public class InformationController extends Controller {
 			categories.add(category);
 		}
 		for(Category category : categoryController.getByType("informations") ) {
-			//TODO Clarify public categories
-			if( category.getOwner().getId() == 1L  ||
-				category.getOwner().getId() == 6L	) {
+			if( category.isPublicAccess()	) {
 				categories.add(category);
 			}
 		}
