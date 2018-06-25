@@ -119,6 +119,22 @@ public interface GroupResource {
     );
 
     /*
+     * GET groups/text/byType/{type}
+     */
+    @DELETE
+    @Path("text/{groupName}")
+    @Produces(TEXT)
+    @ApiOperation(value = "Deletes a group presented by name.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("group.search")
+    String delete(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("groupName") String groupName
+    );
+
+    /*
      * GET groups/all
      */
     @GET

@@ -99,4 +99,9 @@ public class GroupResourceImpl implements GroupResource {
 		return String.join("\n",groups);
 	}
 
+	@Override
+	public String delete(Session session, String groupName) {
+		return new GroupController(session).delete(groupName).getCode();
+	}
+
 }
