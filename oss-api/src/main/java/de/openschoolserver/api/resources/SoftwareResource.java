@@ -389,17 +389,16 @@ public interface SoftwareResource {
             @ApiParam(hidden = true) @Auth Session session
     );
 
-    /* ########################################
-     * Functions to manage installation sets  #
-     * ########################################
-     */
-    /*
-     * PUT
+    /**
+     * Creates the salt state files for the minions.
+     * @param session
+     * @param category
+     * @return  The result in an OssResult object
      */
     @PUT
     @Path("saveState")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Save the actuall software configuration.")
+    @ApiOperation(value = "Creates the salt state files for the minions.")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -408,8 +407,29 @@ public interface SoftwareResource {
             @ApiParam(hidden = true) @Auth Session session
             );
 
-    /*
-     * POST softwares/installations
+    /**
+     * Applies the high states created in the salt state files for the minions.
+     * @param session
+     * @param category
+     * @return  The result in an OssResult object.
+     */
+    @PUT
+    @Path("applyState")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Applies the high states created in the salt state files for the minions.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.modify")
+    OssResponse applyState(
+            @ApiParam(hidden = true) @Auth Session session
+            );
+
+    /**
+     * Creates a new software installation set.
+     * @param session
+     * @param category
+     * @return The result in an OssResult object.
      */
     @POST
     @Path("installations")
@@ -693,7 +713,7 @@ public interface SoftwareResource {
 
 
     /* ##########################################
-     * Functions to get the installation status  
+     * Functions to get the installation status
      * ##########################################
      *
      * GET softwares/devices/{deviceId}
@@ -863,7 +883,4 @@ public interface SoftwareResource {
             @ApiParam(hidden = true) @Auth Session session,
             @ApiParam(value = "ID of the software",required = true) @PathParam("hwconfId") Long hwconfId
             );
-
-    
-    
 }

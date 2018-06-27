@@ -25,6 +25,7 @@ import de.openschoolserver.dao.SoftwareVersion;
 import de.openschoolserver.dao.controller.SoftwareController;
 import de.openschoolserver.dao.controller.CategoryController;
 import de.openschoolserver.dao.controller.CloneToolController;
+import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.RoomController;
 
 public class SoftwareResourceImpl implements SoftwareResource {
@@ -345,5 +346,14 @@ public class SoftwareResourceImpl implements SoftwareResource {
 			ss.addAll(sc.getAllSoftwareStatusOnDevice(device));
 		}
 		return ss;
+	}
+
+	@Override
+	public OssResponse applyState(Session session) {
+		DeviceController deviceController = new DeviceController(session);
+		for( Device device : deviceController.getAll() ) {
+			deviceController.manageDevice(device, "applyState", null);
+		}
+		return new OssResponse(session,"OK","Salt High State was applied on all minions.");
 	}
 }
