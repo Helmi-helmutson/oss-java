@@ -17,12 +17,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Entity
 @Table(name="Jobs")
 @NamedQueries({
-	@NamedQuery(name="Job.findAll",                 query="SELECT c FROM Job c"),
-	@NamedQuery(name="Job.findAllByTime",           query="SELECT c FROM Job c WHERE c.startTime > :after AND c.startTime < :befor"),
-	@NamedQuery(name="Job.getByDescriptionAndTime", query="SELECT c FROM Job c WHERE c.description LIKE :description AND c.startTime > :after AND c.startTime < :befor"),
-	@NamedQuery(name="Job.getByDescription",        query="SELECT c FROM Job c WHERE c.description LIKE :description"),
-	@NamedQuery(name="Job.getByExtiCode",           query="SELECT c FROM Job c WHERE c.exitCode = :extiCode"),
-	@NamedQuery(name="Job.getByNonExtiCode",        query="SELECT c FROM Job c WHERE c.exitCode != :extiCode")
+	@NamedQuery(name="Job.findAll",                 query="SELECT j FROM Job j"),
+	@NamedQuery(name="Job.findAllByTime",           query="SELECT j FROM Job j WHERE j.startTime > :after AND j.startTime < :befor"),
+	@NamedQuery(name="Job.getByDescriptionAndTime", query="SELECT j FROM Job j WHERE j.description LIKE :description AND j.startTime > :after AND j.startTime < :befor"),
+	@NamedQuery(name="Job.getByDescription",        query="SELECT j FROM Job j WHERE j.description LIKE :description"),
+	@NamedQuery(name="Job.getRunning",              query="SELECT j FROM Job j WHERE j.exitCode = NULL"),
+	@NamedQuery(name="Job.getSucceeded",            query="SELECT j FROM Job j WHERE j.exitCode = 0"),
+	@NamedQuery(name="Job.getFailed",               query="SELECT j FROM Job j WHERE j.exitCode > 0")
 })
 public class Job implements Serializable {
 

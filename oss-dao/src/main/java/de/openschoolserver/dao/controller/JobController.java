@@ -27,18 +27,18 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 public class JobController extends Controller {
-	
+
 	Logger logger = LoggerFactory.getLogger(JobController.class);
-	
+
     static FileAttribute<Set<PosixFilePermission>> privatDirAttribute  = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
     static FileAttribute<Set<PosixFilePermission>> privatFileAttribute = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));
-	
+
 	private static String basePath = "/home/groups/SYSADMINS/jobs/";
 
 	public JobController(Session session) {
 		super(session);
 	}
-	
+
 	public Job getById(Long jobId) {
 		EntityManager em = getEntityManager();
 		try {
@@ -57,7 +57,7 @@ public class JobController extends Controller {
 			em.close();
 		}
 	}
-	
+
 	/**
 	 * Creates a new job
 	 * @param job The job to be created.
@@ -183,13 +183,40 @@ public class JobController extends Controller {
 		if( after.equals(befor) ) {
 			query = em.createNamedQuery("Job.getByDescription").setParameter("description", description);
 		} else {
-			query = em.createNativeQuery("Job.getByDescriptionAndTime")
+			query = em.createNamedQuery("Job.getByDescriptionAndTime")
 					.setParameter("description", description)
 					.setParameter("after", after)
 					.setParameter("befor", befor);
 		}
+		List<Job> jobs =  query.getResultList();
 		em.close();
-		return query.getResultList();
+		return jobs;
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Job> getRunningJobs() {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Job.getRunning");
+		List<Job> jobs =  query.getResultList();
+		em.close();
+		return jobs;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Job> getFailedJobs() {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Job.getFailed");
+		List<Job> jobs =  query.getResultList();
+		em.close();
+		return jobs;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Job> getSucceededJobs() {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("Job.getSucceeded");
+		List<Job> jobs =  query.getResultList();
+		em.close();
+		return jobs;
+	}
 }

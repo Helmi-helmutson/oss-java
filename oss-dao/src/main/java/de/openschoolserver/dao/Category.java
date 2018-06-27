@@ -503,11 +503,6 @@ public class Category implements Serializable {
 		}
 	}
 
-	public Date getVAlidFrom() {
-		return validFrom;
-	}
-
-
 	public void setValidFrom(Date validFrom) {
 		this.validFrom = validFrom;
 	}

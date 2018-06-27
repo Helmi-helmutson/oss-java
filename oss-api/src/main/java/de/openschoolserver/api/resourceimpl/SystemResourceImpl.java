@@ -295,4 +295,19 @@ public class SystemResourceImpl implements SystemResource {
 		Session session  = new SessionController().getLocalhostSession();
 		return new SystemController(session).getConfigValue("NAME");
 	}
+
+	@Override
+	public List<Job> getRunningJobs(Session session) {
+		return new JobController(session).getRunningJobs();
+	}
+
+	@Override
+	public List<Job> getFailedJobs(Session session) {
+		return new JobController(session).getFailedJobs();
+	}
+
+	@Override
+	public List<Job> getSucceededJobs(Session session) {
+		return new JobController(session).getSucceededJobs();
+	}
 }

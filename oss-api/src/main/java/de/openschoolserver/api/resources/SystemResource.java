@@ -436,6 +436,36 @@ public interface SystemResource {
         @PathParam("jobId") Long jobId
     );
 
+    @GET
+    @Path("jobs/running")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the job with all parameters inclusive log.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.jobs")
+    List<Job> getRunningJobs(
+        @ApiParam(hidden = true) @Auth Session session
+    );
+
+    @GET
+    @Path("jobs/failed")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the job with all parameters inclusive log.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.jobs")
+    List<Job> getFailedJobs(
+        @ApiParam(hidden = true) @Auth Session session
+    );
+
+    @GET
+    @Path("jobs/succeeded")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the job with all parameters inclusive log.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.jobs")
+    List<Job> getSucceededJobs(
+        @ApiParam(hidden = true) @Auth Session session
+    );
+
     @PUT
     @Path("jobs/{jobId}/exit/{exitValue}")
     @Produces(JSON_UTF8)
