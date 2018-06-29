@@ -439,7 +439,7 @@ CREATE TABLE IF NOT EXISTS Categories (
 	categoryType VARCHAR(16) DEFAULT NULL,
         owner_id     BIGINT UNSIGNED DEFAULT NULL,
 	studentsOnly CHAR(1) DEFAULT 'N',
-	publicAccess CHAR(1) DEFAULT 'N',
+	publicAccess CHAR(1) DEFAULT 'Y',
         validFrom    DATE    DEFAULT NULL,
         validUntil   DATE    DEFAULT NULL,
         FOREIGN KEY(owner_id)  REFERENCES Users(id) ON DELETE CASCADE,
