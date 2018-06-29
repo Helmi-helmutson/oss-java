@@ -642,6 +642,7 @@ public class DeviceController extends Controller {
 	public OssResponse modify(Device device) {
 		logger.debug("modify new device: " + device);
 		Device oldDevice = this.getById(device.getId());
+		HWConf oldHwconf = oldDevice.getHwconf();
 		logger.debug("modify old device: " + oldDevice);
 		List<String> error = new ArrayList<String>();
 		parameters = new ArrayList<String>();
@@ -710,9 +711,21 @@ public class DeviceController extends Controller {
 			oldDevice.setWlanMac(device.getWlanMac());
 			oldDevice.setPlace(device.getPlace());
 			oldDevice.setRow(device.getRow());
-			oldDevice.setHwconf(hwconf);
 			em.getTransaction().begin();
 			em.merge(oldDevice);
+			if( hwconf != oldHwconf) {
+				if( hwconf.getDevices() != null ) {
+					hwconf.getDevices().add(oldDevice);
+				} else {
+					List<Device> devices = new ArrayList<Device>();
+					devices.add(oldDevice);
+					hwconf.setDevices(devices);
+				}
+				oldHwconf.getDevices().remove(oldDevice);
+				oldDevice.setHwconf(hwconf);
+				em.merge(hwconf);
+				em.merge(oldHwconf);
+			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());

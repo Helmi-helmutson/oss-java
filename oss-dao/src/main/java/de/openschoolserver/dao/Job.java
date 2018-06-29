@@ -5,8 +5,6 @@ import java.io.Serializable;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import javax.validation.constraints.Size;
-import javax.validation.constraints.Future;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 

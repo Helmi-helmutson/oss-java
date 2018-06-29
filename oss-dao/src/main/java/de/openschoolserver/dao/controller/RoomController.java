@@ -796,6 +796,7 @@ public class RoomController extends Controller {
 		Device device = new Device();
 		Room   room   = em.find(Room.class, roomId);
 		User   owner  = this.getSession().getUser();
+		HWConf hwconf = room.getHwconf();
 		if( ! owner.getRole().contains("sysadmins") ) {
 			//non sysadmin user want to register his workstation
 			boolean allowed = false;
@@ -811,7 +812,6 @@ public class RoomController extends Controller {
 				}
 			}
 			if( allowed ) {
-				HWConf hwconf = room.getHwconf();
 				if( hwconf == null ) {
 					Query query = em.createNamedQuery("HWConf.getByName");
 					query.setParameter("name", "BYOD");
@@ -847,7 +847,18 @@ public class RoomController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.persist(device);
+			if( hwconf != null ) {
+				if( hwconf.getDevices() != null ) {
+					hwconf.getDevices().add(device);
+				} else {
+					List<Device> devices = new ArrayList<Device>();
+					devices.add(device);
+					hwconf.setDevices(devices);
+				}
+				em.merge(hwconf);
+			}
 			em.merge(room);
+			em.merge(owner);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
