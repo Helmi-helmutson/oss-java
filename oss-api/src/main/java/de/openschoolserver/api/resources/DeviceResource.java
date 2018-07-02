@@ -464,7 +464,7 @@ public interface DeviceResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.manage")
-    OssResponse uploadFileToDevice(
+    OssResponse importDevices(
     		@ApiParam(hidden = true) @Auth Session session,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader

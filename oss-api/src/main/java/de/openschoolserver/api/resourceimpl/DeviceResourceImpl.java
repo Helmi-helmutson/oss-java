@@ -174,7 +174,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse uploadFileToDevice(Session session, InputStream fileInputStream,
+	public OssResponse importDevices(Session session, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		return new DeviceController(session).importDevices(fileInputStream, contentDispositionHeader);
 	}

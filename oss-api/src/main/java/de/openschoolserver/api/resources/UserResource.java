@@ -445,7 +445,7 @@ OssResponse addGuestUsers(
     );
 
 @POST
-	@Path("imports")
+	@Path("import")
 	@Produces(JSON_UTF8)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	@ApiOperation(value = "Import a list of users. The parameters:"
