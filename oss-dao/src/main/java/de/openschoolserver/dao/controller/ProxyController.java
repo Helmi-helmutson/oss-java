@@ -3,14 +3,18 @@ package de.openschoolserver.dao.controller;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
@@ -23,12 +27,83 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 @SuppressWarnings( "unchecked" )
 public class ProxyController extends Controller {
 
-	Logger logger = LoggerFactory.getLogger(ProxyController.class); 
+	Logger logger = LoggerFactory.getLogger(ProxyController.class);
+
+	private Path DESCIPTION = Paths.get("/var/lib/squidGuard/db/BL/global_usage");
+	private Map<String,String>   desc     = new HashMap<>();
+	private Map<String,String>   longDesc = new HashMap<>();;
+	private List<String>         configFile;
 
 	public ProxyController(Session session) {
 		super(session);
+		try {
+			configFile = Files.readAllLines(this.DESCIPTION);
+		}
+		catch( IOException e ) {
+			e.printStackTrace();
+		}
+		String  lang        = this.getConfigValue("LANGUAGE");
+		String  key         = "";
+		String  value       = "";
+		String  longValue   = "";
+		String  valueEN     = "";
+		String  longValueEN = "";
+		String  nameStart   = "NAME "+ lang +":";
+		String  descStart   = "DESC "+ lang +":";
+		String  tmp[];
+		for ( String line : configFile ){
+			if( line.startsWith("NAME:")) {
+				if( !key.isEmpty() ) {
+					if( !value.isEmpty() ) {
+						desc.put(key, value);
+					} else {
+						desc.put(key, valueEN);
+					}
+					if( !longValue.isEmpty() ) {
+						longDesc.put(key, longValue);
+					} else {
+						longDesc.put(key, longValueEN);
+					}
+				}
+				key         = line.split(":\\s+")[1];
+				value       = "";
+				longValue   = "";
+				valueEN     = "";
+				longValueEN = "";
+			}
+			if( line.startsWith("NAME EN:")) {
+				valueEN     = line.split(":\\s")[1];
+			}
+			if( line.startsWith(nameStart)) {
+				tmp = line.split(":\\s");
+				if( tmp.length == 2 ) {
+					value     = tmp[1];
+				}
+			}
+			if( line.startsWith("DESC EN:")) {
+				longValueEN     = line.split(":\\s")[1];
+			}
+			if( line.startsWith(descStart)) {
+				tmp = line.split(":\\s");
+				if( tmp.length == 2 ) {
+					longValue     = tmp[1];
+				}
+			}
+		}
+		if( !key.isEmpty() ) {
+			if( !value.isEmpty() ) {
+				desc.put(key, value);
+			} else {
+				desc.put(key, valueEN);
+			}
+			if( !longValue.isEmpty() ) {
+				longDesc.put(key, longValue);
+			} else {
+				longDesc.put(key, longValueEN);
+			}
+		}
 	}
-	
+
 	/*
 	 * Reads the default proxy acl setting
 	 * @return The default proxy acl setting
@@ -45,9 +120,13 @@ public class ProxyController extends Controller {
 			String[] values = line.split(" ");
 			if( role.equals(values[0])) {
 				for(int i=1; i < values.length; i++ ) {
+					String key = values[i].split(":")[0];
+					boolean enabled = values[i].split(":")[1].equals("true");
 					ProxyRule proxyRule = new ProxyRule(
-							values[i].split(":")[0],
-							values[i].split(":")[1].equals("true")
+							key,
+							enabled,
+							( desc.containsKey(key)     ? desc.get(key) : key),
+							( longDesc.containsKey(key) ? longDesc.get(key) : key )
 							);
 					acl.add(proxyRule);
 				}
@@ -81,7 +160,7 @@ public class ProxyController extends Controller {
 		OSSShellTools.exec(program, reply, error, output.toString());
 		return new OssResponse(this.session,"OK","Proxy Setting was saved succesfully.");
 	}
-	
+
 	public PositiveList getPositiveListById( Long positiveListId ) {
 		EntityManager em = getEntityManager();
 		try {
@@ -180,12 +259,12 @@ public class ProxyController extends Controller {
 							)
 					);
 		}
-		catch( IOException e ) { 
+		catch( IOException e ) {
 			e.printStackTrace();
 		}
 		return positiveList;
 	}
-	
+
 	/*
 	 * Reads the available positive lists
 	 * @return The list of positive lists the user can use
@@ -193,7 +272,7 @@ public class ProxyController extends Controller {
 	public List<PositiveList> getAllPositiveLists() {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("PositiveList.findAll"); 
+			Query query = em.createNamedQuery("PositiveList.findAll");
 			return query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -267,7 +346,7 @@ public class ProxyController extends Controller {
 		program[0] = "/usr/share/oss/tools/squidGuard.pl";
 		program[1] = "write";
 		OSSShellTools.exec(program, reply, error, acls.toString());
-		return new OssResponse(this.session,"OK","Proxy Setting was saved succesfully in your room.");	
+		return new OssResponse(this.session,"OK","Proxy Setting was saved succesfully in your room.");
 	}
 
 	/*
