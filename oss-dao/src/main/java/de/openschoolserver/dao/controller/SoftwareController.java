@@ -509,6 +509,7 @@ public class SoftwareController extends Controller {
 	public OssResponse createInstallationCategory(Category category) {
 		CategoryController categoryController = new CategoryController(this.session);
 		category.setCategoryType("installation");
+		category.setPublicAccess(false);
 		return categoryController.add(category);
 	}
 
