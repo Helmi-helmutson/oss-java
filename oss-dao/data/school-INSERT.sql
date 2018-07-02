@@ -82,6 +82,7 @@ INSERT INTO Categories Values(2, 'Informations for sysadmins','','informations',
 INSERT INTO Categories Values(3, 'Informations for teachers','','informations','1','N','Y',NOW(),NULL);
 INSERT INTO Categories Values(4, 'Informations for students','','informations','1','N','Y',NOW(),NULL);
 INSERT INTO Categories Values(5, 'Informations for administration','','informations','1','N','Y',NOW(),NULL);
+INSERT INTO Categories Values(6, 'Unannounced Informations','','informations','1','N','Y',NOW(),NULL);
 INSERT INTO GroupInCategories Values(1,1);
 INSERT INTO GroupInCategories Values(2,1);
 INSERT INTO GroupInCategories Values(3,1);

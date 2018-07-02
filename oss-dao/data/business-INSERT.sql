@@ -66,6 +66,7 @@ INSERT INTO Enumerates VALUES(NULL,'network','#SCHOOL_NETWORK#/#SCHOOL_NETMASK#'
 INSERT INTO Categories Values(1, 'Informations for all','','informations','1','N','Y',NOW(),NULL);
 INSERT INTO Categories Values(2, 'Informations for sysadmins','','informations','1','N','Y',NOW(),NULL);
 INSERT INTO Categories Values(5, 'Informations for administration','','informations','1','N','Y',NOW(),NULL);
+INSERT INTO Categories Values(6, 'Unannounced Informations','','informations','1','N','Y',NOW(),NULL);
 INSERT INTO GroupInCategories Values(1,1);
 INSERT INTO GroupInCategories Values(4,1);
 INSERT INTO GroupInCategories Values(1,2);
