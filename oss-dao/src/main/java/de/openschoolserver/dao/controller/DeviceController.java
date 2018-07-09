@@ -737,6 +737,7 @@ public class DeviceController extends Controller {
 				}
 				oldHwconf.getDevices().remove(oldDevice);
 				oldDevice.setHwconf(hwconf);
+				oldDevice.setHwconfId(device.getHwconfId());
 				em.merge(hwconf);
 				em.merge(oldHwconf);
 			}
