@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  
+/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved
  * (c) 2017 EXTIS GmbH www.extis.de - all rights reserved */
 package de.openschoolserver.dao.controller;
 import java.io.File;
@@ -34,7 +34,7 @@ import de.openschoolserver.dao.tools.*;
 
 @SuppressWarnings( "unchecked" )
 public class DeviceController extends Controller {
-	
+
 	Logger logger = LoggerFactory.getLogger(DeviceController.class);
 	private List<String>  parameters;
 
@@ -180,7 +180,7 @@ public class DeviceController extends Controller {
 	public OssResponse delete(Device device, boolean atomic) {
 		return this.delete(device.getId(), atomic);
 	}
-	
+
 	protected String check(Device device,Room room) {
 		List<String> error = new ArrayList<String>();
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
@@ -192,7 +192,7 @@ public class DeviceController extends Controller {
 			error.add("The MAC address '" + device.getMac() + "' will be used allready:" + name );
 		}
 		if( ! IPv4.validateMACAddress(device.getMac())) {
-			error.add("The MAC address is not valid:" + device.getMac() );	
+			error.add("The MAC address is not valid:" + device.getMac() );
 		}
 		//Check the name
 		if( ! this.isNameUnique(device.getName())){
@@ -207,12 +207,12 @@ public class DeviceController extends Controller {
 			error.add("The IP address will be used allready:" + name );
 		}
 		if( ! IPv4.validateIPAddress(device.getIp())) {
-			error.add("The IP address is not valid:" + device.getIp() );	
+			error.add("The IP address is not valid:" + device.getIp() );
 		}
 		if( !net.contains(device.getIp())) {
 			error.add("The IP address is not in the room ip address range.");
 		}
-		
+
 		if( device.getWlanMac().isEmpty() ) {
 			device.setWlanIp("");
 		} else {
@@ -223,7 +223,7 @@ public class DeviceController extends Controller {
 				error.add("The WLAN MAC address will be used allready:" + name );
 			}
 			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );	
+				error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );
 			}
 			//Check the IP address
 			name =  this.isIPUnique(device.getWlanIp());
@@ -231,7 +231,7 @@ public class DeviceController extends Controller {
 				error.add("The IP address will be used allready:" + name );
 			}
 			if( ! IPv4.validateIPAddress(device.getWlanIp())) {
-				error.add("The IP address is not valid:" + device.getIp() );	
+				error.add("The IP address is not valid:" + device.getIp() );
 			}
 			if( !net.contains(device.getWlanIp())) {
 				error.add("The IP address is not in the room ip address range.");
@@ -244,7 +244,7 @@ public class DeviceController extends Controller {
 		}
 		return String.join(System.lineSeparator(), error);
 	}
-	
+
 	/*
 	 * Creates devices
 	 */
@@ -414,8 +414,8 @@ public class DeviceController extends Controller {
 	/*
 	 * Import devices from a CSV file. This MUST have following format:
 	 * Separator: semicolon
-	 * All fields MUST exists. 
-	 * Fields: Room; MAC; Serial; Inventary; Locality; HWConf; Owner; Name; IP; WLANMAC; WLANIP; Row; Place; 
+	 * All fields MUST exists.
+	 * Fields: Room; MAC; Serial; Inventary; Locality; HWConf; Owner; Name; IP; WLANMAC; WLANIP; Row; Place;
 	 * Mandatory fields which must not be empty: Room and MAC;
 	 */
 	public OssResponse importDevices(InputStream fileInputStream,
@@ -436,7 +436,7 @@ public class DeviceController extends Controller {
 		Map<Long,List<Device>> devicesToImport    = new HashMap<>();
 		Map<String,Integer> header                = new HashMap<>();
 		StringBuilder Error                       = new StringBuilder();
-		
+
 		//Initialize the the hash for the rooms
 		for( Room r : roomController.getAll() ) {
 			devicesToImport.put(r.getId(), new ArrayList<Device>() );
@@ -454,7 +454,8 @@ public class DeviceController extends Controller {
 			String[] values = line.split(";");
 			Room room = roomController.getByName(values[header.get("room")]);
 			if( room == null ) {
-				
+				logger.debug("Can Not find the Room" +values[header.get("room")] );
+				return new OssResponse(this.getSession(),"ERROR","Can Not find the Room" +values[header.get("room")]);
 			}
 			Device device = new Device();
 			device.setRoom(room);
@@ -494,7 +495,7 @@ public class DeviceController extends Controller {
 			}
 			devicesToImport.get(room.getId()).add(device);
 		}
-		
+
 		for( Room r : roomController.getAll() ) {
 			if( !devicesToImport.get(r.getId()).isEmpty() ) {
 				OssResponse ossResponse = roomController.addDevices(r.getId(), devicesToImport.get(r.getId()));
@@ -597,7 +598,7 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}
 
-	
+
 	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		User user = new UserController(this.session).getByUid(userName);
@@ -641,8 +642,21 @@ public class DeviceController extends Controller {
 
 	public OssResponse modify(Device device) {
 		logger.debug("modify new device: " + device);
-		Device oldDevice = this.getById(device.getId());
+		Device oldDevice;
+		HWConf hwconf;
+		Room   room;
+		EntityManager em = getEntityManager();
+		try {
+			oldDevice= em.find(Device.class, device.getId());
+			hwconf   = em.find(HWConf.class, device.getHwconfId());
+			room     = em.find(Room.class, oldDevice.getRoom().getId());
+		} catch (Exception e) {
+			logger.debug("DeviceId:" + device.getId() + " " + e.getMessage(),e);
+			em.close();
+			return new OssResponse(this.getSession(),"ERROR","Device or HWConf can not be found.");
+		}
 		HWConf oldHwconf = oldDevice.getHwconf();
+
 		logger.debug("modify old device: " + oldDevice);
 		List<String> error = new ArrayList<String>();
 		parameters = new ArrayList<String>();
@@ -653,6 +667,7 @@ public class DeviceController extends Controller {
 		String   name = "";
 		//Check the MAC address
 		if( !this.mayModify(oldDevice) ) {
+			em.close();
 			return new OssResponse(this.getSession(),"ERROR","You must not modify this device: %s",null,oldDevice.getName());
 		}
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
@@ -695,18 +710,17 @@ public class DeviceController extends Controller {
 				}
 			}
 			macChange = true;
-		} 
+		}
 		else if( ! oldDevice.getWlanMac().isEmpty() ) {
 			// The wlan mac was removed
 			device.setWlanIp("");
 			macChange = true;
 		}
 		if(!error.isEmpty()){
+			em.close();
 			return new OssResponse(this.getSession(),"ERROR",String.join(System.lineSeparator(),error),null,parameters);
 		}
-		EntityManager em = getEntityManager();
 		try {
-			HWConf hwconf = new CloneToolController(this.session).getById(device.getHwconfId());
 			oldDevice.setMac(device.getMac());
 			oldDevice.setWlanMac(device.getWlanMac());
 			oldDevice.setPlace(device.getPlace());
@@ -726,6 +740,7 @@ public class DeviceController extends Controller {
 				em.merge(hwconf);
 				em.merge(oldHwconf);
 			}
+			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -751,7 +766,7 @@ public class DeviceController extends Controller {
 		HWConf hwconf = new CloneToolController(this.session).getById(id);
 		return hwconf.getDevices();
 	}
-	
+
 	public OssResponse manageDevice(long deviceId, String action, Map<String, String> actionContent) {
 		Device device = new DeviceController(this.session).getById(deviceId);
 		return this.manageDevice(device, action, actionContent);
@@ -898,7 +913,7 @@ public class DeviceController extends Controller {
 			}
 			return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
 		default:
-				return new OssResponse(this.getSession(),"ERROR", "Unknonw action.");	
+				return new OssResponse(this.getSession(),"ERROR", "Unknonw action.");
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(this.getSession(),"OK", "Device control was applied on '%s'.",null,FQHN.toString());
@@ -910,7 +925,7 @@ public class DeviceController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK", "LoggedIn attributes was cleaned up.");
 	}
-	
+
 	public OssResponse cleanUpLoggedIn(Device device) {
 		EntityManager em = getEntityManager();
 		try {
