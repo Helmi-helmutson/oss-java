@@ -68,6 +68,10 @@ public class ServerApplication extends Application<ServerConfiguration> {
 
         final SystemResource systemResource = new SystemResourceImpl();
         environment.jersey().register(systemResource);
+ 
+	//TODO check if allowed 
+        final AdHocLanResource adHocLanResource = new AdHocLanResourceImpl();
+        environment.jersey().register(adHocLanResource);
         
         final SessionsResource sessionsResource = new SessionsResourceImpl();
         environment.jersey().register(sessionsResource);
