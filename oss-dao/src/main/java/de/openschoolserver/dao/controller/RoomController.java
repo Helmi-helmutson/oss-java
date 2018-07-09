@@ -4,7 +4,7 @@ package de.openschoolserver.dao.controller;
 import java.util.ArrayList;
 
 
-
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -155,16 +155,17 @@ public class RoomController extends Controller {
 			} else {
 				List<Room> rooms = new ArrayList<Room>();
 				for( Category category : this.session.getUser().getCategories() ) {
-					if( category.getCategoryType().equals("AdHocAccess")) {
-						rooms.add(category.getRooms().get(0));
+					if( category.getCategoryType().equals("AdHocAccess") &&
+					  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent) )) {
+							rooms.add(category.getRooms().get(0));
 					}
 				}
 				for(Group group : this.session.getUser().getGroups() ) {
 					for( Category category : group.getCategories() ) {
-						if( category.getCategoryType().equals("AdHocAccess")) {
-							if( !rooms.contains(room)) {
-								rooms.add(category.getRooms().get(0));
-							}
+						if( category.getCategoryType().equals("AdHocAccess") &&
+						  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent)) &&
+						    !rooms.contains(room)) {
+									rooms.add(category.getRooms().get(0));
 						}
 					}
 				}
