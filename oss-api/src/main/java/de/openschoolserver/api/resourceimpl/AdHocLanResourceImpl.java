@@ -6,11 +6,13 @@ import java.util.List;
 
 
 import de.openschoolserver.api.resources.AdHocLanResource;
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
-
+import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.*;
 
 public class AdHocLanResourceImpl implements AdHocLanResource {
@@ -20,48 +22,57 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
-	public List<Long> getObjectIdsOfRoom(Session session, Long roomId, String objectType) {
-		AdHocLanController adHocLan = new AdHocLanController(session);
-		return adHocLan.getObjectIdsOfRoom(roomId,objectType);
+	public List<User> getUsersOfRoom(Session session, Long roomId) {
+		Room room  = new RoomController(session).getById(roomId);
+		for( Category category : room.getCategories() ) {
+			if( category.getCategoryType().equals("AdHocAccess")) {
+				return category.getUsers();
+			}
+		}
+		return new ArrayList<User>();
 	}
 
 	@Override
-	public List<Long> getUsers(Session session) {
+	public List<Group> getGroupsOfRoom(Session session, Long roomId) {
+		Room room  = new RoomController(session).getById(roomId);
+		for( Category category : room.getCategories() ) {
+			if( category.getCategoryType().equals("AdHocAccess")) {
+				return category.getGroups();
+			}
+		}
+		return new ArrayList<Group>();
+	}
+
+	@Override
+	public List<User> getUsers(Session session) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.getUsers();
 	}
 
 	@Override
-	public List<Long> getGroups(Session session) {
+	public List<Group> getGroups(Session session) {
 		AdHocLanController adHocLan = new AdHocLanController(session);
 		return adHocLan.getGroups();
 	}
 
 	@Override
 	public List<Room> getRooms(Session session) {
-		AdHocLanController adHocLan = new AdHocLanController(session);
-		return adHocLan.getRooms();
+		return new RoomController(session).getByType("AdHocAccess");
 	}
 
 	@Override
 	public OssResponse add(Session session, Room room) {
-		AdHocLanController adHocLan = new AdHocLanController(session);
-		return adHocLan.add(room);
+		return new AdHocLanController(session).add(room);
 	}
 
 	@Override
 	public OssResponse putObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
-		AdHocLanController adHocLan = new AdHocLanController(session);
-		return adHocLan.putObjectIntoRoom(roomId,objectType,objectId);
+		return new AdHocLanController(session).putObjectIntoRoom(roomId,objectType,objectId);
 	}
 
 	@Override
 	public List<Device> getDevices(Session session) {
-		List<Device> devices = new ArrayList<Device>();
-		for( Device dev :  session.getUser().getOwnedDevices() ) {
-			devices.add(dev);
-		}
-		return devices;
+		return ( session.getUser().getOwnedDevices() == null ? session.getUser().getOwnedDevices() : new ArrayList<Device>()) ;
 	}
 
 	@Override
@@ -90,6 +101,30 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		Room room = roomController.getById(roomId);
 		room.setRoomType("AdHocAccess");
 		return roomController.modify(room);
+	}
+
+	@Override
+	public List<User> getAvailableUser(Session session, long roomId) {
+		List<User> users = new ArrayList<User>();
+		Category category = new AdHocLanController(session).getAdHocCategoryOfRoom(roomId);
+		for( User user : new UserController(session).getAll() ) {
+			if( !category.getUsers().contains(user) ) {
+				users.add(user);
+			}
+		}
+		return users;
+	}
+
+	@Override
+	public List<Group> getAvailableGroups(Session session, long roomId) {
+		List<Group> groups = new ArrayList<Group>();
+		Category category = new AdHocLanController(session).getAdHocCategoryOfRoom(roomId);
+		for( Group group : new GroupController(session).getAll() ) {
+			if( !category.getGroups().contains(group) ) {
+				groups.add(group);
+			}
+		}
+		return groups;
 	}
 
 }

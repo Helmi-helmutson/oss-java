@@ -5,11 +5,16 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import de.openschoolserver.dao.*;
 
 @SuppressWarnings("unchecked")
 public class AdHocLanController extends Controller {
+	
+	Logger logger = LoggerFactory.getLogger(AdHocLanController.class);
 
 	public AdHocLanController(Session session) {
 		super(session);
@@ -17,90 +22,92 @@ public class AdHocLanController extends Controller {
 	}
 
 
-	/*
-	 * Returns a list of object Ids which habe AdHocAccess in
-	 */
-	public List<Long> getObjectIdsOfRoom(Long roomId, String objectType) {
-		ArrayList<Long> objectIds = new ArrayList<Long>();
-		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("OSSMConfig.getAllObject").setParameter("keyword", "AdHocAccess");
-		query.setParameter("objectType", objectType).setParameter("value", String.valueOf(roomId));
-		for( OSSMConfig mConfig: (List<OSSMConfig>) query.getResultList() ) {
-			objectIds.add(mConfig.getObjectId());
+	public Category getAdHocCategoryOfRoom(Room room) {
+		for( Category category : room.getCategories() ) {
+			if( category.getCategoryType().equals("AdHocAccess")) {
+				return category;
+			}
 		}
-		return objectIds;
+		return null;
 	}
 
-	public List<Long> getUsers() {
-		ArrayList<Long> userIds = new ArrayList<Long>();
-		for(OSSMConfig mconfig : this.getMConfigs("User", "AdHocAccess")) {
-			userIds.add(mconfig.getObjectId());
-		}
-		return userIds;
-	}
-	
-	public List<Long> getGroups() {
-		ArrayList<Long> groupIds = new ArrayList<Long>();
-		for(OSSMConfig mconfig : this.getMConfigs("Group", "AdHocAccess")) {
-			groupIds.add(mconfig.getObjectId());
-		}
-		return groupIds;
+	public Category getAdHocCategoryOfRoom(Long roomId) {
+		Room room = new RoomController(session).getById(roomId);
+		return (( room == null ) ? null :getAdHocCategoryOfRoom(room) );
 	}
 
-	public List<Room> getRooms() {
-		ArrayList<Room> rooms = new ArrayList<Room>();
-		RoomController rc = new RoomController(this.session);
-		if( this.isSuperuser() ) {
-			for( Room room : new RoomController(this.session).getAll() ) {
-				if( room.getRoomType().equals("AdHocAccess")) {
-					rooms.add(room);
+	public List<Group> getGroups() {
+		ArrayList<Group> groups = new ArrayList<Group>();
+		for( Room room : new RoomController(session).getByType("AdHocAccess") ) {
+			for( Category category : room.getCategories() ) {
+				if( category.getCategoryType().equals("AdHocAccess")) {
+					groups.addAll(category.getGroups());
 				}
-			}
-		} else {
-			for( String value : this.getMConfigs(this.session.getUser(),"AdHocAccess" )) {
-				Room room = rc.getById(Long.parseLong(value));
-				if( !rooms.contains(room)) {
-					rooms.add(room);
-				}
-			}
-			for( Group group : this.session.getUser().getGroups() ) {
-				for( String value : this.getMConfigs(group,"AdHocAccess" )) {
-					Room room = rc.getById(Long.parseLong(value));
-					if( !rooms.contains(room)) {
-						rooms.add(room);
-					}
-				}	
 			}
 		}
-		return rooms;
+		return groups;
+	}
+
+	public List<User> getUsers() {
+		ArrayList<User> users = new ArrayList<User>();
+		for( Room room : new RoomController(session).getByType("AdHocAccess") ) {
+			for( Category category : room.getCategories() ) {
+				if( category.getCategoryType().equals("AdHocAccess")) {
+					users.addAll(category.getUsers());
+				}
+			}
+		}
+		return users;
 	}
 
 	public OssResponse add(Room room) {
-		EntityManager em = getEntityManager();
+		logger.debug("Add AdHocLan: " + room);
 		//Search the BYOD HwConf
 		if( room.getHwconf() == null ) {
-			Query query = em.createNamedQuery("HWConf.getByName");
-			query.setParameter("name", "BYOD");
-			HWConf hwconf = (HWConf) query.getResultList().get(0);
-			room.setHwconf(hwconf);
+			HWConf hwconf = new CloneToolController(session).getByName("BYOD");
+			room.setHwconfId(hwconf.getId());
 		}
 		room.setRoomType("AdHocAccess");
 		RoomController roomConrtoller = new RoomController(session);
-		return roomConrtoller.add(room);
+		OssResponse ossResponseRoom =  roomConrtoller.add(room);
+		logger.debug("Add AdHocLan after creating: " + room);
+		if( ossResponseRoom.getCode().equals("ERROR")) {
+			return ossResponseRoom;
+		}
+		Category category = new Category();
+		category.setCategoryType("AdHocAccess");
+		category.setName(room.getName());
+		category.setDescription(room.getDescription());
+		category.setOwner(this.session.getUser());
+		category.setPublicAccess(false);
+		logger.debug("Add AdHocLan category: " + category);
+		CategoryController categoryController = new CategoryController(session);
+		OssResponse ossResponseCategory = categoryController.add(category);
+		if( ossResponseCategory.getCode().equals("ERROR")) {
+			roomConrtoller.delete(ossResponseRoom.getObjectId());
+			return ossResponseCategory;
+		}
+		ossResponseCategory = categoryController.addMember(ossResponseCategory.getObjectId(), "Room", ossResponseRoom.getObjectId());
+		if( ossResponseCategory.getCode().equals("ERROR")) {
+			roomConrtoller.delete(ossResponseRoom.getObjectId());
+			categoryController.delete(ossResponseCategory.getObjectId());
+			return ossResponseCategory;
+		}
+		return ossResponseRoom;
 	}
 
 	public OssResponse putObjectIntoRoom(Long roomId, String objectType, Long objectId) {
-		switch(objectType) {
-		case("User"):
-			UserController userController = new UserController(session);
-			User user = userController.getById(objectId);
-			return this.addMConfig(user, "AdHocAccess", String.valueOf(roomId));
-		case("Group"):
-			GroupController groupController = new GroupController(session);
-			Group group = groupController.getById(objectId);
-			return this.addMConfig(group, "AdHocAccess", String.valueOf(roomId));
+		Room room = new RoomController(session).getById(roomId);
+		Long categoryId = null;
+		for( Category category : room.getCategories() ) {
+			if( category.getCategoryType().equals("AdHocAccess")) {
+				categoryId = category.getId();
+			}
 		}
-		return new OssResponse(this.getSession(),"ERROR","Invalid Object Type");
+		if( categoryId == null ) {
+			return new OssResponse(session,"ERROR","AdHocAccess not found");
+		}
+		return new CategoryController(session).addMember(categoryId, objectType, objectId);
 	}
 }
  

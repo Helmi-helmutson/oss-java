@@ -12,6 +12,10 @@ import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Size;
+
+import org.eclipse.persistence.annotations.Cache;
+import org.eclipse.persistence.annotations.CacheType;
+
 import de.openschoolserver.dao.tools.SslCrypto;
 
 
@@ -31,6 +35,10 @@ import de.openschoolserver.dao.tools.SslCrypto;
 	@NamedQuery(name="User.findByNameAndRole",   query="SELECT u FROM User u WHERE u.givenName = :givenName and u.surName = :surName and u.role = :role"),
 	@NamedQuery(name="User.search", query="SELECT u FROM User u WHERE u.uid LIKE :search OR u.givenName LIKE :search OR u.surName LIKE :search")
 })
+@Cache(
+		  type=CacheType.SOFT, // Cache everything until the JVM decides memory is low.
+		  size=64000
+)
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -168,6 +176,7 @@ public class User implements Serializable {
 	@Column(name = "creator_id")
 	private Long creatorId;
 
+	@JsonIgnore
 	private String initialPassword;
 
 	@Transient

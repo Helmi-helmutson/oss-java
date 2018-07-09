@@ -67,7 +67,7 @@ public interface RoomResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("room.search")
+    @PermitAll
     List<Room> getRoomsToRegister(
             @ApiParam(hidden = true) @Auth Session session
     );

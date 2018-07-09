@@ -28,6 +28,7 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.AccessInRoom;
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.tools.*;
 
 @SuppressWarnings( "unchecked" )
@@ -97,6 +98,20 @@ public class RoomController extends Controller {
 		}
 	}
 
+	public List<Room> getByType(String roomType) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Room.getByType").setParameter("type", roomType);
+			return (List<Room>) query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new ArrayList<>();
+		} finally {
+			em.close();
+		}
+	}
+
+
 	public Room getByIP(String ip) {
 		EntityManager em = getEntityManager();
 		try {
@@ -134,21 +149,22 @@ public class RoomController extends Controller {
 		Room room  = null;
 		try {
 			if( this.isSuperuser() ) {
+				logger.debug("Is suberuser" + this.session.getUser().getUid());
 				Query query = em.createNamedQuery("Room.findAllToRegister");
 				return query.getResultList();
 			} else {
 				List<Room> rooms = new ArrayList<Room>();
-				for(String roomid : this.getMConfigs(this.session.getUser(),"AdHocAccess" ) ) {
-					room = this.getById(Long.parseLong(roomid));
-					if( !rooms.contains(room)) {
-						rooms.add(room);
+				for( Category category : this.session.getUser().getCategories() ) {
+					if( category.getCategoryType().equals("AdHocAccess")) {
+						rooms.add(category.getRooms().get(0));
 					}
 				}
 				for(Group group : this.session.getUser().getGroups() ) {
-					for(String roomid : this.getMConfigs(group,"AdHocAccess" ) ) {
-						room = this.getById(Long.parseLong(roomid));
-						if( !rooms.contains(room)) {
-							rooms.add(room);
+					for( Category category : group.getCategories() ) {
+						if( category.getCategoryType().equals("AdHocAccess")) {
+							if( !rooms.contains(room)) {
+								rooms.add(category.getRooms().get(0));
+							}
 						}
 					}
 				}
@@ -799,31 +815,23 @@ public class RoomController extends Controller {
 		HWConf hwconf = room.getHwconf();
 		if( ! owner.getRole().contains("sysadmins") ) {
 			//non sysadmin user want to register his workstation
-			boolean allowed = false;
-			for( Group group : owner.getGroups() ) {
-				if( this.checkMConfig(group,"AdHocAccess",String.valueOf(roomId)) ) {
-					allowed = true;
-					break;
-				}
+			if( ! this.getAllToRegister().contains(room) ) {
+				return new OssResponse(this.getSession(),"ERROR","You have no rights to register devices in this room.");
 			}
-			if( !allowed ) {
-				if( this.checkMConfig(owner,"AdHocAccess",String.valueOf(roomId)) ) {
-					allowed = true;
-				}
+			//Check if the count of the registered devices is lower then the allowed mount
+			//TODO do. Check it realy
+			if( owner.getOwnedDevices().size() >= room.getPlaces() ) {
+				return new OssResponse(this.getSession(),"ERROR","You must not register more devices in this room.");
 			}
-			if( allowed ) {
-				if( hwconf == null ) {
+			if( hwconf == null ) {
 					Query query = em.createNamedQuery("HWConf.getByName");
 					query.setParameter("name", "BYOD");
 					hwconf = (HWConf) query.getResultList().get(0);
-				}
-				device.setMac(macAddress);
-				device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
-				device.setIp(ipAddress.get(0).split(" ")[0]);
-				device.setHwconf(hwconf);
-			} else {
-				return new OssResponse(this.getSession(),"ERROR","You have no rights to register devices in this room");
 			}
+			device.setMac(macAddress);
+			device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
+			device.setIp(ipAddress.get(0).split(" ")[0]);
+			device.setHwconf(hwconf);
 		} else {
 			device.setMac(macAddress);
 			device.setIp(ipAddress.get(0).split(" ")[0]);

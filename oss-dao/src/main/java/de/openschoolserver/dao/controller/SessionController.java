@@ -149,6 +149,10 @@ public class SessionController extends Controller {
 				modules.remove(acl.getAcl());
 			}
 		}
+		RoomController  roomController = new RoomController(session);
+		if( ! roomController.getAllToRegister().isEmpty() ) {
+			modules.add("adhoclan.mydevices");
+		}
 		session.setCommonName(user.getGivenName() + " " + user.getSurName());
 		session.setAcls(modules);
 		session.setPassword(password);

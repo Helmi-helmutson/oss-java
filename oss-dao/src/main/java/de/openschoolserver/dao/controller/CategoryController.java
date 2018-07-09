@@ -99,7 +99,7 @@ public class CategoryController extends Controller {
 			errorMessage.append(violation.getMessage()).append(getNl());
 		}
 		if( errorMessage.length() > 0 ) {
-			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
+			return new OssResponse(this.getSession(),"ERROR", "Validation Error" + errorMessage.toString());
 		}
 		EntityManager em = getEntityManager();
 		try {

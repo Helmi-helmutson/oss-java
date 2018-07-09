@@ -21,9 +21,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.User;
 
 import java.util.List;
 
@@ -35,19 +37,60 @@ public interface AdHocLanResource {
 	 * Get adhoclan/rooms/{roomId}/{objectType}
 	 */
 	@GET
-	@Path("rooms/{roomId}/{objectType}")
+	@Path("rooms/{roomId}/users")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets all defined groups or users or devices in a giwen AdHocLan room. Object types can be Group or User")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	List<Long> getObjectIdsOfRoom(
+	List<User> getUsersOfRoom(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("roomId")     Long roomId,
-			@PathParam("objectType") String objectType
+			@PathParam("roomId")     Long roomId
 			);
 
+	@GET
+	@Path("rooms/{roomId}/groups")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets all defined groups or users or devices in a giwen AdHocLan room. Object types can be Group or User")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.search")
+	List<Group> getGroupsOfRoom(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")     Long roomId
+			);
+
+	/*
+	 * GET categories/<roomId>/available/<memeberType>
+	 */
+	@GET
+	@Path("rooms/{roomId}/available/users")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Get the non member users of an AdHocLan room.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "Category not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("category.search")
+	List<User> getAvailableUser(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId") long roomId
+			);
+
+	@GET
+	@Path("rooms/{roomId}/available/groups")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Get the non member groups of an AdHocLan room.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "Category not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("category.search")
+	List<Group> getAvailableGroups(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId") long roomId
+			);
+	
 	/*
 	 * Get adhoclan/users
 	 */
@@ -59,7 +102,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	List<Long> getUsers(
+	List<User> getUsers(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 	
@@ -74,7 +117,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.search")
-	List<Long> getGroups(
+	List<Group> getGroups(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 	
@@ -94,7 +137,6 @@ public interface AdHocLanResource {
             @ApiParam(hidden = true) @Auth Session session,
             Room room
     );
-    
 
     /*
      * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
@@ -102,7 +144,7 @@ public interface AdHocLanResource {
     @PUT
 	@Path("rooms/{roomId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Add a new group or user to a giwen AdHocLan room")
+	@ApiOperation(value = "Define a room as AdHocLan room")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -195,5 +237,4 @@ public interface AdHocLanResource {
             @PathParam("macAddress")	String macAddress,
             @PathParam("name")			String name
     );
-
 }
