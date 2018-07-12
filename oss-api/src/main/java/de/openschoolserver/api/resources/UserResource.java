@@ -215,13 +215,28 @@ public interface UserResource {
             @PathParam("userId") long userId
     );
 
+
     /*
    * POST users/<userId>/groups
    */
        @POST
        @Path("{userId}/groups")
        @Produces(JSON_UTF8)
-       @ApiOperation(value = "Put the user to this groups as member.")
+       @ApiOperation(value = "Put the user to this groups as member additionaly.")
+       @ApiResponses(value = {
+               @ApiResponse(code = 404, message = "Group not found"),
+               @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+       @RolesAllowed("user.manage")
+       OssResponse addToGroups(
+               @ApiParam(hidden = true) @Auth Session session,
+               @PathParam("userId") long userId,
+               List<Long> groups
+       );
+
+       @POST
+       @Path("{userId}/groups/set")
+       @Produces(JSON_UTF8)
+       @ApiOperation(value = "Put the user to this groups as member. The user will be removed from all other group.")
        @ApiResponses(value = {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})

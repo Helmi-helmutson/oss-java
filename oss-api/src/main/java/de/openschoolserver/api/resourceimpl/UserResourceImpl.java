@@ -132,6 +132,22 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
+	public OssResponse addToGroups(Session session, long userId, List<Long> groups) {
+		StringBuilder error = new StringBuilder();
+		final GroupController groupController = new GroupController(session);
+		for( Long groupId : groups ) {
+			OssResponse ossResponse = groupController.addMember(groupId,userId);
+			if( !ossResponse.getCode().equals("OK")  ) {
+				error.append(ossResponse.getValue()).append("<br>");
+			}
+		}
+		if( error.length() > 0 ) {
+			return new OssResponse(session,"ERROR",error.toString());
+		}
+		return new OssResponse(session,"OK","User was added to the additional group.");
+	}
+
+	@Override
 	public OssResponse addMember(Session session, long groupId, long userId) {
 		final GroupController groupController = new GroupController(session);
 		return groupController.addMember(groupId,userId);
