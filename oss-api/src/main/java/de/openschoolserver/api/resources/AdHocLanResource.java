@@ -234,7 +234,7 @@ public interface AdHocLanResource {
     OssResponse addDevice(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")		long roomId,
-            @PathParam("macAddress")	String macAddress,
+            @PathParam("MAC")			String macAddress,
             @PathParam("name")			String name
     );
 }
