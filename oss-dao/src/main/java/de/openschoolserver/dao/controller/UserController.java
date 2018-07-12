@@ -490,6 +490,19 @@ public class UserController extends Controller {
 		return new OssResponse(this.getSession(), "OK", "The template for the selected users was copied.");
 	}
 
+	public OssResponse removeProfile(List<Long> userIds) {
+		StringBuilder data = new StringBuilder();
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[] program = new String[2];
+		program[0] = "/usr/sbin/oss_remove_profile.sh";
+		for (Long id : userIds) {
+			program[1] = this.getById(id).getUid();
+			OSSShellTools.exec(program, reply, error, data.toString());
+		}
+		return new OssResponse(this.getSession(), "OK", "The windows profile(s) of the user was removed.");
+	}
+
 	public OssResponse disableLogin(List<Long> userIds, boolean disable) {
 		StringBuilder data = new StringBuilder();
 		StringBuffer reply = new StringBuffer();
@@ -718,5 +731,6 @@ public class UserController extends Controller {
 		}
 		return String.join(this.getNl(), groups);
 	}
+
 
 }

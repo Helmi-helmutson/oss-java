@@ -386,6 +386,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			return  userController.copyTemplate(
 					ossActionMap.getUserIds(),
 					ossActionMap.getStringValue());
+		case "removeProfiles":
+			return  userController.removeProfile(ossActionMap.getUserIds());
 		}
 		return new OssResponse(session,"ERROR","Unknown action");
 	}
