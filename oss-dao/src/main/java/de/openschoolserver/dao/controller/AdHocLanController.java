@@ -97,13 +97,7 @@ public class AdHocLanController extends Controller {
 	}
 
 	public OssResponse putObjectIntoRoom(Long roomId, String objectType, Long objectId) {
-		Room room = new RoomController(session).getById(roomId);
-		Long categoryId = null;
-		for( Category category : room.getCategories() ) {
-			if( category.getCategoryType().equals("AdHocAccess")) {
-				categoryId = category.getId();
-			}
-		}
+		Long categoryId = getAdHocCategoryOfRoom(roomId).getId();
 		if( categoryId == null ) {
 			return new OssResponse(session,"ERROR","AdHocAccess not found");
 		}

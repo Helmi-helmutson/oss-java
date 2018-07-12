@@ -814,6 +814,7 @@ public class RoomController extends Controller {
 		Room   room   = em.find(Room.class, roomId);
 		User   owner  = this.getSession().getUser();
 		HWConf hwconf = room.getHwconf();
+		logger.debug("DEVICE " + macAddress + " " + name);
 		if( ! owner.getRole().contains("sysadmins") ) {
 			//non sysadmin user want to register his workstation
 			if( ! this.getAllToRegister().contains(room) ) {
@@ -830,7 +831,7 @@ public class RoomController extends Controller {
 					hwconf = (HWConf) query.getResultList().get(0);
 			}
 			device.setMac(macAddress);
-			device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll(".", ""));
+			device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll("\\.", ""));
 			device.setIp(ipAddress.get(0).split(" ")[0]);
 			device.setHwconf(hwconf);
 		} else {
@@ -846,6 +847,7 @@ public class RoomController extends Controller {
 		}
 		//Check if the Device settings are OK
 		DeviceController deviceController = new DeviceController(this.session);
+		logger.debug("DEVICE " + device);
 		String error = deviceController.check(device, room);
 		if( !error.isEmpty() ) {
 			return new OssResponse(this.getSession(),"ERROR",error);
@@ -866,6 +868,7 @@ public class RoomController extends Controller {
 				}
 				em.merge(hwconf);
 			}
+			room.getDevices().add(device);
 			em.merge(room);
 			em.merge(owner);
 			em.getTransaction().commit();
