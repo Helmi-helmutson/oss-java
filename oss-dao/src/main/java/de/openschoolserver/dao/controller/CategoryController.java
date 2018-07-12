@@ -190,48 +190,48 @@ public class CategoryController extends Controller {
 		for(Long l : (List<Long>) query.getResultList() ) {
 			objectIds.add(l);
 		}
-		switch(objectName){
-		case("Device"):
+		switch(objectName.toLowerCase()){
+		case("device"):
 			for(Device d : c.getDevices()) {
 				objectIds.remove(d.getId());
 			}
 		break;
-		case("Group"):
+		case("group"):
 			for(Group g : c.getGroups()) {
 				objectIds.remove(g.getId());
 			}
 		break;
-		case("HWConf"):
+		case("hwconf"):
 			for(HWConf h : c.getHWConfs()) {
 				objectIds.remove(h.getId());
 			}
 		break;
-		case("Room"):
+		case("room"):
 			for(Room r: c.getRooms()) {
 				objectIds.remove(r.getId());
 			}
 		break;
-		case("Software"):
+		case("software"):
 			for(Software s: c.getSoftwares()) {
 				objectIds.remove(s.getId());
 			}
 		break;
-		case("User"):
+		case("user"):
 			for(User u: c.getUsers()) {
 				objectIds.remove(u.getId());
 			}
 		break;
-		case("FAQ"):
+		case("faq"):
 			for(FAQ f: c.getFaqs() ) {
 				objectIds.remove(f.getId());
 			}
 		break;
-		case("Announcement"):
+		case("announcement"):
 			for(Announcement a: c.getAnnouncements() ) {
 				objectIds.remove(a.getId());
 			}
 		break;
-		case("Contact"):
+		case("contact"):
 			for(Contact cont: c.getContacts()) {
 				objectIds.remove(cont.getId());
 			}
@@ -245,48 +245,48 @@ public class CategoryController extends Controller {
 		if( c == null ) {
 			return objectIds;
 		}
-		switch(objectName){
-		case("Device"):
+		switch(objectName.toLowerCase()){
+		case("device"):
 			for(Device d : c.getDevices()) {
 				objectIds.add(d.getId());
 			}
 		break;
-		case("Group"):
+		case("group"):
 			for(Group g : c.getGroups()) {
 				objectIds.add(g.getId());
 			}
 		break;
-		case("HWConf"):
+		case("hwconf"):
 			for(HWConf h : c.getHWConfs()) {
 				objectIds.add(h.getId());
 			}
 		break;
-		case("Room"):
+		case("room"):
 			for(Room r: c.getRooms()) {
 				objectIds.add(r.getId());
 			}
 		break;
-		case("Software"):
+		case("software"):
 			for(Software s: c.getSoftwares()) {
 				objectIds.add(s.getId());
 			}
 		break;
-		case("User"):
+		case("user"):
 			for(User u: c.getUsers()) {
 				objectIds.add(u.getId());
 			}
 		break;
-		case("FAQ"):
+		case("faq"):
 			for(FAQ f: c.getFaqs() ) {
 				objectIds.add(f.getId());
 			}
 		break;
-		case("Announcement"):
+		case("announcement"):
 			for(Announcement a: c.getAnnouncements() ) {
 				objectIds.add(a.getId());
 			}
 		break;
-		case("Contact"):
+		case("contact"):
 			for(Contact cont: c.getContacts()) {
 				objectIds.add(cont.getId());
 			}
@@ -300,8 +300,8 @@ public class CategoryController extends Controller {
 		boolean changes = false;
 		try {
 			em.getTransaction().begin();
-			switch(objectName){
-			case("Device"):
+			switch(objectName.toLowerCase()){
+			case("device"):
 				Device device = new DeviceController(this.session).getById(objectId);
 				if(!category.getDevices().contains(device)) {
 					category.getDevices().add(device);
@@ -310,7 +310,7 @@ public class CategoryController extends Controller {
 					changes = true;
 				}
 			break;
-			case("Group"):
+			case("group"):
 				Group group = new GroupController(this.session).getById(objectId);
 				if(!category.getGroups().contains(group)) {
 					category.getGroups().add(group);
@@ -319,7 +319,7 @@ public class CategoryController extends Controller {
 					changes = true;
 				}
 			break;
-			case("HWConf"):
+			case("hwconf"):
 				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
 				if(!category.getHWConfs().contains(hwconf)) {
 					category.getHWConfs().add(hwconf);
@@ -328,7 +328,7 @@ public class CategoryController extends Controller {
 					changes = true;
 				}
 			break;
-			case("Room"):
+			case("room"):
 				Room room = new RoomController(this.session).getById(objectId);
 				if(!category.getRooms().contains(room)) {
 					category.getRooms().add(room);
@@ -337,7 +337,7 @@ public class CategoryController extends Controller {
 					changes = true;
 				}
 			break;
-			case("Software"):
+			case("software"):
 				Software software = new SoftwareController(this.session).getById(objectId);
 				if(!category.getSoftwares().contains(software)) {
 					category.getSoftwares().add(software);
@@ -346,7 +346,7 @@ public class CategoryController extends Controller {
 					changes = true;
 				}
 			break;
-			case("User"):
+			case("user"):
 				User user = new UserController(this.session).getById(objectId);
 				if(!category.getUsers().contains(user)) {
 					category.getUsers().add(user);
@@ -355,7 +355,7 @@ public class CategoryController extends Controller {
 					changes = true;
 				}
 			break;
-			case("FAQ"):
+			case("faq"):
 				FAQ faq = new InformationController(this.session).getFAQById(objectId);
 				if(!category.getFaqs().contains(faq)) {
 					category.getFaqs().add(faq);
@@ -364,7 +364,7 @@ public class CategoryController extends Controller {
 					changes = true;
 				}
 			break;
-			case("Announcement"):
+			case("announcement"):
 				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
 				if(!category.getAnnouncements().contains(info)) {
 					category.getAnnouncements().add(info);
@@ -373,7 +373,7 @@ public class CategoryController extends Controller {
 					changes = true;
 				}
 			break;
-			case("Contact"):
+			case("contact"):
 				Contact contact = new InformationController(this.session).getContactById(objectId);
 				if(!category.getContacts().contains(contact)) {
 					category.getContacts().add(contact);
