@@ -919,6 +919,7 @@ public class RoomController extends Controller {
 		HWConf hwconf = new CloneToolController(this.session).getById(room.getHwconfId());
 		oldRoom.setDescription(room.getDescription());
 		oldRoom.setHwconf(hwconf);
+		oldRoom.setHwconfId(room.getHwconfId());
 		oldRoom.setRoomType(room.getRoomType());
 		oldRoom.setRows(room.getRows());
 		oldRoom.setRoomControl(room.getRoomControl());
