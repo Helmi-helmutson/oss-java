@@ -133,12 +133,16 @@ public class GroupController extends Controller {
 			em.getTransaction().commit();
 			logger.debug("Created Group:" + group);
 		} catch (Exception e) {
-			logger.error(e.getMessage(),e);
+			logger.error("Error crating a group" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
 		}
 		this.startPlugin("add_group", group);
+		if( group.getGroupType().equals("workgroup") ) {
+			logger.debug("Add creator to member");
+			addMember(group,this.session.getUser());
+		}
 		return new OssResponse(this.getSession(),"OK","Group was created.",group.getId());
 	}
 
