@@ -482,7 +482,7 @@ OssResponse addGuestUsers(
 			@ApiParam(hidden = true) @Auth   Session session,
 			@FormDataParam("role")           String  role,
 			@FormDataParam("lang")      String  lang,
-			@FormDataParam("idetntifier")  String  idetntifier,
+			@FormDataParam("identifier")  String  identifier,
 			@FormDataParam("test")  boolean test,
 			@FormDataParam("password")       String  password,
 			@FormDataParam("mustchange")     boolean mustchange,

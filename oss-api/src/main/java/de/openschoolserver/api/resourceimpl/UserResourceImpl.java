@@ -276,7 +276,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse importUser(Session session, String role, String lang, String idetntifier, boolean test,
+	public OssResponse importUser(Session session, String role, String lang, String identifier, boolean test,
 			String password, boolean mustchange, boolean full, boolean allClasses, boolean cleanClassDirs,
 			boolean resetPassword, InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
 		File file = null;
@@ -295,9 +295,9 @@ public class UserResourceImpl implements UserResource {
 		parameters.add(role);
 		parameters.add("--lang");
 		parameters.add(lang);
-		if( idetntifier != null && !idetntifier.isEmpty() ) {
-			parameters.add("--idetntifier");
-			parameters.add(idetntifier);
+		if( identifier != null && !identifier.isEmpty() ) {
+			parameters.add("--identifier");
+			parameters.add(identifier);
 		}
 		if( test ) {
 			parameters.add("--test");
