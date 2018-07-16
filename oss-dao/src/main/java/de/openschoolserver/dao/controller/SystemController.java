@@ -497,7 +497,7 @@ public class SystemController extends Controller {
 		StringBuffer error = new StringBuffer();
 		program[0] = "/usr/share/oss/tools/register.sh";
 		OSSShellTools.exec(program, reply, error, null);
-		if( error.toString().startsWith("OK")) {
+		if( error.toString().isEmpty() ) {
 			return new OssResponse(this.getSession(),"OK","System was registered succesfully.");
 		} else {
 			return new OssResponse(this.getSession(),"ERROR",error.toString());
