@@ -616,6 +616,7 @@ public class Controller extends Config {
 		if( query.getResultList().isEmpty() ) {
 			return null;
 		}
+		//TODO close em
 		return (OSSConfig)  query.getResultList().get(0);
 	}
 
@@ -623,6 +624,7 @@ public class Controller extends Config {
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.getAllForKey");
 		query.setParameter("keyword",key);
+		//TODO close em
 		return (List<OSSMConfig>) query.getResultList();
 	}
 
@@ -630,6 +632,7 @@ public class Controller extends Config {
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
+		//TODO close em
 		return  (List<OSSMConfig>) query.getResultList();
 	}
 
@@ -638,7 +641,7 @@ public class Controller extends Config {
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
-		case "Group":
+		case "de.openschoolserver.dao.Group":
 			 query.setParameter("type","Group");
 			 id    = ((Group) object ).getId();
 			 break;
@@ -660,6 +663,7 @@ public class Controller extends Config {
 		for(OSSMConfig config : (List<OSSMConfig>) query.getResultList() ) {
 			values.add(config.getValue());
 		}
+		em.close();
 		return values;
 	}
 	
@@ -695,6 +699,7 @@ public class Controller extends Config {
 			return null;
 		}
 		OSSConfig config = (OSSConfig) query.getResultList().get(0);
+		em.close();
 		return config.getValue();
 	}
 

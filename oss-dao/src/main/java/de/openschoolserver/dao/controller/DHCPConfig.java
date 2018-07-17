@@ -61,6 +61,12 @@ public class DHCPConfig extends Controller {
 			dhcpConfigFile.add("group {");
 			dhcpConfigFile.add("  #Room" + room.getName());
 			//TODO add dhcp options and statements from RoomConfig
+			for( String dhcpstatement : this.getMConfigs(room, "dhcpStatements")) {
+				dhcpConfigFile.add("    " + dhcpstatement + " ;");
+			}
+			for( String dhcpOption : this.getMConfigs(room, "dhcpOptions")) {
+				dhcpConfigFile.add("    option " + dhcpOption + " ;");
+			}
 			WriteRoom(room);
 			dhcpConfigFile.add("}");
 		}
@@ -99,13 +105,24 @@ public class DHCPConfig extends Controller {
 			dhcpConfigFile.add("    host " + device.getName() + " {");
 			dhcpConfigFile.add("      hardware ethernet " + device.getMac() + ";");
 			dhcpConfigFile.add("      fixed-address " + device.getIp() + ";");
-			//TODO add dhcp options and statements from DeviceConfig
+			//TODO add dhcp options and statements from DeviceConfif
+			for( String dhcpstatement : this.getMConfigs(device, "dhcpStatements")) {
+				dhcpConfigFile.add("      " + dhcpstatement + " ;");
+			}
+			for( String dhcpOption : this.getMConfigs(device, "dhcpOptions")) {
+				dhcpConfigFile.add("      option " + dhcpOption + " ;");
+			}
 			dhcpConfigFile.add("    }");
 			if( IPv4.validateIPAddress(device.getWlanIp()) ){
 				dhcpConfigFile.add("    host " + device.getName() + "-wlan {");
 				dhcpConfigFile.add("      hardware ethernet " + device.getWlanMac() + ";");
 				dhcpConfigFile.add("      fixed-address " + device.getWlanIp() + ";");
-				//TODO add dhcp options and statements from DeviceConfig
+				for( String dhcpstatement : this.getMConfigs(room, "dhcpStatements")) {
+					dhcpConfigFile.add("    " + dhcpstatement + " ;");
+				}
+				for( String dhcpOption : this.getMConfigs(device, "dhcpOptions")) {
+					dhcpConfigFile.add("      option " + dhcpOption + " ;");
+				}
 				dhcpConfigFile.add("    }");
 				line.add(device.getName() + "-wlan"+ domainName );
 			}
