@@ -196,12 +196,12 @@ public interface EducationResource {
     @GET
     @Path("rooms")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the list of ids of the rooms the session user may control.")
+    @ApiOperation(value = "Gets the list of the smart rooms the user has created.")
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Long> getMyRoomsId(
+    List<Category> getMySamrtRooms(
             @ApiParam(hidden = true) @Auth Session session
     );
 

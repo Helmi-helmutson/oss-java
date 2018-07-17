@@ -53,8 +53,14 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Long> getMyRoomsId(Session session) {
-		return new EducationController(session).getMyRoomsId();
+	public List<Category> getMySamrtRooms(Session session) {
+		List<Category> smartRooms = new ArrayList<Category>();
+		for( Category category : session.getUser().getCategories() ) {
+			if(category.getCategoryType().equals("smartRoom")) {
+				smartRooms.add(category);
+			}
+		}
+		return smartRooms;
 	}
 
 	@Override
