@@ -28,6 +28,7 @@ dependencies {
     ext.dropwizardVersion = '1.0.6'
     compile "io.dropwizard:dropwizard-core:$dropwizardVersion"
     compile "io.dropwizard:dropwizard-auth:$dropwizardVersion"
+    compile "io.dropwizard:dropwizard-client:$dropwizardVersion" // used for proxying support api calls
     compile "com.smoketurner:dropwizard-swagger:1.0.6-1"
     compile ("de.extis:XPluginLib:1.0.1-SNAPSHOT") { changing = true }
     compile ("de.claxss:claxssimportlib:1.0.1-SNAPSHOT") { changing = true }

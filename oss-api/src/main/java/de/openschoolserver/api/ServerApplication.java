@@ -19,6 +19,9 @@ import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 
+import javax.ws.rs.client.Client;
+
+import io.dropwizard.client.JerseyClientBuilder;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import de.extis.xpluginlib.PluginHandler;
@@ -53,6 +56,9 @@ public class ServerApplication extends Application<ServerConfiguration> {
     @Override
     public void run(ServerConfiguration configuration, Environment environment) {
 
+    	final Client jerseyClient = new JerseyClientBuilder(environment)
+		        .using(configuration.getJerseyClientConfiguration()).build(getName());
+    	
         @SuppressWarnings("rawtypes")
 		AuthFilter tokenAuthorizer = new OAuthCredentialAuthFilter.Builder<Session>()
                 .setAuthenticator(new OSSTokenAuthenticator())
@@ -112,6 +118,10 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final ImporterResource importerResource = new ImporterResourceImpl();
         environment.jersey().register(importerResource);
         PluginHandler.registerPlugins(environment);
+        
+        final SupportResource supportResource = new SupportResourceImpl(jerseyClient);
+		environment.jersey().register(supportResource);
+
         
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);

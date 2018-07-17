@@ -6,6 +6,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 import org.hibernate.validator.constraints.NotEmpty;
+import io.dropwizard.client.JerseyClientConfiguration;
+
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 public class ServerConfiguration extends Configuration {
 
@@ -38,4 +42,18 @@ public class ServerConfiguration extends Configuration {
     @JsonProperty("swagger")
     public SwaggerBundleConfiguration swaggerBundleConfiguration;
 
+    @Valid
+    @NotNull
+    private JerseyClientConfiguration jerseyClient = new JerseyClientConfiguration();
+
+    @JsonProperty("jerseyClient")
+    public JerseyClientConfiguration getJerseyClientConfiguration() {
+        return jerseyClient;
+    }
+
+    @JsonProperty
+    public String supportUrl;
+    
+    @JsonProperty
+    public String supportEmail;
 }
