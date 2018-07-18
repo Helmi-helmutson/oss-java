@@ -215,7 +215,7 @@ public class EducationController extends Controller {
 		EntityManager   em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			Room room         = new RoomController(this.session).getById(roomId);
+			Room room         = em.find(Room.class, roomId);
 			Category category = room.getCategories().get(0);
 			em.merge(room);
 			em.remove(room);
