@@ -26,6 +26,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.SmartRoom;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.*;
 
@@ -53,11 +54,11 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Category> getMySamrtRooms(Session session) {
-		List<Category> smartRooms = new ArrayList<Category>();
+	public List<Room> getMySamrtRooms(Session session) {
+		List<Room> smartRooms = new ArrayList<Room>();
 		for( Category category : session.getUser().getCategories() ) {
 			if(category.getCategoryType().equals("smartRoom")) {
-				smartRooms.add(category);
+				smartRooms.add(category.getRooms().get(0));
 			}
 		}
 		return smartRooms;
@@ -545,5 +546,10 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			em.close();
 		}
 		return new OssResponse(session,"OK","Device was repositioned.");
+	}
+
+	@Override
+	public SmartRoom getRoomDetails(Session session, Long roomId) {
+		return new SmartRoom(session,roomId);
 	}
 }

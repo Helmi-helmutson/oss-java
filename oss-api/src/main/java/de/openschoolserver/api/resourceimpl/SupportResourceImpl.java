@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import de.openschoolserver.api.resources.SupportResource;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SupportRequest;
-import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.controller.SystemController;
 import de.openschoolserver.dao.tools.OSSShellTools;
 

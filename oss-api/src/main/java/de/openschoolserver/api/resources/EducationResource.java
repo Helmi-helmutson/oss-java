@@ -24,6 +24,7 @@ import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.PositiveList;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.SmartRoom;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Device;
 
@@ -201,7 +202,7 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Category> getMySamrtRooms(
+    List<Room> getMySamrtRooms(
             @ApiParam(hidden = true) @Auth Session session
     );
 
@@ -234,6 +235,23 @@ public interface EducationResource {
     })
     @RolesAllowed("education.rooms")
     List<List<Long>>  getRoom(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId") Long roomId
+            );
+
+    /*
+     * GET education/rooms/{roomId}
+     */
+    @GET
+    @Path("rooms/{roomId}/details")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the state of a room. This call delivers all Informations about a room."
+                )
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    SmartRoom  getRoomDetails(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId
             );
