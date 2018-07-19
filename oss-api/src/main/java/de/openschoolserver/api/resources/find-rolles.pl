@@ -12,10 +12,9 @@ foreach( split /\n/, $ROLES )
 		my $r = $1;
 		next if( $r eq "printers.add" );
 		next if( $r =~ /adhoclan*/ );
-		next if( $r =~ /softwares*/ );
-		next if( $r =~ /category*/ );
 		$hroles->{$1} = 1;
 		if( $r =~ /.search/ || $r =~ /education/  || $r =~ /information/ ) {
+			next if( $r =~ /softwares*/ );
 			$forTeachers->{$r} = 1;
 		}
 	}

@@ -93,11 +93,12 @@ INSERT INTO GroupInCategories Values(3,4);
 INSERT INTO GroupInCategories Values(4,5);
 
 #Standard ACLs
-INSERT INTO Enumerates VALUES(NULL,'apiAcl','myself.manage',6);
+INSERT INTO Enumerates VALUES(NULL,'apiAcl','myself.modify',6);
+INSERT INTO Enumerates VALUES(NULL,'apiAcl','myself.search',6);
 INSERT INTO Acls VALUES(NULL,NULL,1,'myself.modify','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,2,'myself.modify','Y',6);
-INSERT INTO Acls VALUES(NULL,NULL,3,'myself.modify','Y',6);
-INSERT INTO Acls VALUES(NULL,NULL,4,'myself.modify','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,1,'myself.search','Y',6);
+INSERT INTO Acls VALUES(NULL,NULL,2,'myself.search','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,3,'myself.search','Y',6);
 INSERT INTO Acls VALUES(NULL,NULL,4,'myself.search','Y',6);
 #Acls
