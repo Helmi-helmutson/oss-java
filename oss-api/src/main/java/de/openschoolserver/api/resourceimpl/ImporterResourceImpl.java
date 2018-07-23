@@ -2,20 +2,11 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.File;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.Random;
 
 import javax.ws.rs.WebApplicationException;
@@ -54,13 +45,15 @@ public class ImporterResourceImpl implements ImporterResource {
 
 				Importer importer = f.getImporterInstance(importOrder.getImporterId());
 				if (importer.startImport(o)) {
-					ImportHandler h = new ImportHandler();
-					String reslog = h.handleObjects(session, importer, o);
-					importOrder.setImportResult(reslog);
-					o.setPercentCompleted(50);
-					importer.reset();
-					o.setPercentCompleted(100); // TODO change with real
-												// implementation
+					ImportHandler h = new ImportHandler(session, importer, o);
+					h.handleObjects();
+					importOrder.setImportResult("started"); // subsequent calls
+															// will return this
+					// o.setPercentCompleted(50);
+					// importer.reset();
+					// o.setPercentCompleted(100); // TODO change with real
+					// implementation
+
 				}
 			} else {
 				throw new WebApplicationException(409);
@@ -113,7 +106,11 @@ public class ImporterResourceImpl implements ImporterResource {
 
 	@Override
 	public ImportOrder getImportStatus(Session session, ImportOrder importOrder) {
-
+		if (session.getTemporaryUploadData() != null) {
+			LOG.debug("getting import status: " + ((ImportOrder) session.getTemporaryUploadData()).getImportResult());
+		} else {
+			LOG.debug("getting import status for null order");
+		}
 		return (ImportOrder) session.getTemporaryUploadData();
 	}
 
@@ -127,5 +124,4 @@ public class ImporterResourceImpl implements ImporterResource {
 		return importOrder;
 	}
 
-	
 }
