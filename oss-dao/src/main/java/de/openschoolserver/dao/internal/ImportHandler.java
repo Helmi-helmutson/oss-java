@@ -29,13 +29,35 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.GroupController;
 import de.openschoolserver.dao.controller.UserController;
 
-public class ImportHandler {
+public class ImportHandler extends Thread {
+	private Session session;
+	private Importer importer;
+	private ImportOrder order;
+	StringBuilder responseString;
+	boolean done = false;
+
 	private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ImportHandler.class);
 
-	public String handleObjects(Session session, Importer importer, ImportOrder o) {
+	public ImportHandler(Session session, Importer importer, ImportOrder o) {
+		this.session = session;
+		this.importer = importer;
+		this.order = o;
+		responseString = new StringBuilder();
+	}
 
+	public String getResponseString() {
+		return responseString.toString();
+	}
+
+	public void handleObjects() {
+		start();
+		// doHandleObjects();
+
+		// return responseString.toString();
+	}
+
+	private void doHandleObjects() {
 		ImporterObject object;
-		StringBuilder responseString = new StringBuilder();
 		int ctr = 0;
 		try {
 			do {
@@ -45,36 +67,46 @@ public class ImportHandler {
 
 				if (object != null) {
 					String objectMsg = object.getObjectMessage();
-					o.setPercentCompleted((100 / importer.getNumberOfObjects()) * ctr);
+					order.setPercentCompleted((100 / importer.getNumberOfObjects()) * ctr);
 					ctr++;
 					LOG.debug("found object: " + object.getClass());
 					if (object instanceof de.claxss.importlib.SchoolClass) {
-						if (!doCompareAndImportSchoolClass(session, (de.claxss.importlib.SchoolClass) object, o,
+						if (!doCompareAndImportSchoolClass(session, (de.claxss.importlib.SchoolClass) object, order,
 								responseString)) {
-							appendLog(importer, o, "Import " + object.getObjectMessage() + ": FAILED");
+							appendLog(importer, order, "Import " + object.getObjectMessage() + ": FAILED");
 
 						} else {
 
-							appendLog(importer, o, "Import " + object.getObjectMessage() + ": OK");
+							appendLog(importer, order, "Import " + object.getObjectMessage() + ": OK");
 						}
 					} else if (object instanceof de.claxss.importlib.Person) {
 
-						if (!doCompareAndImportUser(session, (de.claxss.importlib.Person) object, o, importer,
+						if (!doCompareAndImportUser(session, (de.claxss.importlib.Person) object, order, importer,
 								responseString)) {
 
-							appendLog(importer, o, "Import " + objectMsg + ": FAILED");
+							appendLog(importer, order, "Import " + objectMsg + ": FAILED");
 						} else {
 
-							appendLog(importer, o, "Import " + objectMsg + ": OK");
+							appendLog(importer, order, "Import " + objectMsg + ": OK");
 						}
 					}
+					order.setImportResult(responseString.toString());
+					// LOG.debug("Setting result string: " +
+					// order.getImportResult());
+					// try {
+					// LOG.debug("Waiting for debugging....");
+					// Thread.sleep(10000); // TODO remove me
+					// } catch (InterruptedException e) {
+					// LOG.error(e.getMessage(), e);
+					// e.printStackTrace();
+					// }
 				}
 			} while (object != null);
 		} finally {
 			closeLogfiles();
 		}
-
-		return responseString.toString();
+		order.setPercentCompleted(100);
+		done = true;
 	}
 
 	private OutputStream logfile = null;
@@ -230,7 +262,7 @@ public class ImportHandler {
 
 	}
 
-	protected boolean doCompareAndImportUser(Session session, Person person, ImportOrder o, Importer importer,
+	private boolean doCompareAndImportUser(Session session, Person person, ImportOrder o, Importer importer,
 			StringBuilder responseString) {
 		final UserController userController = new UserController(session);
 		final GroupController groupController = new GroupController(session);
@@ -240,7 +272,7 @@ public class ImportHandler {
 		List<Person> handledUsers = new ArrayList<Person>();
 		existingUser = ImporterUtil.findUserByUid(oldUserList, person);
 		if (existingUser == null) {
-			LOG.error("user not found by uid: " + person.getFirstname() + " " + person.getName() + " "
+			LOG.info("user not found by uid: " + person.getFirstname() + " " + person.getName() + " "
 					+ person.getLoginId() + " " + person.getBirthday());
 		}
 		if (existingUser == null) {
@@ -266,7 +298,7 @@ public class ImportHandler {
 																			// lib)
 		}
 		if (existingUser == null) {
-			LOG.error("user not found: " + person.getFirstname() + " " + person.getName() + " " + person.getLoginId()
+			LOG.info("user not found: " + person.getFirstname() + " " + person.getName() + " " + person.getLoginId()
 					+ " " + person.getBirthday());
 		}
 		/* ========== second step: create or update the user ============ */
@@ -337,22 +369,38 @@ public class ImportHandler {
 			OssResponse useraddRes = null;
 			if (!o.isTestOnly()) {
 				useraddRes = userController.add(newUser);
-				newUser = userController.getById(useraddRes.getObjectId());
+				if (useraddRes != null && useraddRes.getObjectId() != null) {
+					newUser = userController.getById(useraddRes.getObjectId());
+				} else {
+					if (useraddRes == null) {
+						LOG.error("userController.add returns no response");
+						responseString.append("Benutzer kann nicht angelegt werden: ").append(newUser.getSurName())
+								.append(", ").append(newUser.getGivenName()).append(LINESEP);
+					} else {
+						LOG.error("userController.add returns null as objectid in response: " + useraddRes.getCode()
+								+ " " + useraddRes.getValue());
+						responseString.append("Benutzer kann nicht angelegt werden: ").append(newUser.getSurName())
+								.append(", ").append(newUser.getGivenName()).append(". Grund: ")
+								.append(useraddRes.getValue()).append(LINESEP);
+					}
+					return false;
+				}
 				// appendUserAddLog(importer, o, res, newUser, true);
 			} else {
 				// appendUserAddLog(importer, o, null, newUser, true);
 			}
 			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName()).append(", ")
 					.append(newUser.getGivenName()).append(LINESEP);
-			if (newUser != null && !o.isTestOnly()) {
+			if (newUser != null && newUser.getId() != null && !o.isTestOnly()) {
 				if (person.getSchoolClasses() != null) {
 					for (SchoolClass schoolClass : person.getSchoolClasses()) {
 						Group group = groupController.getByName(schoolClass.getNormalizedName());
-						if (group != null) {
+						if (group != null && group.getId() != null) {
 							LOG.debug("Add user to classes" + newUser.getUid() + " " + group.getName());
 							groupController.addMember(group.getId(), newUser.getId());
 						} else {
-							LOG.error("Group not found: " + schoolClass.getNormalizedName());
+							LOG.info("Group not found: " + schoolClass.getNormalizedName() + " " + group != null
+									? group.getName() : "");
 						}
 					}
 				}
@@ -415,7 +463,7 @@ public class ImportHandler {
 		return "unknown";
 	}
 
-	protected boolean doCompareAndImportSchoolClass(Session session, de.claxss.importlib.SchoolClass schoolClass,
+	private boolean doCompareAndImportSchoolClass(Session session, de.claxss.importlib.SchoolClass schoolClass,
 			ImportOrder o, StringBuilder responseString) {
 		// LOG.error("importing group: " + schoolClass.getNormalizedName());
 		if (schoolClass != null && schoolClass.getNormalizedName() != null) {
@@ -437,5 +485,10 @@ public class ImportHandler {
 		}
 
 		return true;
+	}
+
+	@Override
+	public void run() {
+		doHandleObjects();
 	}
 }
