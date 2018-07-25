@@ -150,7 +150,7 @@ public class DeviceController extends Controller {
 			if( !this.mayModify(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
 			}
-			if( device.getHwconf().getDeviceType().equals("FatClient")) {
+			if(device.getHwconf() != null &&  device.getHwconf().getDeviceType().equals("FatClient")) {
 				needWriteSalt = true;
 				User user = userController.getByUid(device.getName());
 				if( user != null ) {

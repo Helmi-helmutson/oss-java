@@ -124,6 +124,9 @@ public class PrinterResourceImpl implements PrinterResource {
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
+		if( printer.getHwconf().getDeviceType() == null ) {
+			return new OssResponse(session,"ERROR","Printer can not removed. This device was not registered as a printer.");
+		}
 		if( ! printer.getHwconf().getDeviceType().equals("Printer")) {
 			throw new WebApplicationException(405);
 		}
