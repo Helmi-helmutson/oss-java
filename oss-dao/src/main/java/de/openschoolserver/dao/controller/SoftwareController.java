@@ -173,11 +173,11 @@ public class SoftwareController extends Controller {
 	
 	public OssResponse delete(Long softwareId) {
 		EntityManager em = getEntityManager();
-		Software software = this.getById(softwareId);
-		if( !this.mayModify(software) ) {
-		return new OssResponse(this.getSession(),"ERROR","You must not delete this software.");
-        }
 		try {
+			Software software =  em.find(Software.class, softwareId);
+			if( !this.mayModify(software) ) {
+				return new OssResponse(this.getSession(),"ERROR","You must not delete this software.");
+	        }
 			em.getTransaction().begin();
 			if( !em.contains(software)) {
 				software = em.merge(software);
