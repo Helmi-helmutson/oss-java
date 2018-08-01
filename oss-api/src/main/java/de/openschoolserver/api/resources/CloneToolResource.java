@@ -561,13 +561,37 @@ public interface CloneToolResource {
 	@DELETE
 	@Path("devicesByIP/{deviceIP}/cloning")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Deletes the boot configuration for the automatical partitioning for a workstations"
-						)
+	@ApiOperation(value = "Deletes the boot configuration for the automatical partitioning for a workstations")
 	@RolesAllowed("hwconf.manage")
 	OssResponse stopCloningOnDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("deviceIP") String deviceIP
 			);
-
-
+	
+	@GET
+	@Path("multicastDevices")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the list of the network devices for multicast cloning.")
+	@RolesAllowed("hwconf.manage")
+	String[] getMulticastDevices(
+			@ApiParam(hidden = true) @Auth Session session
+			);
+	
+	/**
+	 * Start multicast cloning process of a partition on a device
+	 * @param session
+	 * @param partitionId
+	 * @param networkDevice
+	 * @return 
+	 */
+	@PUT
+	@Path("partitions/{partitionId}/multicast/{networkDevice}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Start multicast imaging with a given partition.")
+	@RolesAllowed("hwconf.manage")
+	OssResponse startMulticast(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("partitionId") Long partitionId,
+			@PathParam("networkDevice") String networkDevice
+			);
 }

@@ -11,6 +11,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.controller.CloneToolController;
+import de.openschoolserver.dao.controller.Config;
 import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.api.resources.CloneToolResource;
@@ -263,5 +264,16 @@ public class CloneToolResourceImpl implements CloneToolResource {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	@Override
+	public String[] getMulticastDevices(Session session) {
+		Config config = new Config("/etc/sysconfig/dhcpd","DHCP_");
+		return config.getConfigValue("INTERFACE").split("\\s+");
+	}
+
+	@Override
+	public OssResponse startMulticast(Session session, Long partitionId, String networkDevice) {
+		return new CloneToolController(session).startMulticast(partitionId,networkDevice);
 	}
 }
