@@ -460,6 +460,22 @@ public interface SoftwareResource {
     );
 
     /*
+     * GET softwares/installations
+     */
+    @GET
+    @Path("installations/{installationId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation( value = "Gets an installations by id." )
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("software.install")
+    Category getInstallation(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
+    /*
      * PUT softwares/installations/{installationId}/softwares/{softwareId}
      */
     @PUT

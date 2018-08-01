@@ -356,4 +356,9 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		}
 		return new OssResponse(session,"OK","Salt High State was applied on all minions.");
 	}
+
+	@Override
+	public Category getInstallation(Session session, long installationId) {
+		return new CategoryController(session).getById(installationId);
+	}
 }
