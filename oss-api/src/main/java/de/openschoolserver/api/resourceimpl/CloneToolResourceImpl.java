@@ -268,7 +268,7 @@ public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
 	public String[] getMulticastDevices(Session session) {
-		Config config = new Config("/etc/sysconfig/dhcpd","DHCP_");
+		Config config = new Config("/etc/sysconfig/dhcpd","DHCPD_");
 		return config.getConfigValue("INTERFACE").split("\\s+");
 	}
 
