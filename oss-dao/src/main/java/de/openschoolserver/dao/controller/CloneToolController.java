@@ -27,6 +27,7 @@ public class CloneToolController extends Controller {
 	
 	protected Path PXE_BOOT   = Paths.get("/usr/share/oss/templates/pxeboot");
 	protected Path ELILO_BOOT = Paths.get("/usr/share/oss/templates/eliloboot");
+	protected String images   = "/srv/itool/images/";
 
 	public CloneToolController(Session session) {
 		super(session);
@@ -552,6 +553,33 @@ public class CloneToolController extends Controller {
 			return "ERROR "+e.getMessage();
 		}
 		return "OK";
+	}
+
+	public OssResponse startMulticast(Long partitionId, String networkDevice) {
+		EntityManager em = getEntityManager();
+		Partition partition;
+		try {
+			partition = em.find(Partition.class, partitionId);
+			Long hwconfId = partition.getHwconf().getId();
+			String[] program   = new String[8];
+			StringBuffer reply = new StringBuffer();
+			StringBuffer error = new StringBuffer();
+			program[0] = "/usr/sbin/udp-sender";
+			program[1] = "--nokbd";
+			program[2] = "--interface";
+			program[3] = networkDevice;
+			program[4] = "--file";
+			program[5] = images + hwconfId + "/" + partition.getName() + ".img";
+			program[6] = "--autostart";
+			program[7] = "&";
+			OSSShellTools.exec(program, reply, error, null);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Multicast imaging was started succesfully.");
 	}
 
 }
