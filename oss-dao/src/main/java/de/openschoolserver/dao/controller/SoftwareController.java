@@ -175,6 +175,7 @@ public class SoftwareController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Software software =  em.find(Software.class, softwareId);
+			String softwareName = software.getName();
 			if( !this.mayModify(software) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this software.");
 	        }
@@ -185,6 +186,14 @@ public class SoftwareController extends Controller {
 			em.remove(software);
 			em.getTransaction().commit();
 			em.getEntityManagerFactory().getCache().evictAll();
+			String[] program    = new String[4];
+			StringBuffer reply  = new StringBuffer();
+			StringBuffer stderr = new StringBuffer();
+			program[0]   = "/usr/bin/zypper";
+			program[1]   = "-D";
+			program[2]   = "/srv/salt/repos.d/";
+			program[3]   = softwareName;
+			OSSShellTools.exec(program, reply, stderr, null);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
