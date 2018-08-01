@@ -851,10 +851,11 @@ public class DeviceController extends Controller {
 			program[3] = "oss_client.unBlockInput";
 			break;
 		case "applyState":
-			program = new String[3];
-			program[0] = "/usr/share/oss/plugins/client_plugin_handler.sh";
-			program[1] = "start";
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "--async";
 			program[2] = FQHN.toString();
+			program[3] = "state.apply";
 			break;
 		case "wol":
 			program = new String[3];
