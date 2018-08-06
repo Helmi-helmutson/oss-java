@@ -637,16 +637,22 @@ public class SystemController extends Controller {
 	public OssResponse setAclToGroup(Long groupId, Acl acl) {
 		Group group = new GroupController(session).getById(groupId);
 		EntityManager em = getEntityManager();
+		Acl oldAcl;
 		logger.debug("Group acl to set: " + acl);
 		try {
+			oldAcl = em.find(Acl.class, acl.getId());
+		} catch(Exception e) {
+			oldAcl = null;
+		}
+		try {
 			em.getTransaction().begin();
-			Acl oldAcl = this.getAclById(acl.getId());
 			if( oldAcl != null ) {
 				if( acl.getAllowed() ) {
 					oldAcl.setAllowed(true);
 					em.merge(oldAcl);
 				} else {
-					em.merge(oldAcl);
+					group.getAcls().remove(oldAcl);
+					em.merge(group);
 					em.remove(oldAcl);
 				}
 			} else {
@@ -728,8 +734,9 @@ public class SystemController extends Controller {
 			if( oldAcl != null && oldAcl.getUser() != null && oldAcl.getUser().equals(user) ) {
 				logger.debug("User old to modify: " + oldAcl);
 				if( this.hasUsersGroupAcl(user,acl)) {
-					em.merge(oldAcl);
+					user.getAcls().remove(oldAcl);
 					em.remove(oldAcl);
+					em.merge(user);
 				} else {
 					oldAcl.setAllowed(acl.getAllowed());
 					em.merge(oldAcl);
