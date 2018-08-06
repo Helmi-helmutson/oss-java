@@ -245,8 +245,10 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[2] = "Administrator%" + session.getPassword();
 		program[3] = "printserver";
 		program[4] = "-c";
-		program[5] = "\'setdriver " + printerName + " " + "\"" + printerName +"\"\'";
+		program[5] = "setdriver " + printerName + " " + printerName;
 		OSSShellTools.exec(program, reply, stderr, null);
+		logger.debug("activateWindowsDriver error" + stderr.toString());
+		logger.debug("activateWindowsDriver reply" + reply.toString());
 		return new OssResponse(session,"OK","Windows driver was activated.");
 	}
 
