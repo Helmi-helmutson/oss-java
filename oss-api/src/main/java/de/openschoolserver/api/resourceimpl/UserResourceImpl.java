@@ -336,8 +336,10 @@ public class UserResourceImpl implements UserResource {
 		StringBuilder importDir  = controller.getImportDir("");
 		List<UserImport> imports = new ArrayList<UserImport>();
 		File importDirObject = new File(importDir.toString());
-		for( String file :  importDirObject.list() ) {
+		if( importDirObject != null ) {
+			for( String file :  importDirObject.list() ) {
 				imports.add(getImport(session,file.replaceAll(importDir.append("/").toString(), "")));
+			}
 		}
 		return imports;
 	}
