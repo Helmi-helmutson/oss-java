@@ -181,36 +181,42 @@ public class DeviceController extends Controller {
 		return this.delete(device.getId(), atomic);
 	}
 
-	protected String check(Device device,Room room) {
+	protected OssResponse check(Device device,Room room) {
 		List<String> error = new ArrayList<String>();
+		List<String> parameters  = new ArrayList<String>();
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
 
 		//Check the MAC address
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
 		String name =  this.isMacUnique(device.getMac());
 		if( name != "" ){
-			error.add("The MAC address '" + device.getMac() + "' will be used allready:" + name );
+			parameters.add(device.getMac());
+			parameters.add(name);
+			return new OssResponse(this.session,"ERROR","The MAC address '%s' will be used allready by '%s'.",null,parameters);
 		}
 		if( ! IPv4.validateMACAddress(device.getMac())) {
-			error.add("The MAC address is not valid:" + device.getMac() );
+			parameters.add(device.getMac());
+			return new OssResponse(this.session,"ERROR","The MAC address '%s' is not valid.",null,parameters);
 		}
 		//Check the name
 		if( ! this.isNameUnique(device.getName())){
-			error.add("Devices name is not unique. " );
+			return new OssResponse(this.session,"ERROR","Devices name is not unique." );
 		}
 		if( this.checkBadHostName(device.getName())){
-			error.add("Devices name contains not allowed characters. " );
+			return new OssResponse(this.session,"ERROR","Devices name contains not allowed characters. " );
 		}
 		//Check the IP address
 		name =  this.isIPUnique(device.getIp());
 		if( name != "" ){
-			error.add("The IP address will be used allready:" + name );
+			parameters.add(name);
+			return new OssResponse(this.session,"ERROR","The IP address will be used allready by '%s'",null,parameters );
 		}
 		if( ! IPv4.validateIPAddress(device.getIp())) {
-			error.add("The IP address is not valid:" + device.getIp() );
+			parameters.add(device.getIp());
+			return new OssResponse(this.session,"ERROR","The IP address '%s' is not valid.", null, parameters );
 		}
 		if( !net.contains(device.getIp())) {
-			error.add("The IP address is not in the room ip address range.");
+			return new OssResponse(this.session,"ERROR","The IP address is not in the room ip address range.");
 		}
 
 		if( device.getWlanMac().isEmpty() ) {
@@ -220,21 +226,25 @@ public class DeviceController extends Controller {
 			device.setWlanMac(device.getWlanMac().toUpperCase().replaceAll("-", ":"));
 			name =  this.isMacUnique(device.getWlanMac());
 			if( name != "" ){
-				error.add("The WLAN MAC address will be used allready:" + name );
+				parameters.add(name);
+				return new OssResponse(this.session,"ERROR","The WLAN MAC address will be used allready '%s'.",null,parameters);
 			}
 			if( ! IPv4.validateMACAddress(device.getMac())) {
-				error.add("The WLAN MAC address is not valid:" + device.getWlanMac() );
+				parameters.add(device.getMac());
+				return new OssResponse(this.session,"ERROR","The WLAN-MAC address '%s' is not valid.",null,parameters);
 			}
 			//Check the IP address
 			name =  this.isIPUnique(device.getWlanIp());
 			if( name != "" ){
-				error.add("The IP address will be used allready:" + name );
+				parameters.add(name);
+				return new OssResponse(this.session,"ERROR","The WLAN-IP address will be used allready by '%s'",null,parameters );
 			}
 			if( ! IPv4.validateIPAddress(device.getWlanIp())) {
-				error.add("The IP address is not valid:" + device.getIp() );
+				parameters.add(device.getWlanIp());
+				return new OssResponse(this.session,"ERROR","The WLAN-IP address '%s' is not valid.", null, parameters );
 			}
 			if( !net.contains(device.getWlanIp())) {
-				error.add("The IP address is not in the room ip address range.");
+				return new OssResponse(this.session,"ERROR","The WLAN-IP address is not in the room ip address range.");
 			}
 		}
 		//Check user parameter
@@ -242,7 +252,10 @@ public class DeviceController extends Controller {
 		for (ConstraintViolation<Device> violation : factory.getValidator().validate(device) ) {
 			error.add(violation.getMessage());
 		}
-		return String.join(System.lineSeparator(), error);
+		if( error.isEmpty() ) {
+			return new OssResponse(this.session,"OK","");
+		}
+		return new OssResponse(this.session,"ERROR",String.join(System.lineSeparator(),error));
 	}
 
 	/*

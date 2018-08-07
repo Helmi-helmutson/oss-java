@@ -698,10 +698,9 @@ public class RoomController extends Controller {
 					}
 					device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 				}
-				String error = deviceController.check(device, room);
-				if( ! error.isEmpty() ) {
-					em.getTransaction().rollback();
-					return new OssResponse(this.getSession(),"ERROR",device.getMac() + " " + error);
+				OssResponse ossResponse = deviceController.check(device, room);
+				if( ossResponse.getCode().equals("ERROR") ) {
+					return ossResponse;
 				}
 				device.setRoom(room);
 				if( device.getOwner() == null ) {
@@ -848,9 +847,9 @@ public class RoomController extends Controller {
 		//Check if the Device settings are OK
 		DeviceController deviceController = new DeviceController(this.session);
 		logger.debug("DEVICE " + device);
-		String error = deviceController.check(device, room);
-		if( !error.isEmpty() ) {
-			return new OssResponse(this.getSession(),"ERROR",error);
+		OssResponse ossResponse = deviceController.check(device, room);
+		if( ossResponse.getCode().equals("ERROR") ) {
+			return ossResponse;
 		}
 		device.setOwner(owner);
 		device.setRoom(room);
