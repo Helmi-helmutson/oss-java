@@ -41,7 +41,7 @@ public class SupportResourceImpl implements SupportResource {
 		if (supportUrl != null) {
 			supportUrl = supportUrl.trim();
 		}
-		if (supportUrl.equalsIgnoreCase("MAIL")) {
+		if (supportUrl != null && supportUrl.equalsIgnoreCase("MAIL")) {
 			supportEmail = sc.getConfigValue("SUPPORT_MAIL_ADDRESS");
 			supportEmailFrom = sc.getConfigValue("SUPPORT_MAIL_FROM");
 			if (supportEmailFrom!=null) {

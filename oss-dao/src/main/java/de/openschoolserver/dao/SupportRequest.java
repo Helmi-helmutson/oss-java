@@ -1,6 +1,8 @@
 /* (c) 2018 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.dao;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class SupportRequest {
     public enum SUPPORT_TYPE {
         Error, FeatureRequest, Feedback, ProductOrder, OfferInq, SalesInq
@@ -24,7 +26,15 @@ public class SupportRequest {
     private String ticketno;
     private String ticketResponseInfo;
 
-    
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
+	}
+
     public SupportRequest() {
 
     }
