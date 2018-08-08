@@ -610,6 +610,8 @@ public class SoftwareController extends Controller {
 				em.getTransaction().begin();
 				softwareLicense.setSoftware(software);
 				em.persist(softwareLicense);
+				software.getSoftwareLicenses().add(softwareLicense);
+				em.merge(software);
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -623,6 +625,8 @@ public class SoftwareController extends Controller {
 				em.getTransaction().begin();
 				softwareLicense.setSoftware(software);
 				em.persist(softwareLicense);
+				software.getSoftwareLicenses().add(softwareLicense);
+				em.merge(software);
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -647,7 +651,9 @@ public class SoftwareController extends Controller {
 						sl.setCount(Integer.parseInt(lic[1]));
 					}
 					em.persist(sl);
+					software.getSoftwareLicenses().add(sl);
 				}
+				em.merge(software);
 				em.getTransaction().commit();
 				Files.delete(file.toPath());
 			} catch (IOException e) {
