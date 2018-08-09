@@ -1,5 +1,7 @@
 package de.openschoolserver.api.resourceimpl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.WebApplicationException;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.api.resources.SupportResource;
+import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SupportRequest;
 import de.openschoolserver.dao.controller.SystemController;
@@ -63,8 +66,9 @@ public class SupportResourceImpl implements SupportResource {
 	}
 
 	@Override
-	public SupportRequest create(Session session, SupportRequest supportRequest) {
+	public OssResponse create(Session session, SupportRequest supportRequest) {
 		loadConf(session);
+		List<String> parameters  = new ArrayList<String>();
 		logger.debug("URL: " + supportUrl);
 		if (supportUrl != null && supportUrl.length() > 0) {
 			// use oss support rest services
@@ -76,7 +80,10 @@ public class SupportResourceImpl implements SupportResource {
 				logger.error("error from support system at " + supportUrl + ": " + response.getStatus());
 				throw new WebApplicationException(response.getStatus());
 			}
-			return response.readEntity(SupportRequest.class);
+			parameters.add(supportRequest.getSubject());
+			parameters.add(response.readEntity(SupportRequest.class).getTicketno());
+			parameters.add(supportRequest.getEmail());
+			return new OssResponse(session,"OK","Support request '%s' was created with ticket number '%s'. Answer will be sent to '%s'.",null,parameters);
 		} else {
 			// use classic email
 			StringBuilder request = new StringBuilder();
@@ -111,12 +118,15 @@ public class SupportResourceImpl implements SupportResource {
 			
 			int result = OSSShellTools.exec(program, reply, error, request.toString());
 			if (result == 0) {
-				supportRequest.setTicketno("EMAIL");
+				parameters.add(supportRequest.getSubject());
+				parameters.add(supportRequest.getEmail());
+					return new OssResponse(session,"OK","Support request '%s' was sent.  Answer will be sent to '%s'.",null,parameters);
 			} else {
 				logger.error("Error sending support mail: " + error.toString());
-				supportRequest.setTicketno("ERROR: " + error.toString());
+				parameters.add(supportRequest.getSubject());
+				parameters.add(error.toString());
+				return new OssResponse(session,"ERROR","Sopport request '%s' could not be sent. Reason '%s'",null, parameters); 
 			}
-			return supportRequest;
 		}
 	}
 
