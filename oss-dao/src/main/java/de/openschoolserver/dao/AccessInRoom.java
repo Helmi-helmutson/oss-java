@@ -126,6 +126,11 @@ public class AccessInRoom implements Serializable {
 	
 	private String  pointInTime;
 
+	//bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User creator;
+
 	public AccessInRoom() {
 		this.pointInTime = "06:00";
 		this.monday   = true;
@@ -329,6 +334,14 @@ public class AccessInRoom implements Serializable {
 
 	public void setWednesday(Boolean wednesday) {
 		this.wednesday = wednesday;
+	}
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
 	}
 
 }

@@ -462,31 +462,6 @@ public class RoomController extends Controller {
 		return room.getAccessInRooms();
 	}
 
-	/*
-	 * Sets the list of accesses in a room
-	 */
-	public OssResponse setAccessList(long roomId,List<AccessInRoom> AccessList){
-		Room room = this.getById(roomId);
-		EntityManager em = getEntityManager();
-		try {
-			em.getTransaction().begin();
-			for( AccessInRoom air : room.getAccessInRooms() ) {
-				room.removeAccessInRoome(air);
-			}
-			for( AccessInRoom air : AccessList ) {
-				air.setRoom(room);
-				room.addAccessInRoom(air);
-			}
-			em.merge(room);
-			em.getTransaction().commit();
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
-		} finally {
-			em.close();
-		}
-		return new OssResponse(this.getSession(),"OK","Acces was created succesfully");
-	}
 
 	/*
 	 * Sets the actual access status in a room
@@ -500,7 +475,10 @@ public class RoomController extends Controller {
 		StringBuffer error = new StringBuffer();
 
 		if(access.getAccessType().equals("ACT") ) {
-			//TODO 
+			DeviceController dc = new DeviceController(this.session);
+			for(Device device : room.getDevices() ) {
+				dc.manageDevice(device, access.getAction(), null);
+			}
 		}
 		else
 		{
@@ -552,7 +530,7 @@ public class RoomController extends Controller {
 	public OssResponse setAccessStatus(long roomId, AccessInRoom access) {
 		Room room = this.getById(roomId);
 		this.setAccessStatus(room, access);
-		return new OssResponse(this.getSession(),"OK", "Access state in was set succesfully." );
+		return new OssResponse(this.getSession(),"OK", "Access state in %s was set succesfully.",null,room.getName() );
 	}
 
 	/*
@@ -562,9 +540,49 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		Calendar rightNow = Calendar.getInstance();
 		String   actTime  = String.format("%02d:%02d", rightNow.get(Calendar.HOUR_OF_DAY),rightNow.get(Calendar.MINUTE));
+		int day = rightNow.get(Calendar.DAY_OF_WEEK);
 		Query query = em.createNamedQuery("AccessInRoom.findActualAccesses");
 		query.setParameter("time", actTime);
+		logger.debug("setScheduledAccess: " + actTime + " Day: " + day);
 		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
+			switch(day) {
+			case 0:
+			case 7:
+				if( ! access.getSunday() ) {
+					continue;
+				}
+				break;
+			case 1:
+				if( ! access.getMonday() ) {
+					continue;
+				}
+				break;
+			case 2:
+				if( ! access.getTuesday() ) {
+					continue;
+				}
+				break;
+			case 3:
+				if( ! access.getWednesday() ) {
+					continue;
+				}
+				break;
+			case 4:
+				if( ! access.getThursday() ) {
+					continue;
+				}
+				break;
+			case 5:
+				if( ! access.getFriday() ) {
+					continue;
+				}
+				break;
+			case 6:
+				if( ! access.getSaturday() ) {
+					continue;
+				}
+				break;
+			}
 			Room room = access.getRoom();
 			this.setAccessStatus(room, access);
 		}
@@ -1151,5 +1169,72 @@ public class RoomController extends Controller {
 		coordinates.add(row);
 		coordinates.add(place);
 		return coordinates;
+	}
+	/*
+	 * Sets the list of accesses in a room
+	 */
+	public OssResponse setAccessList(long roomId,List<AccessInRoom> AccessList){
+		Room room = this.getById(roomId);
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			for( AccessInRoom air : room.getAccessInRooms() ) {
+				room.removeAccessInRoome(air);
+			}
+			for( AccessInRoom air : AccessList ) {
+				air.setRoom(room);
+				room.addAccessInRoom(air);
+			}
+			em.merge(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Acces was created succesfully");
+	}
+
+	public OssResponse addAccessList(long roomId, AccessInRoom accessList) {
+		EntityManager em = getEntityManager();
+		try {
+			Room room = em.find(Room.class, roomId);
+			em.getTransaction().begin();
+			accessList.setRoom(room);
+			accessList.setCreator(this.session.getUser());
+			em.persist(accessList);
+			room.getAccessInRooms().add(accessList);
+			em.merge(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Acces was created succesfully");
+	}
+
+	public OssResponse deleteAccessList(long accessInRoomId) {
+		EntityManager em = getEntityManager();
+		try {
+			AccessInRoom accessList = em.find(AccessInRoom.class, accessInRoomId);
+			if( !this.mayModify(accessList) ) {
+				return new OssResponse(this.getSession(),"ERROR","You must not delete this accessList.");
+			}
+			Room room = accessList.getRoom();
+			em.getTransaction().begin();
+			room.getAccessInRooms().remove(accessList);
+			em.remove(accessList);
+			em.merge(room);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Acces was deleted succesfully");	
 	}
 }

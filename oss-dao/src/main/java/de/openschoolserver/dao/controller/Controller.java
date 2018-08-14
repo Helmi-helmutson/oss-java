@@ -366,6 +366,10 @@ public class Controller extends Config {
 			Acl Acl = (Acl)object;
 			owner = Acl.getCreator();
 			break;
+		case "de.openschoolserver.dao.AccessInRoom":
+			AccessInRoom AccessInRoom = (AccessInRoom)object;
+			owner = AccessInRoom.getCreator();
+			break;
 		case "de.openschoolserver.dao.Announcement":
 			Announcement an = (Announcement)object;
 			owner = an.getOwner();

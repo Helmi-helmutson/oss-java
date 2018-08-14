@@ -106,11 +106,15 @@ public class RoomRescourceImpl implements RoomResource {
         return accesses;
 	}
 
+
 	@Override
-	public OssResponse setAccessList(Session session, long roomId, List<AccessInRoom> accessList) {
-		// TODO Auto-generated method stub
-		final RoomController roomController = new RoomController(session);
-		return roomController.setAccessList(roomId, accessList);
+	public OssResponse addAccessList(Session session, long roomId, AccessInRoom accessList) {
+		return new RoomController(session).addAccessList(roomId,accessList);
+	}
+
+	@Override
+	public OssResponse deleteAccessList(Session session, long accessInRoomId) {
+		return new RoomController(session).deleteAccessList(accessInRoomId);
 	}
 
 	@Override

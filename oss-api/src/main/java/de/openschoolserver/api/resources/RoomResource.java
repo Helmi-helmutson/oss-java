@@ -106,7 +106,7 @@ public interface RoomResource {
             @ApiParam(hidden = true) @Auth Session session,
             Room room
     );
-    
+
     /*
      * POST rooms/add { hash }
      */
@@ -123,7 +123,7 @@ public interface RoomResource {
             @ApiParam(hidden = true) @Auth Session session,
             Room room
     );
-    
+
     /*
      * DELETE rooms/{roomId}
      */
@@ -148,7 +148,7 @@ public interface RoomResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Get hardware configuration of the room")
         @ApiResponses(value = {
-        	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
+       @ApiResponse(code = 404, message = "There is no more IP address in this room."),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.search")
@@ -156,7 +156,7 @@ public interface RoomResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
-    
+
     /*
      * SET rooms/{roomId}/{hwConfId}
      */
@@ -165,7 +165,7 @@ public interface RoomResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Set hardware configuration of the room")
         @ApiResponses(value = {
-        	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
+       @ApiResponse(code = 404, message = "There is no more IP address in this room."),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.modify")
@@ -183,7 +183,7 @@ public interface RoomResource {
     @Produces(JSON_UTF8)
     @ApiOperation(value = "get all available ip-adresses of the room")
         @ApiResponses(value = {
-        	@ApiResponse(code = 404, message = "There is no more IP address in this room."),
+       @ApiResponse(code = 404, message = "There is no more IP address in this room."),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.add")
@@ -209,7 +209,7 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             @PathParam("count") long count
     );
-    
+
     /*
      * PUT rooms/getNextRoomIP/ { netMask : 26, netWork : "10.12.0.0/16" }
      */
@@ -227,7 +227,7 @@ public interface RoomResource {
             @FormParam("netWork") String netWork,
             @FormParam("netMask") int netMask
     );
-    
+
     /*
      * GET rooms/{roomId}/loggedInUsers
      */
@@ -244,10 +244,10 @@ public interface RoomResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
-    
+
     /*
-   	 * POST room/getRooms
-   	 */
+   * POST room/getRooms
+   */
        @POST
        @Path("getRooms")
        @Produces(JSON_UTF8)
@@ -260,7 +260,7 @@ public interface RoomResource {
                @ApiParam(hidden = true) @Auth Session session,
                List<Long> roomIds
        );
-    
+
     /*
      * GET rooms/{roomId}/accessList
      */
@@ -277,25 +277,47 @@ public interface RoomResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
-    
+
     /*
      * POST rooms/{roomId}/accessList { List<Hash> }
      */
     @POST
     @Path("{roomId}/accessList")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Sets the access list in a room")
+    @ApiOperation(value = "Add an access list in a room",
+	notes = "<br>"
+	+ "pointInTime have to have following format: HH:MM<br>"
+	+ "accessType can be FW or ACT<br>"
+	+ "If accessType is FW portal printing proxy direct can be set.<br>"
+	+ "If accessType is ACT action can be shutdown,reboot,logout,close,open,wol<br>"	)
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("room.add")
-    OssResponse setAccessList(
+    OssResponse addAccessList(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
-            List<AccessInRoom>   accessList
+            AccessInRoom   accessList
     );
-    
+
+    /*
+     * DELETE rooms/accessList/{accessInRoomId}
+     */
+    @DELETE
+    @Path("accessList/{accessInRoomId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delets an access list in a room")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("room.add")
+    OssResponse deleteAccessList(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("accessInRoomId") long accessInRoomId
+    );
+
     /*
      * PUT rooms/scheduledAccess
      */
@@ -309,9 +331,9 @@ public interface RoomResource {
     })
     @RolesAllowed("room.add")
     OssResponse setScheduledAccess(
-    		@ApiParam(hidden = true) @Auth Session session
+        @ApiParam(hidden = true) @Auth Session session
     );
-    
+
     /*
      * GET rooms/accessStatus
      */
@@ -325,7 +347,7 @@ public interface RoomResource {
     })
     @RolesAllowed("room.add")
     List<AccessInRoom> getAccessStatus(
-    		@ApiParam(hidden = true) @Auth Session session
+       @ApiParam(hidden = true) @Auth Session session
     );
 
     /*
@@ -341,10 +363,10 @@ public interface RoomResource {
     })
     @RolesAllowed("room.manage")
     AccessInRoom getAccessStatus(
-    		@ApiParam(hidden = true) @Auth Session session,
+  @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
-    
+
     /*
      * POST rooms/{roomId}/accessStatus
      */
@@ -362,7 +384,7 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             AccessInRoom access
     );
-    
+
     // Functions to manage Devices in Rooms
     /*
      * POST rooms/{roomId}/devices { hash }
@@ -381,7 +403,7 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             List<Device> devices
     );
-    
+
     /*
      * PUT rooms/{roomId}/device/{macAddress}/{name}
      */
@@ -417,7 +439,7 @@ public interface RoomResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
-    
+
     /*
      * POST  rooms/{roomId}/deleteDevices [ deviceId, deviceId]
      */
@@ -434,7 +456,7 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             List<Long> deviceId
     );
-    
+
     /*
      * DELETE {roomId}/deleteDevice/{deviceId}
      */
@@ -451,7 +473,7 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             @PathParam("deviceId") Long deviceId
     );
-    
+
     /*
      * Printer control
      */
@@ -468,7 +490,7 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             @PathParam("deviceId") Long deviceId
     );
-    
+
     @DELETE
     @Path("{roomId}/defaultPrinter")
     @Produces(JSON_UTF8)
@@ -522,7 +544,7 @@ public interface RoomResource {
             @PathParam("roomId") long roomId,
             @PathParam("deviceId") long deviceId
     );
-    
+
     @DELETE
     @Path("{roomId}/availablePrinters/{deviceId}")
     @Produces(JSON_UTF8)
@@ -584,7 +606,7 @@ public interface RoomResource {
            @PathParam("roomId") Long roomId,
            @PathParam("action") String action
    );
-   
+
    /*
     * POST rooms/{roomId}/actionWithMap/{action}
     */
@@ -592,9 +614,9 @@ public interface RoomResource {
    @Path("{roomId}/actionWithMap/{action}")
    @Produces(JSON_UTF8)
    @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy."
-   		+ "This version of call allows to send a map with some parametrs:"
-   		+ "graceTime : seconds to wait befor execute action."
-   		+ "message : the message to shown befor/during execute the action.")
+	+ "This version of call allows to send a map with some parametrs:"
+	+ "graceTime : seconds to wait befor execute action."
+	+ "message : the message to shown befor/during execute the action.")
    @ApiResponses(value = {
            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -606,5 +628,5 @@ public interface RoomResource {
            @PathParam("action") String action,
            Map<String, String> actionContent
    );
-   
+
 }
