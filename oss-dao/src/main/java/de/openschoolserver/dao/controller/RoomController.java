@@ -546,38 +546,37 @@ public class RoomController extends Controller {
 		logger.debug("setScheduledAccess: " + actTime + " Day: " + day);
 		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
 			switch(day) {
-			case 0:
-			case 7:
+			case 1:
 				if( ! access.getSunday() ) {
 					continue;
 				}
 				break;
-			case 1:
+			case 2:
 				if( ! access.getMonday() ) {
 					continue;
 				}
 				break;
-			case 2:
+			case 3:
 				if( ! access.getTuesday() ) {
 					continue;
 				}
 				break;
-			case 3:
+			case 4:
 				if( ! access.getWednesday() ) {
 					continue;
 				}
 				break;
-			case 4:
+			case 5:
 				if( ! access.getThursday() ) {
 					continue;
 				}
 				break;
-			case 5:
+			case 6:
 				if( ! access.getFriday() ) {
 					continue;
 				}
 				break;
-			case 6:
+			case 7:
 				if( ! access.getSaturday() ) {
 					continue;
 				}
