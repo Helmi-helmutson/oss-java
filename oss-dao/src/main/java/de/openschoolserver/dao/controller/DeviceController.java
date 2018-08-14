@@ -737,6 +737,8 @@ public class DeviceController extends Controller {
 			oldDevice.setWlanMac(device.getWlanMac());
 			oldDevice.setPlace(device.getPlace());
 			oldDevice.setRow(device.getRow());
+			oldDevice.setInventary(device.getInventary());
+			oldDevice.setSerial(device.getSerial());
 			em.getTransaction().begin();
 			em.merge(oldDevice);
 			if( hwconf != oldHwconf) {
