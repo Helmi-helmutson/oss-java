@@ -227,12 +227,13 @@ public class PrinterResourceImpl implements PrinterResource {
 	public OssResponse activateWindowsDriver(Session session, String printerName) {
 		//Create the windows driver
 		logger.debug("Activating windows driver for: " + printerName);
+		String printserver   = new RoomController(session).getConfigValue("PRINTSERVER");
 		String[] program     = new String[6];
 		StringBuffer reply   = new StringBuffer();
 		StringBuffer stderr  = new StringBuffer();
 		program[0] = "/usr/sbin/cupsaddsmb";
 		program[1] = "-H";
-		program[2] = "printserver";
+		program[2] = printserver;
 		program[3] = "-U";
 		program[4] = "Administrator%" + session.getPassword();
 		program[5] = printerName;
@@ -243,7 +244,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[0] = "/usr/bin/rpcclient";
 		program[1] = "-U";
 		program[2] = "Administrator%" + session.getPassword();
-		program[3] = "printserver";
+		program[3] = printserver;
 		program[4] = "-c";
 		program[5] = "setdriver " + printerName + " " + printerName;
 		OSSShellTools.exec(program, reply, stderr, null);
@@ -333,9 +334,9 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[0] = "/usr/bin/rpcclient";
 		program[1] = "-U";
 		program[2] = "Administrator%" + session.getPassword();
-		program[3] = "printserver";
+		program[3] = roomController.getConfigValue("PRINTSERVER");
 		program[4] = "-c";
-		program[5] = "\"getprinter "+name+ "\"";
+		program[5] = "getprinter "+name;
 		do {
 			try {
 				TimeUnit.SECONDS.sleep(1);
@@ -345,6 +346,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			reply   = new StringBuffer();
 			stderr  = new StringBuffer();
 			OSSShellTools.exec(program, reply, stderr, null);
+			logger.debug("activateWindowsDriver error" + stderr.toString());
 		} while( !stderr.toString().isEmpty() && tries > -1  );
 		
 		if(windowsDriver) {
@@ -433,6 +435,8 @@ public class PrinterResourceImpl implements PrinterResource {
 		program[10]= "socket://"+ printer.getName();
 
 		OSSShellTools.exec(program, reply, stderr, null);
+		logger.debug("activateWindowsDriver error" + stderr.toString());
+		logger.debug("activateWindowsDriver reply" + reply.toString());
 		//TODO check output
 		return new OssResponse(session,"OK", "Printer driver was set succesfully.");
 	}
