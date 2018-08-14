@@ -318,7 +318,7 @@ public interface RoomResource {
     @GET
     @Path("accessStatus")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the actual access status in all rooms.")
+    @ApiOperation(value = "Gets the actual access status in all rooms. This can take a very long time. Do not use it!")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.api.resources.SystemResource;
 import de.openschoolserver.dao.Acl;
+import de.openschoolserver.dao.DnsRecord;
 import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.ProxyRule;
@@ -310,4 +311,34 @@ public class SystemResourceImpl implements SystemResource {
 	public List<Job> getSucceededJobs(Session session) {
 		return new JobController(session).getSucceededJobs();
 	}
+
+	@Override
+	public String[] getDnsDomains(Session session) {
+		return new SystemController(session).getDnsDomains();
+	}
+
+	@Override
+	public OssResponse addDnsDomain(Session session, String domainName) {
+		return new SystemController(session).addDnsDomain(domainName);
+	}
+
+	@Override
+	public OssResponse deleteDnsDomain(Session session, String domainName) {
+		return new SystemController(session).deleteDnsDomain(domainName);
+	}
+	@Override
+	public List<DnsRecord> getRecords(Session session, String domainName) {
+		return new SystemController(session).getRecords(domainName);
+	}
+
+	@Override
+	public OssResponse addDnsRecord(Session session, DnsRecord dnsRecord) {
+		return new SystemController(session).addDnsRecord(dnsRecord);
+	}
+
+	@Override
+	public OssResponse deleteDnsRecord(Session session, DnsRecord dnsRecord) {
+		return new SystemController(session).deleteDnsRecord(dnsRecord);
+	}
+
 }

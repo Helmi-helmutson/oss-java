@@ -21,6 +21,8 @@ import de.openschoolserver.dao.*;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @SuppressWarnings( "unchecked" )
 public class SystemController extends Controller {
@@ -362,19 +364,19 @@ public class SystemController extends Controller {
 				String   dest = rule[1];
 				String   prot = rule.length > 2 ? rule[2] : "all";
 				String   port = rule.length > 3 ? rule[3] : "all";
-				if(host[1].equals("32")) {
+				if(host.length == 1 || host[1].equals("32")) {
 					Device device = deviceController.getByIP(host[0]);
 					if( device == null ) {
-			continue;
+						continue;
 					}
 					statusMap.put("id", Long.toString(device.getId()));
 					statusMap.put("name", device.getName());
 					statusMap.put("type", "host");
 				} else {
-			Room room = roomController.getByIP(host[0]);
-			if( room == null ) {
-			continue;
-			}
+					Room room = roomController.getByIP(host[0]);
+					if( room == null ) {
+						continue;
+					}
 					statusMap.put("id", Long.toString(room.getId()));
 					statusMap.put("name", room.getName());
 					statusMap.put("type", "room" );
@@ -759,4 +761,122 @@ public class SystemController extends Controller {
 		}
 		return new OssResponse(session,"OK","ACL was set succesfully.");
 	}
+
+	public String[] getDnsDomains() {
+		String[] program   = new String[1];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/sbin/oss_get_dns_domains.sh";
+		OSSShellTools.exec(program, reply, error, null);
+		return reply.toString().split("\\n");
+	}
+
+	public OssResponse addDnsDomain(String domainName) {
+		String[] program   = new String[7];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/bin/samba-tool";
+		program[1] = "dns";
+		program[2] = "zonecreate";
+		program[3] = "localhost";
+		program[4] = domainName;
+		program[5] = "-U";
+		program[6] = "register%" + this.getProperty("de.openschoolserver.dao.User.Register.Password");
+		OSSShellTools.exec(program, reply, error, null);
+		//TODO evaluate error
+		return new OssResponse(session,"OK","DNS Zone was created succesfully.");
+	}
+
+	public List<DnsRecord> getRecords(String domainName) {
+		List<DnsRecord> dnsRecords = new ArrayList<DnsRecord>();
+		String[] program   = new String[2];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/sbin/oss_dump_dns_domain.sh";
+		program[1] = domainName;
+		OSSShellTools.exec(program, reply, error, null);
+
+		String name = null;
+		String type = null;
+		String data = null;
+		String patternNameString = "Name=(.+?), Records";
+		String patternTypeString = "(.+?): (.+?) \\(flags";
+		Pattern patternName = Pattern.compile(patternNameString);
+		Pattern patternType = Pattern.compile(patternTypeString);
+		DeviceController dc = new DeviceController(this.session);
+		for( String line : reply.toString().split(this.getNl()) ) {
+			Matcher matcher = patternName.matcher(line);
+			while(matcher.find()) {
+				name = matcher.group(1); 
+				continue;
+			}
+			matcher = patternType.matcher(line);
+			while(matcher.find()) {
+				if( name == null ) {
+					continue;
+				}
+				type = matcher.group(1);
+				data = matcher.group(2);
+				Device device = dc.getByName(name);
+				if( device != null && device.getIp().equals(data) ) {
+					continue;
+				}
+				DnsRecord dnsRecord = new DnsRecord(domainName,type,name,data);
+				dnsRecords.add(dnsRecord);
+			}
+		}
+		return dnsRecords;
+	}
+
+	public OssResponse addDnsRecord(DnsRecord dnsRecord) {
+		String[] program   = new String[9];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/bin/samba-tool";
+		program[1] = "dns";
+		program[2] = "add";
+		program[3] = "localhost";
+		program[4] = dnsRecord.getDomainName();
+		program[5] = dnsRecord.getRecordType();
+		program[6] = dnsRecord.getRecordData();
+		program[7] = "-U";
+		program[8] = "register%" + this.getProperty("de.openschoolserver.dao.User.Register.Password");
+		OSSShellTools.exec(program, reply, error, null);
+		//TODO evaluate error
+		return new OssResponse(session,"OK","DNS record was created succesfully.");
+	}
+
+	public OssResponse deleteDnsRecord(DnsRecord dnsRecord) {
+		String[] program   = new String[9];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/bin/samba-tool";
+		program[1] = "dns";
+		program[2] = "delete";
+		program[3] = "localhost";
+		program[4] = dnsRecord.getDomainName();
+		program[5] = dnsRecord.getRecordType();
+		program[6] = dnsRecord.getRecordData();
+		program[7] = "-U";
+		program[8] = "register%" + this.getProperty("de.openschoolserver.dao.User.Register.Password");
+		OSSShellTools.exec(program, reply, error, null);
+		//TODO evaluate error
+		return new OssResponse(session,"OK","DNS record was deleted succesfully.");
+	}
+
+	public OssResponse deleteDnsDomain(String domainName) {
+		String[] program   = new String[7];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		program[0] = "/usr/bin/samba-tool";
+		program[1] = "dns";
+		program[2] = "zonedelete";
+		program[3] = "localhost";
+		program[4] = domainName;
+		program[5] = "-U";
+		program[6] = "register%" + this.getProperty("de.openschoolserver.dao.User.Register.Password");
+		OSSShellTools.exec(program, reply, error, null);
+		//TODO evaluate error
+		return new OssResponse(session,"OK","DNS Zone was created succesfully.");	}
+
 }

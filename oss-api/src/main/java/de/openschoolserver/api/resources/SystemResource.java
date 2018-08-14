@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.openschoolserver.dao.Acl;
+import de.openschoolserver.dao.DnsRecord;
 import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.ProxyRule;
@@ -586,6 +587,127 @@ public interface SystemResource {
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("userId") Long userId,
         Acl acl
+    );
+
+    /**
+     * Delivers the list of the DNS-Domains the server is responsible for these.
+     * @param session
+     * @return The list of the domains.
+     */
+    @GET
+    @Path("dns/domains")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the list of the DNS-Domains the server is responsible for these.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.dns")
+    String[] getDnsDomains(
+        @ApiParam(hidden = true) @Auth Session session
+    );
+
+    /**
+     * Creates a new DNS domain
+     * @param session
+     * @param domainName The DNS domain name.
+     * @return The result in OssReponse object.
+     */
+    @POST
+    @Path("dns/domains")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation(value = "Creates a new DNS domain.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.dns")
+    OssResponse addDnsDomain(
+        @ApiParam(hidden = true) @Auth Session session,
+        @FormDataParam("domainName")   String  domainName
+    );
+
+    /**
+     * Creates a new DNS domain
+     * @param session
+     * @param domainName The DNS domain name.
+     * @return The result in OssReponse object.
+     */
+    @POST
+    @Path("dns/domains/delete")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation(value = "Deleets an existing DNS domain.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.dns")
+    OssResponse deleteDnsDomain(
+        @ApiParam(hidden = true) @Auth Session session,
+        @FormDataParam("domainName")   String  domainName
+    );
+
+    /**
+     * Delivers the list of the dns records in a domain
+     * @param session
+     * @param domainName The DNS domain name.
+     * @return The result in OssReponse object.
+     */
+    @POST
+    @Path("dns/domains/records")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation(value = "Delivers the list of the dns records in a domain.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.dns")
+    List<DnsRecord> getRecords(
+        @ApiParam(hidden = true) @Auth Session session,
+        @FormDataParam("domainName")   String  domainName
+    );
+
+    /**
+     * Creates a new DNS record in a domain.
+     * @param session
+     * @param domainName The DNS domain name.
+     * @param recordType A|AAAA|PTR|CNAME|NS|MX|SRV|TXT
+     * @param recordName
+     * @param recordData
+     * @return
+     */
+    @POST
+    @Path("dns/domains/addRecord")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Creates a new DNS record. The following Record types are allowed: A|AAAA|PTR|CNAME|NS|MX|SRV|TXT")
+    @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.dns")
+    OssResponse addDnsRecord(
+        @ApiParam(hidden = true) @Auth Session session,
+        DnsRecord dnsRecord
+    );
+
+    /**
+     * Deletes an existing DNS record in a domain.
+     * @param session
+     * @param domainName The DNS domain name.
+     * @param recordType A|AAAA|PTR|CNAME|NS|MX|SRV|TXT
+     * @param recordName
+     * @param recordData
+     * @return
+     */
+    @POST
+    @Path("dns/domains/deleteRecord")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delets an existing DNS record.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.dns")
+    OssResponse deleteDnsRecord(
+        @ApiParam(hidden = true) @Auth Session session,
+        DnsRecord dnsRecord
     );
 
 }
