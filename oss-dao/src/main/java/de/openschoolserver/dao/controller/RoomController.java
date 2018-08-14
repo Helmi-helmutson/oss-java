@@ -1201,6 +1201,7 @@ public class RoomController extends Controller {
 			Room room = em.find(Room.class, roomId);
 			em.getTransaction().begin();
 			accessList.setRoom(room);
+			accessList.setRoomId(roomId);
 			accessList.setCreator(this.session.getUser());
 			em.persist(accessList);
 			room.getAccessInRooms().add(accessList);

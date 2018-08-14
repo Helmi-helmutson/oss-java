@@ -727,6 +727,24 @@ public class SoftwareController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Software License File was uploaded succesfully");
 	}
 
+	public OssResponse deleteLicence(long licenseId) {
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			SoftwareLicense sl = em.find(SoftwareLicense.class, licenseId);
+			Software software = sl.getSoftware();
+			software.getSoftwareLicenses().remove(sl);
+			em.merge(software);
+			em.refresh(sl);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Software license was deleted successfully");
+	}
 	/*
 	 * Return the next free license
 	 */
@@ -1590,4 +1608,5 @@ public class SoftwareController extends Controller {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }

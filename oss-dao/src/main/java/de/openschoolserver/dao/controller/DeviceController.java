@@ -50,7 +50,6 @@ public class DeviceController extends Controller {
 		try {
 			return em.find(Device.class, deviceId);
 		} catch (Exception e) {
-			logger.debug("DeviceId:" + deviceId + " " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();

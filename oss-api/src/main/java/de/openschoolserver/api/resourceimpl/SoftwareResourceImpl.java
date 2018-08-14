@@ -257,8 +257,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public OssResponse deleteLicense(Session session, long licenseId) {
-		// TODO Auto-generated method stub
-		return null;
+		return new SoftwareController(session).deleteLicence(licenseId);
 	}
 
 	@Override
@@ -293,7 +292,6 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public List<SoftwareLicense> getSoftwareLicenses(Session session, long softwareId) {
-		//TODO implementing used!
 		List<SoftwareLicense> licenses = new ArrayList<SoftwareLicense>();
 		for( SoftwareLicense license : new SoftwareController(session).getById(softwareId).getSoftwareLicenses() ) {
 			license.setUsed(license.getDevices().size());

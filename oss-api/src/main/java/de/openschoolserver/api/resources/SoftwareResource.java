@@ -247,7 +247,6 @@ public interface SoftwareResource {
     @GET
     @Path("{softwareId}/license")
     @Produces(JSON_UTF8)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Creates licences to a software" )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -258,7 +257,7 @@ public interface SoftwareResource {
             @PathParam("softwareId") long softwareId
             );
     /*
-     * POST softwares/{softwareId}/license
+     * POST softwares/licenses/{licenseId}
      */
     @POST
     @Path("licenses/{licenseId}")
@@ -285,7 +284,6 @@ public interface SoftwareResource {
     @DELETE
     @Path("licenses/{licenseId}")
     @Produces(JSON_UTF8)
-    @Consumes(MediaType.MULTIPART_FORM_DATA)
     @ApiOperation( value = "Deletes an existing licence." )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
