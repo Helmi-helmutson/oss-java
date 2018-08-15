@@ -367,7 +367,7 @@ public class SoftwareController extends Controller {
 
 	public List<Map<String, String>> getAvailableSoftware() {
 		Map<String,String>        software;
-		List<Map<String, String>> softwares = new ArrayList<>();
+		List<Map<String, String>> softwares = new ArrayList<Map<String,String>>();
 		String[] program    = new String[6];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
@@ -383,11 +383,13 @@ public class SoftwareController extends Controller {
 			logger.debug(reply.toString());
 			Element rootNode = doc.getRootElement();
 			if( rootNode.getChild("search-result") == null ) {
-				throw new WebApplicationException(600);
+				return softwares;
+				//throw new WebApplicationException(600);
 			}
 			if( rootNode.getChild("search-result").getChild("solvable-list").getChildren().isEmpty() ||
 				rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable").isEmpty()	) {
-				throw new WebApplicationException(600);
+				return softwares;
+				//throw new WebApplicationException(600);
 			}
 			List<Element> elements = rootNode.getChild("search-result").getChild("solvable-list").getChildren("solvable");
 			for( Element node : elements ) {
