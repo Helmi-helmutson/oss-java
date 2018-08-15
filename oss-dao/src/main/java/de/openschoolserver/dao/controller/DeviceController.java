@@ -712,7 +712,7 @@ public class DeviceController extends Controller {
 				}
 			}
 			if( oldDevice.getWlanMac().isEmpty() ) {
-				//There was no WLAN-Mac befor we need a new IP-Address
+				//There was no WLAN-Mac before we need a new IP-Address
 				RoomController rc = new RoomController(this.session);
 				List<String> wlanIps = rc.getAvailableIPAddresses(oldDevice.getRoom().getId());
 				if( wlanIps.isEmpty() ) {
