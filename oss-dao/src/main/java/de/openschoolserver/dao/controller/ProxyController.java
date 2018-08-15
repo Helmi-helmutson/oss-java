@@ -65,7 +65,7 @@ public class ProxyController extends Controller {
 						longDesc.put(key, longValueEN);
 					}
 				}
-				key         = line.split(":\\s+")[1];
+				key         = line.split(":\\s+")[1].replaceFirst("/", "-");
 				value       = "";
 				longValue   = "";
 				valueEN     = "";
