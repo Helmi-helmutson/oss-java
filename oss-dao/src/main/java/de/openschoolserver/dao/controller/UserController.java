@@ -232,7 +232,6 @@ public class UserController extends Controller {
 		Group group = new GroupController(this.session).getByName(user.getRole());
 		if (group != null) {
 			groupController.addMember(group, user);
-			;
 		}
 
 		parameters.add(user.getUid());
@@ -411,6 +410,31 @@ public class UserController extends Controller {
 		}
 		return new OssResponse(this.getSession(), "OK", "The filesystem quotas was synced succesfully");
 	}
+
+	public OssResponse syncMsQuotas(List<List<String>> quotas) {
+		EntityManager em = getEntityManager();
+		User user;
+		try {
+			em.getTransaction().begin();
+			for (List<String> quota : quotas) {
+				if (quota.isEmpty())
+					continue;
+				user = this.getByUid(quota.get(0));
+				if (user != null) {
+					user.setMsQuotaUsed(Integer.valueOf(quota.get(1)));
+					user.setMsQuota(Integer.valueOf(quota.get(2)));
+					em.merge(user);
+				}
+			}
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(), "OK", "The mailsystem quotas was synced succesfully");
+	}
+
 
 	public List<User> getUsers(List<Long> userIds) {
 		List<User> users = new ArrayList<User>();

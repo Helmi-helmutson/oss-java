@@ -299,6 +299,22 @@ public interface UserResource {
     );
 
     /*
+     * POST syncFsQuotas
+     */
+    @POST
+    @Path("syncMsQuotas")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Synchronize the file system quota values into the JPA")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    OssResponse syncMsQuotas(
+                @ApiParam(hidden = true) @Auth Session session,
+                List<List<String>> Quotas
+    );
+
+    /*
      * GET users/byUid/{uid}/{attribute}
      * Get's an attribute from a user
      */

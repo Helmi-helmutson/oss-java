@@ -446,4 +446,9 @@ public class UserResourceImpl implements UserResource {
 		}
 		return null;
 	}
+
+	@Override
+	public OssResponse syncMsQuotas(Session session, List<List<String>> Quotas) {
+		return new UserController(session).syncMsQuotas(Quotas);
+	}
 }

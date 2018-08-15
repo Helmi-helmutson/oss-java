@@ -59,7 +59,8 @@ INSERT INTO Enumerates VALUES(NULL,'groupType','guest',1);
 INSERT INTO Enumerates VALUES(NULL,'roomControl','inRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomControl','no',1);
 INSERT INTO Enumerates VALUES(NULL,'roomControl','allTeachers',1);
-INSERT INTO Enumerates VALUES(NULL,'roomControl','teachers',1);
+#We do not provide it on the gui at the moment
+#INSERT INTO Enumerates VALUES(NULL,'roomControl','teachers',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','Library',1);
