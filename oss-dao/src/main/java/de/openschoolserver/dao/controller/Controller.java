@@ -201,6 +201,8 @@ public class Controller extends Config {
 				data.append(String.format("password: %s%n", user.getPassword()));
 				data.append(String.format("uid: %s%n", user.getUid()));
 				data.append(String.format("role: %s%n", user.getRole()));
+				data.append(String.format("fsQuota: %d%n", user.getFsQuota()));
+				data.append(String.format("msQuota: %d%n", user.getMsQuota()));
 				if( user.isMustChange() ) {
 					data.append("mpassword: yes");
 				}
