@@ -616,30 +616,33 @@ public class Controller extends Config {
 	}
 
 	public OSSConfig getConfig(String type, String key) {
+		OSSConfig     ossConfig = null;
 		EntityManager em = this.getEntityManager();
-		Query query = em.createNamedQuery("OSSConfig.getAllByKey");
+		Query query      = em.createNamedQuery("OSSConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
-		if( query.getResultList().isEmpty() ) {
-			return null;
+		if( ! query.getResultList().isEmpty() ) {
+			ossConfig = (OSSConfig)  query.getResultList().get(0);
 		}
-		//TODO close em
-		return (OSSConfig)  query.getResultList().get(0);
+		em.close();
+		return ossConfig;
 	}
 
 	public List<OSSMConfig> getMConfigs(String key) {
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.getAllForKey");
 		query.setParameter("keyword",key);
-		//TODO close em
-		return (List<OSSMConfig>) query.getResultList();
+		List<OSSMConfig> ossMConfigs = (List<OSSMConfig>) query.getResultList();
+		em.close();
+		return ossMConfigs;
 	}
 
 	public List<OSSMConfig> getMConfigs(String type, String key) {
 		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
-		//TODO close em
-		return  (List<OSSMConfig>) query.getResultList();
+		List<OSSMConfig> ossMConfigs = (List<OSSMConfig>) query.getResultList();
+		em.close();
+		return ossMConfigs;
 	}
 
 	public List<String> getMConfigs(Object object, String key) {
@@ -678,6 +681,7 @@ public class Controller extends Config {
 		importDir.append(getConfigValue("HOME_BASE")).append("/groups/SYSADMINS/userimports/").append(startTime);
 		return importDir;
 	}
+
 	public String getConfig(Object object, String key) {
 		Long id = null;
 		EntityManager em = this.getEntityManager();
