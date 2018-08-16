@@ -34,9 +34,11 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 		if( userController.isAllowed("myself.manage") ) {
 			if( user.getPassword() != null && !user.getPassword().isEmpty() ) {
 				ossResponse = userController.checkPassword(user.getPassword());
-				if( ossResponse.getCode().equals("ERROR")) {
+				logger.debug("Check-Password:" + ossResponse );
+				if( ossResponse != null  && ossResponse.getCode().equals("ERROR")) {
 					return ossResponse;
 				}
+				oldUser.setPassword(user.getPassword());
 			}
 			oldUser.setGivenName(user.getGivenName());
 			oldUser.setSurName(user.getSurName());

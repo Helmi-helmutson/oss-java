@@ -2,6 +2,7 @@ package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
+import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -49,7 +50,7 @@ public interface SelfManagementResource {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("myself.modify")
+    @PermitAll
     OssResponse modifyMySelf(
             @ApiParam(hidden = true) @Auth Session session,
             User user
