@@ -31,11 +31,20 @@ public class SmartRoom {
 		RoomController      rc = new RoomController(session);
 		UserController      uc = new UserController(session);
 		this.loggedIns         = ec.getRoom(roomId);
-		Room         room = rc.getById(roomId);
-		Category category = room.getCategories().get(0);
-		this.users   = category.getUsers();
-		this.groups  = category.getGroups();
-		this.devices = category.getDevices(); 
+		Room              room = rc.getById(roomId);
+		this.id          = room.getId();
+		this.description = room.getDescription();
+		this.name        = room.getName();
+		if( room.getCategories() != null && room.getCategories().size() > 0 && room.getCategories().get(0).getCategoryType().equals("smartRoom") ) {
+			Category category = room.getCategories().get(0);
+			this.users   = category.getUsers();
+			this.groups  = category.getGroups();
+			this.devices = category.getDevices(); 
+		} else {
+			this.devices = room.getDevices();
+			this.rows    = room.getRows();
+			this.places  = room.getPlaces();
+		}
 		for(List<Long> loggedIn : loggedIns) {
 			User   user    = uc.getById(loggedIn.get(0));
 			Device device  = dc.getById(loggedIn.get(1));
