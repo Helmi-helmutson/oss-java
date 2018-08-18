@@ -395,7 +395,7 @@ OssResponse addGuestUsers(
  * Some api calls with text arguments
  */
 @DELETE
-@Path("texte/{userName}")
+@Path("text/{userName}")
 @Produces(TEXT)
 @ApiOperation(value = "Delets a user presented by name.")
     @ApiResponses(value = {
