@@ -427,11 +427,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public Group getGroup(Session session, Long groupId) {
-		Group group = new GroupController(session).getById(groupId);
-		if(group.getGroupType().equals("workgroup")) {
-			return group;
-		}
-		return null;
+		return new GroupController(session).getById(groupId);
 	}
 
 	@Override
