@@ -1,10 +1,20 @@
 package de.openschoolserver.dao;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import javax.persistence.EntityManager;
 import de.openschoolserver.dao.controller.*;
 
 public class SmartRoom {
-	
+
+	Logger logger = LoggerFactory.getLogger(SmartRoom.class);
+
 	private Long id;
 
 	private String name;
@@ -18,28 +28,34 @@ public class SmartRoom {
 	private AccessInRoom accessInRooms;
 
 	private List<Device> devices;
-	
+
 	private List<User> users;
-	
+
 	private List<Group> groups;
-	
+
 	private List<List<Long>> loggedIns;
 
+	private Long[][]  deviceMatrix;
+
 	public SmartRoom(Session session, Long roomId) {
+		boolean isSmartRoom    = false;
+		boolean changed        = false;
 		DeviceController    dc = new DeviceController(session);
 		EducationController ec = new EducationController(session);
 		RoomController      rc = new RoomController(session);
 		UserController      uc = new UserController(session);
+		EntityManager       em = rc.getEntityManager();
 		this.loggedIns         = ec.getRoom(roomId);
 		Room              room = rc.getById(roomId);
 		this.id          = room.getId();
 		this.description = room.getDescription();
 		this.name        = room.getName();
-		if( room.getCategories() != null && room.getCategories().size() > 0 && room.getCategories().get(0).getCategoryType().equals("smartRoom") ) {
+		if( (room.getCategories() != null) && (room.getCategories().size() > 0 ) && room.getCategories().get(0).getCategoryType().equals("smartRoom") ) {
+			isSmartRoom = true;
 			Category category = room.getCategories().get(0);
 			this.users   = category.getUsers();
 			this.groups  = category.getGroups();
-			this.devices = category.getDevices(); 
+			this.devices = category.getDevices();
 		} else {
 			this.devices = room.getDevices();
 			this.rows    = room.getRows();
@@ -55,7 +71,71 @@ public class SmartRoom {
 				this.devices.add(device);
 			}
 		}
+		//If this is a smart room, we have to organize the devices.
+		if( isSmartRoom ) {
+			int workstationCount = (this.devices.size() > this.users.size()) ?  this.devices.size() : this.users.size();
+			int availablePlaces  = room.getPlaces() * room.getRows();
+			while( workstationCount > availablePlaces ) {
+				this.places++;
+				this.rows++;
+				availablePlaces  = this.places * this.rows ;
+				changed = true;
+			}
+			if( changed ) {
+				room.setPlaces(this.places);
+				room.setRows(this.rows);
+				try {
+					em.getTransaction().begin();
+					em.merge(room);
+					em.getTransaction().commit();
+				} catch (Exception e) {
+					logger.debug("Modify room:" + e.getMessage());
+				}
+			}
+			deviceMatrix = new Long[this.rows+1][this.places+1];
+			for ( Device device : this.devices ) {
+				String coordinates = dc.getConfig(device, "smartRoom-" + this.id + "-coordinates");
+				if( coordinates != null ) {
+					int r = Integer.parseInt(coordinates.split(",")[0]);
+					int p = Integer.parseInt(coordinates.split(",")[1]);
+					device.setRow(r);
+					device.setRow(p);
+					deviceMatrix[r][p]=device.getId();
+				}
+			}
+			for ( Device device : this.devices ) {
+				String coordinates = dc.getConfig(device, "smartRoom-" + this.id + "-koordinates");
+				if( coordinates == null ) {
+					List<Integer> newCoordinates = this.getNextFreePlace();
+					int r = newCoordinates.get(0);
+					int p = newCoordinates.get(1);
+					device.setRow(r);
+					device.setRow(p);
+					deviceMatrix[r][p]=device.getId();
+					dc.setConfig(device, "smartRoom-" + this.id + "-coordinates", String.format("%d,%d", r,p));
+				}
+			}
+		}
 		this.accessInRooms = rc.getAccessStatus(roomId);
+	}
+
+	@JsonIgnore
+	private List<Integer> getNextFreePlace() {
+		List<Integer> coordinates = new ArrayList<Integer>();
+		int row   = 1;
+		int place = 1;
+		while( this.deviceMatrix[row][place] > 0) {
+			logger.debug("getNextFreePlace:" + row + " " + place);
+			if( place < this.places ) {
+				place++;
+			} else {
+				place = 1;
+				row ++;
+			}
+		}
+		coordinates.add(row);
+		coordinates.add(place);
+		return coordinates;
 	}
 
 	public Long getId() {
