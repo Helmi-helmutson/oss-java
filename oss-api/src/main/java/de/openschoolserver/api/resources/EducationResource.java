@@ -553,7 +553,7 @@ public interface EducationResource {
     @GET
     @Path("groups")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Gets the workgroups of a usrer.")
+    @ApiOperation(value = "Gets the workgroups and classes of a usrer.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -861,6 +861,26 @@ public interface EducationResource {
     @RolesAllowed("education.rooms")
     OssResponse modifyDevice(
             @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") Long deviceId,
+            Device device
+    );
+
+
+    /*
+     * POST education/devices/{deviceId}
+     */
+    @POST
+    @Path("rooms/{roomId}/devices/{deviceId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Updates a device. Only row and place can be changed here. The roomid is neccessary becouse of devices of smart rooms need to be handle on a other way.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.rooms")
+    OssResponse modifyDeviceOfRoom(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("roomId")   Long roomId,
             @PathParam("deviceId") Long deviceId,
             Device device
     );

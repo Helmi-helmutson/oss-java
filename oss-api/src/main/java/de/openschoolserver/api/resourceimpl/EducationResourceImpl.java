@@ -438,7 +438,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public List<Group> getMyGroups(Session session) {
 		List<Group> groups = new ArrayList<Group>();
 		for( Group group : new GroupController(session).getAll() ) {
-			if(group.getOwner().equals(session.getUser())) {
+			if(group.getOwner().equals(session.getUser()) || group.getGroupType().equals("class") ) {
 				groups.add(group);
 			}
 		}
@@ -546,6 +546,18 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			em.close();
 		}
 		return new OssResponse(session,"OK","Device was repositioned.");
+	}
+
+	@Override
+	public OssResponse modifyDeviceOfRoom(Session session, Long roomId, Long deviceId, Device device) {
+		Room room = new RoomController(session).getById(roomId);
+		if( (room.getCategories() != null) && (room.getCategories().size() > 0 ) && room.getCategories().get(0).getCategoryType().equals("smartRoom") ) {
+			DeviceController deviceConrtoller = new DeviceController(session);
+			Device oldDevice = deviceConrtoller.getById(deviceId);
+			return deviceConrtoller.setConfig(oldDevice, "smartRoom-" + roomId + "-coordinates", String.format("%d,%d", device.getRow(),device.getPlace()));
+		} else {
+			return modifyDevice(session, deviceId, device);
+		}
 	}
 
 	@Override
