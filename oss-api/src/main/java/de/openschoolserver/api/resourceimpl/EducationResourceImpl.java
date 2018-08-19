@@ -448,7 +448,13 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<User> getMembers(Session session, long groupId) {
-		return new GroupController(session).getMembers(groupId);
+		List<User> users = new ArrayList<User>();
+		for( User user :  new GroupController(session).getMembers(groupId) ) {
+			if( user.getRole().equals("students")) {
+				users.add(user);
+			}
+		}
+		return users;
 	}
 
 	@Override
