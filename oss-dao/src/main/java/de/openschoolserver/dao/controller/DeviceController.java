@@ -439,7 +439,7 @@ public class DeviceController extends Controller {
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			importFile = Files.readAllLines(file.toPath());
 		} catch (IOException e) {
-			logger.error(e.getMessage(), e);
+			logger.error("File error:" + e.getMessage(), e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
 		RoomController        roomController      = new RoomController(this.session);
@@ -519,7 +519,7 @@ public class DeviceController extends Controller {
 		if( Error.length() == 0 ) {
 			return new OssResponse(this.getSession(),"OK", "Devices were imported succesfully.");
 		}
-		return new OssResponse(this.getSession(),"ERROR",Error.toString());
+		return new OssResponse(this.getSession(),"ERROR","End error:" + Error.toString());
 	}
 
 	public OssResponse setDefaultPrinter(long deviceId, long defaultPrinterId) {
