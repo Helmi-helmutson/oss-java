@@ -272,7 +272,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public OssResponse deActivatePositiveListsInRoom(Session session, Long roomId) {
 		return new ProxyController(session).deleteAclsInRoom(roomId);
 	}
-	
+
 	@Override
 	public List<PositiveList> getPositiveListsInRoom(Session session, Long roomId) {
 		return new ProxyController(session).getPositiveListsInRoom(roomId);
@@ -398,7 +398,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		}
 		return new OssResponse(session,"ERROR","Unknown action");
 	}
-	
+
 	@Override
 	public List<Category> getGuestUsers(Session session) {
 		return new UserController(session).getGuestUsers();
@@ -473,7 +473,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<Device> getDevicesById(Session session, List<Long> deviceIds) {
-		return new DeviceController(session).getDevices(deviceIds); 
+		return new DeviceController(session).getDevices(deviceIds);
 	}
 
 	@Override
