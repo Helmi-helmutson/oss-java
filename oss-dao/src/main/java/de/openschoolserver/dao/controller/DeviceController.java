@@ -462,7 +462,7 @@ public class DeviceController extends Controller {
 		if( !header.containsKey("mac") || !header.containsKey("room")) {
 			return new OssResponse(this.getSession(),"ERROR", "MAC and Room are mandatory fields.");
 		}
-		for(String line : importFile.subList(1, importFile.size()-1) ) {
+		for(String line : importFile.subList(1, importFile.size()) ) {
 			String[] values = line.split(";");
 			Room room = roomController.getByName(values[header.get("room")]);
 			if( room == null ) {
