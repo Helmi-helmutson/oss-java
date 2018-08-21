@@ -260,6 +260,12 @@ public class UserResourceImpl implements UserResource {
 		return new GroupController(session).addMember(groupName, userName).getCode();
 	}
 
+
+	@Override
+	public String addGroupToUser(Session session, String userName, String groupName) {
+		return new GroupController(session).setOwner(groupName, userName).getCode();
+	}
+
 	@Override
 	public String removeFromGroup(Session session, String userName, String groupName) {
 		return new GroupController(session).removeMember(groupName, userName).getCode();
@@ -454,4 +460,5 @@ public class UserResourceImpl implements UserResource {
 	public OssResponse syncMsQuotas(Session session, List<List<String>> Quotas) {
 		return new UserController(session).syncMsQuotas(Quotas);
 	}
+
 }

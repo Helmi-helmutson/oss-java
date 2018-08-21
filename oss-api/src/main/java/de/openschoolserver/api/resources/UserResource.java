@@ -447,6 +447,20 @@ OssResponse addGuestUsers(
                 @PathParam("groupName")    String    groupName
     );
 
+@POST
+@Path("text/{userName}/groups/{groupName}")
+@Produces(TEXT)
+@ApiOperation(value = "Set the user as owner of a group. Helper stuff only.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    String  addGroupToUser(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("userName")     String    userName,
+                @PathParam("groupName")    String    groupName
+    );
+
 @DELETE
 @Path("text/{userName}/groups/{groupName}")
 @Produces(TEXT)
@@ -464,7 +478,7 @@ OssResponse addGuestUsers(
 @GET
 @Path("text/createUid/{givenName}/{surName}")
 @Produces(TEXT)
-@ApiOperation(value = "Delivers a comma separated list of group of the user.")
+@ApiOperation(value = "Creates an uid from givenname and surname.")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})

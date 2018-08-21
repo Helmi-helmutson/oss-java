@@ -17,7 +17,6 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import de.openschoolserver.dao.User;
-import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Enumerate;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
@@ -370,5 +369,25 @@ public class GroupController extends Controller {
 		groups.add(this.getById(id));
 	}
 		return groups;
+	}
+
+	public OssResponse setOwner(String groupName, String userName) {
+		Long groupId = this.getByName(groupName).getId();
+		User user    = new UserController(session).getByUid(userName);
+		EntityManager em = getEntityManager();
+		Group group = em.find(Group.class, groupId);
+		group.setOwner(user);
+		user.getOwnedGroups().add(group);
+		try {
+			em.getTransaction().begin();
+			em.merge(user);
+			em.merge(group);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Group owner was changed.");
 	}
 }
