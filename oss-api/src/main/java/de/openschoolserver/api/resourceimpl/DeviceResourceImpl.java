@@ -18,6 +18,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DHCPConfig;
 import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.EducationController;
+import de.openschoolserver.dao.controller.SessionController;
 
 public class DeviceResourceImpl implements DeviceResource {
 
@@ -99,7 +100,8 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public String getFirstLoggedInUser(Session session, String IP) {
+	public String getFirstLoggedInUser(String IP) {
+		Session session  = new SessionController().getLocalhostSession();
 		DeviceController deviceController = new DeviceController(session);
 		Device device = deviceController.getByIP(IP);
 		if( device != null && !device.getLoggedIn().isEmpty() ) {

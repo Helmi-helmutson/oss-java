@@ -348,9 +348,7 @@ public interface DeviceResource {
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    @RolesAllowed("room.manage")
     String getFirstLoggedInUser(
-            @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP
     );
     /*
