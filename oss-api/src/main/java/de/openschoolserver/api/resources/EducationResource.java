@@ -572,7 +572,7 @@ public interface EducationResource {
         @ApiResponses(value = {
                 @ApiResponse(code = 404, message = "Group not found"),
                 @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-        @RolesAllowed("group.manage")
+        @RolesAllowed("education.groups")
         List<User> getAvailableMembers(
                 @ApiParam(hidden = true) @Auth Session session,
                 @PathParam("groupId") long groupId
@@ -589,7 +589,7 @@ public interface EducationResource {
        @ApiResponses(value = {
                @ApiResponse(code = 404, message = "Group not found"),
                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @RolesAllowed("group.manage")
+       @RolesAllowed("education.groups")
        List<User> getMembers(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId
@@ -604,7 +604,7 @@ public interface EducationResource {
        @ApiOperation(value = "Deletes a member of a group by userId.")
        @ApiResponses(value = {
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @RolesAllowed("group.search")
+       @RolesAllowed("education.groups")
        OssResponse removeMember(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
@@ -621,7 +621,7 @@ public interface EducationResource {
        @ApiResponses(value = {
            @ApiResponse(code = 404, message = "Group not found"),
            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-       @RolesAllowed("group.manage")
+       @RolesAllowed("education.groups")
        OssResponse addMember(
                @ApiParam(hidden = true) @Auth Session session,
                @PathParam("groupId") long groupId,
