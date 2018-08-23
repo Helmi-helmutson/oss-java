@@ -34,14 +34,6 @@ if [ -d /run/lock/oss-api ]; then
         mkdir -p /run/lock/oss-api
 fi
 
-#Restart some scripts
-SQUIDACTIVE=$(  systemctl is-active squid.service )
-SQUIDENABLED=$(  systemctl is-enabled squid.service )
-if [ "$SQUIDACTIVE" = "active" -a "$SQUIDENABLED" = "enabled" ]; then
-        setfacl -m u:squid:r /opt/oss-java/conf/oss-api.properties
-        systemctl restart squid.service
-fi
-
 #Java path
 APP_HOME="/opt/oss-java"
 
