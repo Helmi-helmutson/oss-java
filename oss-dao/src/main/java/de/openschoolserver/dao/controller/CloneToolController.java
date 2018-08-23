@@ -533,13 +533,9 @@ public class CloneToolController extends Controller {
 	}
 
 	public String resetMinion(Long deviceId) {
-		StringBuilder path = new StringBuilder("/etc/salt/pki/master/minions/");
-		String deviceName  = new DeviceController(this.session).getById(deviceId).getName();
-		path.append(deviceName).append(".").append(this.getConfigValue("DOMAIN"));
+		
 		try {
-			Files.deleteIfExists(Paths.get(path.toString()));
-			this.systemctl("restart", "salt-master");
-			this.systemctl("restart", "oss_salt_event_watcher");
+			String deviceName  = new DeviceController(this.session).getById(deviceId).getName();
 			String[] program   = new String[4];
 			StringBuffer reply = new StringBuffer();
 			StringBuffer error = new StringBuffer();
@@ -548,6 +544,17 @@ public class CloneToolController extends Controller {
 			program[2] = "delete";
 			program[3] = deviceName + "$";
 			OSSShellTools.exec(program, reply, error, null);
+			StringBuilder path = new StringBuilder("/etc/salt/pki/master/minions/");
+			path.append(deviceName).append(".").append(this.getConfigValue("DOMAIN"));
+			Files.deleteIfExists(Paths.get(path.toString()));
+			path = new StringBuilder("/etc/salt/pki/master/minions_denied/");
+			path.append(deviceName).append(".").append(this.getConfigValue("DOMAIN"));
+			Files.deleteIfExists(Paths.get(path.toString()));
+			path = new StringBuilder("/etc/salt/pki/master/minions_rejected/");
+			path.append(deviceName).append(".").append(this.getConfigValue("DOMAIN"));
+			Files.deleteIfExists(Paths.get(path.toString()));
+			this.systemctl("restart", "salt-master");
+			this.systemctl("restart", "oss_salt_event_watcher");
 		} catch ( IOException e ) {
 			logger.error(e.getMessage());
 			return "ERROR "+e.getMessage();
