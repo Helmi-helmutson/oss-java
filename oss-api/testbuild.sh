@@ -38,6 +38,12 @@ sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > /data1/OSC/home:varkoly:OSS-4-0/
 cp start-oss-squid-sso /data1/OSC/home:varkoly:OSS-4-0/oss-java/start-oss-squid-sso
 #rm -r oss-java
 xterm -e git log --raw  &
+RELEASE=$(cat RELEASE)
+RELEASE=$((RELEASE+1))
+echo $RELEASE > RELEASE
+sed s/@RELEASE@/${RELEASE}/ oss-java.spec > /data1/OSC/home:varkoly:OSS-4-0/oss-java/oss-java.spec
+git commit -m "New version" RELEASE
+
 cd /data1/OSC/home:varkoly:OSS-4-0/oss-java/
 osc vc
 osc ci
