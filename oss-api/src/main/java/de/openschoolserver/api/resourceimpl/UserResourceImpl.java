@@ -277,8 +277,8 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public String createUid(Session session, String givenName, String surName) {
-		return null;
+	public String createUid(Session session, String givenName, String surName, Date birthDay) {
+		return new UserController(session).createUid(givenName,surName,birthDay);
 	}
 
 	@Override

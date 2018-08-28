@@ -150,6 +150,18 @@ public class UserController extends Controller {
 		}
 	}
 
+	public String createUid(String givenName, String surName, Date birthDay) {
+		String userId = UserUtil.createUserId(givenName, surName, birthDay, true,
+				this.getConfigValue("STRING_CONVERT_TYPE") == "telex", this.getConfigValue("LOGIN_SCHEME"));
+		String newUserId = this.getConfigValue("LOGIN_PREFIX") + userId;
+		Integer i = 1;
+		while (!this.isNameUnique(newUserId)) {
+			newUserId = this.getConfigValue("LOGIN_PREFIX") + userId + i;
+			i++;
+		}
+		return newUserId;
+	}
+
 	public OssResponse add(User user) {
 		EntityManager em = getEntityManager();
 		logger.debug("User to create:" + user);
@@ -173,6 +185,7 @@ public class UserController extends Controller {
 			Integer i = 1;
 			while (!this.isNameUnique(user.getUid())) {
 				user.setUid(this.getConfigValue("LOGIN_PREFIX") + userId + i);
+				i++;
 			}
 		} else {
 			user.setUid(user.getUid().toLowerCase());

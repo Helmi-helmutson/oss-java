@@ -476,7 +476,7 @@ OssResponse addGuestUsers(
     );
 
 @GET
-@Path("text/createUid/{givenName}/{surName}")
+@Path("text/createUid/{givenName}/{surName}/{birthDay}")
 @Produces(TEXT)
 @ApiOperation(value = "Creates an uid from givenname and surname.")
     @ApiResponses(value = {
@@ -486,7 +486,8 @@ OssResponse addGuestUsers(
     String createUid(
                 @ApiParam(hidden = true) @Auth Session session,
                 @PathParam("givenName")  String    givenName,
-                @PathParam("surName")    String    surName
+                @PathParam("surName")    String    surName,
+                @PathParam("birthDay")   Date      birthDay
     );
 
 @POST
