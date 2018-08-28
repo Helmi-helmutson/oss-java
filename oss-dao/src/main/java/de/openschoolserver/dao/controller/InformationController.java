@@ -378,6 +378,18 @@ public class InformationController extends Controller {
 		}
 		try {
 			em.getTransaction().begin();
+			Announcement oldAnnouncement = em.find(Announcement.class, announcement.getId());
+			for( User user : oldAnnouncement.getHaveSeenUsers() ) {
+				user.getReadAnnouncements().remove(oldAnnouncement);
+				em.merge(user);
+				//TODO check if there are relay changes.
+			}
+			oldAnnouncement.setIssue(announcement.getIssue());
+			oldAnnouncement.setKeywords(announcement.getKeywords());
+			oldAnnouncement.setText(announcement.getText());
+			oldAnnouncement.setValidFrom(announcement.getValidFrom());
+			oldAnnouncement.setValidUntil(announcement.getValidUntil());
+			oldAnnouncement.setHaveSeenUsers(new ArrayList<User>());
 			em.merge(announcement);
 			em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "Announcement was modified succesfully.");
@@ -406,7 +418,13 @@ public class InformationController extends Controller {
 		}
 		try {
 			em.getTransaction().begin();
-			em.merge(contact);
+			Contact oldContact = em.find(Contact.class, contact.getId());
+			oldContact.setName(contact.getName());
+			oldContact.setEmail(contact.getEmail());
+			oldContact.setPhone(contact.getPhone());
+			oldContact.setTitle(contact.getTitle());
+			oldContact.setIssue(contact.getIssue());
+			em.merge(oldContact);
 			em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "Contact was modified succesfully.");
 		} catch (Exception e) {
@@ -434,7 +452,11 @@ public class InformationController extends Controller {
 		}
 		try {
 			em.getTransaction().begin();
-			em.merge(faq);
+			FAQ oldFaq = em.find(FAQ.class, faq.getId());
+			oldFaq.setIssue(faq.getIssue());
+			oldFaq.setTitle(faq.getTitle());
+			oldFaq.setText(faq.getText());
+			em.merge(oldFaq);
 			em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "FAQ was modified succesfully.");
 		} catch (Exception e) {
