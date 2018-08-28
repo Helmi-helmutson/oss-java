@@ -122,13 +122,15 @@ public class ProxyController extends Controller {
 				for(int i=1; i < values.length; i++ ) {
 					String key = values[i].split(":")[0];
 					boolean enabled = values[i].split(":")[1].equals("true");
-					ProxyRule proxyRule = new ProxyRule(
+					if( key != "good" && key != "bad" && key != "cephalix" ) {
+						ProxyRule proxyRule = new ProxyRule(
 							key,
 							enabled,
 							( desc.containsKey(key)     ? desc.get(key) : key),
 							( longDesc.containsKey(key) ? longDesc.get(key) : key )
 							);
-					acl.add(proxyRule);
+						acl.add(proxyRule);
+					}
 				}
 			}
 		}
@@ -142,6 +144,9 @@ public class ProxyController extends Controller {
 	 */
 	public OssResponse setDefaults(String role, List<ProxyRule> acl) {
 		StringBuilder output = new StringBuilder();
+		output.append(role).append(":").append("cephalix:true").append(this.getNl());
+		output.append(role).append(":").append("good:true").append(this.getNl());
+		output.append(role).append(":").append("bad:false").append(this.getNl());
 		for(ProxyRule proxyRule : acl ) {
 			output.append(role).append(":").append(proxyRule.getName()).append(":");
 			if( proxyRule.isEnabled() ) {
