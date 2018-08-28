@@ -71,8 +71,10 @@ public class DHCPConfig extends Controller {
 			dhcpConfigFile.add("}");
 		}
 		try {
-		    Files.write(DHCP_CONFIG, dhcpConfigFile );
-		    this.systemctl("restart", "dhcpd");
+			Files.write(DHCP_CONFIG, dhcpConfigFile );
+			if( this.getConfigValue("USE_DHCP").equals("yes") ) {
+			    this.systemctl("try-restart", "dhcpd");
+			}
 			//Build groups by hwconf
 			query = em.createNamedQuery("HWConf.findAll");
 			for( HWConf hwconf : (List<HWConf>) query.getResultList() ) {
@@ -85,8 +87,8 @@ public class DHCPConfig extends Controller {
 				}
 			}
 			Files.write(SALT_GROUPS, saltGroupFile );
-			this.systemctl("restart", "salt-master");
-			this.systemctl("restart", "oss_salt_event_watcher");
+			this.systemctl("try-restart", "salt-master");
+			this.systemctl("try-restart", "oss_salt_event_watcher");
 		} catch( IOException e ) { 
 			e.printStackTrace();
 		} finally { 

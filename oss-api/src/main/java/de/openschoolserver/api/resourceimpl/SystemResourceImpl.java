@@ -219,7 +219,7 @@ public class SystemResourceImpl implements SystemResource {
 			program[3] = "-C";
 			program[4] = "custom/" +list + "/domains";
 			OSSShellTools.exec(program, reply, error, null);
-			new Controller(session).systemctl("restart", "squid");
+			new Controller(session).systemctl("try-restart", "squid");
 			return new OssResponse(session,"OK","Custom list was written successfully");
 		} catch( IOException e ) {
 			e.printStackTrace();

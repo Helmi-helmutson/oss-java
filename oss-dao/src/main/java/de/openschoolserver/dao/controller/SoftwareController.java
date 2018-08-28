@@ -1290,8 +1290,8 @@ public class SoftwareController extends Controller {
 			} catch( IOException e ) { 
 				e.printStackTrace();
 			}
-			this.systemctl("restart", "salt-master");
-			this.systemctl("restart", "oss_salt_event_watcher");
+			this.systemctl("try-restart", "salt-master");
+			this.systemctl("try-restart", "oss_salt_event_watcher");
 		}
 		//TO SET THE RIGHTS
 		if( errorMessages.length() > 0 ) {

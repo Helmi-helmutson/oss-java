@@ -345,7 +345,7 @@ public class SystemController extends Controller {
 			fwServicesExtTcp.add(firewallExt.get("other"));
 		}
 		fwConfig.setConfigValue("SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
-		this.systemctl("restart", "SuSEfirewall2");
+		this.systemctl("try-restart", "SuSEfirewall2");
 		return new OssResponse(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
 	}
 
@@ -425,7 +425,7 @@ public class SystemController extends Controller {
 			fwConfig.setConfigValue("MASQUERADE","yes");
 			fwConfig.setConfigValue("MASQ_NETS", String.join(" ", fwMasqNets));
 		}
-		this.systemctl("restart", "SuSEfirewall2");
+		this.systemctl("try-restart", "SuSEfirewall2");
 		return new OssResponse(this.getSession(),"OK","Firewall outgoing access rule  was set succesfully.");
 	}
 
@@ -461,7 +461,7 @@ public class SystemController extends Controller {
 			fwForwardMasq.add("0/0," + device.getIp() + ",tcp," + map.get("ext") + "," + map.get("port") );
 		}
 		fwConfig.setConfigValue("FORWARD_MASQ", String.join(" ", fwForwardMasq));
-		this.systemctl("restart", "SuSEfirewall2");
+		this.systemctl("try-restart", "SuSEfirewall2");
 		return new OssResponse(this.getSession(),"OK","Firewall remote access rule  was set succesfully.");
 	}
 

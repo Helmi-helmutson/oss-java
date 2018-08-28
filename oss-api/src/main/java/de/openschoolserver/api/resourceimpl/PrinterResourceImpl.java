@@ -327,7 +327,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		OSSShellTools.exec(program, reply, stderr, null);
 		logger.debug(stderr.toString());
 		logger.debug(reply.toString());
-		roomController.systemctl("restart", "samba-printserver");
+		roomController.systemctl("try-restart", "samba-printserver");
 		//Now we have to check if the printer is already visible in samba
 		int tries = 6;
 		program = new String[6];

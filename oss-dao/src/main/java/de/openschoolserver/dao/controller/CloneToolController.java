@@ -553,8 +553,8 @@ public class CloneToolController extends Controller {
 			path = new StringBuilder("/etc/salt/pki/master/minions_rejected/");
 			path.append(deviceName).append(".").append(this.getConfigValue("DOMAIN"));
 			Files.deleteIfExists(Paths.get(path.toString()));
-			this.systemctl("restart", "salt-master");
-			this.systemctl("restart", "oss_salt_event_watcher");
+			this.systemctl("try-restart", "salt-master");
+			this.systemctl("try-restart", "oss_salt_event_watcher");
 		} catch ( IOException e ) {
 			logger.error(e.getMessage());
 			return "ERROR "+e.getMessage();
