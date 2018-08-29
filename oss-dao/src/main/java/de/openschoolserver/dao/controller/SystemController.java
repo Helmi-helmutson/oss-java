@@ -829,7 +829,7 @@ public class SystemController extends Controller {
 	}
 
 	public OssResponse addDnsRecord(DnsRecord dnsRecord) {
-		String[] program   = new String[9];
+		String[] program   = new String[10];
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		program[0] = "/usr/bin/samba-tool";
@@ -837,17 +837,24 @@ public class SystemController extends Controller {
 		program[2] = "add";
 		program[3] = "localhost";
 		program[4] = dnsRecord.getDomainName();
-		program[5] = dnsRecord.getRecordType();
-		program[6] = dnsRecord.getRecordData();
-		program[7] = "-U";
-		program[8] = "register%" + this.getProperty("de.openschoolserver.dao.User.Register.Password");
+		program[5] = dnsRecord.getRecordName();
+		program[6] = dnsRecord.getRecordType();
+		program[7] = dnsRecord.getRecordData();
+		program[8] = "-U";
+		program[9] = "register%" + this.getProperty("de.openschoolserver.dao.User.Register.Password");
 		OSSShellTools.exec(program, reply, error, null);
 		//TODO evaluate error
-		return new OssResponse(session,"OK","DNS record was created succesfully.");
+		logger.debug("addDnsRecord reply" + reply.toString());
+		logger.debug("addDnsRecord error" + error.toString());
+		if( error.toString().isEmpty() ) {
+			return new OssResponse(session,"OK","DNS record was created succesfully.");
+		} else {
+			return new OssResponse(session,"ERROR",error.toString());
+		}
 	}
 
 	public OssResponse deleteDnsRecord(DnsRecord dnsRecord) {
-		String[] program   = new String[9];
+		String[] program   = new String[10];
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		program[0] = "/usr/bin/samba-tool";
@@ -855,13 +862,19 @@ public class SystemController extends Controller {
 		program[2] = "delete";
 		program[3] = "localhost";
 		program[4] = dnsRecord.getDomainName();
-		program[5] = dnsRecord.getRecordType();
-		program[6] = dnsRecord.getRecordData();
-		program[7] = "-U";
-		program[8] = "register%" + this.getProperty("de.openschoolserver.dao.User.Register.Password");
+		program[5] = dnsRecord.getRecordName();
+		program[6] = dnsRecord.getRecordType();
+		program[7] = dnsRecord.getRecordData();
+		program[8] = "-U";
+		program[9] = "register%" + this.getProperty("de.openschoolserver.dao.User.Register.Password");
 		OSSShellTools.exec(program, reply, error, null);
-		//TODO evaluate error
-		return new OssResponse(session,"OK","DNS record was deleted succesfully.");
+		logger.debug("deleteDnsRecord reply" + reply.toString());
+		logger.debug("deleteDnsRecord error" + error.toString());
+		if( error.toString().isEmpty() ) {
+			return new OssResponse(session,"OK","DNS record was created succesfully.");
+		} else {
+			return new OssResponse(session,"ERROR",error.toString());
+		}
 	}
 
 	public OssResponse deleteDnsDomain(String domainName) {
