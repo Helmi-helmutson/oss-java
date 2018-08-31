@@ -728,9 +728,10 @@ public class DeviceController extends Controller {
 			device.setWlanIp("");
 			macChange = true;
 		}
+		logger.debug("ERROR" + error);
 		if(!error.isEmpty()){
 			em.close();
-			return new OssResponse(this.getSession(),"ERROR",String.join(System.lineSeparator(),error),null,parameters);
+			return new OssResponse(this.getSession(),"ERROR","ERROR" + String.join(System.lineSeparator(),error),null,parameters);
 		}
 		try {
 			oldDevice.setMac(device.getMac());
@@ -739,8 +740,10 @@ public class DeviceController extends Controller {
 			oldDevice.setRow(device.getRow());
 			oldDevice.setInventary(device.getInventary());
 			oldDevice.setSerial(device.getSerial());
+			logger.debug("OLD-Device-After-Merge" + oldDevice);
 			em.getTransaction().begin();
 			em.merge(oldDevice);
+			logger.debug("OLDHwconf " + oldHwconf + " new hw " + hwconf);
 			if( hwconf != oldHwconf) {
 				if( hwconf.getDevices() != null ) {
 					hwconf.getDevices().add(oldDevice);
@@ -749,16 +752,20 @@ public class DeviceController extends Controller {
 					devices.add(oldDevice);
 					hwconf.setDevices(devices);
 				}
-				oldHwconf.getDevices().remove(oldDevice);
 				oldDevice.setHwconf(hwconf);
-				oldDevice.setHwconfId(device.getHwconfId());
+				oldDevice.setHwconfId(hwconf.getId());
+				logger.debug(" new hw " + hwconf);
 				em.merge(hwconf);
-				em.merge(oldHwconf);
+				if(oldHwconf != null  ) {
+					oldHwconf.getDevices().remove(oldDevice);
+					logger.debug("OLDHwconf " + oldHwconf );
+					em.merge(oldHwconf);
+				}
 			}
 			em.merge(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", "ERROR-3"+  e.getMessage());
 		} finally {
 			em.close();
 		}

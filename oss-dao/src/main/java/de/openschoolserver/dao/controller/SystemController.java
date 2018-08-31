@@ -373,13 +373,19 @@ public class SystemController extends Controller {
 					statusMap.put("name", device.getName());
 					statusMap.put("type", "host");
 				} else {
-					Room room = roomController.getByIP(host[0]);
-					if( room == null ) {
-						continue;
+					if( host[1].equals(this.getConfigValue("NETMASK")) ) {
+						statusMap.put("id", "0");
+						statusMap.put("name", "INTRANET");
+						statusMap.put("type", "room" );
+					} else {
+						Room room = roomController.getByIP(host[0]);
+						if( room == null ) {
+							continue;
+						}
+						statusMap.put("id", Long.toString(room.getId()));
+						statusMap.put("name", room.getName());
+						statusMap.put("type", "room" );
 					}
-					statusMap.put("id", Long.toString(room.getId()));
-					statusMap.put("name", room.getName());
-					statusMap.put("type", "room" );
 				}
 				statusMap.put("dest", dest);
 				statusMap.put("prot", prot);
@@ -405,8 +411,12 @@ public class SystemController extends Controller {
 		for( Map<String,String> map : firewallList ) {
 			StringBuilder data = new StringBuilder();
 			if( map.get("type").equals("room")) {
-				room = roomController.getById(Long.parseLong(map.get("id")));
-				data.append(room.getStartIP()).append("/").append(String.valueOf(room.getNetMask())).append(",");
+				if( map.get("id").equals("0") ) {
+					data.append(this.getConfigValue("NETWORK")).append("/").append(this.getConfigValue("NETMASK")).append(",");
+				} else {
+					room = roomController.getById(Long.parseLong(map.get("id")));
+					data.append(room.getStartIP()).append("/").append(String.valueOf(room.getNetMask())).append(",");
+				}
 			} else {
 				device = deviceController.getById(Long.parseLong(map.get("id")));
 				data.append(device.getIp()).append("/32,");

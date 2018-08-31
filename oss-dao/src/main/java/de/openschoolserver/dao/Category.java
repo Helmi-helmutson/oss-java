@@ -252,6 +252,7 @@ public class Category implements Serializable {
 		this.softwareIds= new ArrayList<Long>();
 		this.userIds    = new ArrayList<Long>();
 		this.validFrom  = new Date(System.currentTimeMillis());
+		this.rooms    = new ArrayList<Room>();
 	}
 
 	public Long getId() {

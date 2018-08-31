@@ -13,7 +13,7 @@ import de.openschoolserver.dao.*;
 
 @SuppressWarnings("unchecked")
 public class AdHocLanController extends Controller {
-	
+
 	Logger logger = LoggerFactory.getLogger(AdHocLanController.class);
 
 	public AdHocLanController(Session session) {
@@ -24,6 +24,7 @@ public class AdHocLanController extends Controller {
 
 	public Category getAdHocCategoryOfRoom(Room room) {
 		for( Category category : room.getCategories() ) {
+			logger.debug("getAdHocCategoryOfRoom" + category);
 			if( category.getCategoryType().equals("AdHocAccess")) {
 				return category;
 			}
@@ -59,6 +60,7 @@ public class AdHocLanController extends Controller {
 		}
 		return users;
 	}
+
 
 	public OssResponse add(Room room) {
 		logger.debug("Add AdHocLan: " + room);
@@ -104,4 +106,4 @@ public class AdHocLanController extends Controller {
 		return new CategoryController(session).addMember(categoryId, objectType, objectId);
 	}
 }
- 
+

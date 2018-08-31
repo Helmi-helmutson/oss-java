@@ -99,7 +99,17 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	public OssResponse turnOn(Session session, Long roomId) {
 		RoomController roomController = new RoomController(session);
 		Room room = roomController.getById(roomId);
+		Category category = new Category();
+		category.setCategoryType("AdHocAccess");
+		category.setName(room.getName());
+		category.setDescription(room.getDescription());
+		category.setOwner(session.getUser());
+		category.setPublicAccess(false);
+		category.getRooms().add(room);
+		CategoryController categoryController = new CategoryController(session);
+		OssResponse ossResponseCategory = categoryController.add(category);
 		room.setRoomType("AdHocAccess");
+		room.getCategories().add(category);
 		return roomController.modify(room);
 	}
 
