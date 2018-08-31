@@ -519,11 +519,10 @@ public class EducationController extends Controller {
 			}
 		}
 		if( errors.isEmpty() ) {
-			new OssResponse(this.getSession(),"OK", "Device control was applied.");
+			return new OssResponse(this.getSession(),"OK", "Room control was applied.");
 		} else {
 			return new OssResponse(this.getSession(),"ERROR",String.join("<br>", errors));
 		}
-		return null;
 	}
 
 	public Long getRoomActualController(long roomId) {
