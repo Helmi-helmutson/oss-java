@@ -60,6 +60,7 @@ public class SmartRoom {
 			this.devices = room.getDevices();
 			this.rows    = room.getRows();
 			this.places  = room.getPlaces();
+			this.users   = new ArrayList<User>();
 		}
 		for(List<Long> loggedIn : loggedIns) {
 			User   user    = uc.getById(loggedIn.get(0));
