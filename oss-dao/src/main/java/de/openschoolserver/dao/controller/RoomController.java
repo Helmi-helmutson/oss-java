@@ -1014,13 +1014,16 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
 		DeviceController deviceController = new DeviceController(session);
+		room.setAvailablePrinters(new ArrayList<Device>());
 		try {
 			em.getTransaction().begin();
 			for( Device device : deviceController.getDevices(deviceIds)) {
-				device.getAvailableInRooms().add(room);
-				em.merge(device);
+				if( ! room.getAvailablePrinters().contains(device) ) {
+					device.getAvailableInRooms().add(room);
+					room.getAvailablePrinters().add(device);
+					em.merge(device);
+				}
 			}
-			room.setAvailablePrinters(deviceController.getDevices(deviceIds));
 			em.merge(room);
 			em.getTransaction().commit();
 
