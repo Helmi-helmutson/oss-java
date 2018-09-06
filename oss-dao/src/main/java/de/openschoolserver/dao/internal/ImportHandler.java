@@ -349,7 +349,7 @@ public class ImportHandler extends Thread {
 						}
 					}
 				}
-				responseString.append("Benutzer wird umgezogen: ").append(existingUser.getName()).append(", ")
+				responseString.append("Benutzer wird aktualisiert: ").append(existingUser.getName()).append(", ")
 						.append(existingUser.getFirstname()).append(" ").append(bclasses.toString()).append(LINESEP);
 			}
 			if (change && !o.isTestOnly()) {
@@ -359,13 +359,42 @@ public class ImportHandler extends Thread {
 			// create the user
 			User newUser = new User();
 			newUser.setUid(person.getLoginId());
+			if (person.getPersonNumber()!=null && person.getPersonNumber().length()>0) {
+			  newUser.setUuid(person.getPersonNumber());
+			}
 			newUser.setGivenName(person.getFirstname());
 			newUser.setSurName(person.getName());
-			newUser.setRole(o.getRequestedUserRole() != null ? o.getRequestedUserRole() : getOSSRole(person));
+			newUser.setRole((o.getRequestedUserRole() != null && o.getRequestedUserRole().length()>0) ? o.getRequestedUserRole() : getOSSRole(person));
+			if (person.getBirthday()!=null) {
 			newUser.setBirthDay(person.getBirthday());
+			} else {
+				newUser.setBirthDay(new Date());
+			}
+			
 			if (person.getPassword() != null && person.getPassword().length() > 0) {
 				newUser.setPassword(person.getPassword());
+			} else if (o.getNewUserPassword()!=null && o.getNewUserPassword().length()>0) {
+				// handling of given new user password
+				if (o.getNewUserPassword().equals("[teachers:random,students:birthday]")) {
+					
+					if ("students".equals(newUser.getRole())) {
+						SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
+						newUser.setPassword(fmt.format(newUser.getBirthDay()));
+			
+					} else {
+						// no password set -> random
+			
+					}
+				} else {
+					newUser.setPassword(o.getNewUserPassword());
+				}
 			}
+			
+			if (newUser.getUuid()!=null) {
+				responseString.append(" uuid: ").append(newUser.getUuid());
+			}
+		
+			
 			OssResponse useraddRes = null;
 			if (!o.isTestOnly()) {
 				useraddRes = userController.add(newUser);
@@ -389,22 +418,29 @@ public class ImportHandler extends Thread {
 			} else {
 				// appendUserAddLog(importer, o, null, newUser, true);
 			}
-			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName()).append(", ")
-					.append(newUser.getGivenName()).append(LINESEP);
+			
+			StringBuilder newUserClassesBuilder = new StringBuilder();
 			if (newUser != null && newUser.getId() != null && !o.isTestOnly()) {
 				if (person.getSchoolClasses() != null) {
 					for (SchoolClass schoolClass : person.getSchoolClasses()) {
 						Group group = groupController.getByName(schoolClass.getNormalizedName());
 						if (group != null && group.getId() != null) {
 							LOG.debug("Add user to classes" + newUser.getUid() + " " + group.getName());
+							newUserClassesBuilder.append(group.getName()).append(" ");
 							groupController.addMember(group.getId(), newUser.getId());
 						} else {
-							LOG.info("Group not found: " + schoolClass.getNormalizedName() + " " + group != null
-									? group.getName() : "");
+							LOG.info("Group not found: " + schoolClass.getNormalizedName() + " " + (group != null
+									? group.getName() : ""));
 						}
 					}
 				}
 			}
+			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName()).append(", ")
+			.append(newUser.getGivenName()).append(" ").append(newUserClassesBuilder);
+			if (newUser.getUuid()!=null) {
+				responseString.append(" uuid: ").append(newUser.getUuid());
+			}
+			responseString.append(LINESEP);
 			if (!o.isTestOnly()) {
 				// done here to get the classnames of the user
 				newUser = userController.getById(useraddRes.getObjectId());

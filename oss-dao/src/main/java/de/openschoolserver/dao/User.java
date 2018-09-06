@@ -295,7 +295,7 @@ public class User implements Serializable {
 	}
 
 	public void setUuid(String uuid) {
-		this.uid = uuid;
+		this.uuid = uuid;
 	}
 
 	public Date getBirthDay() {
