@@ -270,7 +270,20 @@ public class ImportHandler extends Thread {
 
 		List<Person> oldUserList = buildOldUserlist(userController);
 		List<Person> handledUsers = new ArrayList<Person>();
-		existingUser = ImporterUtil.findUserByUid(oldUserList, person);
+		
+		if (person.getPersonNumber()!=null && person.getPersonNumber().length()>0) {
+			// try to find per uuid
+			for (Person person2 : oldUserList) {
+				if (person.getPersonNumber().equals(person2.getPersonNumber())) {
+					existingUser = person2;
+					LOG.info("user  found by uuid: " + person.getPersonNumber() + " " + person.getFirstname() + " " + person.getName() + " "
+							+ person.getLoginId() + " " + person.getBirthday());
+				}
+			}
+		}
+		if (existingUser!=null ) {
+		  existingUser = ImporterUtil.findUserByUid(oldUserList, person);
+		}
 		if (existingUser == null) {
 			LOG.info("user not found by uid: " + person.getFirstname() + " " + person.getName() + " "
 					+ person.getLoginId() + " " + person.getBirthday());
@@ -390,11 +403,6 @@ public class ImportHandler extends Thread {
 				}
 			}
 			
-			if (newUser.getUuid()!=null) {
-				responseString.append(" uuid: ").append(newUser.getUuid());
-			}
-		
-			
 			OssResponse useraddRes = null;
 			if (!o.isTestOnly()) {
 				useraddRes = userController.add(newUser);
@@ -472,6 +480,7 @@ public class ImportHandler extends Thread {
 			p.setName(user.getSurName());
 			p.setLoginId(user.getUid());
 			p.setData(user);
+			p.setPersonNumber(user.getUuid());
 			for (Group group : user.getGroups()) {
 				if ("class".equals(group.getGroupType())) {
 					SchoolClass sc = new SchoolClass(group.getName());
