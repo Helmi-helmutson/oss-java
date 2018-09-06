@@ -370,23 +370,20 @@ public class ImportHandler extends Thread {
 			} else {
 				newUser.setBirthDay(new Date());
 			}
-			responseString.append("TODO password mech : " + (person.getPassword()!=null ? person.getPassword() : "") + " " + (o.getNewUserPassword()!=null ? o.getNewUserPassword() : ""));
-
+			
 			if (person.getPassword() != null && person.getPassword().length() > 0) {
 				newUser.setPassword(person.getPassword());
 			} else if (o.getNewUserPassword()!=null && o.getNewUserPassword().length()>0) {
 				// handling of given new user password
 				if (o.getNewUserPassword().equals("[teachers:random,students:birthday]")) {
-					responseString.append("TODO Remove me special password mech detected: " + newUser.getRole());
+					
 					if ("students".equals(newUser.getRole())) {
 						SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
 						newUser.setPassword(fmt.format(newUser.getBirthDay()));
-						responseString.append(LINESEP).append("TODO Remove me special password mech detected: " + newUser.getRole() + " " + fmt.format(newUser.getBirthDay()));
-
+			
 					} else {
 						// no password set -> random
-						responseString.append(LINESEP).append("TODO Remove me special password mech detected: no student");
-
+			
 					}
 				} else {
 					newUser.setPassword(o.getNewUserPassword());
@@ -396,8 +393,7 @@ public class ImportHandler extends Thread {
 			if (newUser.getUuid()!=null) {
 				responseString.append(" uuid: ").append(newUser.getUuid());
 			}
-			responseString.append(" with password (TODO REMOVE ME): ").append(newUser.getPassword()).append("....").append(LINESEP);
-	
+		
 			
 			OssResponse useraddRes = null;
 			if (!o.isTestOnly()) {
@@ -444,8 +440,7 @@ public class ImportHandler extends Thread {
 			if (newUser.getUuid()!=null) {
 				responseString.append(" uuid: ").append(newUser.getUuid());
 			}
-			responseString.append(" with password (TODO REMOVE ME): ").append(newUser.getInitialPassword())
-			.append(LINESEP);
+			responseString.append(LINESEP);
 			if (!o.isTestOnly()) {
 				// done here to get the classnames of the user
 				newUser = userController.getById(useraddRes.getObjectId());
