@@ -403,11 +403,6 @@ public class ImportHandler extends Thread {
 				}
 			}
 			
-			if (newUser.getUuid()!=null) {
-				responseString.append(" uuid: ").append(newUser.getUuid());
-			}
-		
-			
 			OssResponse useraddRes = null;
 			if (!o.isTestOnly()) {
 				useraddRes = userController.add(newUser);
