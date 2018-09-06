@@ -1247,7 +1247,7 @@ public class SoftwareController extends Controller {
 			deviceSls.add(device.getName() + ":");
 			deviceSls.add("  system.computer_name: []");
 			for( Partition partition : device.getHwconf().getPartitions() ) {
-				if( partition.getJoinType().equals("Domain") || partition.getJoinType().equals("Simple") ) {
+				if( partition.getJoinType() != null && ( partition.getJoinType().equals("Domain") || partition.getJoinType().equals("Simple")) ) {
 					deviceSls.add(domainName + ":");
 					deviceSls.add("  system.join_domain:");
 					deviceSls.add("    - username: register");
