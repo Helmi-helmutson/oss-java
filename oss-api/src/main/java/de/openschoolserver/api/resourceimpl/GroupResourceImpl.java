@@ -104,4 +104,12 @@ public class GroupResourceImpl implements GroupResource {
 		return new GroupController(session).delete(groupName).getCode();
 	}
 
+	@Override
+	public OssResponse cleanUpDirectory(Session session, long groupId) {
+		GroupController gc = new GroupController(session);
+		Group group = gc.getById(groupId);
+		return gc.cleanGrupDirectory(group);
+		
+	}
+
 }

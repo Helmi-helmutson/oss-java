@@ -233,7 +233,23 @@ public interface GroupResource {
             @PathParam("groupId") long groupId
     );
     
-    //Manipulation of memebers
+    
+    /*
+     * PUT groups/<groupId>
+     */
+    @PUT
+    @Path("{groupId}/cleanUpDirectory")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Deletes the group directory.")
+    @ApiResponses(value = {
+        @ApiResponse(code = 404, message = "Group not found"),
+        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("group.delete")
+    OssResponse cleanUpDirectory(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("groupId") long groupId
+    );
+    
     
     /*
    	 * POST groups/<groupId>/members
