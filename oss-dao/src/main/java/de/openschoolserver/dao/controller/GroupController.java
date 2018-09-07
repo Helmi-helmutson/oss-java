@@ -17,6 +17,7 @@ import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.tools.OSSShellTools;
 import de.openschoolserver.dao.Enumerate;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
@@ -390,4 +391,29 @@ public class GroupController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK","Group owner was changed.");
 	}
+
+	public OssResponse cleanGrupDirectory(Group group) {
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[] program = new String[2];
+		program[0] = "/usr/sbin/oss_clean_group_directory.sh";
+		program[1] = group.getName();
+		OSSShellTools.exec(program, reply, error, null);
+		if( error.length() > 0 ) {
+			parameters = new ArrayList<String>();
+			parameters.add(group.getName());
+			parameters.add(error.toString());
+			return new OssResponse(this.getSession(),"ERROR","Class directory %s can not be cleaned. Reason %s",null,parameters);
+		}
+		return new OssResponse(this.getSession(),"OK","Group directory was cleaned.");
+	}
+
+	public OssResponse cleanClassDirectories() {
+		for( Group group : this.getByType("class")) {
+			if( cleanGrupDirectory(group).getCode().equals("ERROR") ) {
+				return new OssResponse(this.getSession(),"ERROR","Class directory %s can not be cleaned.",null,group.getName());
+			}
+		}
+		return new OssResponse(this.getSession(),"OK","Class directories was cleaned.");
+	}	
 }
