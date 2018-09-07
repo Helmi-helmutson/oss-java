@@ -11,8 +11,10 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,17 @@ public class ImportHandler extends Thread {
 		ImporterObject object;
 		int ctr = 0;
 		try {
+			final UserController userController = new UserController(session);
+			final GroupController groupController = new GroupController(session);
+			List<User> allUsers =null;
+			if (order.getRequestedUserRole() != null && order.getRequestedUserRole().length()>0) {
+				allUsers = userController.getByRole(order.getRequestedUserRole());
+			} else {
+				allUsers = userController.getAll();
+			}		 
+			List<Group> allClasses = groupController.getByType("class");
+			Set<String> foundRoles = new HashSet<String>();
+			List<Person> oldUserList = buildOldUserlist(userController);
 			do {
 
 				// handle data
@@ -72,7 +85,7 @@ public class ImportHandler extends Thread {
 					LOG.debug("found object: " + object.getClass());
 					if (object instanceof de.claxss.importlib.SchoolClass) {
 						if (!doCompareAndImportSchoolClass(session, (de.claxss.importlib.SchoolClass) object, order,
-								responseString)) {
+								responseString,groupController,allClasses)) {
 							appendLog(importer, order, "Import " + object.getObjectMessage() + ": FAILED");
 
 						} else {
@@ -82,7 +95,7 @@ public class ImportHandler extends Thread {
 					} else if (object instanceof de.claxss.importlib.Person) {
 
 						if (!doCompareAndImportUser(session, (de.claxss.importlib.Person) object, order, importer,
-								responseString)) {
+								responseString,groupController,userController,foundRoles,oldUserList,allUsers)) {
 
 							appendLog(importer, order, "Import " + objectMsg + ": FAILED");
 						} else {
@@ -102,6 +115,52 @@ public class ImportHandler extends Thread {
 					// }
 				}
 			} while (object != null);
+			
+			// cleanup processing
+				
+				if (order.isIncludesAll()) {
+					for (User user : allUsers) {
+						if (foundRoles.contains(user.getRole()) && ! "Default profile".equals(user.getGivenName())) {
+							if (!order.isTestOnly()) {
+								responseString.append("Lösche Benutzer: ").append(user.getUid()).append(" " ).append(user.getGivenName()).append(" ").append(user.getSurName()).append(LINESEP);
+								userController.delete(user);
+							} else {
+								responseString.append("Werde Benutzer löschen: ").append(user.getUid()).append(" " ).append(user.getGivenName()).append(" ").append(user.getSurName()).append(LINESEP);
+							}
+						}
+						order.setImportResult(responseString.toString());
+
+					}
+				}
+				if (order.isContainsAllClasses()) {
+					for (Group group : allClasses) {
+						if (!order.isTestOnly()) {
+							responseString.append("Lösche Klasse: ").append(group.getName()).append(LINESEP);
+							groupController.delete(group);
+						} else {
+							responseString.append("Werde Klasse löschen: ").append(group.getName()).append(LINESEP);
+						}
+						order.setImportResult(responseString.toString());
+
+					}
+				}
+				if (order.isCleanupClassesDir()) {
+					if (!order.isTestOnly()) {
+						responseString.append("Lösche Inhalte der Klassenverzeichnisse").append(LINESEP);
+						groupController.cleanClassDirectories();
+					} else {
+						responseString.append("Werde Inhalte der Klassenverzeichnisse löschen").append(LINESEP);
+					}
+				}
+				order.setImportResult(responseString.toString());
+
+				if (order.isCleanupUserData()) {
+					//TODO cleanup user home dies
+					// maybe we will implement this later, actually not done
+				}
+				
+			
+			
 		} finally {
 			closeLogfiles();
 		}
@@ -263,13 +322,12 @@ public class ImportHandler extends Thread {
 	}
 
 	private boolean doCompareAndImportUser(Session session, Person person, ImportOrder o, Importer importer,
-			StringBuilder responseString) {
-		final UserController userController = new UserController(session);
-		final GroupController groupController = new GroupController(session);
+			StringBuilder responseString,GroupController groupController,UserController userController,Set<String> foundRoles, List<Person> oldUserList, List<User>remainingUsers ) {
+		
 		Person existingUser = null;
 
-		List<Person> oldUserList = buildOldUserlist(userController);
-		List<Person> handledUsers = new ArrayList<Person>();
+	
+	//	List<Person> handledUsers = new ArrayList<Person>();
 		
 		if (person.getPersonNumber()!=null && person.getPersonNumber().length()>0) {
 			// try to find per uuid
@@ -316,8 +374,13 @@ public class ImportHandler extends Thread {
 		}
 		/* ========== second step: create or update the user ============ */
 		if (existingUser != null) {
-			handledUsers.add(existingUser);
+		//	handledUsers.add(existingUser);
+			
+			
 			User ossUser = (User) existingUser.getData();
+			remainingUsers.remove(ossUser);
+			foundRoles.add(ossUser.getRole());
+			
 			// update the user
 			boolean change = false;
 			if (person.getLoginId() != null && !person.getLoginId().equals(ossUser.getUid())) {
@@ -378,6 +441,7 @@ public class ImportHandler extends Thread {
 			newUser.setGivenName(person.getFirstname());
 			newUser.setSurName(person.getName());
 			newUser.setRole((o.getRequestedUserRole() != null && o.getRequestedUserRole().length()>0) ? o.getRequestedUserRole() : getOSSRole(person));
+			foundRoles.add(newUser.getRole());
 			if (person.getBirthday()!=null) {
 			newUser.setBirthDay(person.getBirthday());
 			} else {
@@ -445,9 +509,7 @@ public class ImportHandler extends Thread {
 			}
 			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName()).append(", ")
 			.append(newUser.getGivenName()).append(" ").append(newUserClassesBuilder);
-			if (newUser.getUuid()!=null) {
-				responseString.append(" uuid: ").append(newUser.getUuid());
-			}
+			
 			responseString.append(LINESEP);
 			if (!o.isTestOnly()) {
 				// done here to get the classnames of the user
@@ -457,7 +519,7 @@ public class ImportHandler extends Thread {
 				appendUserAddLog(importer, o, null, newUser, true);
 			}
 		}
-		// TODO handle old users
+		
 		return true;
 	}
 
@@ -509,10 +571,10 @@ public class ImportHandler extends Thread {
 	}
 
 	private boolean doCompareAndImportSchoolClass(Session session, de.claxss.importlib.SchoolClass schoolClass,
-			ImportOrder o, StringBuilder responseString) {
+			ImportOrder o, StringBuilder responseString, GroupController groupController, List<Group> remainingClasses) {
 		// LOG.error("importing group: " + schoolClass.getNormalizedName());
 		if (schoolClass != null && schoolClass.getNormalizedName() != null) {
-			final GroupController groupController = new GroupController(session);
+			
 			final Group existingClass = groupController.getByName(schoolClass.getNormalizedName());
 
 			if (existingClass == null) {
@@ -526,6 +588,8 @@ public class ImportHandler extends Thread {
 					groupController.add(newClass);
 				}
 				responseString.append("Neue Gruppe wird angelegt: ").append(newClass.getName()).append(LINESEP);
+			} else {
+				remainingClasses.remove(existingClass);
 			}
 		}
 
