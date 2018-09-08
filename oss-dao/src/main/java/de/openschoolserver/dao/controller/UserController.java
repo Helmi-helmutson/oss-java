@@ -30,7 +30,7 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 public class UserController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(UserController.class);
-	private List<String> parameters = new ArrayList<String>();
+	
 
 	public UserController(Session session) {
 		super(session);
@@ -152,7 +152,7 @@ public class UserController extends Controller {
 
 	public String createUid(String givenName, String surName, Date birthDay) {
 		String userId = UserUtil.createUserId(givenName, surName, birthDay, true,
-				this.getConfigValue("STRING_CONVERT_TYPE") == "telex", this.getConfigValue("LOGIN_SCHEME"));
+				"telex".equals(this.getConfigValue("STRING_CONVERT_TYPE")) , this.getConfigValue("LOGIN_SCHEME"));
 		String newUserId = this.getConfigValue("LOGIN_PREFIX") + userId;
 		Integer i = 1;
 		while (!this.isNameUnique(newUserId)) {
@@ -180,7 +180,7 @@ public class UserController extends Controller {
 		// Create uid if not given
 		if (user.getUid() == null || user.getUid().isEmpty()) {
 			String userId = UserUtil.createUserId(user.getGivenName(), user.getSurName(), user.getBirthDay(), true,
-					this.getConfigValue("STRING_CONVERT_TYPE") == "telex", this.getConfigValue("LOGIN_SCHEME"));
+					"telex".equals(this.getConfigValue("STRING_CONVERT_TYPE")), this.getConfigValue("LOGIN_SCHEME"));
 			user.setUid(this.getConfigValue("LOGIN_PREFIX") + userId);
 			Integer i = 1;
 			while (!this.isNameUnique(user.getUid())) {
@@ -246,7 +246,7 @@ public class UserController extends Controller {
 		if (group != null) {
 			groupController.addMember(group, user);
 		}
-
+		List<String> parameters = new ArrayList<String>();
 		parameters.add(user.getUid());
 		parameters.add(user.getGivenName());
 		parameters.add(user.getSurName());

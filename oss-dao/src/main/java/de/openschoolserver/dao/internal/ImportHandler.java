@@ -11,9 +11,11 @@ import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import org.slf4j.LoggerFactory;
@@ -29,6 +31,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.GroupController;
+import de.openschoolserver.dao.controller.SystemController;
 import de.openschoolserver.dao.controller.UserController;
 
 public class ImportHandler extends Thread {
@@ -59,11 +62,33 @@ public class ImportHandler extends Thread {
 	}
 
 	private void doHandleObjects() {
+		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
+		importStartDt = fmt.format(new Date());
+		
+		String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
+		if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
+			filepath = "/tmp/userimport." + importStartDt;
+		} else {
+			filepath = "/home/groups/SYSADMINS/userimport." + importStartDt;
+		}
+
+		
 		ImporterObject object;
 		int ctr = 0;
+		String oldConfigValuePWCheck="yes";
+		final SystemController systemController = new SystemController(session);
+		
 		try {
 			final UserController userController = new UserController(session);
 			final GroupController groupController = new GroupController(session);
+			
+			
+			
+			oldConfigValuePWCheck = systemController.getConfigValue("CHECK_PASSWORD_QUALITY");
+			if (oldConfigValuePWCheck == null || ! "no".equals(oldConfigValuePWCheck)) {
+			systemController.setConfigValue("CHECK_PASSWORD_QUALITY", "no");
+			}
+			
 			List<User> allUsers =null;
 			if (order.getRequestedUserRole() != null && order.getRequestedUserRole().length()>0) {
 				allUsers = userController.getByRole(order.getRequestedUserRole());
@@ -163,30 +188,50 @@ public class ImportHandler extends Thread {
 			
 		} finally {
 			closeLogfiles();
+			if (oldConfigValuePWCheck == null || ! "no".equals(oldConfigValuePWCheck)) {
+				systemController.setConfigValue("CHECK_PASSWORD_QUALITY",oldConfigValuePWCheck);
+			}
 		}
 		order.setPercentCompleted(100);
 		done = true;
 	}
 
 	private OutputStream logfile = null;
-	private OutputStream useraddLogfile = null;
+	//private OutputStream useraddLogfile = null;
+	Map<String,OutputStream> useraddLogfiles = new HashMap<String,OutputStream>();
 	private String CSVSEP = ";";
 	private String LINESEP = "\n";
 	private String CLASSESSEP = ",";
+	private String importStartDt;
+	private String filepath;
+	
+	private OutputStream getUserAddLogFile(String schoolclass) throws FileNotFoundException {
+		OutputStream result = useraddLogfiles.get(schoolclass);
+		if (result==null) {
+		File uaf = new File(filepath + "/userlist_" + schoolclass + ".csv");
+
+		result = new FileOutputStream(uaf);
+		useraddLogfiles.put(schoolclass, result);
+		StringBuilder b = new StringBuilder();
+		b.append("LOGIN").append(CSVSEP).append("NACHNAME").append(CSVSEP).append("VORNAME").append(CSVSEP)
+				.append("GEBURTSTAG").append(CSVSEP).append("KLASSE").append(CSVSEP).append("PASSWORT")
+				.append(LINESEP);
+		try {
+			result.write(b.toString().getBytes("UTF-8"));
+		} catch (UnsupportedEncodingException e) {
+			LOG.error("createLogfiles: " + e.getMessage());
+		} catch (IOException e) {
+			LOG.error("createLogfiles: " + e.getMessage());
+		}
+		}
+		return result;
+	}
 
 	private void createLogfiles(Importer i, ImportOrder o) {
 
-		if (logfile == null || useraddLogfile == null) {
-			SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
-			String now = fmt.format(new Date());
-			String filepath;
-			String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
-			if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
-				filepath = "/tmp/userimport." + now;
-			} else {
-				filepath = "/home/groups/SYSADMINS/userimport." + now;
-			}
-
+		if (logfile == null ) {
+			
+			
 			File dir = new File(filepath);
 			dir.mkdir();
 			File lf = new File(filepath + "/import.log");
@@ -195,7 +240,7 @@ public class ImportHandler extends Thread {
 				if (logfile == null) {
 					logfile = new FileOutputStream(lf);
 					StringBuilder b = new StringBuilder();
-					b.append(now).append(" Import: ").append(i.getImporterDescription().getName()).append(" Modus: ")
+					b.append(importStartDt).append(" Import: ").append(i.getImporterDescription().getName()).append(" Modus: ")
 							.append(o.isTestOnly() ? "Test Import" : "Tatsächlicher Import").append(LINESEP);
 					try {
 						logfile.write(b.toString().getBytes("UTF-8"));
@@ -205,20 +250,7 @@ public class ImportHandler extends Thread {
 						LOG.error("createLogfiles: " + e.getMessage());
 					}
 				}
-				if (useraddLogfile == null) {
-					useraddLogfile = new FileOutputStream(uaf);
-					StringBuilder b = new StringBuilder();
-					b.append("LOGIN").append(CSVSEP).append("NACHNAME").append(CSVSEP).append("VORNAME").append(CSVSEP)
-							.append("GEBURTSTAG").append(CSVSEP).append("KLASSE").append(CSVSEP).append("PASSWORT")
-							.append(LINESEP);
-					try {
-						useraddLogfile.write(b.toString().getBytes("UTF-8"));
-					} catch (UnsupportedEncodingException e) {
-						LOG.error("createLogfiles: " + e.getMessage());
-					} catch (IOException e) {
-						LOG.error("createLogfiles: " + e.getMessage());
-					}
-				}
+				
 			} catch (FileNotFoundException e) {
 				LOG.error("createLogfiles: " + e.getMessage());
 			}
@@ -239,14 +271,15 @@ public class ImportHandler extends Thread {
 			}
 			logfile = null;
 		}
-		if (useraddLogfile != null) {
+		for (OutputStream file : useraddLogfiles.values()) {
 			try {
-				useraddLogfile.close();
+				file.close();
 			} catch (IOException e) {
 				LOG.error("closeLogfiles useraddLogfile:" + e.getMessage());
 			}
-			useraddLogfile = null;
-		}
+			useraddLogfiles.clear();
+		} 
+		
 	}
 
 	private void appendLog(Importer i, ImportOrder o, String msg) {
@@ -272,7 +305,20 @@ public class ImportHandler extends Thread {
 		}
 		return value;
 	}
-
+    private String getFirstClass(User user) {
+    	if (user.getGroups() != null) {
+			if (user.getGroups().size() == 1) {
+				return user.getGroups().get(0).getName();
+			}
+			int i = 0;
+			for (Group group : user.getGroups()) {
+				if ("class".equals(group.getGroupType())) {
+					return group.getName();		
+				}
+			}
+		}
+    	return "";
+    }
 	private String getCSVClasses(User user) {
 		StringBuilder b = new StringBuilder();
 		if (user.getGroups() != null) {
@@ -308,11 +354,12 @@ public class ImportHandler extends Thread {
 			SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
 			String birthday = newUser.getBirthDay() != null ? fmt.format(newUser.getBirthDay()) : "";
 			String classes = getCSVClasses(newUser);
+			String firstclass = getFirstClass(newUser);
 			buf.append(newUser.getUid()).append(CSVSEP).append(normalizeValue(newUser.getSurName())).append(CSVSEP)
 					.append(normalizeValue(newUser.getGivenName())).append(CSVSEP).append(birthday).append(CSVSEP)
 					.append(normalizeValue(classes)).append(CSVSEP).append(res != null ? extractPW(res) : "")
 					.append(LINESEP);
-			useraddLogfile.write(buf.toString().getBytes("UTF-8"));
+			getUserAddLogFile(firstclass).write(buf.toString().getBytes("UTF-8"));
 		} catch (UnsupportedEncodingException e) {
 			LOG.error("appendUserAddLog:" + e.getMessage());
 		} catch (IOException e) {
