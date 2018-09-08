@@ -348,6 +348,7 @@ public class ImportHandler extends Thread {
 	}
 
 	private void appendUserAddLog(Importer i, ImportOrder o, OssResponse res, User newUser, boolean create) {
+		if (!o.isTestOnly()) {
 		createLogfiles(i, o);
 		try {
 			StringBuilder buf = new StringBuilder();
@@ -365,7 +366,7 @@ public class ImportHandler extends Thread {
 		} catch (IOException e) {
 			LOG.error("appendUserAddLog:" + e.getMessage());
 		}
-
+		}
 	}
 
 	private boolean doCompareAndImportUser(Session session, Person person, ImportOrder o, Importer importer,
