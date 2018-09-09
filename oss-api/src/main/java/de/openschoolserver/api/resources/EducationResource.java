@@ -662,10 +662,10 @@ public interface EducationResource {
      );
 
      /*
-      * * PUT education/groups/{groupId}/actions
+      * * PUT education/groups/{groupId}/actions/{actionNam}
      */
     @PUT
-    @Path("groups/{groupId}/{action}")
+    @Path("groups/{groupId}/actions/{action}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Apply an actions for a group.")
     @ApiResponses(value = {
