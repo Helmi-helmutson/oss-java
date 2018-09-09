@@ -43,7 +43,7 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("adhoclan.manage")
 	List<User> getUsersOfRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")     Long roomId
@@ -56,7 +56,7 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("adhoclan.manage")
 	List<Group> getGroupsOfRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")     Long roomId
@@ -72,7 +72,7 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("category.search")
+	@RolesAllowed("adhoclan.manage")
 	List<User> getAvailableUser(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId") long roomId
@@ -85,7 +85,7 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "Category not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("category.search")
+	@RolesAllowed("adhoclan.manage")
 	List<Group> getAvailableGroups(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId") long roomId
@@ -101,7 +101,7 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("adhoclan.manage")
 	List<User> getUsers(
 			@ApiParam(hidden = true) @Auth Session session
 			);
@@ -116,7 +116,7 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("adhoclan.search")
+	@RolesAllowed("adhoclan.manage")
 	List<Group> getGroups(
 			@ApiParam(hidden = true) @Auth Session session
 			);
