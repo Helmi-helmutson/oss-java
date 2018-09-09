@@ -378,9 +378,13 @@ public class EducationResourceImpl implements Resource, EducationResource {
 					ossActionMap.getStringValue(),
 					ossActionMap.isBooleanValue());
 		case "setFilesystemQuota":
-			break;
+			return  userController.setFsQuota(
+					ossActionMap.getUserIds(),
+					ossActionMap.getLongValue());
 		case "setMailsystemQuota":
-			break;
+			return  userController.setMsQuota(
+					ossActionMap.getUserIds(),
+					ossActionMap.getLongValue());
 		case "disableLogin":
 			return  userController.disableLogin(
 					ossActionMap.getUserIds(),
@@ -565,5 +569,17 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public SmartRoom getRoomDetails(Session session, Long roomId) {
 		return new SmartRoom(session,roomId);
+	}
+
+	@Override
+	public OssResponse manageGroup(Session session, Long groupId, String action) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public OssResponse manageGroup(Session session, Long groupId, String action, Map<String, String> actionContent) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

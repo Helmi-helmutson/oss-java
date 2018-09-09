@@ -472,7 +472,6 @@ public class UserController extends Controller {
 
 	public OssResponse resetUserPassword(List<Long> userIds, String password, boolean mustChange) {
 		logger.debug("resetUserPassword: " + password);
-		StringBuilder data = new StringBuilder();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[5];
@@ -481,7 +480,7 @@ public class UserController extends Controller {
 		program[2] = "passwordsettings";
 		program[3] = "set";
 		program[4] = "--complexity=off";
-		OSSShellTools.exec(program, reply, error, data.toString());
+		OSSShellTools.exec(program, reply, error, null);
 
 		if (mustChange) {
 			program = new String[6];
@@ -505,13 +504,12 @@ public class UserController extends Controller {
 			program[2] = "passwordsettings";
 			program[3] = "set";
 			program[4] = "--complexity=on";
-			OSSShellTools.exec(program, reply, error, data.toString());
+			OSSShellTools.exec(program, reply, error, null);
 		}
 		return new OssResponse(this.getSession(), "OK", "The password of the selected users was reseted.");
 	}
 
 	public OssResponse copyTemplate(List<Long> userIds, String stringValue) {
-		StringBuilder data = new StringBuilder();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[2];
@@ -522,26 +520,24 @@ public class UserController extends Controller {
 		program[0] = "/usr/sbin/oss_copy_template_home.sh";
 		for (Long id : userIds) {
 			program[1] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, data.toString());
+			OSSShellTools.exec(program, reply, error, null);
 		}
 		return new OssResponse(this.getSession(), "OK", "The template for the selected users was copied.");
 	}
 
 	public OssResponse removeProfile(List<Long> userIds) {
-		StringBuilder data = new StringBuilder();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[2];
 		program[0] = "/usr/sbin/oss_remove_profile.sh";
 		for (Long id : userIds) {
 			program[1] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, data.toString());
+			OSSShellTools.exec(program, reply, error, null);
 		}
 		return new OssResponse(this.getSession(), "OK", "The windows profile(s) of the user was removed.");
 	}
 
 	public OssResponse disableLogin(List<Long> userIds, boolean disable) {
-		StringBuilder data = new StringBuilder();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[4];
@@ -554,12 +550,38 @@ public class UserController extends Controller {
 		}
 		for (Long id : userIds) {
 			program[3] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, data.toString());
+			OSSShellTools.exec(program, reply, error, null);
 		}
 		if (disable) {
 			return new OssResponse(this.getSession(), "OK", "The selected users were disabled.");
 		}
 		return new OssResponse(this.getSession(), "OK", "The selected users were enabled.");
+	}
+
+	public OssResponse setFsQuota(List<Long> userIds, Long fsQuota) {
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[] program = new String[3];
+		program[0] = "/usr/sbin/oss-set-quota.sh";
+		program[2] = String.valueOf(fsQuota);
+		for (Long id : userIds) {
+			program[1] = this.getById(id).getUid();
+			OSSShellTools.exec(program, reply, error, null);
+		}
+		return new OssResponse(this.getSession(), "OK", "The filesystem quota for selected users was set.");
+	}
+
+	public OssResponse setMsQuota(List<Long> userIds, Long msQuota) {
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[] program = new String[3];
+		program[0] = "/usr/sbin/oss-set-mquota.pl";
+		program[2] = String.valueOf(msQuota);
+		for (Long id : userIds) {
+			program[1] = this.getById(id).getUid();
+			OSSShellTools.exec(program, reply, error, null);
+		}
+		return new OssResponse(this.getSession(), "OK", "The filesystem quota for selected users was set.");
 	}
 
 	public OssResponse collectFile(List<User> users, String projectName) {
