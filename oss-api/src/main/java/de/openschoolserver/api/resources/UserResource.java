@@ -343,7 +343,7 @@ public interface UserResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("user.search")
-    List<String> getUidsByRole(
+    String getUidsByRole(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("role") String role
     );

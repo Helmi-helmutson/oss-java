@@ -462,13 +462,13 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public List<String> getUidsByRole(Session session, String role) {
+	public String getUidsByRole(Session session, String role) {
 		final UserController userController = new UserController(session);
 		List<String> users = new ArrayList<String>();
 		for( User user : userController.getByRole(role) ) {
 			users.add(user.getUid());
 		}
-		return users;
+		return String.join(userController.getNl(),users);
 	}
 
 }
