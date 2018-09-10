@@ -120,8 +120,10 @@ public class CategoryController extends Controller {
 			em.getTransaction().commit();
 			logger.debug("Created Category:" + category );
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exeption: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Category was created",category.getId());
 	}
@@ -140,6 +142,8 @@ public class CategoryController extends Controller {
 		Category oldCategory = this.getById(category.getId());
 		oldCategory.setDescription(category.getDescription());
 		oldCategory.setName(category.getName());
+		oldCategory.setStudentsOnly(category.getStudentsOnly());
+		oldCategory.setPublicAccess(category.isPublicAccess());
 		try {
 			em.getTransaction().begin();
 			em.merge(oldCategory);
@@ -298,7 +302,7 @@ public class CategoryController extends Controller {
 		EntityManager em = getEntityManager();
 		boolean changes = false;
 		try {
-			Category category = em.find(Category.class, objectId);
+			Category category = em.find(Category.class, categoryId);
 			em.getTransaction().begin();
 			switch(objectName.toLowerCase()){
 			case("device"):
@@ -388,7 +392,7 @@ public class CategoryController extends Controller {
 				em.getTransaction().commit();
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("addMember: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
@@ -399,7 +403,7 @@ public class CategoryController extends Controller {
 	public OssResponse deleteMember(Long categoryId, String objectName, Long objectId ) {
 		EntityManager em = getEntityManager();
 		try {
-			Category category = em.find(Category.class, objectId);
+			Category category = em.find(Category.class, categoryId);
 			em.getTransaction().begin();
 			switch(objectName.toLowerCase()){
 			case("device"):

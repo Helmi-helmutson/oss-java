@@ -3,8 +3,6 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
 import de.openschoolserver.api.resources.AdHocLanResource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
@@ -164,6 +162,18 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		}
 		room.setId(oldRoom.getId());
 		return rc.modify(oldRoom);
+	}
+
+	@Override
+	public boolean getStudentsOnly(Session session, Long roomId) {
+		return new AdHocLanController(session).getAdHocCategoryOfRoom(roomId).getStudentsOnly();
+	}
+
+	@Override
+	public OssResponse setStudentsOnly(Session session, Long roomId, boolean studentsOnly) {
+		Category category = new AdHocLanController(session).getAdHocCategoryOfRoom(roomId);
+		category.setStudentsOnly(studentsOnly);
+		return new CategoryController(session).modify(category);
 	}
 
 }

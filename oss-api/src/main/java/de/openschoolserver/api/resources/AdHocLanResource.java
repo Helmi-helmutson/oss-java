@@ -169,6 +169,7 @@ public interface AdHocLanResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId
 			);
+
     /*
      * POST addhoclan/rooms/{roomId}
      */
@@ -185,6 +186,40 @@ public interface AdHocLanResource {
 			@PathParam("roomId")		Long roomId,
 			Room room
 			);
+
+    /*
+     * Get addhoclan/rooms/{roomId}/studentsOnly
+     */
+    @GET
+	@Path("rooms/{roomId}/studentsOnly")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets an AdHocLan room.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.manage")
+	boolean getStudentsOnly(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")		Long roomId
+			);
+
+    /*
+     * Get addhoclan/rooms/{roomId}/studentsOnly
+     */
+    @POST
+	@Path("rooms/{roomId}/studentsOnly")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets an AdHocLan room.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.manage")
+    OssResponse setStudentsOnly(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")		Long roomId,
+			boolean studentsOnly
+			);
+
 
     /*
      * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
