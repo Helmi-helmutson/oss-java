@@ -332,6 +332,22 @@ public interface UserResource {
             @PathParam("attribute") String attribute
   );
 
+    /*
+     * GET users/byRole/<role>
+     */
+    @GET
+    @Path("uidsByRole/{role}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get users from a rolle")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("user.search")
+    List<String> getUidsByRole(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("role") String role
+    );
+
 
     /*
      * Mange gast user
