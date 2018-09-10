@@ -154,6 +154,37 @@ public interface AdHocLanResource {
 			@PathParam("roomId")		Long roomId
 			);
 
+    /*
+     * POST addhoclan/rooms/{roomId}
+     */
+    @GET
+	@Path("rooms/{roomId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets an AdHocLan room.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.manage")
+	Room getRoomById(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")		Long roomId
+			);
+    /*
+     * POST addhoclan/rooms/{roomId}
+     */
+    @POST
+	@Path("rooms/{roomId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Modify an AdHocLan room")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.manage")
+	OssResponse modify(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")		Long roomId,
+			Room room
+			);
 
     /*
      * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
@@ -167,6 +198,24 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.manage")
 	OssResponse putObjectIntoRoom(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")		Long roomId,
+			@PathParam("objectType")	String onjectType,
+			@PathParam("objectId")		Long objectId
+			);
+
+    /*
+     * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
+     */
+    @DELETE
+	@Path("rooms/{roomId}/{objectType}/{objectId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Removes a group or user from an AdHocLan room")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.manage")
+	OssResponse deleteObjectIntoRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId,
 			@PathParam("objectType")	String onjectType,

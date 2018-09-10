@@ -397,13 +397,13 @@ public class CategoryController extends Controller {
 	}
 
 	public OssResponse deleteMember(Long categoryId, String objectName, Long objectId ) {
-		Category category = this.getById(categoryId);
 		EntityManager em = getEntityManager();
+		Category category = em.find(Category.class, objectId);
 		try {
 			em.getTransaction().begin();
 			switch(objectName){
 			case("Device"):
-				Device device = new DeviceController(this.session).getById(objectId);
+				Device device = em.find(Device.class, objectId);
 				if(category.getDevices().contains(device)) {
 					category.getDevices().remove(device);
 					device.getCategories().remove(category);
@@ -411,7 +411,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("Group"):
-				Group group = new GroupController(this.session).getById(objectId);
+				Group group = em.find(Group.class, objectId);
 				if(category.getGroups().contains(group)) {
 					category.getGroups().remove(group);
 					group.getCategories().remove(category);
@@ -419,7 +419,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("HWConf"):
-				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
+				HWConf hwconf = em.find(HWConf.class, objectId);
 				if(category.getHWConfs().contains(hwconf)) {
 					category.getHWConfs().remove(hwconf);
 					hwconf.getCategories().remove(category);
@@ -427,7 +427,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("Room"):
-				Room room = new RoomController(this.session).getById(objectId);
+				Room room = em.find(Room.class, objectId);
 				if(category.getRooms().contains(room)) {
 					category.getRooms().remove(room);
 					room.getCategories().remove(category);
@@ -435,7 +435,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("Software"):
-				Software software = new SoftwareController(this.session).getById(objectId);
+				Software software = em.find(Software.class, objectId);
 				if( category.getSoftwares().contains(software) ) {
 					category.getSoftwares().remove(software);
 					category.getRemovedSoftwares().add(software);
@@ -445,7 +445,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("User"):
-				User user = new UserController(this.session).getById(objectId);
+				User user = em.find(User.class, objectId);
 				if( category.getUsers().contains(user)) {
 					category.getUsers().remove(user);
 					user.getCategories().remove(category);
@@ -453,7 +453,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("FAQ"):
-				FAQ faq = new InformationController(this.session).getFAQById(objectId);
+				FAQ faq = em.find(FAQ.class, objectId);
 				if(category.getFaqs().contains(faq) ) {
 					category.getFaqs().remove(faq);
 					faq.getCategories().remove(category);
@@ -461,7 +461,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("Announcement"):
-				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
+				Announcement info = em.find(Announcement.class, objectId);
 				if( category.getAnnouncements().contains(info)) {
 					category.getAnnouncements().remove(info);
 					info.getCategories().remove(category);
@@ -469,7 +469,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("Contact"):
-				Contact contact = new InformationController(this.session).getContactById(objectId);
+				Contact contact = em.find(Contact.class, objectId);
 				if( category.getContacts().contains(contact)) {
 					category.getContacts().remove(contact);
 					contact.getCategories().remove(category);

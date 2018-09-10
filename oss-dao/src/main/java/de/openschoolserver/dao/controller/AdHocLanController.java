@@ -105,5 +105,14 @@ public class AdHocLanController extends Controller {
 		}
 		return new CategoryController(session).addMember(categoryId, objectType, objectId);
 	}
+
+
+	public OssResponse deleteObjectIntoRoom(Long roomId, String objectType, Long objectId) {
+		Long categoryId = getAdHocCategoryOfRoom(roomId).getId();
+		if( categoryId == null ) {
+			return new OssResponse(session,"ERROR","AdHocAccess not found");
+		}
+		return new CategoryController(session).deleteMember(categoryId, objectType, objectId);
+	}
 }
 
