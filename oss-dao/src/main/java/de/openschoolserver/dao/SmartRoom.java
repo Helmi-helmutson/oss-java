@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.EntityManager;
 import de.openschoolserver.dao.controller.*;
 
 public class SmartRoom {
