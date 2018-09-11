@@ -56,9 +56,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Room> getMySamrtRooms(Session session) {
 		List<Room> smartRooms = new ArrayList<Room>();
-		for( Category category : session.getUser().getCategories() ) {
-			if(category.getCategoryType().equals("smartRoom")) {
-				smartRooms.add(category.getRooms().get(0));
+		for( Category category  : new CategoryController(session).getByType("smartRoom") ) {
+			if( category.isPublicAccess() || category.getOwner().equals(session.getUser())) {
+				logger.debug("getMySamrtRooms" + category);
+				if( category.getRooms() != null && category.getRooms().size() > 0 ) {
+					smartRooms.add(category.getRooms().get(0));
+				}
 			}
 		}
 		return smartRooms;
@@ -573,7 +576,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse manageGroup(Session session, Long groupId, String action) {
-		// TODO Auto-generated method stub
+		GroupController gc = new GroupController(session);
+		Group group = gc.getById(groupId);
+		switch(action.toLowerCase()) {
+		case "turnsmartroom":
+			return gc.createSmartRoomForGroup(group, true, true);
+		}
 		return null;
 	}
 
