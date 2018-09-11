@@ -38,31 +38,32 @@ public class SmartRoom {
 	private Long[][]  deviceMatrix;
 
 	public SmartRoom(Session session, Long roomId) {
-		boolean isSmartRoom    = false;
-		boolean changed        = false;
 		DeviceController    dc = new DeviceController(session);
 		EducationController ec = new EducationController(session);
 		RoomController      rc = new RoomController(session);
 		UserController      uc = new UserController(session);
-		EntityManager       em = rc.getEntityManager();
 		this.loggedIns         = ec.getRoom(roomId);
 		Room              room = rc.getById(roomId);
 		this.id          = room.getId();
 		this.description = room.getDescription();
 		this.name        = room.getName();
-		if( (room.getCategories() != null) && (room.getCategories().size() > 0 ) && room.getCategories().get(0).getCategoryType().equals("smartRoom") ) {
-			isSmartRoom = true;
+		this.rows        = room.getRows();
+		this.places      = room.getPlaces();
+		if( room.getRoomType().equals("smartRoom") ) {
 			Category category = room.getCategories().get(0);
-			this.users   = category.getUsers();
+			this.users   = new ArrayList<User>();
+			for( User user : category.getUsers() ) {
+				if( user.getRole().equals("students")) {
+					this.users.add(user);
+				}
+			}
 			this.groups  = category.getGroups();
 			this.devices = category.getDevices();
 		} else {
 			this.devices = room.getDevices();
-			this.rows    = room.getRows();
-			this.places  = room.getPlaces();
 			this.users   = new ArrayList<User>();
 		}
-		for(List<Long> loggedIn : loggedIns) {
+		for(List<Long> loggedIn : this.loggedIns) {
 			User   user    = uc.getById(loggedIn.get(0));
 			Device device  = dc.getById(loggedIn.get(1));
 			if( user != null && !this.users.contains(user) ) {
@@ -72,7 +73,7 @@ public class SmartRoom {
 				this.devices.add(device);
 			}
 		}
-		//If this is a smart room, we have to organize the devices.
+		/*If this is a smart room, we have to organize the devices.
 		if( isSmartRoom ) {
 			int workstationCount = (this.devices.size() > this.users.size()) ?  this.devices.size() : this.users.size();
 			int availablePlaces  = room.getPlaces() * room.getRows();
@@ -116,7 +117,7 @@ public class SmartRoom {
 					dc.setConfig(device, "smartRoom-" + this.id + "-coordinates", String.format("%d,%d", r,p));
 				}
 			}
-		}
+		}*/
 		this.accessInRooms = rc.getAccessStatus(roomId);
 	}
 

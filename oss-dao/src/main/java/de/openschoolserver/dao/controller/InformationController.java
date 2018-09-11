@@ -583,23 +583,24 @@ public class InformationController extends Controller {
 	 */
 	public List<Category> getInfoCategories() {
 		CategoryController categoryController = new CategoryController(this.session);
-		if( this.isSuperuser() ) {
-			return categoryController.getByType("informations");
-		}
-		try {
-			logger.debug("User getCategories:" +new ObjectMapper().writeValueAsString(this.session.getUser().getCategories()));
-			logger.debug("User getOwnedCategories:" +new ObjectMapper().writeValueAsString(this.session.getUser().getOwnedCategories()));
-			logger.debug("Information Categories:" +new ObjectMapper().writeValueAsString(categoryController.getByType("informations")));
-		} catch (Exception e) {
-			logger.debug( "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }" );
-		}
+		boolean isSuperuser = this.isSuperuser();
 		List<Category> categories = new ArrayList<Category>();
 		for(Category category : this.session.getUser().getOwnedCategories() ) {
 			categories.add(category);
 		}
 		for(Category category : categoryController.getByType("informations") ) {
-			if( category.isPublicAccess()	) {
-				categories.add(category);
+			if(isSuperuser ||  category.isPublicAccess() ) {
+				if( !categories.contains(category) ) {
+					categories.add(category);
+				}
+			}
+		}
+		for(Category category : categoryController.getByType("smartRoom") ) {
+			logger.debug("getInfoCategories smartRoom:" + category );
+			if( isSuperuser ||  category.isPublicAccess() ) {
+				if( !categories.contains(category) ) {
+					categories.add(category);
+				}
 			}
 		}
 		return categories;

@@ -31,10 +31,9 @@ public class EducationController extends Controller {
 		super(session);
 	}
 
-	/*
+	/* 
 	 * Return the Category to a smart room
 	 */
-	
 	public Category getCategoryToRoom(Long roomId){
 		EntityManager   em = getEntityManager();
 		Room room;
@@ -53,6 +52,19 @@ public class EducationController extends Controller {
 			}
 		}
 		return null;
+	}
+
+	public List<Room> getMySmartRooms() {
+		List<Room> smartRooms = new ArrayList<Room>();
+		for( Category category  : new CategoryController(session).getByType("smartRoom") ) {
+			if( category.isPublicAccess() || category.getOwner().equals(session.getUser())) {
+				logger.debug("getMySamrtRooms" + category);
+				if( category.getRooms() != null && category.getRooms().size() > 0 ) {
+					smartRooms.add(category.getRooms().get(0));
+				}
+			}
+		}
+		return smartRooms;
 	}
 
 	/**
@@ -83,14 +95,11 @@ public class EducationController extends Controller {
 			}
 		} else {
 			rooms.add(this.session.getRoom());
-		}
-		for( Category category : this.session.getUser().getCategories() ) {
-			for( Room room : category.getRooms() ) {
-				if( room.getRoomType().equals("smartRoom")) {
-					rooms.add(room);
-				}
+			if( this.session.getRoom().getRoomControl().equals("inRoom")) {
+				return rooms;
 			}
 		}
+		rooms.addAll(this.getMySmartRooms());
 		return rooms;
 	}
 
@@ -210,7 +219,7 @@ public class EducationController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK","Smart Room was modified succesfully.");
 	}
-	
+
 	public OssResponse deleteSmartRoom(Long roomId) {
 		EntityManager   em = getEntityManager();
 		try {
@@ -231,7 +240,7 @@ public class EducationController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Smart Room was deleted succesfully.");
 	}
 
-	
+
 	/*
 	 * Get the list of users which are logged in a room or smart room
 	 * If a user of a smart room is not logged on the device id is 0L;
@@ -402,7 +411,7 @@ public class EducationController extends Controller {
 			newFileName.append(fileName);
 			File newFile = new File( newFileName.toString() );
 			Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			
+
 			// Set owner
 			UserPrincipal owner = lookupService.lookupPrincipalByName(user.getUid());
 			Files.setOwner(importDir.toPath(), owner);
@@ -494,7 +503,7 @@ public class EducationController extends Controller {
 
 		/*
 		* This is a very special action
-		*/		
+		*/
 		if( action.equals("organizeRoom")) {
 			return new RoomController(session).organizeRoom(roomId);
 		}
@@ -591,8 +600,7 @@ public class EducationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
-		}	
+		}
 		return new OssResponse(this.getSession(),"OK", "Now you have the control for the selected room.");
-
 	}
 }

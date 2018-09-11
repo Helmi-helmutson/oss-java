@@ -18,6 +18,7 @@ import javax.validation.ValidatorFactory;
 
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Enumerate;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
@@ -141,7 +142,11 @@ public class GroupController extends Controller {
 		this.startPlugin("add_group", group);
 		if( group.getGroupType().equals("workgroup") ) {
 			logger.debug("Add creator to member");
+			createSmartRoomForGroup(group,true,false);
 			addMember(group,this.session.getUser());
+		}
+		if(group.getGroupType().equals("class")) {
+			createSmartRoomForGroup(group,true,true);
 		}
 		return new OssResponse(this.getSession(),"OK","Group was created.",group.getId());
 	}
@@ -415,5 +420,22 @@ public class GroupController extends Controller {
 			}
 		}
 		return new OssResponse(this.getSession(),"OK","Class directories was cleaned.");
-	}	
+	}
+
+	public OssResponse createSmartRoomForGroup(Long groupId, boolean studentsOnly, boolean publicAccess) {
+		Group group = this.getById(groupId);
+		return createSmartRoomForGroup(group,studentsOnly,publicAccess);
+	}
+
+	public OssResponse createSmartRoomForGroup(Group group, boolean studentsOnly, boolean publicAccess) {
+		Category category = new Category();
+		category.setName(group.getName());
+		category.setDescription(group.getDescription());
+		category.setCategoryType("smartRoom");
+		category.setStudentsOnly(studentsOnly);
+		category.setPublicAccess(publicAccess);
+		category.setGroupIds(new ArrayList<Long>());
+		category.getGroupIds().add(group.getId());
+		return new EducationController(this.session).createSmartRoom(category);
+	}
 }

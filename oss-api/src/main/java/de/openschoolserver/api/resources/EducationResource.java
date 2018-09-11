@@ -202,7 +202,7 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Room> getMySamrtRooms(
+    List<Room> getMySmartRooms(
             @ApiParam(hidden = true) @Auth Session session
     );
 
