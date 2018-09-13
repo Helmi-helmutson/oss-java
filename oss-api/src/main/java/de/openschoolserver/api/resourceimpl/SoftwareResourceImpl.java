@@ -359,4 +359,19 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public Category getInstallation(Session session, long installationId) {
 		return new CategoryController(session).getById(installationId);
 	}
+
+	@Override
+	public List<Map<String, String>> listUpdatesForSoftwarePackages(Session session) {
+		return new SoftwareController(session).listUpdatesForSoftwarePackages();
+	}
+
+	@Override
+	public OssResponse updatesSoftwares(Session session, List<String> softwares) {
+		return new SoftwareController(session).updatesSoftwares(softwares);
+	}
+
+	@Override
+	public OssResponse deleteDownloadedSoftwares(Session session, List<String> softwares) {
+		return new SoftwareController(session).deleteDownloadedSoftwares(softwares);
+	}
 }
