@@ -3,7 +3,7 @@
 . /etc/sysconfig/schoolserver
 
 #Create a session for local services
-LOCAL_TOKEN=$( grep -q de.openschoolserver.api.auth.localhost= /opt/oss-java/conf/oss-api.properties )
+LOCAL_TOKEN=$( grep 'de.openschoolserver.api.auth.localhost=localhost_' /opt/oss-java/conf/oss-api.properties )
 if [ -z "${LOCAL_TOKEN}" -o "${SCHOOL_RESET_REGISTER_PASSWORD}" = "yes" ]; then
 	grep -q de.openschoolserver.api.auth.localhost= /opt/oss-java/conf/oss-api.properties || echo de.openschoolserver.api.auth.localhost=TOKEN >> /opt/oss-java/conf/oss-api.properties
 	TOKEN="localhost_"$(uuidgen)
