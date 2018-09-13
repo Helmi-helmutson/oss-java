@@ -99,6 +99,7 @@ public class Controller extends Config {
 		query.setParameter("uid", name);
 		List<User> user = (List<User>) query.getResultList();
 		if( ! user.isEmpty() ){
+			logger.debug("Found user " + user);
 			em.close();
 			return false;
 		}
@@ -106,6 +107,7 @@ public class Controller extends Config {
 		query.setParameter("name", name);
 		List<Group> group = (List<Group>) query.getResultList();
 		if( ! group.isEmpty() ){
+			logger.debug("Found group " + group );
 			em.close();
 			return false;
 		}
@@ -113,6 +115,7 @@ public class Controller extends Config {
 		query.setParameter("name", name);
 		List<Device> device = (List<Device>) query.getResultList();
 		if( ! device.isEmpty() ){
+			logger.debug("Found device " + device );
 			em.close();
 			return false;
 		}
@@ -120,6 +123,7 @@ public class Controller extends Config {
 		query.setParameter("name", name);
 		List<Room> room = (List<Room>) query.getResultList();
 		if( ! room.isEmpty() ){
+			logger.debug("Found room " + room );
 			em.close();
 			return false;
 		}
@@ -225,6 +229,7 @@ public class Controller extends Config {
 			case "modify_group":
 				data.append(String.format("name: %s%n", group.getName()));
 				data.append(String.format("description: %s%n", group.getDescription()));
+				data.append(String.format("groupType: %s%n", group.getGroupType()));
 				break;
 			case "delete_group":
 				data.append(String.format("name: %s%n", group.getName()));
