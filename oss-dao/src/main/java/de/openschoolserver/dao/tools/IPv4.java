@@ -83,6 +83,10 @@ public class IPv4 {
 
 	static public boolean validateIPAddress(String IPAddress) {
 
+		if( IPAddress == null ) {
+			return false;
+		}
+
 		if (IPAddress.startsWith("0")) {
 			return false;
 		}
@@ -100,6 +104,10 @@ public class IPv4 {
 	}
 
 	static public boolean validateMACAddress(String MACAddress) {
+
+		if (MACAddress == null ) {
+			return false;
+		}
 
 		if (MACAddress.isEmpty()) {
 			return false;
