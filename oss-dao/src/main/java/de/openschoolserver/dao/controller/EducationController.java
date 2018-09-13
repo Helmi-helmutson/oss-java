@@ -225,11 +225,17 @@ public class EducationController extends Controller {
 		try {
 			em.getTransaction().begin();
 			Room room         = em.find(Room.class, roomId);
-			Category category = room.getCategories().get(0);
-			em.merge(room);
+			for( Category category : room.getCategories() ) {
+				if( category.getCategoryType().equals("smartRoom") && category.getName().equals(room.getName()) ) {
+					User owner = category.getOwner();
+					if( owner != null ) {
+						owner.getCategories().remove(category);
+						em.merge(owner);
+					}
+					em.remove(category);
+				}
+			}
 			em.remove(room);
-			em.merge(category);
-			em.remove(category);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
