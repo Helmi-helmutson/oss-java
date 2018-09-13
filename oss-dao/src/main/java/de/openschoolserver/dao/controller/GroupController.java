@@ -23,6 +23,7 @@ import de.openschoolserver.dao.Enumerate;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Room;
 
 @SuppressWarnings( "unchecked" )
 public class GroupController extends Controller {
@@ -189,7 +190,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR","This group must not be deleted.");
 		}
 		if( !this.mayModify(group) ) {
-       return new OssResponse(this.getSession(),"ERROR","You must not delete this group.");
+			return new OssResponse(this.getSession(),"ERROR","You must not delete this group.");
         }
 		//Primary group must not be deleted if there are member
 		if( group.getGroupType().equals("primary")) {
@@ -204,9 +205,24 @@ public class GroupController extends Controller {
 			if( !em.contains(group)) {
 				group = em.merge(group);
 			}
+			for ( Category category : group.getCategories() ) {
+				if( category.getCategoryType().equals("smartRoom") && category.getName().equals(group.getName()) ) {
+					for( Room room : category.getRooms() ) {
+						if( room.getRoomType().equals("smartRoom") && room.getName().equals(group.getName())) {
+							em.remove(room);
+						}
+					}
+					User owner = category.getOwner();
+					if( owner != null ) {
+						owner.getCategories().remove(category);
+						em.merge(owner);
+					}
+					em.remove(category);
+				}
+			}
 			em.remove(group);
 			em.getTransaction().commit();
-			em.getEntityManagerFactory().getCache().evictAll();
+			//em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -428,6 +444,11 @@ public class GroupController extends Controller {
 	}
 
 	public OssResponse createSmartRoomForGroup(Group group, boolean studentsOnly, boolean publicAccess) {
+		for ( Category cat : group.getCategories() ) {
+			if( cat.getCategoryType().equals("smartRoom") && cat.getName().equals(group.getName()) ) {
+				return new OssResponse(this.getSession(),"OK","Smart room is for this group already created.");
+			}
+		}
 		Category category = new Category();
 		category.setName(group.getName());
 		category.setDescription(group.getDescription());
