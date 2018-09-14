@@ -266,6 +266,12 @@ public class SoftwareController extends Controller {
 						software.setSourceAvailable(true);
 						softwares.add(software);
 					}
+				} else {
+					f = new File(SALT_PACKAGE_DIR + software.getName() + ".sls" );
+					if( f.exists() ) {
+						software.setSourceAvailable(true);
+						softwares.add(software);
+					}
 				}
 			}
 		}
