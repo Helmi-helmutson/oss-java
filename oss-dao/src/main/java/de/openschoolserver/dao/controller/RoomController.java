@@ -533,6 +533,16 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Access state in %s was set succesfully.",null,room.getName() );
 	}
 
+
+	public OssResponse setDefaultAccess() {
+		EntityManager em = getEntityManager();
+		Query query = em.createNamedQuery("AccessInRoom.findByType");
+		query.setParameter("accessType", "DEF");
+		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
+			this.setAccessStatus(access.getRoom(), access);
+		}
+		return null;
+	}
 	/*
 	 * Sets the scheduled access status in all rooms
 	 */
@@ -1240,4 +1250,5 @@ public class RoomController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK","Acces was deleted succesfully");	
 	}
+
 }

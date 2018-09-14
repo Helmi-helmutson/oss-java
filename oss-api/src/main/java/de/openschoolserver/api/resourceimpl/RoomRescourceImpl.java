@@ -125,6 +125,13 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
+	public OssResponse setDefaultAccess(Session session) {
+		// TODO Auto-generated method stub
+		final RoomController roomController = new RoomController(session);
+		return roomController.setDefaultAccess();
+	}
+
+	@Override
 	public List<AccessInRoom> getAccessStatus(Session session) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
