@@ -120,8 +120,10 @@ public class CategoryController extends Controller {
 			em.getTransaction().commit();
 			logger.debug("Created Category:" + category );
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("Exeption: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Category was created",category.getId());
 	}
@@ -140,6 +142,8 @@ public class CategoryController extends Controller {
 		Category oldCategory = this.getById(category.getId());
 		oldCategory.setDescription(category.getDescription());
 		oldCategory.setName(category.getName());
+		oldCategory.setStudentsOnly(category.getStudentsOnly());
+		oldCategory.setPublicAccess(category.isPublicAccess());
 		try {
 			em.getTransaction().begin();
 			em.merge(oldCategory);
@@ -296,13 +300,13 @@ public class CategoryController extends Controller {
 
 	public OssResponse addMember(Long categoryId, String objectName,Long objectId ) {
 		EntityManager em = getEntityManager();
-		Category category = this.getById(categoryId);
 		boolean changes = false;
 		try {
+			Category category = em.find(Category.class, categoryId);
 			em.getTransaction().begin();
 			switch(objectName.toLowerCase()){
 			case("device"):
-				Device device = new DeviceController(this.session).getById(objectId);
+				Device device = em.find(Device.class, objectId);
 				if(!category.getDevices().contains(device)) {
 					category.getDevices().add(device);
 					device.getCategories().add(category);
@@ -311,7 +315,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("group"):
-				Group group = new GroupController(this.session).getById(objectId);
+				Group group = em.find(Group.class, objectId);
 				if(!category.getGroups().contains(group)) {
 					category.getGroups().add(group);
 					group.getCategories().add(category);
@@ -320,7 +324,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("hwconf"):
-				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
+				HWConf hwconf = em.find(HWConf.class, objectId);
 				if(!category.getHWConfs().contains(hwconf)) {
 					category.getHWConfs().add(hwconf);
 					hwconf.getCategories().add(category);
@@ -329,7 +333,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("room"):
-				Room room = new RoomController(this.session).getById(objectId);
+				Room room = em.find(Room.class, objectId);
 				if(!category.getRooms().contains(room)) {
 					category.getRooms().add(room);
 					room.getCategories().add(category);
@@ -338,7 +342,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("software"):
-				Software software = new SoftwareController(this.session).getById(objectId);
+				Software software = em.find(Software.class, objectId);
 				if(!category.getSoftwares().contains(software)) {
 					category.getSoftwares().add(software);
 					software.getCategories().add(category);
@@ -347,7 +351,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("user"):
-				User user = new UserController(this.session).getById(objectId);
+				User user = em.find(User.class, objectId);
 				if(!category.getUsers().contains(user)) {
 					category.getUsers().add(user);
 					user.getCategories().add(category);
@@ -356,7 +360,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("faq"):
-				FAQ faq = new InformationController(this.session).getFAQById(objectId);
+				FAQ faq = em.find(FAQ.class, objectId);
 				if(!category.getFaqs().contains(faq)) {
 					category.getFaqs().add(faq);
 					faq.getCategories().add(category);
@@ -365,7 +369,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("announcement"):
-				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
+				Announcement info = em.find(Announcement.class, objectId);
 				if(!category.getAnnouncements().contains(info)) {
 					category.getAnnouncements().add(info);
 					info.getCategories().add(category);
@@ -374,7 +378,7 @@ public class CategoryController extends Controller {
 				}
 			break;
 			case("contact"):
-				Contact contact = new InformationController(this.session).getContactById(objectId);
+				Contact contact = em.find(Contact.class, objectId);
 				if(!category.getContacts().contains(contact)) {
 					category.getContacts().add(contact);
 					contact.getCategories().add(category);
@@ -388,7 +392,7 @@ public class CategoryController extends Controller {
 				em.getTransaction().commit();
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("addMember: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();
@@ -397,45 +401,45 @@ public class CategoryController extends Controller {
 	}
 
 	public OssResponse deleteMember(Long categoryId, String objectName, Long objectId ) {
-		Category category = this.getById(categoryId);
 		EntityManager em = getEntityManager();
 		try {
+			Category category = em.find(Category.class, categoryId);
 			em.getTransaction().begin();
-			switch(objectName){
-			case("Device"):
-				Device device = new DeviceController(this.session).getById(objectId);
+			switch(objectName.toLowerCase()){
+			case("device"):
+				Device device = em.find(Device.class, objectId);
 				if(category.getDevices().contains(device)) {
 					category.getDevices().remove(device);
 					device.getCategories().remove(category);
 					em.merge(device);
 				}
 			break;
-			case("Group"):
-				Group group = new GroupController(this.session).getById(objectId);
+			case("group"):
+				Group group = em.find(Group.class, objectId);
 				if(category.getGroups().contains(group)) {
 					category.getGroups().remove(group);
 					group.getCategories().remove(category);
 					em.merge(group);
 				}
 			break;
-			case("HWConf"):
-				HWConf hwconf = new CloneToolController(this.session).getById(objectId);
+			case("hwconf"):
+				HWConf hwconf = em.find(HWConf.class, objectId);
 				if(category.getHWConfs().contains(hwconf)) {
 					category.getHWConfs().remove(hwconf);
 					hwconf.getCategories().remove(category);
 					em.merge(hwconf);
 				}
 			break;
-			case("Room"):
-				Room room = new RoomController(this.session).getById(objectId);
+			case("room"):
+				Room room = em.find(Room.class, objectId);
 				if(category.getRooms().contains(room)) {
 					category.getRooms().remove(room);
 					room.getCategories().remove(category);
 					em.merge(room);
 				}
 			break;
-			case("Software"):
-				Software software = new SoftwareController(this.session).getById(objectId);
+			case("software"):
+				Software software = em.find(Software.class, objectId);
 				if( category.getSoftwares().contains(software) ) {
 					category.getSoftwares().remove(software);
 					category.getRemovedSoftwares().add(software);
@@ -444,32 +448,32 @@ public class CategoryController extends Controller {
 					em.merge(software);
 				}
 			break;
-			case("User"):
-				User user = new UserController(this.session).getById(objectId);
+			case("user"):
+				User user = em.find(User.class, objectId);
 				if( category.getUsers().contains(user)) {
 					category.getUsers().remove(user);
 					user.getCategories().remove(category);
 					em.merge(user);
 				}
 			break;
-			case("FAQ"):
-				FAQ faq = new InformationController(this.session).getFAQById(objectId);
+			case("faq"):
+				FAQ faq = em.find(FAQ.class, objectId);
 				if(category.getFaqs().contains(faq) ) {
 					category.getFaqs().remove(faq);
 					faq.getCategories().remove(category);
 					em.merge(faq);
 				}
 			break;
-			case("Announcement"):
-				Announcement info = new InformationController(this.session).getAnnouncementById(objectId);
+			case("announcement"):
+				Announcement info = em.find(Announcement.class, objectId);
 				if( category.getAnnouncements().contains(info)) {
 					category.getAnnouncements().remove(info);
 					info.getCategories().remove(category);
 					em.merge(info);
 				}
 			break;
-			case("Contact"):
-				Contact contact = new InformationController(this.session).getContactById(objectId);
+			case("contact"):
+				Contact contact = em.find(Contact.class, objectId);
 				if( category.getContacts().contains(contact)) {
 					category.getContacts().remove(contact);
 					contact.getCategories().remove(category);

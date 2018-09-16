@@ -3,8 +3,6 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.ArrayList;
 import java.util.List;
-
-
 import de.openschoolserver.api.resources.AdHocLanResource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
@@ -71,6 +69,11 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
+	public OssResponse deleteObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
+		return new AdHocLanController(session).deleteObjectIntoRoom(roomId,objectType,objectId);
+	}
+
+	@Override
 	public List<Device> getDevices(Session session) {
 		return ( session.getUser().getOwnedDevices() == null ? session.getUser().getOwnedDevices() : new ArrayList<Device>()) ;
 	}
@@ -97,7 +100,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public OssResponse turnOn(Session session, Long roomId) {
-		RoomController roomController = new RoomController(session);
+		final RoomController roomController = new RoomController(session);
 		Room room = roomController.getById(roomId);
 		Category category = new Category();
 		category.setCategoryType("AdHocAccess");
@@ -135,6 +138,42 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 			}
 		}
 		return groups;
+	}
+
+	@Override
+	public Room getRoomById(Session session, Long roomId) {
+		final RoomController roomController = new RoomController(session);
+		Room room = roomController.getById(roomId);
+		if( room == null ) {
+			return null;
+		}
+		if( room.getRoomType().equals("AdHocAccess")) {
+			return room;
+		}
+		return null;
+	}
+
+	@Override
+	public OssResponse modify(Session session, Long roomId, Room room) {
+		final RoomController rc =  new RoomController(session);
+		Room oldRoom = rc.getById(roomId);
+		if( !oldRoom.getRoomType().equals("AdHocAccess")) {
+			return new OssResponse(session,"ERROR","This is not an AdHocLan room");
+		}
+		room.setId(oldRoom.getId());
+		return rc.modify(oldRoom);
+	}
+
+	@Override
+	public boolean getStudentsOnly(Session session, Long roomId) {
+		return new AdHocLanController(session).getAdHocCategoryOfRoom(roomId).getStudentsOnly();
+	}
+
+	@Override
+	public OssResponse setStudentsOnly(Session session, Long roomId, boolean studentsOnly) {
+		Category category = new AdHocLanController(session).getAdHocCategoryOfRoom(roomId);
+		category.setStudentsOnly(studentsOnly);
+		return new CategoryController(session).modify(category);
 	}
 
 }

@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @NamedQueries( {
     @NamedQuery(name="AccessInRoom.findAll",            query="SELECT a FROM AccessInRoom a"),
     @NamedQuery(name="AccessInRoom.findByRoom",         query="SELECT a FROM AccessInRoom a WHERE a.room = :room"),
+    @NamedQuery(name="AccessInRoom.findByType",         query="SELECT a FROM AccessInRoom a WHERE a.accessType = :accessType"),
     @NamedQuery(name="AccessInRoom.findActualAccesses", query="SELECT a FROM AccessInRoom a WHERE a.pointInTime = :time")
 })
 

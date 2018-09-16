@@ -332,6 +332,22 @@ public interface UserResource {
             @PathParam("attribute") String attribute
   );
 
+    /*
+     * GET users/byRole/<role>
+     */
+    @GET
+    @Path("uidsByRole/{role}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get users from a rolle")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("user.search")
+    String getUidsByRole(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("role") String role
+    );
+
 
     /*
      * Mange gast user
@@ -585,6 +601,21 @@ OssResponse addGuestUsers(
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("user.search")
     UserImport getRunningImport(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+
+/*
+ * Some additional stuff
+ */
+@PUT
+@Path("allTeachersInAllClasses")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of imports.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.search")
+    OssResponse allTeachersInAllClasses(
             @ApiParam(hidden = true) @Auth Session session
     );
 

@@ -76,6 +76,7 @@ public class AdHocLanController extends Controller {
 		if( ossResponseRoom.getCode().equals("ERROR")) {
 			return ossResponseRoom;
 		}
+		Long roomId = ossResponseRoom.getObjectId();
 		Category category = new Category();
 		category.setCategoryType("AdHocAccess");
 		category.setName(room.getName());
@@ -89,10 +90,16 @@ public class AdHocLanController extends Controller {
 			roomConrtoller.delete(ossResponseRoom.getObjectId());
 			return ossResponseCategory;
 		}
-		ossResponseCategory = categoryController.addMember(ossResponseCategory.getObjectId(), "Room", ossResponseRoom.getObjectId());
+		Long categoryId = ossResponseCategory.getObjectId();
+		ossResponseCategory = categoryController.addMember(categoryId, "Room", roomId);
+		logger.debug("Add room to Category:"+ categoryId + " " + roomId);
 		if( ossResponseCategory.getCode().equals("ERROR")) {
-			roomConrtoller.delete(ossResponseRoom.getObjectId());
-			categoryController.delete(ossResponseCategory.getObjectId());
+			if( ossResponseRoom.getObjectId() != null ) {
+				roomConrtoller.delete(ossResponseRoom.getObjectId());
+			}
+			if( ossResponseCategory.getObjectId() != null ) {
+				categoryController.delete(ossResponseCategory.getObjectId());
+			}
 			return ossResponseCategory;
 		}
 		return ossResponseRoom;
@@ -104,6 +111,15 @@ public class AdHocLanController extends Controller {
 			return new OssResponse(session,"ERROR","AdHocAccess not found");
 		}
 		return new CategoryController(session).addMember(categoryId, objectType, objectId);
+	}
+
+
+	public OssResponse deleteObjectIntoRoom(Long roomId, String objectType, Long objectId) {
+		Long categoryId = getAdHocCategoryOfRoom(roomId).getId();
+		if( categoryId == null ) {
+			return new OssResponse(session,"ERROR","AdHocAccess not found");
+		}
+		return new CategoryController(session).deleteMember(categoryId, objectType, objectId);
 	}
 }
 

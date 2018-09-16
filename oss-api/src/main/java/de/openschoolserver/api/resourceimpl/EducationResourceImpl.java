@@ -54,14 +54,9 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<Room> getMySamrtRooms(Session session) {
-		List<Room> smartRooms = new ArrayList<Room>();
-		for( Category category : session.getUser().getCategories() ) {
-			if(category.getCategoryType().equals("smartRoom")) {
-				smartRooms.add(category.getRooms().get(0));
-			}
-		}
-		return smartRooms;
+	public List<Room> getMySmartRooms(Session session) {
+		return new EducationController(session).getMySmartRooms();
+
 	}
 
 	@Override
@@ -378,9 +373,13 @@ public class EducationResourceImpl implements Resource, EducationResource {
 					ossActionMap.getStringValue(),
 					ossActionMap.isBooleanValue());
 		case "setFilesystemQuota":
-			break;
+			return  userController.setFsQuota(
+					ossActionMap.getUserIds(),
+					ossActionMap.getLongValue());
 		case "setMailsystemQuota":
-			break;
+			return  userController.setMsQuota(
+					ossActionMap.getUserIds(),
+					ossActionMap.getLongValue());
 		case "disableLogin":
 			return  userController.disableLogin(
 					ossActionMap.getUserIds(),
@@ -565,5 +564,22 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public SmartRoom getRoomDetails(Session session, Long roomId) {
 		return new SmartRoom(session,roomId);
+	}
+
+	@Override
+	public OssResponse manageGroup(Session session, Long groupId, String action) {
+		GroupController gc = new GroupController(session);
+		Group group = gc.getById(groupId);
+		switch(action.toLowerCase()) {
+		case "turnsmartroom":
+			return gc.createSmartRoomForGroup(group, true, true);
+		}
+		return null;
+	}
+
+	@Override
+	public OssResponse manageGroup(Session session, Long groupId, String action, Map<String, String> actionContent) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

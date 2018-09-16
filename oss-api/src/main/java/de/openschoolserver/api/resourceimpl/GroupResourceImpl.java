@@ -83,20 +83,22 @@ public class GroupResourceImpl implements GroupResource {
 	@Override
 	public String getMembersText(Session session, String groupName) {
 		List<String> member = new ArrayList<String>();
-		Group group = new GroupController(session).getByName(groupName);
+		final GroupController gc = new GroupController(session);
+		Group group = gc.getByName(groupName);
 		for(User user : group.getUsers() ) {
 			member.add(user.getUid());
 		}
-		return String.join("\n",member);
+		return String.join(gc.getNl(),member);
 	}
 
 	@Override
 	public String getByTypeText(Session session, String type) {
 		List<String> groups = new ArrayList<String>();
-		for( Group group : new GroupController(session).getByType(type)) {
+		final GroupController gc = new GroupController(session);
+		for( Group group : gc.getByType(type)) {
 			groups.add(group.getName());
 		}
-		return String.join("\n",groups);
+		return String.join(gc.getNl(),groups);
 	}
 
 	@Override

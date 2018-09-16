@@ -122,7 +122,7 @@ public class ProxyController extends Controller {
 				for(int i=1; i < values.length; i++ ) {
 					String key = values[i].split(":")[0];
 					boolean enabled = values[i].split(":")[1].equals("true");
-					if( key != "good" && key != "bad" && key != "cephalix" ) {
+					if( !key.equals("good") && !key.equals("bad") && !key.equals("cephalix") ) {
 						ProxyRule proxyRule = new ProxyRule(
 							key,
 							enabled,

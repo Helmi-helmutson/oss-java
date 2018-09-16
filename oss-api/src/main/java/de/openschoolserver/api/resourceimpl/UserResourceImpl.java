@@ -461,4 +461,26 @@ public class UserResourceImpl implements UserResource {
 		return new UserController(session).syncMsQuotas(Quotas);
 	}
 
+	@Override
+	public String getUidsByRole(Session session, String role) {
+		final UserController userController = new UserController(session);
+		List<String> users = new ArrayList<String>();
+		for( User user : userController.getByRole(role) ) {
+			users.add(user.getUid());
+		}
+		return String.join(userController.getNl(),users);
+	}
+
+	@Override
+	public OssResponse allTeachersInAllClasses(Session session) {
+		final UserController userController = new UserController(session);
+		final GroupController groupController = new GroupController(session);
+		for( User user : userController.getByRole("teachers") ) {
+			for( Group group : groupController.getByType("class")) {
+				groupController.addMember(group, user);
+			}
+		}
+		return new OssResponse(session,"OK", "All teachers was put into all classes.");
+	}
+
 }

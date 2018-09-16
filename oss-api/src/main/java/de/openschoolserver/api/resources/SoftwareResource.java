@@ -2,7 +2,6 @@
 package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.*;
-import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import java.io.InputStream;
 import java.util.List;
@@ -350,6 +349,24 @@ public interface SoftwareResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("softwareName") String softwareName
             );
+
+    /*
+     * DELET softwares/downloaded/{softwareName}
+     */
+    @POST
+    @Path("deleteDownloadedSoftwares")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delets software downloaded from the CEPHALIX repository.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No category was found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator"),
+            @ApiResponse(code = 600, message = "Connection to CEPHALIX software repository server is broken.")})
+    @RolesAllowed("software.download")
+    OssResponse deleteDownloadedSoftwares(
+            @ApiParam(hidden = true) @Auth Session session,
+            List<String> softwares
+            );
+
     /*
      * GET softwares/downloadStatus
      */
@@ -386,6 +403,46 @@ public interface SoftwareResource {
     List<Map<String,String>> listDownloadedSoftware(
             @ApiParam(hidden = true) @Auth Session session
     );
+
+    /*
+     * POST softwares/listUpdatesForSoftwarePackages
+     */
+    @POST
+    @Path("listUpdatesForSoftwarePackages")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "List the status of the downloaded software. ",
+            notes = "This call delivers a list of maps of the downloaded software.<br>"
+            + "[ {<br>"
+            + "    name : name of the software,<br>"
+            + "    versions : the new version of the software,<br>"
+            + "} ]")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No category was found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<Map<String,String>> listUpdatesForSoftwarePackages(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+
+    /*
+     * POST softwares/updatesSoftwares ['afasd','afasds','dsfasdfs']
+     */
+    @POST
+    @Path("updatesSoftwares")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Downloads softwares from the CEPHALIX repository.",
+    notes = "The call must provide a list of softwares to be downloaded: "
+            + "[ \"MSWhatever\", \"AnOtherProgram\" ] "
+            + "The requirements will be solved automaticaly.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No category was found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator"),
+            @ApiResponse(code = 600, message = "Connection to CEPHALIX software repository server is broken.")})
+    @RolesAllowed("software.download")
+    OssResponse updatesSoftwares(
+            @ApiParam(hidden = true) @Auth Session session,
+            List<String> softwares
+            );
 
     /**
      * Creates the salt state files for the minions.
