@@ -604,4 +604,19 @@ OssResponse addGuestUsers(
             @ApiParam(hidden = true) @Auth Session session
     );
 
+/*
+ * Some additional stuff
+ */
+@PUT
+@Path("allTeachersInAllClasses")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Get the list of imports.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.search")
+    OssResponse allTeachersInAllClasses(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+
 }

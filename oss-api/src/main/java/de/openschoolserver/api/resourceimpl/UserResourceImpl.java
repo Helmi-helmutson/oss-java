@@ -471,4 +471,16 @@ public class UserResourceImpl implements UserResource {
 		return String.join(userController.getNl(),users);
 	}
 
+	@Override
+	public OssResponse allTeachersInAllClasses(Session session) {
+		final UserController userController = new UserController(session);
+		final GroupController groupController = new GroupController(session);
+		for( User user : userController.getByRole("teachers") ) {
+			for( Group group : groupController.getByType("class")) {
+				groupController.addMember(group, user);
+			}
+		}
+		return new OssResponse(session,"OK", "All teachers was put into all classes.");
+	}
+
 }
