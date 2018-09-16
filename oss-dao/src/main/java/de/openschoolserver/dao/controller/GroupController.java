@@ -310,8 +310,11 @@ public class GroupController extends Controller {
 	public OssResponse addMember(Group group, User user) {
 		EntityManager em = getEntityManager();
 		if( !this.mayModify(group) ) {
-       return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+			return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
         }
+		if( user.getGroups().contains(group)) {
+			return new OssResponse(this.getSession(),"OK","User %s is already member of group %s.",null,parameters );
+		}
 		group.getUsers().add(user);
 		if (user.getGroups()==null) {
 			user.setGroups(new ArrayList<Group>());
