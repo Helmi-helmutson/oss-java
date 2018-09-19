@@ -1271,7 +1271,7 @@ public class SoftwareController extends Controller {
 				continue;
 			}
 			List<String> deviceRemove  = new ArrayList<String>();
-			List<String> deviceGrains  = new ArrayList<String>();
+			//List<String> deviceGrains  = new ArrayList<String>();
 			List<String> deviceInstall = new ArrayList<String>();
 			List<String> deviceOssInst = new ArrayList<String>();
 			deviceRemove.add("packages.toremove:");
@@ -1328,13 +1328,13 @@ public class SoftwareController extends Controller {
 				filePath.append(softwareName).append(".sls");
 				File file = new File(filePath.toString());
 				if( file.exists() ) {
-					for( SoftwareLicense sl : device.getSoftwareLicenses() ) {
+					/* for( SoftwareLicense sl : device.getSoftwareLicenses() ) {
 						if( sl.getSoftware().equals(software) ) {
 							deviceGrains.add(softwareName + "_KEY");
 							deviceGrains.add("  grains.present:");
 							deviceGrains.add("    - value: " + sl.getValue());
 						}
-					}
+					}*/
 					/*
 					 * TODO to implement frozen versions.
 					 */
@@ -1362,7 +1362,7 @@ public class SoftwareController extends Controller {
 				deviceSls.addAll(deviceRemove);
 			}
 			deviceSls.addAll(deviceInstall);
-			deviceSls.addAll(deviceGrains);
+			//deviceSls.addAll(deviceGrains);
 			if( deviceOssInst.size() > 0 ) {
 				deviceSls.add("include:");
 				deviceSls.addAll(deviceOssInst);
@@ -1663,16 +1663,15 @@ public class SoftwareController extends Controller {
 	public String getSoftwareLicencesOnDevice(String deviceName) {
 
 		Device        device    =  new DeviceController(this.session).getByName(deviceName);
-		StringBuilder licenses = new StringBuilder();
+		Map<String,String>        licenses   = new HashMap<String,String>();
 		for( SoftwareLicense license : device.getSoftwareLicenses() ) {
-			licenses.append("LIC_");
-			licenses.append(license.getSoftware().getName());
-			licenses.append(" '");
-			licenses.append(license.getValue());
-			licenses.append("'");
-			licenses.append(this.getNl());
+			licenses.put("LIC_" + license.getSoftware().getName(), license.getValue());
 		}
-		return licenses.toString();
+		try {
+			return new ObjectMapper().writeValueAsString(licenses);
+		} catch (Exception e) {
+			return "";
+		}
 	}
 
 	public List<Software> getSoftwareStatusById(List<Long> softwareIds) {
