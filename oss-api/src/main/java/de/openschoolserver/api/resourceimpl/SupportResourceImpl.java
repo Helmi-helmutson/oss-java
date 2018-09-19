@@ -81,8 +81,11 @@ public class SupportResourceImpl implements SupportResource {
 				throw new WebApplicationException(response.getStatus());
 			}
 			parameters.add(supportRequest.getSubject());
-			parameters.add(response.readEntity(SupportRequest.class).getTicketno());
+			SupportRequest suppres = response.readEntity(SupportRequest.class);
+			
+			parameters.add(suppres.getTicketno());
 			parameters.add(supportRequest.getEmail());
+			parameters.add(suppres.getTicketResponseInfo());
 			return new OssResponse(session,"OK","Support request '%s' was created with ticket number '%s'. Answer will be sent to '%s'.",null,parameters);
 		} else {
 			// use classic email
