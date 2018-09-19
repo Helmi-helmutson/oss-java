@@ -1667,9 +1667,9 @@ public class SoftwareController extends Controller {
 		for( SoftwareLicense license : device.getSoftwareLicenses() ) {
 			softwares.append("'LIC_");
 			softwares.append(license.getSoftware().getName());
-			softwares.append("' '");
+			softwares.append("' ");
 			softwares.append(license.getValue());
-			softwares.append("'\\n");
+			softwares.append(this.getNl());
 		}
 		return softwares.toString();
 	}
