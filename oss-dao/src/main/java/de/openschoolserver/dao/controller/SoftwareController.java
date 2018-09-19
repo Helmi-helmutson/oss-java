@@ -1663,15 +1663,16 @@ public class SoftwareController extends Controller {
 	public String getSoftwareLicencesOnDevice(String deviceName) {
 
 		Device        device    =  new DeviceController(this.session).getByName(deviceName);
-		StringBuilder softwares = new StringBuilder();
+		StringBuilder licenses = new StringBuilder();
 		for( SoftwareLicense license : device.getSoftwareLicenses() ) {
-			softwares.append("'LIC_");
-			softwares.append(license.getSoftware().getName());
-			softwares.append("' ");
-			softwares.append(license.getValue());
-			softwares.append(this.getNl());
+			licenses.append("LIC_");
+			licenses.append(license.getSoftware().getName());
+			licenses.append(" '");
+			licenses.append(license.getValue());
+			licenses.append("'");
+			licenses.append(this.getNl());
 		}
-		return softwares.toString();
+		return licenses.toString();
 	}
 
 	public List<Software> getSoftwareStatusById(List<Long> softwareIds) {
