@@ -312,6 +312,9 @@ public class GroupController extends Controller {
 		if( !this.mayModify(group) ) {
 			return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
         }
+		parameters = new ArrayList<String>();
+		parameters.add(user.getUid());
+		parameters.add(group.getName());
 		if( user.getGroups().contains(group)) {
 			return new OssResponse(this.getSession(),"OK","User %s is already member of group %s.",null,parameters );
 		}
@@ -331,9 +334,6 @@ public class GroupController extends Controller {
 			em.close();
 		}
 		this.changeMemberPlugin("addmembers", group, user);
-		parameters = new ArrayList<String>();
-		parameters.add(user.getUid());
-		parameters.add(group.getName());
 		return new OssResponse(this.getSession(),"OK","User %s was added to group %s.",null,parameters );
 	}
 
