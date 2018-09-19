@@ -228,7 +228,7 @@ public interface SoftwareResource {
     @Path("{softwareId}/license")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Creates licences to a software" )
+    @ApiOperation( value = "Creates licence(s) to a software" )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -246,7 +246,7 @@ public interface SoftwareResource {
     @GET
     @Path("{softwareId}/license")
     @Produces(JSON_UTF8)
-    @ApiOperation( value = "Creates licences to a software" )
+    @ApiOperation( value = "Gets the licences to a software" )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
