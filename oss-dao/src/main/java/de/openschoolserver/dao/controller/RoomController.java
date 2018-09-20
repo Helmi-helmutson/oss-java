@@ -250,6 +250,8 @@ public class RoomController extends Controller {
 		room.setHwconf(hwconf);
 		room.setCreator(this.session.getUser());
 		hwconf.getRooms().add(room);
+		//AccessInRoom accessInRoom = new AccessInRoom(room);
+		new AccessInRoom(room);
 		try {
 			logger.debug("Create Room:" + room);
 			em.getTransaction().begin();
