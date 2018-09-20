@@ -92,6 +92,8 @@ INSERT INTO GroupInCategories Values(1,2);
 INSERT INTO GroupInCategories Values(2,3);
 INSERT INTO GroupInCategories Values(3,4);
 INSERT INTO GroupInCategories Values(4,5);
+#AccessInRooms
+INSERT INTO AccessInRooms Values(NULL,2,'DEF','06:00','Y','Y','Y','Y','Y','Y','Y','Y','N','N','N','N','N',NULL,1);
 
 #Standard ACLs
 INSERT INTO Enumerates VALUES(NULL,'apiAcl','myself.modify',6);
