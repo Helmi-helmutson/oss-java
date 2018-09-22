@@ -222,7 +222,11 @@ public class DeviceResourceImpl implements DeviceResource {
 	@Override
 	public String getDefaultPrinter(Session session, String IP) {
 		DeviceController deviceController = new DeviceController(session);
-		Device printer = deviceController.getDefaultPrinter(deviceController.getByIP(IP).getId());
+		Device device = deviceController.getByIP(IP);
+		if( device == null ) {
+			return "";
+		}
+		Device printer = deviceController.getDefaultPrinter(device.getId());
 		if( printer != null ) {
 			return printer.getName();
 		}
@@ -233,6 +237,9 @@ public class DeviceResourceImpl implements DeviceResource {
 	public String getAvailablePrinters(Session session, String IP) {
 		DeviceController deviceController = new DeviceController(session);
 		Device device = deviceController.getByIP(IP);
+		if( device == null ) {
+			return "";
+		}
 		List<String> printers = new ArrayList<String>();
 		for( Device printer : deviceController.getAvailablePrinters(device.getId()) ) {
 			printers.add(printer.getName());
