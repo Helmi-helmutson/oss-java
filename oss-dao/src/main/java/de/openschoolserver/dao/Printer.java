@@ -2,23 +2,48 @@ package de.openschoolserver.dao;
 
 import de.openschoolserver.dao.controller.*;
 import de.openschoolserver.dao.tools.*;
+
+import java.io.Serializable;
 import java.util.regex.*;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Printer {
-	
+@Entity
+@Table(name="Printers")
+@NamedQueries({
+	@NamedQuery(name="Printer.findAll",   query="SELECT p FROM Printer p"),
+	@NamedQuery(name="Printer.findAllId", query="SELECT p.id FROM Printer p"),
+	@NamedQuery(name="Printer.getPrinterByName", query="SELECT p FROM Printer p WHERE p.name = :name")
+})
+@SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
+public class Printer implements Serializable  {
+	private static final long serialVersionUID = 1L;
+
 	/*
 	 * Variables required for creating a printer
 	 */
+	@Id
+	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private Long      id;
+
+
 	private String    name;
 	private String    manufacturer;
 	private String    model;
 	private String    mac;
 	private Long      roomId;
 	private boolean   windowsDriver;
-	
+
 	/*
 	 * State variables
 	 */
@@ -26,8 +51,15 @@ public class Printer {
 	private boolean   acceptingJobs;
 	private int       activeJobs;
 
+	//bi-directional many-to-one association to HWConf
+	@ManyToOne
 	@JsonIgnore
-	private Device    device;	
+	private Device    device;
+
+	//bi-directional many-to-one association to User
+	@ManyToOne
+	@JsonIgnore
+	private User creator;
 
 	public Printer() {
 	}
@@ -61,7 +93,7 @@ public class Printer {
 		this.activeJobs = lines.length-2;
 		this.windowsDriver = false;
 	}
-	
+
 	public Printer(String name, DeviceController deviceController) {
 		this.name = name;
 		this.device = deviceController.getByName(name);
@@ -157,6 +189,4 @@ public class Printer {
 	public void setWindowsDriver(boolean windowsDriver) {
 		this.windowsDriver = windowsDriver;
 	}
-
-
 }
