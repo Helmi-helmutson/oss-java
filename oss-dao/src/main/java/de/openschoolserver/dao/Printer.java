@@ -51,7 +51,7 @@ public class Printer implements Serializable  {
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
-	privateUser creator;
+	private User creator;
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="availablePrinters",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
