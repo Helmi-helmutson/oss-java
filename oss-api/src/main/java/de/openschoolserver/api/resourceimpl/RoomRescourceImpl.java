@@ -5,6 +5,7 @@ import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.EducationController;
@@ -229,7 +230,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public Device getDefaultPrinter(Session session, long roomId) {
+	public Printer getDefaultPrinter(Session session, long roomId) {
 		return new RoomController(session).getById(roomId).getDefaultPrinter();
 	}
 
@@ -249,7 +250,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<Device> getAvailablePrinters(Session session, long roomId) {
+	public List<Printer> getAvailablePrinters(Session session, long roomId) {
 		return new RoomController(session).getById(roomId).getAvailablePrinters();
 	}
 

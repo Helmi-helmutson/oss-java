@@ -78,16 +78,12 @@ public class Room implements Serializable {
 	//bi-directional many-to-many association to Device
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
-			name="AvailablePrinters"
-			, joinColumns={
-					@JoinColumn(name="room_id")
-			}
-			, inverseJoinColumns={
-					@JoinColumn(name="printer_id")
-			}
+			name="AvailablePrinters",
+			joinColumns={ @JoinColumn(name="room_id") },
+			inverseJoinColumns={@JoinColumn(name="printer_id")}
 			)
 	@JsonIgnore
-	private List<Device> availablePrinters;
+	private List<Printer> availablePrinters;
 
 	//bi-directional many-to-one association to Device
 	@ManyToOne( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
@@ -101,7 +97,7 @@ public class Room implements Serializable {
 			}
 			)
 	@JsonIgnore
-	private Device defaultPrinter;
+	private Printer defaultPrinter;
 
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="room")
@@ -135,7 +131,7 @@ public class Room implements Serializable {
 		this.startIP           = "";
 		this.categories        = new ArrayList<Category>();
 		this.accessInRooms     = new ArrayList<AccessInRoom>();
-		this.availablePrinters = new ArrayList<Device>();
+		this.availablePrinters = new ArrayList<Printer>();
 		this.devices           = new ArrayList<Device>();
 		this.smartControls     = new ArrayList<RoomSmartControl>();
 	}
@@ -291,19 +287,19 @@ public class Room implements Serializable {
 		return device;
 	}
 
-	public List<Device> getAvailablePrinters() {
+	public List<Printer> getAvailablePrinters() {
 		return this.availablePrinters;
 	}
 
-	public void setAvailablePrinters(List<Device> availablePrinters) {
+	public void setAvailablePrinters(List<Printer> availablePrinters) {
 		this.availablePrinters = availablePrinters;
 	}
 
-	public Device getDefaultPrinter() {
+	public Printer getDefaultPrinter() {
 		return this.defaultPrinter;
 	}
 
-	public void setDefaultPrinter(Device defaultPrinter) {
+	public void setDefaultPrinter(Printer defaultPrinter) {
 		this.defaultPrinter = defaultPrinter;
 	}
 

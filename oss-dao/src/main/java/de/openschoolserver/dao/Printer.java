@@ -4,17 +4,22 @@ import de.openschoolserver.dao.controller.*;
 import de.openschoolserver.dao.tools.*;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.regex.*;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -23,7 +28,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @NamedQueries({
 	@NamedQuery(name="Printer.findAll",   query="SELECT p FROM Printer p"),
 	@NamedQuery(name="Printer.findAllId", query="SELECT p.id FROM Printer p"),
-	@NamedQuery(name="Printer.getPrinterByName", query="SELECT p FROM Printer p WHERE p.name = :name")
+	@NamedQuery(name="Printer.getByName", query="SELECT p FROM Printer p WHERE p.name = :name")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Printer implements Serializable  {
@@ -36,20 +41,7 @@ public class Printer implements Serializable  {
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private Long      id;
 
-
 	private String    name;
-	private String    manufacturer;
-	private String    model;
-	private String    mac;
-	private Long      roomId;
-	private boolean   windowsDriver;
-
-	/*
-	 * State variables
-	 */
-	private String    state;
-	private boolean   acceptingJobs;
-	private int       activeJobs;
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
@@ -59,7 +51,56 @@ public class Printer implements Serializable  {
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
-	private User creator;
+	privateUser creator;
+
+	//bi-directional many-to-many association to Device
+	@ManyToMany(mappedBy="availablePrinters",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
+	private List<Device> availableForDevices;
+
+	//bi-directional many-to-many association to Device
+	@OneToMany(mappedBy="defaultPrinter")
+	@JsonIgnore
+	private List<Device> defaultForDevices;
+
+	//bi-directional many-to-many association to Room
+	@ManyToMany(mappedBy="availablePrinters", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@JsonIgnore
+	private List<Room> availableInRooms;
+
+	//bi-directional many-to-many association to Room
+	@OneToMany(mappedBy="defaultPrinter")
+	@JsonIgnore
+	private List<Room> defaultInRooms;
+
+	// Transient variable:
+
+	@Transient
+	private String    manufacturer;
+
+	@Transient
+	private String    model;
+
+	@Transient
+	private String    mac;
+
+	@Transient
+	private Long      roomId;
+
+	@Transient
+	private boolean   windowsDriver;
+
+	/*
+	 * State variables
+	 */
+	@Transient
+	private String    state;
+
+	@Transient
+	private boolean   acceptingJobs;
+
+	@Transient
+	private int       activeJobs;
 
 	public Printer() {
 	}
@@ -188,5 +229,45 @@ public class Printer implements Serializable  {
 
 	public void setWindowsDriver(boolean windowsDriver) {
 		this.windowsDriver = windowsDriver;
+	}
+
+	public User getCreator() {
+		return creator;
+	}
+
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
+
+	public List<Device> getAvailableForDevices() {
+		return availableForDevices;
+	}
+
+	public void setAvailableForDevices(List<Device> availableForDevices) {
+		this.availableForDevices = availableForDevices;
+	}
+
+	public List<Device> getDefaultForDevices() {
+		return defaultForDevices;
+	}
+
+	public void setDefaultForDevices(List<Device> defaultForDevices) {
+		this.defaultForDevices = defaultForDevices;
+	}
+
+	public List<Room> getAvailableInRooms() {
+		return availableInRooms;
+	}
+
+	public void setAvailableInRooms(List<Room> availableInRooms) {
+		this.availableInRooms = availableInRooms;
+	}
+
+	public List<Room> getDefaultInRooms() {
+		return defaultInRooms;
+	}
+
+	public void setDefaultInRooms(List<Room> defaultInRooms) {
+		this.defaultInRooms = defaultInRooms;
 	}
 }

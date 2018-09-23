@@ -27,6 +27,7 @@ import javax.validation.ValidatorFactory;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -50,23 +51,6 @@ public class DeviceController extends Controller {
 		try {
 			return em.find(Device.class, deviceId);
 		} catch (Exception e) {
-			return null;
-		} finally {
-			em.close();
-		}
-	}
-
-	/*
-	 * Delivers a list of devices wit the given device type
-	 */
-	public List<Device> getByTpe(String type) {
-		EntityManager em = getEntityManager();
-		try {
-			Query query = em.createNamedQuery("Device.getDeviceByType");
-			query.setParameter("deviceType", type);
-			return query.getResultList();
-		} catch (Exception e) {
-			logger.error("DeviceType:" + type + " " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();
@@ -353,9 +337,9 @@ public class DeviceController extends Controller {
 	 * Find the default printer for a device
 	 * If no printer was defined by the device find this from the room
 	 */
-	public Device getDefaultPrinter(long deviceId) {
+	public Printer getDefaultPrinter(long deviceId) {
 		Device device = this.getById(deviceId);
-		Device printer = device.getDefaultPrinter();
+		Printer printer = device.getDefaultPrinter();
 		if( printer != null) {
 			return printer;
 		}
@@ -370,14 +354,14 @@ public class DeviceController extends Controller {
 	 * Find the available printer for a device
 	 * If no printer was defined by the device find these from the room
 	 */
-	public List<Device> getAvailablePrinters(long deviceId) {
+	public List<Printer> getAvailablePrinters(long deviceId) {
 		Device device = this.getById(deviceId);
-		List<Device> printers   = new ArrayList<Device>();
-		for( Device printer : device.getAvailablePrinters() ) {
+		List<Printer> printers   = new ArrayList<Printer>();
+		for( Printer printer : device.getAvailablePrinters() ) {
 			printers.add(printer);
 		}
 		if( printers.isEmpty() ){
-			for(Device printer : device.getRoom().getAvailablePrinters()){
+			for(Printer printer : device.getRoom().getAvailablePrinters()){
 				printers.add(printer);
 			}
 		}
@@ -524,8 +508,8 @@ public class DeviceController extends Controller {
 
 	public OssResponse setDefaultPrinter(long deviceId, long defaultPrinterId) {
 		// TODO Auto-generated method stub
-		Device device         = this.getById(deviceId);
-		Device defaultPrinter = this.getById(defaultPrinterId);
+		Device device          = this.getById(deviceId);
+		Printer defaultPrinter = new PrinterController(session).getById(defaultPrinterId);
 		device.setDefaultPrinter(defaultPrinter);
 		EntityManager em = getEntityManager();
 		try {
@@ -541,11 +525,12 @@ public class DeviceController extends Controller {
 	}
 
 	public OssResponse setAvailablePrinters(long deviceId, List<Long> availablePrinterIds) {
-		// TODO Auto-generated method stub
+		// TODO DAS IST FALSCH
 		Device device         = this.getById(deviceId);
-		List<Device> availablePrinters = new ArrayList<Device>();
+		List<Printer> availablePrinters = new ArrayList<Printer>();
+		PrinterController printerController = new PrinterController(session);
 		for( Long aP : availablePrinterIds ) {
-			availablePrinters.add(this.getById(aP));
+			availablePrinters.add(printerController.getById(aP));
 		}
 		device.setAvailablePrinters(availablePrinters);
 		EntityManager em = getEntityManager();

@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.PrintersOfManufacturer;
@@ -57,6 +58,24 @@ public interface PrinterResource {
 			);
 
 	@POST
+	@Path("addQueue")
+	@Produces(JSON_UTF8)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
+	@ApiOperation(value = "Creates a new printer.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("printers.add")
+	OssResponse addPrinterQueue(
+			@ApiParam(hidden = true) @Auth Session session,
+			@FormDataParam("name")          String  name,
+			@FormDataParam("deviceId")   	Long    deviceId,
+			@FormDataParam("model")   		String  model,
+			@FormDataParam("windowsDriver") boolean windowsDriver,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+			);
+
+	@POST
 	@Path("{printerId}/setDriver")
 	@Produces(JSON_UTF8)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -80,6 +99,18 @@ public interface PrinterResource {
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("printers.manage")
 	List<Printer> getPrinters(
+			@ApiParam(hidden = true) @Auth Session session
+			);
+
+	@GET
+	@Path("allDevices")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets thes lis of all printer devices.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No device was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("printers.manage")
+	List<Device> getPrinterDevices(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 

@@ -166,14 +166,24 @@ CREATE TABLE IF NOT EXISTS LoggedOn (
         PRIMARY KEY(device_id, user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
+CREATE TABLE IF NOT EXISTS Printers (
+        id           BIGINT UNSIGNED NOT NULL,
+        device_id    BIGINT UNSIGNED NOT NULL,
+        creator_id   BIGINT UNSIGNED DEFAULT NULL,
+        name         VARCHAR(32) NOT NULL,
+        FOREIGN KEY(device_id)  REFERENCES Devices(id) ON DELETE CASCADE,
+        FOREIGN KEY(creator_id) REFERENCES Users(id)   ON DELETE CASCADE,
+        PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+
 CREATE TABLE IF NOT EXISTS DefaultPrinter (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         room_id      BIGINT UNSIGNED DEFAULT NULL,
         device_id    BIGINT UNSIGNED DEFAULT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY(room_id)    REFERENCES Rooms(id)   ON DELETE CASCADE,
-        FOREIGN KEY(device_id)  REFERENCES Devices(id) ON DELETE CASCADE,
-        FOREIGN KEY(printer_id) REFERENCES Devices(id) ON DELETE CASCADE,
+        FOREIGN KEY(room_id)    REFERENCES Rooms(id)    ON DELETE CASCADE,
+        FOREIGN KEY(device_id)  REFERENCES Devices(id)  ON DELETE CASCADE,
+        FOREIGN KEY(printer_id) REFERENCES Printers(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
@@ -182,9 +192,9 @@ CREATE TABLE IF NOT EXISTS AvailablePrinters (
         room_id      BIGINT UNSIGNED DEFAULT NULL,
         device_id    BIGINT UNSIGNED DEFAULT NULL,
         printer_id   BIGINT UNSIGNED NOT NULL,
-        FOREIGN KEY(room_id)    REFERENCES Rooms(id)   ON DELETE CASCADE,
-        FOREIGN KEY(device_id)  REFERENCES Devices(id) ON DELETE CASCADE,
-        FOREIGN KEY(printer_id) REFERENCES Devices(id) ON DELETE CASCADE,
+        FOREIGN KEY(room_id)    REFERENCES Rooms(id)    ON DELETE CASCADE,
+        FOREIGN KEY(device_id)  REFERENCES Devices(id)  ON DELETE CASCADE,
+        FOREIGN KEY(printer_id) REFERENCES Printers(id) ON DELETE CASCADE,
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 

@@ -24,6 +24,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SmartRoom;
@@ -274,12 +275,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public Device getDefaultPrinter(Session session, Long roomId) {
+	public Printer getDefaultPrinter(Session session, Long roomId) {
 		return new RoomController(session).getById(roomId).getDefaultPrinter();
 	}
 
 	@Override
-	public List<Device> getAvailablePrinters(Session session, Long roomId) {
+	public List<Printer> getAvailablePrinters(Session session, Long roomId) {
 		return new RoomController(session).getById(roomId).getAvailablePrinters();
 	}
 

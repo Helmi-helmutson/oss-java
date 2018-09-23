@@ -9,6 +9,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Acl;
 
 import org.slf4j.Logger;
@@ -79,8 +80,8 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public String getSessionValue(Session session,String key){
-		Device defaultPrinter  = null;
-		List<Device> availablePrinters = null;
+		Printer defaultPrinter  = null;
+		List<Printer> availablePrinters = null;
 		List<String> data = new ArrayList<String>();
 		final SessionController sessionController = new SessionController(session);
 		switch(key) {
@@ -99,7 +100,7 @@ public class SessionsResourceImpl implements SessionsResource {
 			if( availablePrinters == null )
 				availablePrinters = session.getRoom().getAvailablePrinters();
 			if( availablePrinters != null ) {
-				for( Device printer : availablePrinters ) {
+				for( Printer printer : availablePrinters ) {
 					data.add(printer.getName());
 				}
 				return String.join(" ", data);

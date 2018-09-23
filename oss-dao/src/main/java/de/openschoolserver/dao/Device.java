@@ -94,12 +94,7 @@ public class Device implements Serializable {
 			inverseJoinColumns={ @JoinColumn(name="printer_id") }
 	)
 	@JsonIgnore
-	private List<Device> availablePrinters;
-
-	//bi-directional many-to-many association to Device
-	@ManyToMany(mappedBy="availablePrinters",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JsonIgnore
-	private List<Device> availableForDevices;
+	private List<Printer> availablePrinters;
 
 	//bi-directional many-to-many association to Device
 	@ManyToOne
@@ -109,12 +104,13 @@ public class Device implements Serializable {
 			inverseJoinColumns={@JoinColumn(name="printer_id")}
 		)
 	@JsonIgnore
-	private Device defaultPrinter;
+	private Printer defaultPrinter;
 
-	//bi-directional many-to-many association to Device
-	@OneToMany(mappedBy="defaultPrinter")
+	//bi-directional many-to-one association to SoftwareStatus
+	@OneToMany(mappedBy="device")
 	@JsonIgnore
-	private List<Device> defaultForDevices;
+	private List<Printer> printerQueue;
+
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -146,16 +142,6 @@ public class Device implements Serializable {
 	@ManyToOne
 	@JsonIgnore
 	private User owner;
-
-	//bi-directional many-to-many association to Room
-	@ManyToMany(mappedBy="availablePrinters", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-	@JsonIgnore
-	private List<Room> availableInRooms;
-
-	//bi-directional many-to-many association to Room
-	@OneToMany(mappedBy="defaultPrinter")
-	@JsonIgnore
-	private List<Room> defaultInRooms;
 
 	//bi-directional many-to-one association to TestUser
 	@OneToMany(mappedBy="device")
@@ -291,27 +277,19 @@ public class Device implements Serializable {
 		this.locality = value;
 	}
 
-	public List<Device> getAvailablePrinters() {
+	public List<Printer> getAvailablePrinters() {
 		return this.availablePrinters;
 	}
 
-	public void setAvailablePrinters(List<Device> availablePrinters) {
+	public void setAvailablePrinters(List<Printer> availablePrinters) {
 		this.availablePrinters = availablePrinters;
 	}
 
-	public List<Device> getAvailableForDevices() {
-		return this.availableForDevices;
-	}
-
-	public void setAvailableForDevices(List<Device> availableForDevices) {
-		this.availableForDevices = availableForDevices;
-	}
-
-	public Device getDefaultPrinter() {
+	public Printer getDefaultPrinter() {
 		return this.defaultPrinter;
 	}
 
-	public void setDefaultPrinter(Device defaultPrinter) {
+	public void setDefaultPrinter(Printer defaultPrinter) {
 		this.defaultPrinter = defaultPrinter;
 	}
 
@@ -337,22 +315,6 @@ public class Device implements Serializable {
 
 	public void setOwner(User owner) {
 		this.owner = owner;
-	}
-
-	public List<Room> getAvailableInRooms() {
-		return this.availableInRooms;
-	}
-
-	public void setAvailableInRooms(List<Room> availableInRooms) {
-		this.availableInRooms = availableInRooms;
-	}
-
-	public List<Room> getDefaultInRooms() {
-		return this.defaultInRooms;
-	}
-
-	public void setDefaultInRooms(List<Room> defaultInRooms) {
-		this.defaultInRooms = defaultInRooms;
 	}
 
 	public List<TestUser> getTestUsers() {
@@ -410,14 +372,6 @@ public class Device implements Serializable {
 		this.wlanMac = wlanmac;
 	}
 
-	public List<Device> getDefaultForDevices() {
-		return defaultForDevices;
-	}
-
-	public void setDefaultForDevices(List<Device> defaultForDevices) {
-		this.defaultForDevices = defaultForDevices;
-	}
-
 	public List<SoftwareLicense> getSoftwareLicenses() {
 		return softwareLicenses;
 	}
@@ -452,5 +406,13 @@ public class Device implements Serializable {
 
 	public void setRoomId(Long roomId) {
 		this.roomId = roomId;
+	}
+
+	public List<Printer> getPrinterQueue() {
+		return printerQueue;
+	}
+
+	public void setPrinterQueue(List<Printer> printerQueue) {
+		this.printerQueue = printerQueue;
 	}
 }

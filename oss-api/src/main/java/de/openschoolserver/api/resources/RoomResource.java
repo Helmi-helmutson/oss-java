@@ -15,6 +15,7 @@ import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Session;
 
 import java.util.List;
@@ -528,7 +529,7 @@ public interface RoomResource {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("room.manage")
-    Device getDefaultPrinter(
+    Printer getDefaultPrinter(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );
@@ -583,7 +584,7 @@ public interface RoomResource {
         @ApiResponse(code = 404, message = "Device not found"),
         @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("room.search")
-    List<Device> getAvailablePrinters(
+    List<Printer> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId
     );

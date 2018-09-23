@@ -20,6 +20,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Printer;
 
 import java.io.InputStream;
 import java.util.List;
@@ -45,22 +46,6 @@ public interface DeviceResource {
     Device getById(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
-    );
-
-    /*
-	 * GET devices/byType/<deviceTyp>
-	 */
-    @GET
-    @Path("byType/{deviceType}")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Get device by type, this can be printer, mobileDvice, ...")
-    @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Device not found"),
-            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @RolesAllowed("device.manage")
-    List<Device> getByType(
-            @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("deviceType") String type
     );
 
     /*
@@ -235,7 +220,7 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    Device getDefaultPrinter(
+    Printer getDefaultPrinter(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
     );
@@ -284,7 +269,7 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-    List<Device> getAvailablePrinters(
+    List<Printer> getAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
     );

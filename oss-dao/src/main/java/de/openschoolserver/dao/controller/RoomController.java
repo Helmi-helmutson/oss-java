@@ -24,6 +24,7 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
@@ -980,18 +981,18 @@ public class RoomController extends Controller {
 	public OssResponse setDefaultPrinter(Long roomId, Long deviceId) {
 
 		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(session);
-		Device device = deviceController.getById(deviceId);
-		if( room.getDefaultPrinter() != null && room.getDefaultPrinter().equals(device) ) {
+		PrinterController printerController = new PrinterController(session);
+		Printer printer = printerController.getById(deviceId);
+		if( room.getDefaultPrinter() != null && room.getDefaultPrinter().equals(printer) ) {
 			return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
 		}
-		room.setDefaultPrinter(device);
-		device.getDefaultInRooms().add(room);
+		room.setDefaultPrinter(printer);
+		printer.getDefaultInRooms().add(room);
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(room);
-			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1004,14 +1005,14 @@ public class RoomController extends Controller {
 	public OssResponse deleteDefaultPrinter(long roomId) {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
-		Device device = room.getDefaultPrinter();
-		if( device != null  ) {
+		Printer printer = room.getDefaultPrinter();
+		if( printer != null  ) {
 			room.setDefaultPrinter(null);
-			device.getDefaultInRooms().remove(room);
+			printer.getDefaultInRooms().remove(room);
 			try {
 				em.getTransaction().begin();
 				em.merge(room);
-				em.merge(device);
+				em.merge(printer);
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1022,18 +1023,19 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","The default printer of the room was deleted succesfully.");
 	}
 
-	public OssResponse setAvailablePrinters(long roomId, List<Long> deviceIds) {
+	public OssResponse setAvailablePrinters(long roomId, List<Long> printerIds) {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(session);
-		room.setAvailablePrinters(new ArrayList<Device>());
+		PrinterController printerController = new PrinterController(session);
+		room.setAvailablePrinters(new ArrayList<Printer>());
 		try {
 			em.getTransaction().begin();
-			for( Device device : deviceController.getDevices(deviceIds)) {
-				if( ! room.getAvailablePrinters().contains(device) ) {
-					device.getAvailableInRooms().add(room);
-					room.getAvailablePrinters().add(device);
-					em.merge(device);
+			for( Long printerId : printerIds) {
+				Printer printer = printerController.getById(printerId);
+				if( ! room.getAvailablePrinters().contains(printer) ) {
+					printer.getAvailableInRooms().add(room);
+					room.getAvailablePrinters().add(printer);
+					em.merge(printer);
 				}
 			}
 			em.merge(room);
@@ -1050,18 +1052,18 @@ public class RoomController extends Controller {
 	public OssResponse addAvailablePrinter(long roomId, long deviceId) {
 
 		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(session);
-		Device device = deviceController.getById(deviceId);
-		if( room.getAvailablePrinters().contains(device) ) {
+		PrinterController printerController = new PrinterController(session);
+		Printer printer = printerController.getById(deviceId);
+		if( room.getAvailablePrinters().contains(printer) ) {
 			return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
 		}
-		room.getAvailablePrinters().add(device);
-		device.getAvailableInRooms().add(room);
+		room.getAvailablePrinters().add(printer);
+		printer.getAvailableInRooms().add(room);
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(room);
-			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1074,14 +1076,14 @@ public class RoomController extends Controller {
 	public OssResponse deleteAvailablePrinter(long roomId, long deviceId) {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(session);
-		Device device = deviceController.getById(deviceId);
-		room.getAvailablePrinters().remove(device);
-		device.getAvailableInRooms().remove(room);
+		PrinterController printerController = new PrinterController(session);
+		Printer printer = printerController.getById(deviceId);
+		room.getAvailablePrinters().remove(printer);
+		printer.getAvailableInRooms().remove(room);
 		try {
 			em.getTransaction().begin();
 			em.merge(room);
-			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());

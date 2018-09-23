@@ -22,6 +22,7 @@ import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.PositiveList;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SmartRoom;
@@ -1048,7 +1049,7 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    Device getDefaultPrinter(
+    Printer getDefaultPrinter(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );
@@ -1064,7 +1065,7 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Device> getAvailablePrinters(
+    List<Printer> getAvailablePrinters(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );
