@@ -391,7 +391,7 @@ public interface UserResource {
      );
 
 @POST
-@Path("add")
+@Path("guestUsers/add")
 @Produces(JSON_UTF8)
 @Consumes(MediaType.MULTIPART_FORM_DATA)
 @ApiOperation(value = "Creates a new printer.")
