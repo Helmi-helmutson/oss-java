@@ -138,4 +138,9 @@ public class SessionsResourceImpl implements SessionsResource {
 		}
 		return modules;
 	}
+
+	@Override
+	public String logonScript(Session session, String OS) {
+		return new SessionController(session).logonScript(OS);
+	}
 }

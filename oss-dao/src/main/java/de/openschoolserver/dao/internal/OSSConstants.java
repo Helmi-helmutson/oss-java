@@ -12,6 +12,7 @@ public interface OSSConstants {
 	String roleSysadmin = "sysadmins";
 	String roleAdministratrion = "administration";
 	String roleWorkstation = "workstations";
+	String winLineSeparator = "\r\n";
 
     static FileAttribute<Set<PosixFilePermission>> privatDirAttribute      = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
     static FileAttribute<Set<PosixFilePermission>> privatFileAttribute     = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));

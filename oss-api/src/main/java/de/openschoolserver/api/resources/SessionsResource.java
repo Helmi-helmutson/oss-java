@@ -98,12 +98,25 @@ public interface SessionsResource {
     @GET
     @Path("allowedModules")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Get some session values. Available keys are: defaultPrinter, availablePrinters, dnsName, domainName.")
+    @ApiOperation(value = "Get the list of allowed modules for the session user.")
     @ApiResponses(value = {
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @PermitAll
-   List<String> allowedModules(
+    List<String> allowedModules(
             @ApiParam(hidden = true) @Auth Session session
     );
+
+    @GET
+    @Path("logonScript/{OS}")
+    @Produces(TEXT)
+    @ApiOperation(value = "Get the logo on script for the user and operating system.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @PermitAll
+    String logonScript(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("OS") String OS
+     );
 }

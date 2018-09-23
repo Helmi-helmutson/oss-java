@@ -18,6 +18,7 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.tools.*;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import io.dropwizard.auth.AuthenticationException;
 
 @SuppressWarnings("unchecked")
@@ -337,5 +339,48 @@ public class SessionController extends Controller {
 			return this.getByToken(token);
 		}
 		return null;
+	}
+
+	public String logonScript(String OS) {
+		//TODO make logon server configurable
+		String[]   program = new String[6];
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		List<String> batFile = new ArrayList<String>();
+		batFile.add("net use z: \\\\admin\\"+ this.session.getUser().getUid()
+					+ " /persisten:no /user:"
+					+ this.getConfigValue("WORKGROUP")+"\\"
+					+ this.session.getUser().getUid() + " "
+					+ this.session.getPassword());
+		program[0] = "/usr/share/oss/plugins/shares/netlogon/open/100-create-logon-script.sh";
+		program[1] = this.session.getUser().getUid();
+		program[2] = this.session.getIP();
+		program[3] = OS;
+		if( this.session.getDevice() != null ) {
+			program[4] = this.session.getDevice().getName();
+		} else {
+			program[4] = "dummy";
+		}
+		program[5] = this.getConfigValue("DOMAIN");
+		OSSShellTools.exec(program, reply, error, null);
+		File file = new File("/var/lib/samba/sysvol/" + this.getConfigValue("DOMAIN") + "/scripts/" +  this.session.getUser().getUid() + ".bat");
+		if( file.exists() ) {
+			try {
+				String tmp = System.getProperty("line.separator");
+				System.setProperty("line.separator", winLineSeparator);
+				for(String line : Files.readAllLines(file.toPath()) ) {
+					if( line.startsWith("net use z:") ) {
+						continue;
+					}
+					if( line.startsWith("net use") || line.startsWith("rundll32 printui.dll")) {
+						batFile.add(line);
+					}
+				}
+				System.setProperty("line.separator", tmp);
+			} catch (Exception e) {
+				logger.error("logonScript" + e.getMessage());
+			}
+		}
+		return String.join(winLineSeparator,batFile);
 	}
 }
