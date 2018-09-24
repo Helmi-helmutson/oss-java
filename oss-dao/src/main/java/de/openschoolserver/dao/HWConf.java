@@ -45,7 +45,7 @@ public class HWConf implements Serializable {
 	private List<Device> devices;
 
 	//bi-directional many-to-one association to Partition
-	@OneToMany(mappedBy="hwconf", cascade={ CascadeType.REMOVE,CascadeType.PERSIST })
+	@OneToMany(mappedBy="hwconf", cascade=CascadeType.ALL, orphanRemoval = true )
 	private List<Partition> partitions;
 
 	//bi-directional many-to-one association to Room
@@ -54,7 +54,7 @@ public class HWConf implements Serializable {
 	private List<Room> rooms;
 	
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="hwconfs",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(mappedBy="hwconfs")
 	@JsonIgnore
 	private List<Category> categories;
 	
@@ -128,8 +128,6 @@ public class HWConf implements Serializable {
 		this.name = name;
 	}
 
-
-
 	public String getDeviceType() {
 		return deviceType;
 	}
@@ -149,14 +147,12 @@ public class HWConf implements Serializable {
 	public Device addDevice(Device device) {
 		getDevices().add(device);
 		device.setHwconf(this);
-
 		return device;
 	}
 
 	public Device removeDevice(Device device) {
 		getDevices().remove(device);
 		device.setHwconf(null);
-
 		return device;
 	}
 
@@ -171,7 +167,6 @@ public class HWConf implements Serializable {
 	public Partition addPartition(Partition partition) {
 		getPartitions().add(partition);
 		partition.setHwconf(this);
-
 		return partition;
 	}
 

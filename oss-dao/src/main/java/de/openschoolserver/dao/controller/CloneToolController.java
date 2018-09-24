@@ -15,6 +15,7 @@ import de.openschoolserver.dao.Clone;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Partition;
+import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.tools.OSSShellTools;
@@ -292,6 +293,14 @@ public class CloneToolController extends Controller {
 	        }
 			if( ! em.contains(hwconf)) {
 				hwconf = em.merge(hwconf);
+			}
+			for( Device o : hwconf.getDevices() ) {
+				o.setHwconf(null);
+				em.merge(o);
+			}
+			for( Room o : hwconf.getRooms() ) {
+				o.setHwconf(null);
+				em.merge(o);
 			}
 			em.remove(hwconf);
 			em.getTransaction().commit();

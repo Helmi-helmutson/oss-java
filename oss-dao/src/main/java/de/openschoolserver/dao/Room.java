@@ -60,20 +60,20 @@ public class Room implements Serializable {
 
 	private String roomControl;
 
-        //bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="rooms", cascade=CascadeType.ALL, orphanRemoval=true)
+    //bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="rooms")
 	@JsonIgnore
-	private List<Category> categories;
+	private List<Category> categories = new ArrayList<Category>();
 
 	//bi-directional many-to-one association to AccessInRoom
 	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
-	private List<AccessInRoom> accessInRooms;
+	private List<AccessInRoom> accessInRooms = new ArrayList<AccessInRoom>();
 
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="room")
 	@JsonIgnore
-	private List<Device> devices;
+	private List<Device> devices = new ArrayList<Device>();
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
@@ -83,7 +83,7 @@ public class Room implements Serializable {
 			inverseJoinColumns={@JoinColumn(name="printer_id")}
 			)
 	@JsonIgnore
-	private List<Printer> availablePrinters;
+	private List<Printer> availablePrinters = new ArrayList<Printer>();
 
 	//bi-directional many-to-one association to Device
 	@ManyToOne( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
@@ -98,12 +98,12 @@ public class Room implements Serializable {
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="room")
 	@JsonIgnore
-	private List<Test> tests;
+	private List<Test> tests = new ArrayList<Test>();
 
 	//bi-directional many-to-one association to RoomSmartControl
 	@OneToMany(mappedBy="room")
 	@JsonIgnore
-	private List<RoomSmartControl> smartControls;
+	private List<RoomSmartControl> smartControls = new ArrayList<RoomSmartControl>();
 		
 	@Transient
 	private String network;

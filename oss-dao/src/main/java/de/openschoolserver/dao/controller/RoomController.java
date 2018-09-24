@@ -249,6 +249,7 @@ public class RoomController extends Controller {
 			}
 		}
 		room.setHwconf(hwconf);
+		logger.debug("User creating Room:" + this.session.getUser() + session.getUser() );
 		room.setCreator(this.session.getUser());
 		hwconf.getRooms().add(room);
 		//AccessInRoom accessInRoom = new AccessInRoom(room);
@@ -733,9 +734,6 @@ public class RoomController extends Controller {
 					return ossResponse;
 				}
 				device.setRoom(room);
-				if( device.getOwner() == null ) {
-					device.setOwner(this.session.getUser());
-				}
 				hwconf = cloneToolController.getById(device.getHwconfId());
 				if( hwconf == null ) {
 					if( room.getHwconf() != null ){
@@ -863,6 +861,7 @@ public class RoomController extends Controller {
 			device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll("\\.", ""));
 			device.setIp(ipAddress.get(0).split(" ")[0]);
 			device.setHwconf(hwconf);
+			device.setOwner(owner);
 		} else {
 			device.setMac(macAddress);
 			device.setIp(ipAddress.get(0).split(" ")[0]);
@@ -881,7 +880,6 @@ public class RoomController extends Controller {
 		if( ossResponse.getCode().equals("ERROR") ) {
 			return ossResponse;
 		}
-		device.setOwner(owner);
 		device.setRoom(room);
 		logger.debug(device.toString());
 		try {
