@@ -55,12 +55,12 @@ public class Software implements Serializable {
 	private List<SoftwareVersion> softwareVersions;
 	
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="softwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(mappedBy="softwares")
 	@JsonIgnore
 	private List<Category> categories;
 
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="removedSoftwares", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(mappedBy="removedSoftwares")
 	@JsonIgnore
 	private List<Category> removedFromCategories;
 

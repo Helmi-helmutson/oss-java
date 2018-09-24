@@ -40,15 +40,15 @@ public class Group implements Serializable {
 	private String groupType;
 
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="groups",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(mappedBy="groups")
 	private List<Category> categories;
 
 	//bi-directional many-to-one association to Acls
-	@OneToMany(mappedBy="group", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="group")
 	private List<Acl> acls;
 
 	//bi-directional many-to-many association to User
-	@ManyToMany(mappedBy="groups",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(mappedBy="groups")
 	@JsonIgnore
 	private List<User> users;
 

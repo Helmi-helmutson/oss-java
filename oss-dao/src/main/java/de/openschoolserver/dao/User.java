@@ -72,12 +72,17 @@ public class User implements Serializable {
 	private List<Alias> aliases;
 
 	//bi-directional many-to-one association to Alias
-	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="user")
 	@JsonIgnore
 	private List<Acl> acls;
-		
+
+	//bi-directional many-to-one association to Alias
+	@OneToMany(mappedBy="user")
+	@JsonIgnore
+	private List<AccessInRoom> accessInRoom;
+
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="owner")
 	@JsonIgnore
 	private List<Device> ownedDevices;
 	
@@ -87,27 +92,27 @@ public class User implements Serializable {
 	private List<PositiveList> ownedPositiveLists;
 	
 	//bi-directional many-to-one association to groups
-	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="owner")
 	@JsonIgnore
 	private List<Group> ownedGroups;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="owner")
 	@JsonIgnore
 	private List<Category> ownedCategories = new ArrayList<Category>();
 
 	//bi-directional many-to-one association to TestFile
-	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="user")
 	@JsonIgnore
 	private List<TestFile> testFiles;
 
 	//bi-directional many-to-one association to TestUser
-	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="user")
 	@JsonIgnore
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-one association to Test
-	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="user")
 	@JsonIgnore
 	private List<Test> tests;
 	
@@ -122,17 +127,17 @@ public class User implements Serializable {
 	private List<FAQ> myFAQs;
 	
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="owner")
 	@JsonIgnore
 	private List<Contact> myContacts;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="owner",cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="owner")
 	@JsonIgnore
 	private List<Announcement> myAnnouncements;
 
 	//bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="users", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
+	@ManyToMany(mappedBy="users")
 	@JsonIgnore
 	private List<Category> categories = new ArrayList<Category>();
 		
@@ -201,7 +206,7 @@ public class User implements Serializable {
 		this.mustChange = false;
 		this.ownedPositiveLists = new ArrayList<PositiveList>();
 		this.ownedCategories    = new ArrayList<Category>();
-		this.ownedDevices		= new ArrayList<Device>();
+		this.ownedDevices	= new ArrayList<Device>();
 		this.ownedGroups        = new ArrayList<Group>();
 		this.loggedOn           = new ArrayList<Device>();
 		this.readAnnouncements  = new ArrayList<Announcement>();

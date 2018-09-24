@@ -61,7 +61,7 @@ public class Room implements Serializable {
 	private String roomControl;
 
         //bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="rooms", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(mappedBy="rooms", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<Category> categories;
 
@@ -71,7 +71,7 @@ public class Room implements Serializable {
 	private List<AccessInRoom> accessInRooms;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="room")
 	@JsonIgnore
 	private List<Device> devices;
 
@@ -88,13 +88,9 @@ public class Room implements Serializable {
 	//bi-directional many-to-one association to Device
 	@ManyToOne( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
-			name="DefaultPrinter"
-			, joinColumns={
-					@JoinColumn(name="room_id")
-			}
-			, inverseJoinColumns={
-					@JoinColumn(name="printer_id")
-			}
+			name="DefaultPrinter",
+			joinColumns={ @JoinColumn(name="room_id") },
+			inverseJoinColumns={ @JoinColumn(name="printer_id") }
 			)
 	@JsonIgnore
 	private Printer defaultPrinter;
@@ -120,7 +116,7 @@ public class Room implements Serializable {
 	@Column(name="hwconf_id", insertable=false, updatable=false)
 	private Long hwconfId;
 	
-    //bi-directional many-to-one association to User
+	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
 	private User creator;
