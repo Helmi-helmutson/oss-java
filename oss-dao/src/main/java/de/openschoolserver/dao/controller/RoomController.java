@@ -252,8 +252,9 @@ public class RoomController extends Controller {
 		logger.debug("User creating Room:" + this.session.getUser() + session.getUser() );
 		room.setCreator(this.session.getUser());
 		hwconf.getRooms().add(room);
-		//AccessInRoom accessInRoom = new AccessInRoom(room);
-		new AccessInRoom(room);
+		if( room.getRoomControl() != null && !room.getRoomControl().equals("no")) {
+			new AccessInRoom(room);
+		}
 		try {
 			logger.debug("Create Room:" + room);
 			em.getTransaction().begin();
@@ -953,6 +954,12 @@ public class RoomController extends Controller {
 		oldRoom.setPlaces(room.getPlaces());
 		try {
 			em.getTransaction().begin();
+			if(oldRoom.getRoomControl().equals("no")) {
+				for( AccessInRoom o : oldRoom.getAccessInRooms() ) {
+					em.remove(o);
+				}
+				oldRoom.setAccessInRoom(null);
+			}
 			em.merge(oldRoom);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -1214,6 +1221,10 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Room room = em.find(Room.class, roomId);
+			if( room.getRoomControl() != null && room.getRoomControl().equals("no") ) {
+				em.close();
+				return new OssResponse(this.getSession(),"ERROR", "You must not set access control in a room with no room control.");
+			}
 			em.getTransaction().begin();
 			accessList.setRoom(room);
 			accessList.setRoomId(roomId);
