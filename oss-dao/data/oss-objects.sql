@@ -167,7 +167,7 @@ CREATE TABLE IF NOT EXISTS LoggedOn (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 CREATE TABLE IF NOT EXISTS Printers (
-        id           BIGINT UNSIGNED NOT NULL,
+        id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         device_id    BIGINT UNSIGNED NOT NULL,
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
         name         VARCHAR(32) NOT NULL,
