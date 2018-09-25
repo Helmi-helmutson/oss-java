@@ -84,7 +84,7 @@ public class Device implements Serializable {
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JsonIgnore
-	private List<Category> categories;
+	private List<Category> categories = new ArrayList<Category>();
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -94,7 +94,7 @@ public class Device implements Serializable {
 			inverseJoinColumns={ @JoinColumn(name="printer_id") }
 	)
 	@JsonIgnore
-	private List<Printer> availablePrinters;
+	private List<Printer> availablePrinters = new ArrayList<Printer>();
 
 	//bi-directional many-to-many association to Device
 	@ManyToOne
@@ -109,18 +109,18 @@ public class Device implements Serializable {
 	//bi-directional many-to-one association to SoftwareStatus
 	@OneToMany(mappedBy="device")
 	@JsonIgnore
-	private List<Printer> printerQueue;
+	private List<Printer> printerQueue = new ArrayList<Printer>();
 
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
-	private List<SoftwareLicense> softwareLicenses;
+	private List<SoftwareLicense> softwareLicenses = new ArrayList<SoftwareLicense>() ;
 
 	//bi-directional many-to-one association to SoftwareStatus
 	@OneToMany(mappedBy="device")
 	@JsonIgnore
-	private List<SoftwareStatus> softwareStatus;
+	private List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
@@ -152,7 +152,7 @@ public class Device implements Serializable {
 	//@ManyToMany(mappedBy="loggedOn", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@ManyToMany(mappedBy="loggedOn")
 	@JsonIgnore
-	private List<User> loggedIn;
+	private List<User> loggedIn = new ArrayList<User>();
 
 	public Device() {
 		this.hwconfId = null;
@@ -161,9 +161,6 @@ public class Device implements Serializable {
 		this.mac = "";
 		this.wlanIp   = "";
 		this.wlanMac  = "";
-		this.softwareLicenses = new ArrayList<SoftwareLicense>();
-		this.softwareStatus   = new ArrayList<SoftwareStatus>();
-		this.loggedIn         = new ArrayList<User>();
 	}
 
 	public Long getId() {
