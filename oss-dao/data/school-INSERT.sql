@@ -32,7 +32,7 @@ INSERT INTO HWConfs VALUES(5,'Win10-64-No-Join','Win10 64Bit without Domain Join
 INSERT INTO Partitions values(3,5,'sda1','Boot','WinBoot','no','partimage',NULL,1);
 INSERT INTO Partitions values(4,5,'sda2','System','Win10','no','partimage',NULL,1);
 INSERT INTO Rooms VALUES(1,1,'SERVER_NET','Virtual room for servers','technicalRoom','no',10,10,'#SERVER_NETWORK#',#SERVER_NETMASK#,6);
-INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','technicalRoom','no',10,10,'#ANON_NETWORK#',#ANON_NETMASK#,6);
+INSERT INTO Rooms VALUES(2,NULL,'ANON_DHCP','Virtual room for unknown devices','technicalRoom','sysadminsOnly',10,10,'#ANON_NETWORK#',#ANON_NETMASK#,6);
 INSERT INTO Devices VALUES(1,1,1,NULL,'#SCHOOL_NETBIOSNAME#','#SCHOOL_SERVER#',NULL,'','',0,0,'','','',0);
 INSERT INTO Devices VALUES(2,1,1,NULL,'schoolserver','#SCHOOL_MAILSERVER#',NULL,'','',0,0,'','','',0);
 INSERT INTO Devices VALUES(3,1,1,NULL,'proxy','#SCHOOL_PROXY#',NULL,'','',0,0,'','','',0);
@@ -59,6 +59,7 @@ INSERT INTO Enumerates VALUES(NULL,'groupType','guest',1);
 INSERT INTO Enumerates VALUES(NULL,'roomControl','inRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomControl','no',1);
 INSERT INTO Enumerates VALUES(NULL,'roomControl','allTeachers',1);
+INSERT INTO Enumerates VALUES(NULL,'roomControl','sysadminsOnly',1);
 #We do not provide it on the gui at the moment
 #INSERT INTO Enumerates VALUES(NULL,'roomControl','teachers',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom',1);
