@@ -784,7 +784,7 @@ public class UserController extends Controller {
 				groups.add(group.getName());
 			}
 		}
-		return String.join(this.getNl(), groups);
+		return String.join(";", groups);
 	}
 
 	public void inheritCreatedObjects(User creator, User newCreator) {
