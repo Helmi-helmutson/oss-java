@@ -56,13 +56,13 @@ cp %{SOURCE8}  %{buildroot}/opt/oss-java/data/
 cp %{SOURCE9}  %{buildroot}/opt/oss-java/bin/
 
 %pre
-/opt/oss-java/bin/turn-to-new-printer.sh
 %service_add_pre oss-api.service
 
 %preun
 %service_del_preun oss-api.service
  
 %post
+/opt/oss-java/bin/turn-to-new-printer.sh
 %service_add_post oss-api.service
 
 %postun
