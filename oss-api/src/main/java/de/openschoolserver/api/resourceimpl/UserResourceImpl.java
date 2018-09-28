@@ -186,7 +186,7 @@ public class UserResourceImpl implements UserResource {
 			for( Group group : user.getGroups() ) {
 				groups.add(group.getName());
 			}
-			return String.join(" ", groups);
+			return String.join(userController.getNl(), groups);
 		default:
 			//This is a config or mconfig. We have to merge it from the groups from actual room and from the user
 			List<String> configs = new ArrayList<String>();
