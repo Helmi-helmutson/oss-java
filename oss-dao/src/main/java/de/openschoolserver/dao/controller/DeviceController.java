@@ -125,6 +125,7 @@ public class DeviceController extends Controller {
 		UserController userController = new UserController(this.session);
 		boolean needWriteSalt = false;
 		Device device = em.find(Device.class, deviceId);
+		User user = null;
 		try {
 			em.getTransaction().begin();
 			if( this.isProtected(device) ) {
@@ -135,10 +136,10 @@ public class DeviceController extends Controller {
 			}
 			if(device.getHwconf() != null &&  device.getHwconf().getDeviceType().equals("FatClient")) {
 				needWriteSalt = true;
-				User user = userController.getByUid(device.getName());
-				if( user != null ) {
-					userController.delete(user);
-				}
+			}
+			user = userController.getByUid(device.getName());
+			if( user != null ) {
+				userController.delete(user);
 			}
 			this.startPlugin("delete_device", device);
 			em.merge(device);
@@ -799,8 +800,7 @@ public class DeviceController extends Controller {
 		String[] program    = null;
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
-		switch(action) {
-		case "shutDown":
+		switch(action.toLowerCase()) {
 		case "shutdown":
 			if( message.isEmpty() ) {
 				message = "System will shutdown in " + graceTime + "minutes";
@@ -821,13 +821,6 @@ public class DeviceController extends Controller {
 			program[3] = "system.reboot";
 			program[4] = graceTime;
 			break;
-		case "logout":
-			program = new String[4];
-			program[0] = "/usr/bin/salt";
-			program[1] = "--async";
-			program[2] = FQHN.toString();
-			program[3] = "oss_client.logout";
-			break;
 		case "close":
 			program = new String[4];
 			program[0] = "/usr/bin/salt";
@@ -842,21 +835,21 @@ public class DeviceController extends Controller {
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.unLockClient";
 			break;
-		case "lockInput":
+		case "lockinput":
 			program = new String[4];
 			program[0] = "/usr/bin/salt";
 			program[1] = "--async";
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.blockInput";
 			break;
-		case "unlockInput":
+		case "unlockinput":
 			program = new String[4];
 			program[0] = "/usr/bin/salt";
 			program[1] = "--async";
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.unBlockInput";
 			break;
-		case "applyState":
+		case "applystate":
 			program = new String[4];
 			program[0] = "/usr/bin/salt";
 			program[1] = "--async";
@@ -872,7 +865,7 @@ public class DeviceController extends Controller {
 		case "controlProxy":
 			//TODO
 			break;
-		case "saveFile":
+		case "savefile":
 			List<String>   fileContent =new ArrayList<String>();
 			fileContent.add(actionContent.get("content"));
 			String fileName = actionContent.get("fileName");
@@ -889,7 +882,14 @@ public class DeviceController extends Controller {
 			program[2] = file.toPath().toString();
 			program[3] = actionContent.get("path");
 			break;
-		case "cleanUpLoggedIn":
+		case "logoff":
+		case "logout":
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "oss_client.logOff";
+		case "cleanuploggedin":
 			EntityManager em = getEntityManager();
 			em.getTransaction().begin();
 			for( User user : device.getLoggedIn() ) {
