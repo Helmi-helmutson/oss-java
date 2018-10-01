@@ -1081,15 +1081,18 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","The selected printer was added to the room.");
 	}
 
-	public OssResponse deleteAvailablePrinter(long roomId, long deviceId) {
+	public OssResponse deleteAvailablePrinter(long roomId, long printerId) {
 		EntityManager em = getEntityManager();
-		Room room = this.getById(roomId);
-		PrinterController printerController = new PrinterController(session);
-		Printer printer = printerController.getById(deviceId);
-		room.getAvailablePrinters().remove(printer);
-		printer.getAvailableInRooms().remove(room);
 		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Room room = em.find(Room.class, roomId);
+			if( room == null || printer == null) {
+				em.close();
+				return new OssResponse(this.getSession(),"ERROR", "Room or printer cannot be found.");
+			}
 			em.getTransaction().begin();
+			room.getAvailablePrinters().remove(printer);
+			printer.getAvailableInRooms().remove(room);
 			em.merge(room);
 			em.merge(printer);
 			em.getTransaction().commit();
