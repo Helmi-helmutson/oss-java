@@ -599,6 +599,7 @@ public class UserController extends Controller {
 		program[6] = projectName;
 		program[7] = "-c";
 		program[8] = "y";
+		program[9] = "-d";
 		program[10] = "y";
 		for (User user : users) {
 			program[4] = user.getUid();
@@ -621,6 +622,7 @@ public class UserController extends Controller {
 		program[6] = projectName;
 		program[7] = "-c";
 		program[8] = "y";
+		program[9] = "-d";
 		program[10] = "y";
 		for (Long id : userIds) {
 			program[4] = this.getById(id).getUid();
@@ -642,12 +644,12 @@ public class UserController extends Controller {
 		program[5] = "-p";
 		program[6] = project;
 		program[7] = "-c";
+		program[9] = "-d";
 		if (cleanUpExport) {
 			program[8] = "y";
 		} else {
 			program[8] = "n";
 		}
-		program[9] = "-d";
 		if (sortInDirs) {
 			program[10] = "y";
 		} else {
