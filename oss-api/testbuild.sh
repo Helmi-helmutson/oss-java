@@ -35,8 +35,7 @@ cd src/main/java/de/openschoolserver/api/resources/
 cd ${HERE}
 CLASSPATH=$( grep "^CLASSPATH=" oss-java/bin/de.openschoolserver.api )
 sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > /data1/OSC/home:varkoly:OSS-4-0/oss-java/start-oss-api
-cp start-oss-squid-sso /data1/OSC/home:varkoly:OSS-4-0/oss-java/start-oss-squid-sso
-#rm -r oss-java
+rm -r oss-java
 xterm -e git log --raw  &
 RELEASE=$(cat RELEASE)
 RELEASE=$((RELEASE+1))
