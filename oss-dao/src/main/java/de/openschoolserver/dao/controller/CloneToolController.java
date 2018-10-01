@@ -1,7 +1,9 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -46,7 +48,14 @@ public class CloneToolController extends Controller {
 		EntityManager em = getEntityManager();
 
 		try {
-			return em.find(HWConf.class, hwconfId);
+			HWConf hwconf = em.find(HWConf.class, hwconfId);
+			for( Partition partition : hwconf.getPartitions() ) {
+				File f = new File(images + hwconfId + "/" + partition.getName() + ".img");
+				if( f.exists() ) {
+					partition.setLastCloned(new Timestamp(f.lastModified()));
+				}
+			}
+			return hwconf;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
