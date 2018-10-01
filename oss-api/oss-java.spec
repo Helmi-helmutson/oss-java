@@ -17,11 +17,10 @@ Source1:	oss-api.properties
 Source2:	config.yml	
 Source3:	start-oss-api
 Source4:	oss-api.service
-Source5:        start-oss-squid-sso
+Source5:	turn-to-new-printer.sh
 Source6:	oss-objects.sql
 Source7:	school-INSERT.sql
 Source8:	business-INSERT.sql
-Source9:	turn-to-new-printer.sh
 Requires: 	systemd 
 Requires:	oss-base
 BuildArch:      noarch
@@ -53,7 +52,6 @@ cp %{SOURCE5}  %{buildroot}/opt/oss-java/bin/
 cp %{SOURCE6}  %{buildroot}/opt/oss-java/data/
 cp %{SOURCE7}  %{buildroot}/opt/oss-java/data/
 cp %{SOURCE8}  %{buildroot}/opt/oss-java/data/
-cp %{SOURCE9}  %{buildroot}/opt/oss-java/bin/
 
 %pre
 %service_add_pre oss-api.service
