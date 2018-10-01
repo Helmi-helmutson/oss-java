@@ -220,8 +220,8 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse setDefaultPrinter(Session session, long roomId, Long deviceId) {
-		return new RoomController(session).setDefaultPrinter(roomId, deviceId);
+	public OssResponse setDefaultPrinter(Session session, long roomId, Long printerIds) {
+		return new RoomController(session).setDefaultPrinter(roomId, printerIds);
 	}
 
 	@Override
@@ -235,18 +235,18 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse setAvailablePrinters(Session session, long roomId, List<Long> deviceIds) {
-		return new RoomController(session).setAvailablePrinters(roomId, deviceIds);
+	public OssResponse setAvailablePrinters(Session session, long roomId, List<Long> printerIds) {
+		return new RoomController(session).setAvailablePrinters(roomId, printerIds);
 	}
 
 	@Override
-	public OssResponse addAvailablePrinters(Session session, long roomId, long deviceId) {
-		return new RoomController(session).addAvailablePrinter(roomId, deviceId);
+	public OssResponse addAvailablePrinters(Session session, long roomId, long printerId) {
+		return new RoomController(session).addAvailablePrinter(roomId, printerId);
 	}
 
 	@Override
-	public OssResponse deleteAvailablePrinters(Session session, long roomId, long deviceId) {
-		return new RoomController(session).deleteAvailablePrinter(roomId, deviceId);
+	public OssResponse deleteAvailablePrinters(Session session, long roomId, long printerId) {
+		return new RoomController(session).deleteAvailablePrinter(roomId, printerId);
 	}
 
 	@Override
