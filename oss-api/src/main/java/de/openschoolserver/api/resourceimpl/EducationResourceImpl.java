@@ -218,7 +218,10 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse uploadFileToGroup(Session session, Long groupId, InputStream fileInputStream,
+	public OssResponse uploadFileToGroup(Session session,
+			Long groupId,
+			boolean studentsOnly,
+			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		return new EducationController(session).uploadFileTo("group",groupId,fileInputStream,contentDispositionHeader);
 	}
@@ -340,27 +343,26 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse collectFileFromStudentsOfGroup(Session session, Long groupId, String projectName) {
+	public OssResponse collectFileFromfGroup(Session session,
+			Long groupId,
+			String projectName,
+			boolean sortInDirs,
+			boolean cleanUpExport,
+			boolean studentsOnly
+			) {
 		UserController userController = new UserController(session);
-		List<User> users = new ArrayList<User>();
 		Group group        = new GroupController(session).getById(groupId);
 		for( User user : group.getUsers() ) {
-			if( user.getRole().equals(roleStudent)) {
-				users.add(user);
+			if( !studentsOnly ||  user.getRole().equals(roleStudent)) {
+				if( user.getRole().equals(roleTeacher) ) {
+					userController.collectFileFromUser(user, projectName, false, sortInDirs);
+				} else {
+					userController.collectFileFromUser(user, projectName, cleanUpExport, sortInDirs);
+				}
 			}
 		}
-		return userController.collectFile(users, projectName);
-	}
-
-	@Override
-	public OssResponse collectFileFromMembersOfGroup(Session session, Long groupId, String projectName) {
-		UserController userController = new UserController(session);
-		List<User> users = new ArrayList<User>();
-		Group group        = new GroupController(session).getById(groupId);
-		for( User user : group.getUsers() ) {
-			users.add(user);
-		}
-		return userController.collectFile(users, projectName);
+		return new OssResponse(session, "OK",
+				"The files from the export directories of selected users were collected.");
 	}
 
 	@Override
