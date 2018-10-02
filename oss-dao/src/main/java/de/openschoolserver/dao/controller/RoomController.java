@@ -1057,18 +1057,16 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","The available printers of the room was set succesfully.");
 	}
 
-	public OssResponse addAvailablePrinter(long roomId, long deviceId) {
-
-		Room room = this.getById(roomId);
-		PrinterController printerController = new PrinterController(session);
-		Printer printer = printerController.getById(deviceId);
-		if( room.getAvailablePrinters().contains(printer) ) {
-			return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
-		}
-		room.getAvailablePrinters().add(printer);
-		printer.getAvailableInRooms().add(room);
+	public OssResponse addAvailablePrinter(long roomId, long printerId) {
 		EntityManager em = getEntityManager();
 		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Room room = em.find(Room.class, roomId);
+			if( room.getAvailablePrinters().contains(printer) ) {
+				return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
+			}
+			room.getAvailablePrinters().add(printer);
+			printer.getAvailableInRooms().add(room);
 			em.getTransaction().begin();
 			em.merge(room);
 			em.merge(printer);
@@ -1087,7 +1085,6 @@ public class RoomController extends Controller {
 			Printer printer = em.find(Printer.class, printerId);
 			Room room = em.find(Room.class, roomId);
 			if( room == null || printer == null) {
-				em.close();
 				return new OssResponse(this.getSession(),"ERROR", "Room or printer cannot be found.");
 			}
 			em.getTransaction().begin();
