@@ -242,12 +242,12 @@ public interface DeviceResource {
     );
 
     /*
-     * PUT devices/{deviceId}/defaultPrinter/{defaultPrinterId}
+     * PUT devices/{deviceId}/defaultPrinter/{printerId}
      */
     @PUT
     @Path("{deviceId}/defaultPrinter/{defaultPrinterId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Set default printer Name")
+    @ApiOperation(value = "Set default printer for the device.")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -255,7 +255,23 @@ public interface DeviceResource {
     OssResponse setDefaultPrinter(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId,
-            @PathParam("defaulPrinterId") long defaultPrinterId
+            @PathParam("printerId") long printerId
+    );
+
+    /*
+     * DELETE devices/{deviceId}/defaultPrinter
+     */
+    @DELETE
+    @Path("{deviceId}/defaultPrinter")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "REmove the default printer from the device.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.manage")
+    OssResponse deleteDefaultPrinter(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") long deviceId
     );
 
     /*
@@ -294,19 +310,36 @@ public interface DeviceResource {
      * PUT devices/{deviceId}/availablePrinters
      */
     @PUT
-    @Path("{deviceId}/availablePrinters")
+    @Path("{deviceId}/availablePrinters/{printerId}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Set the list of name of the available printers")
+    @ApiOperation(value = "Add an available printer to the device.")
         @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.manage")
-    OssResponse setAvailablePrinters(
+    OssResponse addAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId,
-            List<Long> availablePrinters
+            @PathParam("printerId") long printerId
     );
-    
+
+    /*
+     * DELETE devices/{deviceId}/availablePrinters
+     */
+    @DELETE
+    @Path("{deviceId}/availablePrinters/{printerId}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Remove an available printer from the device.")
+        @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("device.manage")
+    OssResponse deleteAvailablePrinters(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("deviceId") long deviceId,
+            @PathParam("printerId") long printerId
+    );
+
     /*
      * GET devices/loggedInUsers/{IP-Address}
      */
@@ -364,7 +397,7 @@ public interface DeviceResource {
         @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("device.manage")
-    OssResponse removeLoggedInUser(
+    OssResponse deleteLoggedInUser(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP,
             @PathParam("userName") String userName

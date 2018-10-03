@@ -116,11 +116,19 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse setAvailablePrinters(Session session, long deviceId, List<Long> availablePrinters) {
-		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.setAvailablePrinters(deviceId,availablePrinters);
+	public OssResponse deleteDefaultPrinter(Session session, long deviceId) {
+		return new DeviceController(session).deleteDefaultPrinter(deviceId);
 	}
 
+	@Override
+	public OssResponse addAvailablePrinters(Session session, long deviceId, long printerId) {
+		return new DeviceController(session).addAvailablePrinter(deviceId, printerId);
+	}
+
+	@Override
+	public OssResponse deleteAvailablePrinters(Session session, long deviceId, long printerId) {
+		return new DeviceController(session).deleteAvailablePrinter(deviceId, printerId);
+	}
 	@Override
 	public OssResponse setLoggedInUsers(Session session, String IP, String userName) {
 		final DeviceController deviceController = new DeviceController(session);
@@ -128,11 +136,11 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse removeLoggedInUser(Session session, String IP, String userName) {
+	public OssResponse deleteLoggedInUser(Session session, String IP, String userName) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.removeLoggedInUser(IP, userName);
 	}
-	
+
 	@Override
 	public void refreshConfig(Session session) {
 		new DHCPConfig(session).Create();
@@ -242,6 +250,4 @@ public class DeviceResourceImpl implements DeviceResource {
 	public String getAllUsedDevices(Session session, Long saltClientOnly) {
 		return new DeviceController(session).getAllUsedDevices(saltClientOnly);
 	}
-
-	
 }

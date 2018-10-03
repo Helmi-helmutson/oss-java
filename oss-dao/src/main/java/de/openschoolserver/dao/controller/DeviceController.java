@@ -507,14 +507,17 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"ERROR","End error:" + Error.toString());
 	}
 
-	public OssResponse setDefaultPrinter(long deviceId, long defaultPrinterId) {
-		// TODO Auto-generated method stub
-		Device device          = this.getById(deviceId);
-		Printer defaultPrinter = new PrinterController(session).getById(defaultPrinterId);
-		device.setDefaultPrinter(defaultPrinter);
+	public OssResponse setDefaultPrinter(long deviceId, long printerId) {
 		EntityManager em = getEntityManager();
 		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Device device   = em.find(Device.class, deviceId);
+			if( device == null || printer == null) {
+				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
+			}
 			em.getTransaction().begin();
+			device.setDefaultPrinter(printer);
+			printer.getDefaultForDevices().add(device);
 			em.merge(device);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -525,26 +528,76 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Default printer was set succesfully.");
 	}
 
-	public OssResponse setAvailablePrinters(long deviceId, List<Long> availablePrinterIds) {
-		// TODO DAS IST FALSCH
-		Device device         = this.getById(deviceId);
-		List<Printer> availablePrinters = new ArrayList<Printer>();
-		PrinterController printerController = new PrinterController(session);
-		for( Long aP : availablePrinterIds ) {
-			availablePrinters.add(printerController.getById(aP));
+
+	public OssResponse deleteDefaultPrinter(long deviceId) {
+		EntityManager em = getEntityManager();
+		Device  device  = em.find(Device.class, deviceId);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Device cannot be found.");
 		}
-		device.setAvailablePrinters(availablePrinters);
+		Printer printer = device.getDefaultPrinter();
+		if( printer != null  ) {
+			try {
+				em.getTransaction().begin();
+				device.setDefaultPrinter(null);
+				printer.getDefaultForDevices().remove(device);
+				em.merge(device);
+				em.merge(printer);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			} finally {
+				em.close();
+			}
+		}
+		return new OssResponse(this.getSession(),"OK","The default printer of the room was deleted succesfully.");
+	}
+
+	public OssResponse addAvailablePrinter(long deviceId, long printerId) {
 		EntityManager em = getEntityManager();
 		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Device device   = em.find(Device.class, deviceId);
+			if( device == null || printer == null) {
+				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
+			}
+			if( device.getAvailablePrinters().contains(printer) ) {
+				return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
+			}
 			em.getTransaction().begin();
+			device.getAvailablePrinters().add(printer);
+			printer.getDefaultForDevices().add(device);
 			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Available printers were set succesfully.");
+		return new OssResponse(this.getSession(),"OK","The selected printer was added to the room.");
+	}
+
+	public OssResponse deleteAvailablePrinter(long deviceId, long printerId) {
+		EntityManager em = getEntityManager();
+		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Device device   = em.find(Device.class, deviceId);
+			if( device == null || printer == null) {
+				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
+			}
+			em.getTransaction().begin();
+			device.getAvailablePrinters().remove(printer);
+			printer.getDefaultForDevices().remove(device);
+			em.merge(device);
+			em.merge(printer);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","The selected printer was removed from room.");
 	}
 
 	public OssResponse addLoggedInUser(String IP, String userName) {

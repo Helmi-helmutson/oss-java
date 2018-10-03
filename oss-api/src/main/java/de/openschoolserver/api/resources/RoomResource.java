@@ -545,11 +545,11 @@ public interface RoomResource {
     OssResponse setAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
-            List<Long> deviceIds
+            List<Long> printerIds
     );
 
     @PUT
-    @Path("{roomId}/availablePrinters/{deviceId}")
+    @Path("{roomId}/availablePrinters/{prinerId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Adds an available printers in a room.")
     @ApiResponses(value = {
@@ -559,11 +559,11 @@ public interface RoomResource {
     OssResponse addAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") long roomId,
-            @PathParam("deviceId") long deviceId
+            @PathParam("prinerId") long prinerId
     );
 
     @DELETE
-    @Path("{roomId}/availablePrinters/{deviceId}")
+    @Path("{roomId}/availablePrinters/{prinerId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Deletes an avilable printer in a room.")
     @ApiResponses(value = {
@@ -573,7 +573,7 @@ public interface RoomResource {
     OssResponse deleteAvailablePrinters(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId")   long roomId,
-            @PathParam("deviceId") long deviceId
+            @PathParam("prinerId") long prinerId
     );
 
     @GET
