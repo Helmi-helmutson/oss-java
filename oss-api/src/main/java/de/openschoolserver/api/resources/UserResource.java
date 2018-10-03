@@ -340,12 +340,12 @@ public interface UserResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-     @RolesAllowed("user.search")
-     String getUserAttribute(
-  @ApiParam(hidden = true) @Auth Session session,
+    @RolesAllowed("user.search")
+    String getUserAttribute(
+    @ApiParam(hidden = true) @Auth Session session,
             @PathParam("uid")  String uid,
             @PathParam("attribute") String attribute
-  );
+    );
 
     /*
      * GET users/byRole/<role>
