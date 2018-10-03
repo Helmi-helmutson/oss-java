@@ -20,6 +20,7 @@ import de.openschoolserver.dao.Partition;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 @SuppressWarnings( "unchecked" )
@@ -551,9 +552,20 @@ public class CloneToolController extends Controller {
 	}
 
 	public String resetMinion(Long deviceId) {
-		
+		EntityManager em = getEntityManager();
 		try {
-			String deviceName  = new DeviceController(this.session).getById(deviceId).getName();
+			Device device = em.find(Device.class, deviceId);
+			if( device == null ) {
+				return "ERROR Ca not find the device.";
+			}
+			em.getTransaction().begin();
+			for ( SoftwareStatus st : device.getSoftwareStatus() ) {
+				em.remove(st);
+			}
+			device.setSoftwareStatus(null);
+			em.merge(device);
+			em.getTransaction().commit();
+			String deviceName  = device.getName();
 			String[] program   = new String[4];
 			StringBuffer reply = new StringBuffer();
 			StringBuffer error = new StringBuffer();
@@ -601,6 +613,32 @@ public class CloneToolController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Multicast imaging was started succesfully.");
+	}
+
+	public OssResponse modifyPartition(Long partitionId, Partition partition) {
+		EntityManager em = getEntityManager();
+		try {
+			if( partition.getId() != partitionId ) {
+				return new OssResponse(this.getSession(),"ERROR","Partition id mismatch.");
+			}
+			Partition oldPartition = em.find(Partition.class, partitionId);
+			if( oldPartition == null ) {
+				return new OssResponse(this.getSession(),"ERROR","Cannot find partition.");
+			}
+			em.getTransaction().begin();
+			oldPartition.setDescription(partition.getDescription());
+			oldPartition.setOs(partition.getOs());
+			oldPartition.setFormat(partition.getFormat());
+			oldPartition.setJoinType(partition.getJoinType());
+			em.merge(oldPartition);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error("modifyPartition:" + e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
