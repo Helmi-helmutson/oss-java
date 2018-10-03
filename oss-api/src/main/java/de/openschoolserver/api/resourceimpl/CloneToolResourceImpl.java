@@ -276,4 +276,9 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	public OssResponse startMulticast(Session session, Long partitionId, String networkDevice) {
 		return new CloneToolController(session).startMulticast(partitionId,networkDevice);
 	}
+
+	@Override
+	public OssResponse modifyPartition(Session session, Long partitionId, Partition partition) {
+		return new CloneToolController(session).modifyPartition(partitionId, partition);
+	}
 }

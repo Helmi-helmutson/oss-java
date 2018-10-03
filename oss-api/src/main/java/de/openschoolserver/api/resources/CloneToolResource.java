@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+ /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.*;
@@ -28,7 +28,7 @@ import java.util.List;
 @Path("clonetool")
 @Api(value = "clonetool")
 public interface CloneToolResource {
-  
+
 	/*
 	 * Get clonetool/hwconf
 	 */
@@ -43,7 +43,7 @@ public interface CloneToolResource {
 	String getHWConf(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
-  
+
 	/*
 	 * PUT clonetool/resetMinion
 	 */
@@ -74,7 +74,7 @@ public interface CloneToolResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId
 	);
-  
+
 	/*
 	 * Get clonetool/isMaster
 	 */
@@ -89,7 +89,7 @@ public interface CloneToolResource {
 	String isMaster(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
-  
+
 	/*
 	 * Get clonetool/devices/{deviceId}/isMaster
 	 */
@@ -105,7 +105,7 @@ public interface CloneToolResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId
 	);
-  
+
 	/*
 	 * Get clonetool/devices/{deviceId}/setMaster/{isMaster}
 	 */
@@ -122,7 +122,7 @@ public interface CloneToolResource {
 	        @PathParam("deviceId") Long deviceId,
 	        @PathParam("isMaster") int isMaster
 	);
-  
+
 	/*
 	 * Get clonetool/devices/{deviceIisMaster
 	 */
@@ -138,7 +138,7 @@ public interface CloneToolResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("isMaster") int isMaster
 	);
-  
+
 	/*
 	 * Get clonetool/all
 	 */
@@ -153,7 +153,7 @@ public interface CloneToolResource {
 	List<HWConf> getAllHWConf(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
-       
+
 	/*
 	 * Get clonetool/{hwconfId}
 	 */
@@ -201,7 +201,7 @@ public interface CloneToolResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
 	);
-	
+
 	/*
      * GET clonetool/{hwconfId}/partitions
     */
@@ -217,7 +217,7 @@ public interface CloneToolResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long hwconfId
 	);
-    
+
 	/*
 	 * Get clonetool/{hwconfId}/{partitionName}
 	 */
@@ -269,7 +269,7 @@ public interface CloneToolResource {
 	String getRoomsToRegister(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
-	
+
 	/*
      * GET rooms/{roomId}/getAvailableIPAddresses
      */
@@ -324,7 +324,7 @@ public interface CloneToolResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        HWConf hwconf
 	);
-       
+
 	/*
 	 * Post clonetool/{hwconfId}
 	 */
@@ -341,7 +341,7 @@ public interface CloneToolResource {
 	        @PathParam("hwconfId") Long hwconfId,
 		    HWConf hwconf
 	);
-    
+
 	/*
 	 * PUT clonetool/{hwconfId}/{partition}
 	 */
@@ -396,7 +396,7 @@ public interface CloneToolResource {
 	        @PathParam("key") String key,
 	        @PathParam("value") String value
 	);
-    
+
 	/*
 	 * DELETE clonetool/{hwconfId}
 	 */
@@ -448,9 +448,9 @@ public interface CloneToolResource {
 	        @PathParam("partitionName") String partitionName,
 	        @PathParam("key") String key
 	);
-	
+
 	/*
-	 * 
+	 *
 	 */
 	@POST
 	@Path("{hwconfId}/cloning")
@@ -469,7 +469,7 @@ public interface CloneToolResource {
 			);
 
 	/*
-	 * 
+	 *
 	 */
 	@PUT
 	@Path("{hwconfId}/cloning/{multiCast}")
@@ -485,13 +485,13 @@ public interface CloneToolResource {
 			);
 
 	/*
-	 * 
+	 *
 	 */
 	@PUT
 	@Path("rooms/{roomId}/cloning/{multiCast}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Creates the boot configuration for the automatical partitioning for all workstations in a room." +
-			  			  "Multicast can be 0 or 1"
+				  "Multicast can be 0 or 1"
 						)
 	@RolesAllowed("hwconf.manage")
 	OssResponse startCloningInRoom(
@@ -501,7 +501,7 @@ public interface CloneToolResource {
 			);
 
 	/*
-	 * 
+	 *
 	 */
 	@PUT
 	@Path("devices/{deviceId}/cloning")
@@ -516,7 +516,7 @@ public interface CloneToolResource {
 
 
 	/*
-	 * 
+	 *
 	 */
 	@DELETE
 	@Path("{hwconfId}/cloning")
@@ -527,9 +527,9 @@ public interface CloneToolResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("hwconfId") Long hwconfId
 			);
-	
+
 	/*
-	 * 
+	 *
 	 */
 	@DELETE
 	@Path("rooms/{roomId}/cloning")
@@ -542,7 +542,7 @@ public interface CloneToolResource {
 			);
 
 	/*
-	 * 
+	 *
 	 */
 	@DELETE
 	@Path("devices/{deviceId}/cloning")
@@ -567,7 +567,7 @@ public interface CloneToolResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("deviceIP") String deviceIP
 			);
-	
+
 	@GET
 	@Path("multicastDevices")
 	@Produces(JSON_UTF8)
@@ -576,13 +576,13 @@ public interface CloneToolResource {
 	String[] getMulticastDevices(
 			@ApiParam(hidden = true) @Auth Session session
 			);
-	
+
 	/**
 	 * Start multicast cloning process of a partition on a device
 	 * @param session
 	 * @param partitionId
 	 * @param networkDevice
-	 * @return 
+	 * @return
 	 */
 	@PUT
 	@Path("partitions/{partitionId}/multicast/{networkDevice}")
@@ -593,5 +593,23 @@ public interface CloneToolResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("partitionId") Long partitionId,
 			@PathParam("networkDevice") String networkDevice
+			);
+
+	/**
+	 * Sets the parameters of an existing partition
+	 * @param session
+	 * @param partitionId
+	 * @param partition
+	 * @return
+	 */
+	@POST
+	@Path("partitions/{partitionId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Sets the parameters of an existing partition.")
+	@RolesAllowed("hwconf.manage")
+	OssResponse modifyPartition(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("partitionId") Long partitionId,
+			Partition partition
 			);
 }
