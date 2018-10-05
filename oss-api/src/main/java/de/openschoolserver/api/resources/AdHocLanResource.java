@@ -281,7 +281,7 @@ public interface AdHocLanResource {
 	@GET
 	@Path("devices")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets all AdHocLan Devices of a user.")
+	@ApiOperation(value = "Gets all owned AdHocLan Devices of a user.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -296,7 +296,7 @@ public interface AdHocLanResource {
 	@DELETE
 	@Path("devices/{deviceId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Delets an AdHocLan Devices of a user.")
+	@ApiOperation(value = "Delets an owned AdHocLan Devices of a user.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -304,6 +304,23 @@ public interface AdHocLanResource {
 	OssResponse deleteDevice(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("deviceId")         Long    deviceId
+			);
+
+	/*
+	 * Get adhoclan/devices/{deviceId}
+	 */
+	@POST
+	@Path("devices/{deviceId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Modify an owned AdHocLan Devices of a user.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No category was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	OssResponse modifyDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("deviceId")         Long    deviceId,
+			Device device
 			);
 
     @PUT
