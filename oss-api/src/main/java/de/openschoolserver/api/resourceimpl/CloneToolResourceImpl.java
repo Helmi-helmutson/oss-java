@@ -13,11 +13,13 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.controller.CloneToolController;
 import de.openschoolserver.dao.controller.Config;
 import de.openschoolserver.dao.controller.RoomController;
+import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.api.resources.CloneToolResource;
 
-
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.UriInfo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -280,5 +282,16 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	@Override
 	public OssResponse modifyPartition(Session session, Long partitionId, Partition partition) {
 		return new CloneToolController(session).modifyPartition(partitionId, partition);
+	}
+
+	@Override
+	public String getFqhn(UriInfo ui, HttpServletRequest req) {
+		Session session  = new SessionController().getLocalhostSession();
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getByIP(req.getRemoteAddr());
+		if( device != null ) {
+			return device.getName().concat(".").concat(deviceController.getConfigValue("DOMAIN"));
+		}
+		return "";
 	}
 }

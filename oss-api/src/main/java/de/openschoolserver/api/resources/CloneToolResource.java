@@ -4,6 +4,7 @@ package de.openschoolserver.api.resources;
 import static de.openschoolserver.api.resources.Resource.*;
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.POST;
@@ -11,6 +12,8 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriInfo;
 
 import io.dropwizard.auth.Auth;
 import io.swagger.annotations.Api;
@@ -612,4 +615,24 @@ public interface CloneToolResource {
 			@PathParam("partitionId") Long partitionId,
 			Partition partition
 			);
+
+	/*
+	 * Some anonyme calls
+	 */
+	/*
+	 * Calls without authorization
+	 */
+	@GET
+	@Path("fqhn")
+	@Produces(TEXT)
+	@ApiOperation(value = "Gets the fully qualified host name of the requester.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 401, message = "No regcode was found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	String getFqhn(
+	        @Context UriInfo ui,
+	        @Context HttpServletRequest req
+	);
+
 }
