@@ -305,6 +305,9 @@ public class UserController extends Controller {
 	}
 
 	public OssResponse delete(User user) {
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find the user.");
+		}
 		if (this.isProtected(user)) {
 			return new OssResponse(this.getSession(), "ERROR", "This user must not be deleted.");
 		}
@@ -658,7 +661,7 @@ public class UserController extends Controller {
 		OSSShellTools.exec(program, reply, stderr, null);
 		if (stderr.toString().isEmpty()) {
 			logger.debug("Collected project " + project + " from " + user.getUid());
-			return new OssResponse(this.getSession(), "OK", "File was collected from:", null, user.getUid());
+			return new OssResponse(this.getSession(), "OK", "File was collected from: %s", null, user.getUid());
 		}
 		logger.error("Can not collect project " + project + " from " + user.getUid() + stderr.toString());
 

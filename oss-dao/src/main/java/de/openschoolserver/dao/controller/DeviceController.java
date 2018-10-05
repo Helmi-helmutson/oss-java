@@ -15,6 +15,8 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 import java.util.List;
 import java.util.Map;
 
@@ -125,6 +127,9 @@ public class DeviceController extends Controller {
 		UserController userController = new UserController(this.session);
 		boolean needWriteSalt = false;
 		Device device = em.find(Device.class, deviceId);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find device with id %s.",null,String.valueOf(deviceId));
+		}
 		User user = null;
 		try {
 			em.getTransaction().begin();
@@ -142,7 +147,15 @@ public class DeviceController extends Controller {
 				userController.delete(user);
 			}
 			this.startPlugin("delete_device", device);
-			em.merge(device);
+			if( device.getOwner() != null ) {
+				User owner = device.getOwner();
+				logger.debug("Deleting private device owner:" + owner + " device " + device);
+				owner.getOwnedDevices().remove(device);
+				if( session.getUser().equals(owner)) {
+					session.getUser().getOwnedDevices().remove(device);
+				}
+				em.merge(owner);
+			}
 			em.remove(device);
 			em.getTransaction().commit();
 			if( atomic ) {

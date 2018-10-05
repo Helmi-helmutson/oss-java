@@ -274,6 +274,9 @@ public class RoomController extends Controller {
 	public OssResponse delete(long roomId){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
+		if( room == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find room with id %s.",null,String.valueOf(roomId));
+		}
 		if( !this.mayModify(room) ) {
 			return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
 		}
@@ -885,7 +888,6 @@ public class RoomController extends Controller {
 			return ossResponse;
 		}
 		device.setRoom(room);
-		logger.debug(device.toString());
 		try {
 			em.getTransaction().begin();
 			em.persist(device);
@@ -901,7 +903,11 @@ public class RoomController extends Controller {
 			}
 			room.getDevices().add(device);
 			em.merge(room);
-			em.merge(owner);
+			if( ! owner.getRole().contains("sysadmins") ) {
+			//TODO
+				owner.getOwnedDevices().add(device);
+				em.merge(owner);
+			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());

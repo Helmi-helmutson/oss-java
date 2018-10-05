@@ -124,6 +124,9 @@ public class PrinterController extends Controller {
 		OssResponse ossResponse = new OssResponse(session,"OK","Printer was deleted succesfully.");
 		try {
 			Printer printer = em.find(Printer.class, printerId);
+			if( printer == null ) {
+				return new OssResponse(this.getSession(),"ERROR", "Can not find printer with id %s.",null,String.valueOf(printerId));
+			}
 			Device  printerDevice = printer.getDevice();
 			String[] program    = new String[3];
 			StringBuffer reply  = new StringBuffer();
