@@ -2,8 +2,6 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import de.openschoolserver.dao.*;
 
-@SuppressWarnings("unchecked")
 public class AdHocLanController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(AdHocLanController.class);
@@ -114,7 +111,7 @@ public class AdHocLanController extends Controller {
 	}
 
 
-	public OssResponse deleteObjectIntoRoom(Long roomId, String objectType, Long objectId) {
+	public OssResponse deleteObjectInRoom(Long roomId, String objectType, Long objectId) {
 		Long categoryId = getAdHocCategoryOfRoom(roomId).getId();
 		if( categoryId == null ) {
 			return new OssResponse(session,"ERROR","AdHocAccess not found");

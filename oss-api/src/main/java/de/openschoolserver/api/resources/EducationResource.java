@@ -487,7 +487,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    OssResponse downloadFilesFromRoom(@ApiParam(hidden = true) @Auth Session session,
+    OssResponse collectFileFromRoom(@ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId,
             @FormDataParam("projectName") String projectName,
             @FormDataParam("sortInDirs")  boolean sortInDirs,
