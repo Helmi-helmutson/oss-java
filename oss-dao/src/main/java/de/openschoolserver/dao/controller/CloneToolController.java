@@ -556,7 +556,7 @@ public class CloneToolController extends Controller {
 		try {
 			Device device = em.find(Device.class, deviceId);
 			if( device == null ) {
-				return "ERROR Ca not find the device.";
+				return "ERROR Can not find the device.";
 			}
 			em.getTransaction().begin();
 			for ( SoftwareStatus st : device.getSoftwareStatus() ) {
