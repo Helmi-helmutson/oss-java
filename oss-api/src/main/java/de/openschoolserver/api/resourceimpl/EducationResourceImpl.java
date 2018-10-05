@@ -86,28 +86,6 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse downloadFilesFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs,
-			boolean cleanUpExport) {
-		Map<String, String> actionContent = new HashMap<String,String>();
-		RoomController roomController = new RoomController(session);
-		Room room = roomController.getById(roomId);
-		actionContent.put("sortInDirs", "true");
-		actionContent.put("cleanUpExport", "true");
-		if( projectName == null ) {
-			actionContent.put("projectName", roomController.nowString() + "." + room.getName() );
-		} else {
-			actionContent.put("projectName",projectName);
-		}
-		if( !sortInDirs) {
-			actionContent.put("sortInDirs", "false");
-		}
-		if( !cleanUpExport) {
-			actionContent.put("cleanUpExport", "false");
-		}
-		return this.manageRoom(session, roomId, "download", actionContent);
-	}
-
-	@Override
 	public OssResponse manageRoom(Session session, Long roomId, String action, Map<String, String> actionContent) {
 		try {
 			logger.debug("EducationResourceImpl.manageRoom:" + roomId + " action:" + action);
@@ -340,6 +318,26 @@ public class EducationResourceImpl implements Resource, EducationResource {
 				users.add(userController.getById(logged.get(0)));
 		}
 		return new UserController(session).collectFile(users, projectName);
+	}
+
+	@Override
+	public OssResponse collectFileFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs, boolean cleanUpExport) {
+		UserController userController = new UserController(session);
+		StringBuilder result = new StringBuilder();
+		for( List<Long> logged : new EducationController(session).getRoom(roomId) ) {
+			User user = userController.getById(logged.get(0));
+			if( user != null ) {
+				OssResponse ossResult = userController.collectFileFromUser(user,projectName,sortInDirs,cleanUpExport);
+				if( ossResult.getCode().equals("OK")) {
+					result.append("OK: ").append(user.getUid()).append(" (").append(user.getSurName()).append(", ").append(user.getGivenName()).append(")OK").append(userController.getNl());
+				} else {
+					result.append("ERROR: ").append(user.getUid()).append(" (").append(user.getSurName()).append(", ").append(user.getGivenName()).append(")").append(userController.getNl());
+				}
+			}
+
+		}
+		return new  OssResponse(session,"OK", result.toString());
+
 	}
 
 	@Override
