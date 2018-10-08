@@ -746,6 +746,70 @@ public interface SoftwareResource {
             @PathParam("installationId") long installationId
     );
 
+    /*
+     * GET softwares/installations/{installationId}/available/softwares
+     */
+    @GET
+    @Path("installations/{installationId}/available/softwares")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of softwares in an installation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<Long> getAvailableSoftwares(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
+    /*
+     * GET softwares/installations/{installationId}/available/devices
+     */
+    @GET
+    @Path("installations/{installationId}/available/devices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of devices in an installation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<Long> getAvailableDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
+    /*
+     * GET softwares/installations/{installationId}/available/rooms
+     */
+    @GET
+    @Path("installations/{installationId}/available/rooms")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of rooms in an installation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<Long> getAvailableRooms(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
+    /*
+     * GET softwares/installations/{installationId}/available/hwconfs
+     */
+    @GET
+    @Path("installations/{installationId}/available/hwconfs")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of hwconfs in an installation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<Long> getAvailableHWConfs(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
     /* #######################################################
      * Functions for the plugin by starting the clients.     #
      * In this case only the device name is accessible.      #

@@ -8,7 +8,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.SoftwareResource;
@@ -29,7 +30,7 @@ import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.RoomController;
 
 public class SoftwareResourceImpl implements SoftwareResource {
-
+	Logger logger           = LoggerFactory.getLogger(SoftwareResource.class);
 	public SoftwareResourceImpl() {
 	}
 
@@ -373,5 +374,57 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse deleteDownloadedSoftwares(Session session, List<String> softwares) {
 		return new SoftwareController(session).deleteDownloadedSoftwares(softwares);
+	}
+
+	@Override
+	public List<Long> getAvailableSoftwares(Session session, long installationId) {
+		SoftwareController sc = new SoftwareController(session);
+		List<Long> softwareIds = new ArrayList<Long>();
+		Category installationSet = new CategoryController(session).getById(installationId);
+		for( Software software : sc.getAllInstallable() ) {
+			if( !installationSet.getSoftwares().contains(software) ) {
+				softwareIds.add(software.getId());
+			}
+		}
+		return softwareIds;
+	}
+
+	@Override
+	public List<Long> getAvailableDevices(Session session, long installationId) {
+		List<Long> deviceIds = new ArrayList<Long>();
+		DeviceController dc = new DeviceController(session);
+		for( Long deviceId : new CategoryController(session).getAvailableMembers(installationId, "Device") ) {
+			Device device = dc.getById(deviceId);
+			if( device != null  &&  device.getHwconf() != null && device.getHwconf().getDeviceType().equals("FatClient") ) {
+				deviceIds.add(deviceId);
+			}
+		}
+		return deviceIds;
+	}
+
+	@Override
+	public List<Long> getAvailableRooms(Session session, long installationId) {
+		List<Long> roomIds = new ArrayList<Long>();
+		RoomController rc = new RoomController(session);
+		for( Long roomId : new CategoryController(session).getAvailableMembers(installationId, "Room") ) {
+			Room room = rc.getById(roomId);
+			if( room != null  &&  room.getHwconf() != null && room.getHwconf().getDeviceType().equals("FatClient") ) {
+				roomIds.add(roomId);
+			}
+		}
+		return roomIds;
+	}
+
+	@Override
+	public List<Long> getAvailableHWConfs(Session session, long installationId) {
+		List<Long> hwconfIds = new ArrayList<Long>();
+		CloneToolController cc = new CloneToolController(session);
+		for( Long hwconfId : new CategoryController(session).getAvailableMembers(installationId, "HWConf") ) {
+			HWConf hwconf = cc.getById(hwconfId);
+			if( hwconf != null && hwconf.getDeviceType().equals("FatClient") ) {
+				hwconfIds.add(hwconfId);
+			}
+		}
+		return hwconfIds;
 	}
 }
