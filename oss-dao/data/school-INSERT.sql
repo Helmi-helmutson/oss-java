@@ -66,8 +66,6 @@ INSERT INTO Enumerates VALUES(NULL,'roomType','ClassRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','ComputerRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','Library',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','Laboratory',1);
-INSERT INTO Enumerates VALUES(NULL,'roomType','WlanAccess',1);
-INSERT INTO Enumerates VALUES(NULL,'roomType','AdHocAccess',1);
 INSERT INTO Enumerates VALUES(NULL,'roomType','TechnicalRoom',1);
 INSERT INTO Enumerates VALUES(NULL,'accessType','DEF',1);
 INSERT INTO Enumerates VALUES(NULL,'accessType','FW',1);
