@@ -491,11 +491,14 @@ public class DeviceController extends Controller {
 			if(header.containsKey("wlanip")) {
 				device.setWlanIp(values[header.get("wlanip")]);
 			}
-			if(header.containsKey("raw")) {
-				device.setRow(Integer.parseInt(values[header.get("raw")]));
+			if(header.containsKey("row")) {
+				device.setRow(Integer.parseInt(values[header.get("row")]));
+			}
+			if(header.containsKey("place")) {
+				device.setPlace(Integer.parseInt(values[header.get("place")]));
 			}
 			if(header.containsKey("serial")) {
-				device.setPlace(Integer.parseInt(values[header.get("raw")]));
+				device.setSerial(values[header.get("serial")]);
 			}
 			if(header.containsKey("owner")) {
 				device.setOwner(userController.getByUid(values[header.get("owner")]));
