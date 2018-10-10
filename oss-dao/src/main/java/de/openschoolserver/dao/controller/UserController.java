@@ -296,6 +296,16 @@ public class UserController extends Controller {
 		return new OssResponse(this.getSession(), "OK", "User was modified succesfully");
 	}
 
+	public OssResponse deleteStudents(List<Long> userIds) {
+		for( Long userId : userIds ) {
+			User user = this.getById(userId);
+			if( user.getRole().equals(roleStudent)) {
+				this.delete(user);
+			}
+		}
+		return new OssResponse(this.getSession(), "OK", "Users were deleted succesfully");
+	}
+
 	public OssResponse delete(long userId) {
 		return this.delete(this.getById(userId));
 	}

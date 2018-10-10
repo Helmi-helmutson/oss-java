@@ -4,7 +4,6 @@ package de.openschoolserver.api.resourceimpl;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -322,10 +321,15 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse collectFileFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs, boolean cleanUpExport) {
-		UserController userController = new UserController(session);
-		StringBuilder result = new StringBuilder();
+		UserController userController     = new UserController(session);
+		DeviceController deviceController = new DeviceController(session);
+		StringBuilder result   = new StringBuilder();
 		for( List<Long> logged : new EducationController(session).getRoom(roomId) ) {
-			User user = userController.getById(logged.get(0));
+			User   user   = userController.getById(logged.get(0));
+			Device device =  deviceController.getById(logged.get(1));
+			if( user == null ) {
+				user = userController.getByUid(device.getName());
+			}
 			if( user != null ) {
 				OssResponse ossResult = userController.collectFileFromUser(user,projectName,sortInDirs,cleanUpExport);
 				if( ossResult.getCode().equals("OK")) {
@@ -334,7 +338,6 @@ public class EducationResourceImpl implements Resource, EducationResource {
 					result.append("ERROR: ").append(user.getUid()).append(" (").append(user.getSurName()).append(", ").append(user.getGivenName()).append(")").append(userController.getNl());
 				}
 			}
-
 		}
 		return new  OssResponse(session,"OK", result.toString());
 
@@ -395,6 +398,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 					ossActionMap.getStringValue());
 		case "removeProfiles":
 			return  userController.removeProfile(ossActionMap.getUserIds());
+		case "deleteUser":
+			if( session.getAcls().contains("user.delete") || session.getAcls().contains("student.delete") ) {
+				return  userController.deleteStudents(ossActionMap.getUserIds());
+			} else {
+				return new OssResponse(session,"ERROR","You have no right to execute this action.");
+			}
 		}
 		return new OssResponse(session,"ERROR","Unknown action");
 	}
