@@ -3,8 +3,9 @@
 . /etc/sysconfig/schoolserver
 
 #Create a session for local services
-LOCAL_TOKEN=$( grep 'de.openschoolserver.api.auth.localhost=localhost_' /opt/oss-java/conf/oss-api.properties )
-if [ -z "${LOCAL_TOKEN}" -o "${SCHOOL_RESET_REGISTER_PASSWORD}" = "yes" ]; then
+TOKEN=$( grep de.openschoolserver.api.auth.localhost= /opt/oss-java/conf/oss-api.properties | sed 's/de.openschoolserver.api.auth.localhost=//' )
+LOCAL_TOKEN=$( echo "SELECT COUNT(*) FROM Sessions WHERE token='$TOKEN'" | mysql OSS | tail -n 1 )
+if [  "${LOCAL_TOKEN}" = 0 -o "${SCHOOL_RESET_REGISTER_PASSWORD}" = "yes" ]; then
 	grep -q de.openschoolserver.api.auth.localhost= /opt/oss-java/conf/oss-api.properties || echo de.openschoolserver.api.auth.localhost=TOKEN >> /opt/oss-java/conf/oss-api.properties
 	TOKEN="localhost_"$(uuidgen)
 	sed -i s/de.openschoolserver.api.auth.localhost=.*/de.openschoolserver.api.auth.localhost=$TOKEN/ /opt/oss-java/conf/oss-api.properties
