@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import de.openschoolserver.dao.Category;
+import de.openschoolserver.dao.OssBaseObject;
 import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.SoftwareLicense;
 import de.openschoolserver.dao.SoftwareStatus;
@@ -693,7 +694,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getSoftwares(
+    List<OssBaseObject> getSoftwares(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -709,7 +710,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getDevices(
+    List<OssBaseObject> getDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -725,7 +726,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getRooms(
+    List<OssBaseObject> getRooms(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -741,7 +742,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getHWConfs(
+    List<OssBaseObject> getHWConfs(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -757,7 +758,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getAvailableSoftwares(
+    List<OssBaseObject> getAvailableSoftwares(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -773,7 +774,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getAvailableDevices(
+    List<OssBaseObject> getAvailableDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -789,7 +790,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getAvailableRooms(
+    List<OssBaseObject> getAvailableRooms(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -805,7 +806,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getAvailableHWConfs(
+    List<OssBaseObject> getAvailableHWConfs(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );

@@ -16,6 +16,7 @@ import de.openschoolserver.api.resources.SoftwareResource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
+import de.openschoolserver.dao.OssBaseObject;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
@@ -147,27 +148,43 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public List<Long> getSoftwares(Session session, long installationId) {
-		CategoryController categoryController = new CategoryController(session);
-		return categoryController.getMembers(installationId, "Software");
+	public List<OssBaseObject> getSoftwares(Session session, long installationId) {
+		Category category = new CategoryController(session).getById(installationId);
+		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
+		for( Software object : category.getSoftwares() ) {
+			objects.add(new OssBaseObject(object.getId(),object.getName()));
+		}
+		return objects;
 	}
 
 	@Override
-	public List<Long> getDevices(Session session, long installationId) {
-		CategoryController categoryController = new CategoryController(session);
-		return categoryController.getMembers(installationId, "Device");
+	public List<OssBaseObject> getDevices(Session session, long installationId) {
+		Category category = new CategoryController(session).getById(installationId);
+		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
+		for( Device object : category.getDevices() ) {
+			objects.add(new OssBaseObject(object.getId(),object.getName()));
+		}
+		return objects;
 	}
 
 	@Override
-	public List<Long> getRooms(Session session, long installationId) {
-		CategoryController categoryController = new CategoryController(session);
-		return categoryController.getMembers(installationId, "Room");
+	public List<OssBaseObject> getRooms(Session session, long installationId) {
+		Category category = new CategoryController(session).getById(installationId);
+		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
+		for( Room object : category.getRooms() ) {
+			objects.add(new OssBaseObject(object.getId(),object.getName()));
+		}
+		return objects;
 	}
 
 	@Override
-	public List<Long> getHWConfs(Session session, long installationId) {
-		CategoryController categoryController = new CategoryController(session);
-		return categoryController.getMembers(installationId, "HWConf");
+	public List<OssBaseObject> getHWConfs(Session session, long installationId) {
+		Category category = new CategoryController(session).getById(installationId);
+		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
+		for( HWConf object : category.getHWConfs() ) {
+			objects.add(new OssBaseObject(object.getId(),object.getName()));
+		}
+		return objects;
 	}
 
 	@Override
@@ -377,54 +394,54 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	}
 
 	@Override
-	public List<Long> getAvailableSoftwares(Session session, long installationId) {
+	public List<OssBaseObject> getAvailableSoftwares(Session session, long installationId) {
 		SoftwareController sc = new SoftwareController(session);
-		List<Long> softwareIds = new ArrayList<Long>();
+		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
 		Category installationSet = new CategoryController(session).getById(installationId);
 		for( Software software : sc.getAllInstallable() ) {
 			if( !installationSet.getSoftwares().contains(software) ) {
-				softwareIds.add(software.getId());
+				objects.add(new OssBaseObject(software.getId(),software.getName()));
 			}
 		}
-		return softwareIds;
+		return objects;
 	}
 
 	@Override
-	public List<Long> getAvailableDevices(Session session, long installationId) {
-		List<Long> deviceIds = new ArrayList<Long>();
+	public List<OssBaseObject> getAvailableDevices(Session session, long installationId) {
+		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
 		DeviceController dc = new DeviceController(session);
 		for( Long deviceId : new CategoryController(session).getAvailableMembers(installationId, "Device") ) {
 			Device device = dc.getById(deviceId);
 			if( device != null  &&  device.getHwconf() != null && device.getHwconf().getDeviceType().equals("FatClient") ) {
-				deviceIds.add(deviceId);
+				objects.add(new OssBaseObject(device.getId(),device.getName()));
 			}
 		}
-		return deviceIds;
+		return objects;
 	}
 
 	@Override
-	public List<Long> getAvailableRooms(Session session, long installationId) {
-		List<Long> roomIds = new ArrayList<Long>();
+	public List<OssBaseObject> getAvailableRooms(Session session, long installationId) {
+		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
 		RoomController rc = new RoomController(session);
 		for( Long roomId : new CategoryController(session).getAvailableMembers(installationId, "Room") ) {
 			Room room = rc.getById(roomId);
 			if( room != null  &&  room.getHwconf() != null && room.getHwconf().getDeviceType().equals("FatClient") ) {
-				roomIds.add(roomId);
+				objects.add(new OssBaseObject(room.getId(),room.getName()));
 			}
 		}
-		return roomIds;
+		return objects;
 	}
 
 	@Override
-	public List<Long> getAvailableHWConfs(Session session, long installationId) {
-		List<Long> hwconfIds = new ArrayList<Long>();
+	public List<OssBaseObject> getAvailableHWConfs(Session session, long installationId) {
+		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
 		CloneToolController cc = new CloneToolController(session);
 		for( Long hwconfId : new CategoryController(session).getAvailableMembers(installationId, "HWConf") ) {
 			HWConf hwconf = cc.getById(hwconfId);
 			if( hwconf != null && hwconf.getDeviceType().equals("FatClient") ) {
-				hwconfIds.add(hwconfId);
+				objects.add(new OssBaseObject(hwconf.getId(),hwconf.getName()));
 			}
 		}
-		return hwconfIds;
+		return objects;
 	}
 }
