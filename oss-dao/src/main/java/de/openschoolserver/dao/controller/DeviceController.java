@@ -1067,6 +1067,7 @@ public class DeviceController extends Controller {
 		}
 		return this.setLoggedInUsers(device, user);
 	}
+
 	public OssResponse setLoggedInUsers(Long deviceId, Long userId) {
 		Device device = this.getById(deviceId);
 		if( device == null ) {
@@ -1078,8 +1079,8 @@ public class DeviceController extends Controller {
 		}
 		return this.setLoggedInUsers(device, user);
 	}
-	public OssResponse setLoggedInUsers(Device device, User user) {
 
+	public OssResponse setLoggedInUsers(Device device, User user) {
 		parameters = new ArrayList<String>();
 		parameters.add(device.getName());
 		parameters.add(device.getIp());
@@ -1090,6 +1091,7 @@ public class DeviceController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
+			device.setLoggedIn(new ArrayList<User>());
 			device.getLoggedIn().add(user);
 			user.getLoggedOn().add(device);
 			em.merge(device);
