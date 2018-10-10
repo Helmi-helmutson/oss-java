@@ -8,6 +8,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.EducationController;
 import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.api.resources.RoomResource;
@@ -15,9 +16,11 @@ import de.openschoolserver.api.resources.RoomResource;
 
 import javax.ws.rs.WebApplicationException;
 import java.util.List;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Map;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -267,6 +270,12 @@ public class RoomRescourceImpl implements RoomResource {
 	@Override
 	public OssResponse manageRoom(Session session, Long roomId, String action, Map<String, String> actionContent) {
 		return new EducationController(session).manageRoom(roomId,action, actionContent);
+	}
+
+	@Override
+	public OssResponse importRooms(Session session, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		return new RoomController(session).importRooms(fileInputStream, contentDispositionHeader);
 	}
 
 }

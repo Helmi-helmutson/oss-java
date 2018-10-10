@@ -1,11 +1,17 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 
 import static de.openschoolserver.dao.internal.OSSConstants.*;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +42,21 @@ import de.openschoolserver.dao.tools.*;
 public class RoomController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(RoomController.class);
+
+	@SuppressWarnings("serial")
+	static Map<String, Integer> countToNm = new HashMap<String, Integer>() {{
+		put("4",  30);
+		put("8",  29);
+		put("16",  28);
+		put("32",  27);
+		put("64",  26);
+		put("128",  25);
+		put("256",  24);
+		put("512",  23);
+		put("1024",  22);
+		put("2048",  21);
+		put("4096",  20);
+	}};
 
 	public RoomController(Session session) {
 		super(session);
@@ -201,9 +222,9 @@ public class RoomController extends Controller {
 		if( room.getRoomType().equals("smartRoom") ) {
 			return new OssResponse(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
-                HWConf hwconf = new HWConf();
-                CloneToolController cloneToolController = new CloneToolController(this.session);
-                HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
+        HWConf hwconf = new HWConf();
+        CloneToolController cloneToolController = new CloneToolController(this.session);
+        HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
 		logger.debug("First HWConf:" +  firstFatClient.toString());
 
 		//Check parameters
@@ -1273,4 +1294,65 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Acces was deleted succesfully");	
 	}
 
+	public OssResponse importRooms(InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
+		File file = null;
+		List<String> importFile;
+		try {
+			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			importFile = Files.readAllLines(file.toPath());
+		} catch (IOException e) {
+			logger.error("File error:" + e.getMessage(), e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		}
+		CloneToolController   cloneToolController = new CloneToolController(this.session);
+		Map<String,Integer> header                = new HashMap<>();
+		OssResponse ossResponse;
+		String headerLine = importFile.get(0);
+		int i = 0;
+		for(String field : headerLine.split(";")) {
+			header.put(field.toLowerCase(), i);
+			i++;
+		}
+		if( !header.containsKey("name") || !header.containsKey("hwconf")) {
+			return new OssResponse(this.getSession(),"ERROR", "Fields name and hwconf are mandatory.");
+		}
+		for(String line : importFile.subList(1, importFile.size()) ) {
+			String[] values = line.split(";");
+			Room room = new Room();
+			if(header.containsKey("name")) {
+				room.setName(values[header.get("name")]);
+			}
+			if(header.containsKey("description")) {
+				room.setName(values[header.get("description")]);
+			}
+			if(header.containsKey("count")) {
+				if( ! countToNm.containsKey(values[header.get("count")]) ) {
+					return new OssResponse(this.getSession(),"ERROR", "Bad computer count. Allowed values are 4,8,16,32,64,128.256,512,1024,2048,4096");
+				}
+				room.setNetMask(countToNm.get(values[header.get("count")]));
+			}
+			if(header.containsKey("rows")) {
+				room.setRows(Integer.parseInt(values[header.get("rows")]));
+			}
+			if(header.containsKey("places")) {
+				room.setPlaces(Integer.parseInt(values[header.get("places")]));
+			}
+			if(header.containsKey("control")) {
+				room.setRoomControl(values[header.get("control")]);
+			}
+			if(header.containsKey("type")) {
+				room.setRoomType(values[header.get("type")]);
+			}
+			if(header.containsKey("hwconf")) {
+				room.setHwconf(cloneToolController.getByName(values[header.get("hwconf")]));
+			}
+			ossResponse = this.add(room);
+			if( ossResponse.getCode().equals("ERROR") ) {
+				return ossResponse;
+			}
+			this.organizeRoom(room.getId());
+		}
+		return new OssResponse(this.getSession(),"OK","Rooms was imported succesfully.");
+	}
 }
