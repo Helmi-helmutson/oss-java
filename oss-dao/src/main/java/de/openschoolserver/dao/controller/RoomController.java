@@ -1344,6 +1344,9 @@ public class RoomController extends Controller {
 			if(header.containsKey("type")) {
 				room.setRoomType(values[header.get("type")]);
 			}
+			if(header.containsKey("network")) {
+				room.setNetwork(values[header.get("network")]);
+			}
 			if(header.containsKey("hwconf")) {
 				room.setHwconf(cloneToolController.getByName(values[header.get("hwconf")]));
 			}
