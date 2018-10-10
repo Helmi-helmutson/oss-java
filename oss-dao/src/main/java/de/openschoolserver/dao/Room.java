@@ -124,6 +124,7 @@ public class Room implements Serializable {
 	public Room() {
 		this.network           = "";
 		this.roomControl       = "inRoom";
+		this.roomType		   = "ComputerRoom";
 		this.startIP           = "";
 		this.categories        = new ArrayList<Category>();
 		this.accessInRooms     = new ArrayList<AccessInRoom>();
