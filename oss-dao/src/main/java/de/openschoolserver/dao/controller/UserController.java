@@ -577,11 +577,13 @@ public class UserController extends Controller {
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[3];
-		program[0] = "/usr/sbin/oss-set-quota.sh";
+		program[0] = "/usr/sbin/oss_set_quota.sh";
 		program[2] = String.valueOf(fsQuota);
 		for (Long id : userIds) {
-			program[1] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, null);
+			if( id != 1 ) {
+				program[1] = this.getById(id).getUid();
+				OSSShellTools.exec(program, reply, error, null);
+			}
 		}
 		return new OssResponse(this.getSession(), "OK", "The filesystem quota for selected users was set.");
 	}
@@ -590,7 +592,7 @@ public class UserController extends Controller {
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[3];
-		program[0] = "/usr/sbin/oss-set-mquota.pl";
+		program[0] = "/usr/sbin/oss_set_mquota.pl";
 		program[2] = String.valueOf(msQuota);
 		for (Long id : userIds) {
 			program[1] = this.getById(id).getUid();
