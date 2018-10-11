@@ -399,7 +399,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		case "removeProfiles":
 			return  userController.removeProfile(ossActionMap.getUserIds());
 		case "deleteUser":
-			if( session.getAcls().contains("user.delete") || session.getAcls().contains("student.delete") ) {
+			SessionController sessionController = new SessionController();
+			if( sessionController.authorize(session,"user.delete") || sessionController.authorize(session,"student.delete") ) {
 				return  userController.deleteStudents(ossActionMap.getUserIds());
 			} else {
 				return new OssResponse(session,"ERROR","You have no right to execute this action.");
