@@ -1233,6 +1233,7 @@ public class RoomController extends Controller {
 				room.removeAccessInRoome(air);
 			}
 			for( AccessInRoom air : AccessList ) {
+				air.correctTime();
 				air.setRoom(room);
 				room.addAccessInRoom(air);
 			}
@@ -1256,6 +1257,7 @@ public class RoomController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR", "You must not set access control in a room with no room control.");
 			}
 			em.getTransaction().begin();
+			accessList.correctTime();
 			accessList.setRoom(room);
 			accessList.setRoomId(roomId);
 			accessList.setCreator(this.session.getUser());
