@@ -406,7 +406,7 @@ public class CloneToolController extends Controller {
 		StringBuilder ERROR = new StringBuilder();
 		try {
 			pxeBoot   = Files.readAllLines(PXE_BOOT);
-			eliloBoot = Files.readAllLines(PXE_BOOT);
+			eliloBoot = Files.readAllLines(ELILO_BOOT);
 		}
 		catch( IOException e ) { 
 			e.printStackTrace();
@@ -468,7 +468,7 @@ public class CloneToolController extends Controller {
 		StringBuilder ERROR = new StringBuilder();
 		try {
 			pxeBoot   = Files.readAllLines(PXE_BOOT);
-			eliloBoot = Files.readAllLines(PXE_BOOT);
+			eliloBoot = Files.readAllLines(ELILO_BOOT);
 		}
 		catch( IOException e ) { 
 			e.printStackTrace();
