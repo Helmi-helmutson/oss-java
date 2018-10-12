@@ -601,7 +601,6 @@ public class UserController extends Controller {
 		program[10] = "y";
 		for (User user : users) {
 			program[4] = user.getUid();
-			logger.error("TODO REMOVE ME: exec sessionuid=" + this.session.getUser().getUid() + " project=" + projectName + " user=" + user.getUid() );
 			OSSShellTools.exec(program, reply, error, data.toString());
 		}
 		return new OssResponse(this.getSession(), "OK",
