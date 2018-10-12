@@ -3,6 +3,12 @@ package de.openschoolserver.api.resourceimpl;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.persistence.EntityManager;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import de.openschoolserver.api.resources.AdHocLanResource;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
@@ -14,6 +20,8 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.*;
 
 public class AdHocLanResourceImpl implements AdHocLanResource {
+
+	Logger logger = LoggerFactory.getLogger(AdHocLanResource.class);
 
 	public AdHocLanResourceImpl() {
 		// TODO Auto-generated constructor stub
@@ -70,12 +78,12 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public OssResponse deleteObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
-		return new AdHocLanController(session).deleteObjectIntoRoom(roomId,objectType,objectId);
+		return new AdHocLanController(session).deleteObjectInRoom(roomId,objectType,objectId);
 	}
 
 	@Override
 	public List<Device> getDevices(Session session) {
-		return ( session.getUser().getOwnedDevices() == null ? session.getUser().getOwnedDevices() : new ArrayList<Device>()) ;
+		return session.getUser().getOwnedDevices();
 	}
 
 	@Override
@@ -97,6 +105,36 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	public OssResponse addDevice(Session session, long roomId, String macAddress, String name) {
 		return new RoomController(session).addDevice(roomId, macAddress, name);
 	}
+
+	@Override
+	public OssResponse modifyDevice(Session session, Long deviceId, Device device) {
+		DeviceController deviceController = new DeviceController(session);
+		EntityManager em = deviceController.getEntityManager();
+		try {
+			Device oldDevice = em.find(Device.class, deviceId);
+			if( oldDevice == null ) {
+				return new OssResponse(session,"ERROR","Can not find the device.");
+			}
+			if( deviceId != device.getId() ) {
+				return new OssResponse(session,"ERROR","Device ID mismatch.");
+			}
+			if( ! deviceController.mayModify(device) ) {
+				return new OssResponse(session,"ERROR", "This is not your device.");
+			}
+			em.getTransaction().begin();
+			oldDevice.setMac(device.getMac());
+			em.merge(oldDevice);
+			em.getTransaction().commit();
+			new DHCPConfig(session).Create();
+		}  catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(session,"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(session,"OK", "Device was modified successfully");
+	}
+
 
 	@Override
 	public OssResponse turnOn(Session session, Long roomId) {

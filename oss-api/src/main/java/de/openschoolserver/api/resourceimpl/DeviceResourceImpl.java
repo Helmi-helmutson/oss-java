@@ -14,6 +14,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import de.openschoolserver.api.resources.DeviceResource;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.DHCPConfig;
 import de.openschoolserver.dao.controller.DeviceController;
@@ -63,16 +64,6 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public List<Device> getByType(Session session, String type) {
-		final DeviceController deviceController = new DeviceController(session);
-		final List<Device> devices = deviceController.getByTpe(type);
-		if (devices == null) {
-	            throw new WebApplicationException(404);
-	    }
-		return devices;
-	}
-
-	@Override
 	public Device getByName(Session session, String Name) {
 		final DeviceController deviceController = new DeviceController(session);
 		final Device device = deviceController.getByName(Name);
@@ -83,13 +74,13 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public Device getDefaultPrinter(Session session, long deviceId) {
+	public Printer getDefaultPrinter(Session session, long deviceId) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.getDefaultPrinter(deviceId);
 	}
 
 	@Override
-	public List<Device> getAvailablePrinters(Session session, long deviceId) {
+	public List<Printer> getAvailablePrinters(Session session, long deviceId) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.getAvailablePrinters(deviceId);
 	}
@@ -125,11 +116,19 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse setAvailablePrinters(Session session, long deviceId, List<Long> availablePrinters) {
-		final DeviceController deviceController = new DeviceController(session);
-		return deviceController.setAvailablePrinters(deviceId,availablePrinters);
+	public OssResponse deleteDefaultPrinter(Session session, long deviceId) {
+		return new DeviceController(session).deleteDefaultPrinter(deviceId);
 	}
 
+	@Override
+	public OssResponse addAvailablePrinters(Session session, long deviceId, long printerId) {
+		return new DeviceController(session).addAvailablePrinter(deviceId, printerId);
+	}
+
+	@Override
+	public OssResponse deleteAvailablePrinters(Session session, long deviceId, long printerId) {
+		return new DeviceController(session).deleteAvailablePrinter(deviceId, printerId);
+	}
 	@Override
 	public OssResponse setLoggedInUsers(Session session, String IP, String userName) {
 		final DeviceController deviceController = new DeviceController(session);
@@ -137,11 +136,11 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse removeLoggedInUser(Session session, String IP, String userName) {
+	public OssResponse deleteLoggedInUser(Session session, String IP, String userName) {
 		final DeviceController deviceController = new DeviceController(session);
 		return deviceController.removeLoggedInUser(IP, userName);
 	}
-	
+
 	@Override
 	public void refreshConfig(Session session) {
 		new DHCPConfig(session).Create();
@@ -222,11 +221,11 @@ public class DeviceResourceImpl implements DeviceResource {
 	@Override
 	public String getDefaultPrinter(Session session, String IP) {
 		DeviceController deviceController = new DeviceController(session);
-		Device device = deviceController.getByIP(IP);
+		Device device =  deviceController.getByIP(IP);
 		if( device == null ) {
 			return "";
 		}
-		Device printer = deviceController.getDefaultPrinter(device.getId());
+		Printer printer = deviceController.getDefaultPrinter(device.getId());
 		if( printer != null ) {
 			return printer.getName();
 		}
@@ -241,7 +240,7 @@ public class DeviceResourceImpl implements DeviceResource {
 			return "";
 		}
 		List<String> printers = new ArrayList<String>();
-		for( Device printer : deviceController.getAvailablePrinters(device.getId()) ) {
+		for( Printer printer : deviceController.getAvailablePrinters(device.getId()) ) {
 			printers.add(printer.getName());
 		}
 		return String.join(" ", printers);
@@ -251,6 +250,4 @@ public class DeviceResourceImpl implements DeviceResource {
 	public String getAllUsedDevices(Session session, Long saltClientOnly) {
 		return new DeviceController(session).getAllUsedDevices(saltClientOnly);
 	}
-
-	
 }

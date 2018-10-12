@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The persistent class for the AccessInRoom database table.
- * 
+ *
  */
 @Entity
 @Table(name="AccessInRooms")
@@ -35,7 +35,7 @@ public class AccessInRoom implements Serializable {
 	private Room room;
 
 	/*
-	 * The type of the access control. This can be ACT (action) or FWC or firewall access control 
+	 * The type of the access control. This can be ACT (action) or FWC or firewall access control
 	 */
 	private String accessType;
 
@@ -60,71 +60,71 @@ public class AccessInRoom implements Serializable {
 	private Boolean tuesday;
 
 	/*
-	 * If the corresponding access should be applied Wednesdays 
+	 * If the corresponding access should be applied Wednesdays
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean wednesday;
 
 	/*
-	 * If the corresponding access should be applied Thursdays 
+	 * If the corresponding access should be applied Thursdays
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean thursday;
 
 	/*
-	 * If the corresponding access should be applied Fridays 
+	 * If the corresponding access should be applied Fridays
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean friday;
 
 	/*
-	 * If the corresponding access should be applied Saturdays 
+	 * If the corresponding access should be applied Saturdays
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean saturday;
 
 	/*
-	 * If the corresponding access should be applied Sundays 
+	 * If the corresponding access should be applied Sundays
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean sunday;
 
 	/*
-	 * If the corresponding access should be applied on holidays 
+	 * If the corresponding access should be applied on holidays
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean holiday;
 
 	/*
-	 * If the direct internet access is allowed or should be allowed. 
+	 * If the direct internet access is allowed or should be allowed.
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean direct;
 
 	/*
-	 * If is allowed log in or should be allowed. 
+	 * If is allowed log in or should be allowed.
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean login;
 
 	/*
-	 * If the access to the portal and mailserver is allowed or should be allowed. 
+	 * If the access to the portal and mailserver is allowed or should be allowed.
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean portal;
 
 	/*
-	 * If the access to the printserver is allowed or should be allowed. 
+	 * If the access to the printserver is allowed or should be allowed.
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean printing;
 
 	/*
-	 * If the direct internet access via proxy is allowed or should be allowed. 
+	 * If the direct internet access via proxy is allowed or should be allowed.
 	 */
 	@Convert(converter=BooleanToStringConverter.class)
 	private Boolean proxy;
-	
+
 	private String  pointInTime;
 
 	//bi-directional many-to-one association to User
@@ -196,7 +196,7 @@ public class AccessInRoom implements Serializable {
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		try {
@@ -205,7 +205,7 @@ public class AccessInRoom implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
+
 
 	public Room getRoom() {
 		return this.room;
@@ -284,7 +284,11 @@ public class AccessInRoom implements Serializable {
 	}
 
 	public void setPointInTime(String pointInTime) {
-		this.pointInTime = pointInTime;
+		if(  pointInTime.length() == 4 ) {
+			this.pointInTime = "0" + pointInTime;
+		} else {
+			this.pointInTime = pointInTime;
+		}
 	}
 
 	public Boolean getPortal() {
@@ -367,4 +371,9 @@ public class AccessInRoom implements Serializable {
 		this.creator = creator;
 	}
 
+	public void correctTime() {
+		if(  this.pointInTime.length() == 4 ) {
+			this.pointInTime = "0" + pointInTime;
+		}
+	}
 }

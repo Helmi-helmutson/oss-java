@@ -4,7 +4,6 @@ package de.openschoolserver.api.resourceimpl;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +23,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SmartRoom;
@@ -82,28 +82,6 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			logger.error("EducationResourceImpl.manageRoom error:" + e.getMessage());
 		}
 		return new EducationController(session).manageRoom(roomId,action, null);
-	}
-
-	@Override
-	public OssResponse downloadFilesFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs,
-			boolean cleanUpExport) {
-		Map<String, String> actionContent = new HashMap<String,String>();
-		RoomController roomController = new RoomController(session);
-		Room room = roomController.getById(roomId);
-		actionContent.put("sortInDirs", "true");
-		actionContent.put("cleanUpExport", "true");
-		if( projectName == null ) {
-			actionContent.put("projectName", roomController.nowString() + "." + room.getName() );
-		} else {
-			actionContent.put("projectName",projectName);
-		}
-		if( !sortInDirs) {
-			actionContent.put("sortInDirs", "false");
-		}
-		if( !cleanUpExport) {
-			actionContent.put("cleanUpExport", "false");
-		}
-		return this.manageRoom(session, roomId, "download", actionContent);
 	}
 
 	@Override
@@ -217,7 +195,10 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse uploadFileToGroup(Session session, Long groupId, InputStream fileInputStream,
+	public OssResponse uploadFileToGroup(Session session,
+			Long groupId,
+			boolean studentsOnly,
+			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		return new EducationController(session).uploadFileTo("group",groupId,fileInputStream,contentDispositionHeader);
 	}
@@ -274,12 +255,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public Device getDefaultPrinter(Session session, Long roomId) {
+	public Printer getDefaultPrinter(Session session, Long roomId) {
 		return new RoomController(session).getById(roomId).getDefaultPrinter();
 	}
 
 	@Override
-	public List<Device> getAvailablePrinters(Session session, Long roomId) {
+	public List<Printer> getAvailablePrinters(Session session, Long roomId) {
 		return new RoomController(session).getById(roomId).getAvailablePrinters();
 	}
 
@@ -339,27 +320,50 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse collectFileFromStudentsOfGroup(Session session, Long groupId, String projectName) {
-		UserController userController = new UserController(session);
-		List<User> users = new ArrayList<User>();
-		Group group        = new GroupController(session).getById(groupId);
-		for( User user : group.getUsers() ) {
-			if( user.getRole().equals(roleStudent)) {
-				users.add(user);
+	public OssResponse collectFileFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs, boolean cleanUpExport) {
+		UserController userController     = new UserController(session);
+		DeviceController deviceController = new DeviceController(session);
+		StringBuilder result   = new StringBuilder();
+		for( List<Long> logged : new EducationController(session).getRoom(roomId) ) {
+			User   user   = userController.getById(logged.get(0));
+			Device device =  deviceController.getById(logged.get(1));
+			if( user == null ) {
+				user = userController.getByUid(device.getName());
+			}
+			if( user != null ) {
+				OssResponse ossResult = userController.collectFileFromUser(user,projectName,sortInDirs,cleanUpExport);
+				if( ossResult.getCode().equals("OK")) {
+					result.append("OK: ").append(user.getUid()).append(" (").append(user.getSurName()).append(", ").append(user.getGivenName()).append(")OK").append(userController.getNl());
+				} else {
+					result.append("ERROR: ").append(user.getUid()).append(" (").append(user.getSurName()).append(", ").append(user.getGivenName()).append(")").append(userController.getNl());
+				}
 			}
 		}
-		return userController.collectFile(users, projectName);
+		return new  OssResponse(session,"OK", result.toString());
+
 	}
 
 	@Override
-	public OssResponse collectFileFromMembersOfGroup(Session session, Long groupId, String projectName) {
+	public OssResponse collectFileFromfGroup(Session session,
+			Long groupId,
+			String projectName,
+			boolean sortInDirs,
+			boolean cleanUpExport,
+			boolean studentsOnly
+			) {
 		UserController userController = new UserController(session);
-		List<User> users = new ArrayList<User>();
 		Group group        = new GroupController(session).getById(groupId);
 		for( User user : group.getUsers() ) {
-			users.add(user);
+			if( !studentsOnly ||  user.getRole().equals(roleStudent)) {
+				if( user.getRole().equals(roleTeacher) ) {
+					userController.collectFileFromUser(user, projectName, false, sortInDirs);
+				} else {
+					userController.collectFileFromUser(user, projectName, cleanUpExport, sortInDirs);
+				}
+			}
 		}
-		return userController.collectFile(users, projectName);
+		return new OssResponse(session, "OK",
+				"The files from the export directories of selected users were collected.");
 	}
 
 	@Override
@@ -394,6 +398,13 @@ public class EducationResourceImpl implements Resource, EducationResource {
 					ossActionMap.getStringValue());
 		case "removeProfiles":
 			return  userController.removeProfile(ossActionMap.getUserIds());
+		case "deleteUser":
+			SessionController sessionController = new SessionController();
+			if( sessionController.authorize(session,"user.delete") || sessionController.authorize(session,"student.delete") ) {
+				return  userController.deleteStudents(ossActionMap.getUserIds());
+			} else {
+				return new OssResponse(session,"ERROR","You have no right to execute this action.");
+			}
 		}
 		return new OssResponse(session,"ERROR","Unknown action");
 	}

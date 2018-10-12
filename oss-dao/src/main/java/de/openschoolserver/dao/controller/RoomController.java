@@ -1,11 +1,17 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 
 import static de.openschoolserver.dao.internal.OSSConstants.*;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +30,7 @@ import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
@@ -35,6 +42,21 @@ import de.openschoolserver.dao.tools.*;
 public class RoomController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(RoomController.class);
+
+	@SuppressWarnings("serial")
+	static Map<String, Integer> countToNm = new HashMap<String, Integer>() {{
+		put("4",  30);
+		put("8",  29);
+		put("16",  28);
+		put("32",  27);
+		put("64",  26);
+		put("128",  25);
+		put("256",  24);
+		put("512",  23);
+		put("1024",  22);
+		put("2048",  21);
+		put("4096",  20);
+	}};
 
 	public RoomController(Session session) {
 		super(session);
@@ -200,9 +222,9 @@ public class RoomController extends Controller {
 		if( room.getRoomType().equals("smartRoom") ) {
 			return new OssResponse(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
-                HWConf hwconf = new HWConf();
-                CloneToolController cloneToolController = new CloneToolController(this.session);
-                HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
+        HWConf hwconf = new HWConf();
+        CloneToolController cloneToolController = new CloneToolController(this.session);
+        HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
 		logger.debug("First HWConf:" +  firstFatClient.toString());
 
 		//Check parameters
@@ -248,10 +270,12 @@ public class RoomController extends Controller {
 			}
 		}
 		room.setHwconf(hwconf);
+		logger.debug("User creating Room:" + this.session.getUser() + session.getUser() );
 		room.setCreator(this.session.getUser());
 		hwconf.getRooms().add(room);
-		//AccessInRoom accessInRoom = new AccessInRoom(room);
-		new AccessInRoom(room);
+		if( room.getRoomControl() != null && !room.getRoomControl().equals("no")) {
+			new AccessInRoom(room);
+		}
 		try {
 			logger.debug("Create Room:" + room);
 			em.getTransaction().begin();
@@ -271,6 +295,9 @@ public class RoomController extends Controller {
 	public OssResponse delete(long roomId){
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
+		if( room == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find room with id %s.",null,String.valueOf(roomId));
+		}
 		if( !this.mayModify(room) ) {
 			return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
 		}
@@ -469,6 +496,9 @@ public class RoomController extends Controller {
 	 * Sets the actual access status in a room
 	 */
 	public void setAccessStatus(Room room, AccessInRoom access) {
+		if( room.getRoomControl() != null  && room.getRoomControl().equals("no")) {
+			return;
+		}
 		String[] program = new String[4];
 		program[0] = "/usr/sbin/oss_set_access_state.sh";
 		program[2] = room.getStartIP() + "/" + room.getNetMask();
@@ -732,9 +762,6 @@ public class RoomController extends Controller {
 					return ossResponse;
 				}
 				device.setRoom(room);
-				if( device.getOwner() == null ) {
-					device.setOwner(this.session.getUser());
-				}
 				hwconf = cloneToolController.getById(device.getHwconfId());
 				if( hwconf == null ) {
 					if( room.getHwconf() != null ){
@@ -862,6 +889,7 @@ public class RoomController extends Controller {
 			device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll("\\.", ""));
 			device.setIp(ipAddress.get(0).split(" ")[0]);
 			device.setHwconf(hwconf);
+			device.setOwner(owner);
 		} else {
 			device.setMac(macAddress);
 			device.setIp(ipAddress.get(0).split(" ")[0]);
@@ -880,9 +908,7 @@ public class RoomController extends Controller {
 		if( ossResponse.getCode().equals("ERROR") ) {
 			return ossResponse;
 		}
-		device.setOwner(owner);
 		device.setRoom(room);
-		logger.debug(device.toString());
 		try {
 			em.getTransaction().begin();
 			em.persist(device);
@@ -898,7 +924,11 @@ public class RoomController extends Controller {
 			}
 			room.getDevices().add(device);
 			em.merge(room);
-			em.merge(owner);
+			if( ! owner.getRole().contains("sysadmins") ) {
+			//TODO
+				owner.getOwnedDevices().add(device);
+				em.merge(owner);
+			}
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -954,6 +984,12 @@ public class RoomController extends Controller {
 		oldRoom.setPlaces(room.getPlaces());
 		try {
 			em.getTransaction().begin();
+			if(oldRoom.getRoomControl().equals("no")) {
+				for( AccessInRoom o : oldRoom.getAccessInRooms() ) {
+					em.remove(o);
+				}
+				oldRoom.setAccessInRoom(null);
+			}
 			em.merge(oldRoom);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -980,18 +1016,18 @@ public class RoomController extends Controller {
 	public OssResponse setDefaultPrinter(Long roomId, Long deviceId) {
 
 		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(session);
-		Device device = deviceController.getById(deviceId);
-		if( room.getDefaultPrinter() != null && room.getDefaultPrinter().equals(device) ) {
+		PrinterController printerController = new PrinterController(session);
+		Printer printer = printerController.getById(deviceId);
+		if( room.getDefaultPrinter() != null && room.getDefaultPrinter().equals(printer) ) {
 			return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
 		}
-		room.setDefaultPrinter(device);
-		device.getDefaultInRooms().add(room);
+		room.setDefaultPrinter(printer);
+		printer.getDefaultInRooms().add(room);
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(room);
-			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1004,14 +1040,14 @@ public class RoomController extends Controller {
 	public OssResponse deleteDefaultPrinter(long roomId) {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
-		Device device = room.getDefaultPrinter();
-		if( device != null  ) {
+		Printer printer = room.getDefaultPrinter();
+		if( printer != null  ) {
 			room.setDefaultPrinter(null);
-			device.getDefaultInRooms().remove(room);
+			printer.getDefaultInRooms().remove(room);
 			try {
 				em.getTransaction().begin();
 				em.merge(room);
-				em.merge(device);
+				em.merge(printer);
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1022,18 +1058,19 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","The default printer of the room was deleted succesfully.");
 	}
 
-	public OssResponse setAvailablePrinters(long roomId, List<Long> deviceIds) {
+	public OssResponse setAvailablePrinters(long roomId, List<Long> printerIds) {
 		EntityManager em = getEntityManager();
 		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(session);
-		room.setAvailablePrinters(new ArrayList<Device>());
+		PrinterController printerController = new PrinterController(session);
+		room.setAvailablePrinters(new ArrayList<Printer>());
 		try {
 			em.getTransaction().begin();
-			for( Device device : deviceController.getDevices(deviceIds)) {
-				if( ! room.getAvailablePrinters().contains(device) ) {
-					device.getAvailableInRooms().add(room);
-					room.getAvailablePrinters().add(device);
-					em.merge(device);
+			for( Long printerId : printerIds) {
+				Printer printer = printerController.getById(printerId);
+				if( ! room.getAvailablePrinters().contains(printer) ) {
+					printer.getAvailableInRooms().add(room);
+					room.getAvailablePrinters().add(printer);
+					em.merge(printer);
 				}
 			}
 			em.merge(room);
@@ -1047,21 +1084,19 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","The available printers of the room was set succesfully.");
 	}
 
-	public OssResponse addAvailablePrinter(long roomId, long deviceId) {
-
-		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(session);
-		Device device = deviceController.getById(deviceId);
-		if( room.getAvailablePrinters().contains(device) ) {
-			return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
-		}
-		room.getAvailablePrinters().add(device);
-		device.getAvailableInRooms().add(room);
+	public OssResponse addAvailablePrinter(long roomId, long printerId) {
 		EntityManager em = getEntityManager();
 		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Room room = em.find(Room.class, roomId);
+			if( room.getAvailablePrinters().contains(printer) ) {
+				return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
+			}
+			room.getAvailablePrinters().add(printer);
+			printer.getAvailableInRooms().add(room);
 			em.getTransaction().begin();
 			em.merge(room);
-			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1071,17 +1106,19 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","The selected printer was added to the room.");
 	}
 
-	public OssResponse deleteAvailablePrinter(long roomId, long deviceId) {
+	public OssResponse deleteAvailablePrinter(long roomId, long printerId) {
 		EntityManager em = getEntityManager();
-		Room room = this.getById(roomId);
-		DeviceController deviceController = new DeviceController(session);
-		Device device = deviceController.getById(deviceId);
-		room.getAvailablePrinters().remove(device);
-		device.getAvailableInRooms().remove(room);
 		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Room room = em.find(Room.class, roomId);
+			if( room == null || printer == null) {
+				return new OssResponse(this.getSession(),"ERROR", "Room or printer cannot be found.");
+			}
 			em.getTransaction().begin();
+			room.getAvailablePrinters().remove(printer);
+			printer.getAvailableInRooms().remove(room);
 			em.merge(room);
-			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1196,6 +1233,7 @@ public class RoomController extends Controller {
 				room.removeAccessInRoome(air);
 			}
 			for( AccessInRoom air : AccessList ) {
+				air.correctTime();
 				air.setRoom(room);
 				room.addAccessInRoom(air);
 			}
@@ -1214,7 +1252,12 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Room room = em.find(Room.class, roomId);
+			if( room.getRoomControl() != null && room.getRoomControl().equals("no") ) {
+				em.close();
+				return new OssResponse(this.getSession(),"ERROR", "You must not set access control in a room with no room control.");
+			}
 			em.getTransaction().begin();
+			accessList.correctTime();
 			accessList.setRoom(room);
 			accessList.setRoomId(roomId);
 			accessList.setCreator(this.session.getUser());
@@ -1253,4 +1296,68 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Acces was deleted succesfully");	
 	}
 
+	public OssResponse importRooms(InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
+		File file = null;
+		List<String> importFile;
+		try {
+			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			importFile = Files.readAllLines(file.toPath());
+		} catch (IOException e) {
+			logger.error("File error:" + e.getMessage(), e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		}
+		CloneToolController   cloneToolController = new CloneToolController(this.session);
+		Map<String,Integer> header                = new HashMap<>();
+		OssResponse ossResponse;
+		String headerLine = importFile.get(0);
+		int i = 0;
+		for(String field : headerLine.split(";")) {
+			header.put(field.toLowerCase(), i);
+			i++;
+		}
+		if( !header.containsKey("name") || !header.containsKey("hwconf")) {
+			return new OssResponse(this.getSession(),"ERROR", "Fields name and hwconf are mandatory.");
+		}
+		for(String line : importFile.subList(1, importFile.size()) ) {
+			String[] values = line.split(";");
+			Room room = new Room();
+			if(header.containsKey("name")) {
+				room.setName(values[header.get("name")]);
+			}
+			if(header.containsKey("description")) {
+				room.setName(values[header.get("description")]);
+			}
+			if(header.containsKey("count")) {
+				if( ! countToNm.containsKey(values[header.get("count")]) ) {
+					return new OssResponse(this.getSession(),"ERROR", "Bad computer count. Allowed values are 4,8,16,32,64,128.256,512,1024,2048,4096");
+				}
+				room.setNetMask(countToNm.get(values[header.get("count")]));
+			}
+			if(header.containsKey("rows")) {
+				room.setRows(Integer.parseInt(values[header.get("rows")]));
+			}
+			if(header.containsKey("places")) {
+				room.setPlaces(Integer.parseInt(values[header.get("places")]));
+			}
+			if(header.containsKey("control")) {
+				room.setRoomControl(values[header.get("control")]);
+			}
+			if(header.containsKey("type")) {
+				room.setRoomType(values[header.get("type")]);
+			}
+			if(header.containsKey("network")) {
+				room.setNetwork(values[header.get("network")]);
+			}
+			if(header.containsKey("hwconf")) {
+				room.setHwconf(cloneToolController.getByName(values[header.get("hwconf")]));
+			}
+			ossResponse = this.add(room);
+			if( ossResponse.getCode().equals("ERROR") ) {
+				return ossResponse;
+			}
+			this.organizeRoom(room.getId());
+		}
+		return new OssResponse(this.getSession(),"OK","Rooms was imported succesfully.");
+	}
 }

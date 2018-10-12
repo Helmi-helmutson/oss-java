@@ -20,6 +20,7 @@
                 <class>de.openschoolserver.dao.OssResponse</class>
                 <class>de.openschoolserver.dao.Partition</class>
                 <class>de.openschoolserver.dao.PositiveList</class>
+                <class>de.openschoolserver.dao.Printer</class>
                 <class>de.openschoolserver.dao.Room</class>
                 <class>de.openschoolserver.dao.RoomSmartControl</class>
                 <class>de.openschoolserver.dao.Session</class>

@@ -16,21 +16,16 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 import de.extis.core.util.UserUtil;
-import de.openschoolserver.dao.Category;
-import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.FAQ;
-import de.openschoolserver.dao.Group;
-import de.openschoolserver.dao.OssResponse;
-import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 @SuppressWarnings("unchecked")
 public class UserController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(UserController.class);
-	
+
 
 	public UserController(Session session) {
 		super(session);
@@ -136,7 +131,7 @@ public class UserController extends Controller {
 			} else {
 				List<User> users = new ArrayList<User>();
 				for (User user : (List<User>) query.getResultList()) {
-					if (user.getRole().equals("students")) {
+					if (user.getRole().equals(roleStudent)) {
 						users.add(user);
 					}
 				}
@@ -218,7 +213,7 @@ public class UserController extends Controller {
 		}
 		// Make backup from password. password field is transient!
 		user.setInitialPassword(user.getPassword());
-		user.setCreatorId(this.session.getUserId());
+		user.setCreator(this.session.getUser());
 		// Check user parameter
 		StringBuilder errorMessage = new StringBuilder();
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -301,6 +296,16 @@ public class UserController extends Controller {
 		return new OssResponse(this.getSession(), "OK", "User was modified succesfully");
 	}
 
+	public OssResponse deleteStudents(List<Long> userIds) {
+		for( Long userId : userIds ) {
+			User user = this.getById(userId);
+			if( user.getRole().equals(roleStudent)) {
+				this.delete(user);
+			}
+		}
+		return new OssResponse(this.getSession(), "OK", "Users were deleted succesfully");
+	}
+
 	public OssResponse delete(long userId) {
 		return this.delete(this.getById(userId));
 	}
@@ -310,10 +315,20 @@ public class UserController extends Controller {
 	}
 
 	public OssResponse delete(User user) {
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find the user.");
+		}
 		if (this.isProtected(user)) {
 			return new OssResponse(this.getSession(), "ERROR", "This user must not be deleted.");
 		}
 		this.startPlugin("delete_user", user);
+		//TODO make it configurable
+		User admin = getById(1L);
+		if( user.getRole().equals(roleStudent) || user.getRole().equals(roleWorkstation) ){
+			deleteCreatedObjects(user);
+		} else {
+			inheritCreatedObjects(user,admin);
+		}
 		EntityManager em = getEntityManager();
 		user = em.find(User.class, user.getId());
 		List<Device> devices = user.getOwnedDevices();
@@ -562,11 +577,13 @@ public class UserController extends Controller {
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[3];
-		program[0] = "/usr/sbin/oss-set-quota.sh";
+		program[0] = "/usr/sbin/oss_set_quota.sh";
 		program[2] = String.valueOf(fsQuota);
 		for (Long id : userIds) {
-			program[1] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, null);
+			if( id != 1 ) {
+				program[1] = this.getById(id).getUid();
+				OSSShellTools.exec(program, reply, error, null);
+			}
 		}
 		return new OssResponse(this.getSession(), "OK", "The filesystem quota for selected users was set.");
 	}
@@ -575,7 +592,7 @@ public class UserController extends Controller {
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[3];
-		program[0] = "/usr/sbin/oss-set-mquota.pl";
+		program[0] = "/usr/sbin/oss_set_mquota.pl";
 		program[2] = String.valueOf(msQuota);
 		for (Long id : userIds) {
 			program[1] = this.getById(id).getUid();
@@ -642,12 +659,12 @@ public class UserController extends Controller {
 		program[5] = "-p";
 		program[6] = project;
 		program[7] = "-c";
+		program[9] = "-d";
 		if (cleanUpExport) {
 			program[8] = "y";
 		} else {
 			program[8] = "n";
 		}
-		program[9] = "-d";
 		if (sortInDirs) {
 			program[10] = "y";
 		} else {
@@ -656,7 +673,7 @@ public class UserController extends Controller {
 		OSSShellTools.exec(program, reply, stderr, null);
 		if (stderr.toString().isEmpty()) {
 			logger.debug("Collected project " + project + " from " + user.getUid());
-			return new OssResponse(this.getSession(), "OK", "File was collected from:", null, user.getUid());
+			return new OssResponse(this.getSession(), "OK", "File was collected from: %s", null, user.getUid());
 		}
 		logger.error("Can not collect project " + project + " from " + user.getUid() + stderr.toString());
 
@@ -695,8 +712,7 @@ public class UserController extends Controller {
 	}
 
 	public Category getGuestUsersCategory(Long guestUsersId) {
-		// TODO Auto-generated method stub
-		return null;
+		return new CategoryController(this.session).getById(guestUsersId);
 	}
 
 	public OssResponse deleteGuestUsers(Long guestUsersId) {
@@ -713,12 +729,7 @@ public class UserController extends Controller {
 				groupController.delete(group);
 			}
 		}
-		for (FAQ faw : category.getFaqs()) {
-
-		}
-		// Have to implement.
-		OssResponse ossResponse = new OssResponse();
-		return ossResponse;
+		return categoryController.delete(category);
 	}
 
 	public OssResponse addGuestUsers(String name, String description, Long roomId, int count, Date validUntil) {
@@ -793,5 +804,142 @@ public class UserController extends Controller {
 		return String.join(this.getNl(), groups);
 	}
 
+	public void inheritCreatedObjects(User creator, User newCreator) {
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			//Acls
+			for( Acl o : creator.getCreatedAcls() ) {
+				o.setCreator(newCreator);
+				em.merge(o);
+			}
+			creator.setCreatedAcls(null);
+			//AccessInRoom
+			for( AccessInRoom o : creator.getCreatedAccessInRoom() ) {
+				o.setCreator(newCreator);
+				em.merge(o);
+			}
+			creator.setCreatedAccessInRoom(null);
+			//Announcement
+			for( Announcement o : creator.getMyAnnouncements() ) {
+				o.setOwner(newCreator);
+				em.merge(o);
+			}
+			creator.setMyAnnouncements(null);
+			//Categories
+			for( Category o : creator.getOwnedCategories() ) {
+				o.setOwner(newCreator);
+				em.merge(o);
+			}
+			creator.setOwnedCategories(null);
+			//Contacts
+			for( Contact o : creator.getMyContacts() ) {
+				o.setOwner(newCreator);
+				em.merge(o);
+			}
+			creator.setMyContacts(null);
+			//Groups
+			for( Group o : creator.getOwnedGroups() ) {
+				o.setOwner(newCreator);
+				em.merge(o);
+			}
+			creator.setOwnedGroups(null);
+			//HWConfs
+			for( HWConf o : creator.getCreatedHWConfs() ) {
+				o.setCreator(newCreator);
+				em.merge(o);
+			}
+			creator.setCreatedHWConfs(null);
+			//PositiveList
+			for( PositiveList o : creator.getOwnedPositiveLists() ) {
+				o.setOwner(newCreator);
+				em.merge(o);
+			}
+			creator.setOwnedPositiveLists(null);
+			//Partitions
+			for( Partition o : creator.getCreatedPartitions()) {
+				o.setCreator(newCreator);
+				em.merge(o);
+			}
+			creator.setCreatedPartitions(null);
+			//Rooms
+			for( Room o : creator.getCreatedRooms() ) {
+				o.setCreator(newCreator);
+				em.merge(o);
+			}
+			creator.setCreatedRooms(null);
+			//User
+			for( User o : creator.getCreatedUsers() ) {
+				o.setCreator(newCreator);
+				em.merge(o);
+			}
+			creator.setCreatedRooms(null);
+			em.merge(creator);
+			em.merge(newCreator);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error("inheritCreatedObjects:" + e.getMessage());
+		}
+	}
+
+	public void deleteCreatedObjects(User creator) {
+		EntityManager em = getEntityManager();
+		try {
+			em.getTransaction().begin();
+			//Acls
+			for( Acl o : creator.getCreatedAcls() ) {
+				em.remove(o);
+			}
+			creator.setCreatedAcls(null);
+			//AccessInRoom
+			for( AccessInRoom o : creator.getCreatedAccessInRoom() ) {
+				em.remove(o);
+			}
+			creator.setCreatedAccessInRoom(null);
+			//Announcement
+			for( Announcement o : creator.getMyAnnouncements() ) {
+				em.remove(o);
+			}
+			creator.setMyAnnouncements(null);
+			//Categories
+			for( Category o : creator.getOwnedCategories() ) {
+				em.remove(o);
+			}
+			creator.setOwnedCategories(null);
+			//Contacts
+			for( Contact o : creator.getMyContacts() ) {
+				em.remove(o);
+			}
+			creator.setMyContacts(null);
+			//Groups
+			for( Group o : creator.getOwnedGroups() ) {
+				em.remove(o);
+			}
+			creator.setOwnedGroups(null);
+			//HWConfs
+			for( HWConf o : creator.getCreatedHWConfs() ) {
+				em.remove(o);
+			}
+			creator.setCreatedHWConfs(null);
+			//PositiveList
+			for( PositiveList o : creator.getOwnedPositiveLists() ) {
+				em.remove(o);
+			}
+			creator.setOwnedPositiveLists(null);
+			//Rooms
+			for( Room o : creator.getCreatedRooms() ) {
+				em.remove(o);
+			}
+			creator.setCreatedRooms(null);
+			//User
+			for( User o : creator.getCreatedUsers() ) {
+				em.remove(o);
+			}
+			creator.setCreatedRooms(null);em.merge(creator);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error("inheritCreatedObjects:" + e.getMessage());
+		}
+	}
 
 }

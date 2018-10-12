@@ -431,7 +431,7 @@ public class Controller extends Config {
 			break;
 		case "de.openschoolserver.dao.User":
 			User user = (User)object;
-			ownerId = user.getCreatorId();
+			ownerId = user.getCreator().getId();
 			break;
 		}
 		if( ownerId == null ) {

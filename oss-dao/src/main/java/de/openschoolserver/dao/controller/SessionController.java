@@ -33,7 +33,7 @@ import io.dropwizard.auth.AuthenticationException;
 @SuppressWarnings("unchecked")
 public class SessionController extends Controller {
 
-	Logger logger = LoggerFactory.getLogger(SessionController.class); 
+	Logger logger = LoggerFactory.getLogger(SessionController.class);
 
 	public SessionController(Session session) {
 		super(session);
@@ -86,7 +86,7 @@ public class SessionController extends Controller {
 			logger.error(e.getMessage(), e);
 			return null;
 		}
-		
+
 		//TODO what to do with deviceType
 		User user = userController.getByUid(username);
 		if( user == null ) {
@@ -231,7 +231,7 @@ public class SessionController extends Controller {
 						device.getLoggedIn().remove(user);
 						em.merge(device);
 						em.merge(user);
-					}   
+					}
 					em.remove(foundSession);
 				}
 				em.getTransaction().commit();
@@ -332,7 +332,7 @@ public class SessionController extends Controller {
 		}
 		return false;
 	}
-	
+
 	public Session getLocalhostSession() {
 		String token = this.getProperty("de.openschoolserver.api.auth.localhost");
 		if( token != null ) {
@@ -369,7 +369,8 @@ public class SessionController extends Controller {
 				String tmp = System.getProperty("line.separator");
 				System.setProperty("line.separator", winLineSeparator);
 				for(String line : Files.readAllLines(file.toPath()) ) {
-					if( line.startsWith("net use z:") ) {
+					if( line.startsWith("net use z:") ||
+						line.contains("netlogon")) {
 						continue;
 					}
 					if( line.startsWith("net use") || line.startsWith("rundll32 printui.dll")) {

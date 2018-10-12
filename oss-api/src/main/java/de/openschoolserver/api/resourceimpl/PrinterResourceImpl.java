@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.*;
-import java.util.concurrent.TimeUnit;
 
 import javax.ws.rs.WebApplicationException;
 
@@ -21,11 +19,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.api.resources.PrinterResource;
+import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.PrintersOfManufacturer;
-import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
@@ -33,7 +30,7 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 public class PrinterResourceImpl implements PrinterResource {
 	
 	Logger logger = LoggerFactory.getLogger(PrinterResourceImpl.class);
-	private Path DRIVERS   = Paths.get("/usr/share/oss/templates/drivers.txt");
+
 	private Path PRINTERS  = Paths.get("/usr/share/oss/templates/printers.txt");
 
 	public PrinterResourceImpl() {
@@ -42,105 +39,28 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public List<Printer> getPrinters(Session session) {
-		List<Printer> printers = new ArrayList<Printer>();
-		DeviceController deviceController = new DeviceController(session);
-		String[] program = new String[3];
-		StringBuffer reply  = new StringBuffer();
-		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/bin/ipptool";
-		program[1] = "ipp://localhost/printers/";
-		program[2] = "get-printers.test";
-		OSSShellTools.exec(program, reply, stderr, null);
-		logger.debug(stderr.toString());
-		String[] lines = reply.toString().split(deviceController.getNl());
-		Pattern pattern = Pattern.compile("\\S+");
-		for( int i=2 ; i < lines.length; i ++) {
-			logger.debug("printer:" + lines[i]);
-			Matcher matcher = pattern.matcher(lines[i]);
-			if( matcher.find()) {
-				String  name    = matcher.group(0);
-				Printer printer = new Printer(name,deviceController);
-				Device  device  = deviceController.getByName(name);
-				if( device == null ) {
-					continue;
-				}
-				printer.setId(device.getId());
-				printer.setRoomId(device.getRoom().getId());
-				printer.setMac(device.getMac());
-				if( matcher.find() ) {
-					printer.setState(matcher.group(0));
-				}
-				if( matcher.find() ) {
-					printer.setAcceptingJobs(matcher.group(0).equals("true"));
-				}
-				if( matcher.find() ) {
-					logger.debug("Found job:" + matcher.group(0));
-					printer.setActiveJobs(Integer.parseInt(matcher.group(0)));
-				}
-				// Test if the windows driver was activated
-				File file = new File("/var/lib/printserver/drivers/x64/3/"+name+".ppd");
-				if( file.exists() ) {
-					printer.setWindowsDriver(true);
-				}
-				program = new String[5];
-				program[0] = "/usr/bin/gawk";
-				program[1] = "-F";
-				program[2] = ":";
-				program[3] = "/*NickName/ { print $2 }";
-				program[4] = "/etc/cups/ppd/" + name + ".ppd";
-				StringBuffer reply2  = new StringBuffer();
-				logger.debug(stderr.toString());
-				OSSShellTools.exec(program, reply2, stderr, null);
-				printer.setModel(reply2.toString());
-				printers.add(printer);
-			}
-		}
-		return printers;
+		return new PrinterController(session).getPrinters();
 	}
 
 	@Override
 	public OssResponse deletePrinter(Session session, Long printerId) {
-		DeviceController devcieController = new DeviceController(session);
-		Device printer = devcieController.getById(printerId);
-		if( printer == null ) {
-			throw new WebApplicationException(404);
-		}
-		if( ! printer.getHwconf().getDeviceType().equals("Printer")) {
-			throw new WebApplicationException(405);
-		}
-		String[] program    = new String[3];
-		StringBuffer reply  = new StringBuffer();
-		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/sbin/lpadmin";
-		program[1] = "-x";
-		program[2] = printer.getName();
-		OSSShellTools.exec(program, reply, stderr, null);
-		return devcieController.delete(printerId, true);
+		return new PrinterController(session).deletePrinter(printerId);
 	}
 
 	@Override
 	public OssResponse deletePrinter(Session session, String printerName) {
-		Device printer = new DeviceController(session).getByName(printerName);
+		Printer printer = new PrinterController(session).getByName(printerName);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( printer.getHwconf().getDeviceType() == null ) {
-			return new OssResponse(session,"ERROR","Printer can not removed. This device was not registered as a printer.");
-		}
-		if( ! printer.getHwconf().getDeviceType().equals("Printer")) {
-			throw new WebApplicationException(405);
-		}
-		return deletePrinter(session, printer.getId());
+		return new PrinterController(session).deletePrinter(printer.getId());
 	}
 
 	@Override
 	public OssResponse resetPrinter(Session session, Long printerId) {
-		Device printer = new DeviceController(session).getById(printerId);
+		Printer printer = new PrinterController(session).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
-		}
-		if( ! printer.getHwconf().getDeviceType().equals("Printer")) {
-			throw new WebApplicationException(405);
 		}
 		return resetPrinter(session, printer.getName());
 	}
@@ -161,40 +81,25 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse enablePrinter(Session session, Long printerId) {
-		Device printer = new DeviceController(session).getById(printerId);
+		Printer printer = new PrinterController(session).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( ! printer.getHwconf().getDeviceType().equals("Printer")) {
-			throw new WebApplicationException(405);
-		}
-		return enablePrinter(session, printer.getName());
+		return new PrinterController(session).enablePrinter(printer.getName());
 	}
 
 	@Override
 	public OssResponse enablePrinter(Session session, String printerName) {
-		String[] program = new String[2];
-		StringBuffer reply  = new StringBuffer();
-		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/sbin/cupsenable";
-		program[1] = printerName;
-		OSSShellTools.exec(program, reply, stderr, null);
-		program[0] = "/usr/sbin/cupsaccept";
-		program[1] = printerName;
-		OSSShellTools.exec(program, reply, stderr, null);
-		return new OssResponse(session,"OK","Printer was enabled succesfully.");
+		return new PrinterController(session).enablePrinter(printerName);
 	}
 
 	@Override
 	public OssResponse disablePrinter(Session session, Long printerId) {
-		Device printer = new DeviceController(session).getById(printerId);
+		Printer printer = new PrinterController(session).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		if( !printer.getHwconf().getDeviceType().equals("Printer")) {
-			throw new WebApplicationException(405);
-		}
-		return disablePrinter(session, printer.getName());
+		return new PrinterController(session).enablePrinter(printer.getName());
 	}
 
 	@Override
@@ -213,44 +118,16 @@ public class PrinterResourceImpl implements PrinterResource {
 	
 	@Override
 	public OssResponse activateWindowsDriver(Session session, Long printerId) {
-		Device printer = new DeviceController(session).getById(printerId);
+		Printer printer = new PrinterController(session).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
-		}
-		if( !printer.getHwconf().getDeviceType().equals("Printer")) {
-			throw new WebApplicationException(405);
 		}
 		return activateWindowsDriver( session, printer.getName() );
 	}
 
 	@Override
 	public OssResponse activateWindowsDriver(Session session, String printerName) {
-		//Create the windows driver
-		logger.debug("Activating windows driver for: " + printerName);
-		String printserver   = new RoomController(session).getConfigValue("PRINTSERVER");
-		String[] program     = new String[6];
-		StringBuffer reply   = new StringBuffer();
-		StringBuffer stderr  = new StringBuffer();
-		program[0] = "/usr/sbin/cupsaddsmb";
-		program[1] = "-H";
-		program[2] = printserver;
-		program[3] = "-U";
-		program[4] = "Administrator%" + session.getPassword();
-		program[5] = printerName;
-		OSSShellTools.exec(program, reply, stderr, null);
-		if( stderr.length() > 0 ) {
-			return new OssResponse(session,"ERROR", stderr.toString());
-		}
-		program[0] = "/usr/bin/rpcclient";
-		program[1] = "-U";
-		program[2] = "Administrator%" + session.getPassword();
-		program[3] = printserver;
-		program[4] = "-c";
-		program[5] = "setdriver " + printerName + " " + printerName;
-		OSSShellTools.exec(program, reply, stderr, null);
-		logger.debug("activateWindowsDriver error" + stderr.toString());
-		logger.debug("activateWindowsDriver reply" + reply.toString());
-		return new OssResponse(session,"OK","Windows driver was activated.");
+		return new PrinterController(session).activateWindowsDriver(printerName);
 	}
 
 	@Override
@@ -262,107 +139,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			boolean windowsDriver,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		
-		
-		logger.debug("addPrinter: " + name + "#" + mac + "#" + roomId + "#" + model +"#" + ( windowsDriver ? "yes" : "no" ) );
-		//First we create a device object
-		RoomController roomController = new RoomController(session);
-		HWConf hwconf = new CloneToolController(session).getByName("Printer");
-		Device device = new Device();
-		device.setMac(mac);
-		device.setName(name);
-		device.setHwconfId(hwconf.getId());
-		logger.debug(hwconf.getName() + "#" + hwconf.getId() );
-		List<Device> devices = new ArrayList<Device>();
-		devices.add(device);
-		
-		//Persist the device object
-		OssResponse ossResponse = roomController.addDevices(roomId, devices);
-		if( ossResponse.getCode().equals("ERROR")) {
-			return ossResponse;
-		}
-		
-		//Create the printer in CUPS
-		String driverFile = "/usr/share/cups/model/Postscript.ppd.gz";
-		if( fileInputStream != null ) {
-			File file = null;
-			try {
-				file = File.createTempFile("oss_driverFile", name, new File("/opt/oss-java/tmp/"));
-				Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-				return new OssResponse(session,"ERROR", e.getMessage());
-			}
-			driverFile = file.toPath().toString();
-		} else {
-			try {
-				for( String line : Files.readAllLines(DRIVERS) ) {
-					String[] fields = line.split("###");
-					if( fields.length == 2 && fields[0].equals(model) ) {
-						driverFile = fields[1];
-						break;
-					}
-				}
-			} catch (IOException e) {
-				logger.error(e.getMessage(), e);
-				return new OssResponse(session,"ERROR", e.getMessage());
-			}
-		}
-		logger.debug("Add printer/usr/sbin/lpadmin -p " + name + " -P " + driverFile + " -o printer-error-policy=abort-job -o PageSize=A4 -v socket://" + name   );
-		String[] program = new String[11];
-		StringBuffer reply  = new StringBuffer();
-		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/sbin/lpadmin";
-		program[1] = "-p";
-		program[2] = name;
-		program[3] = "-P";
-		program[4] = driverFile;
-		program[5] = "-o";
-		program[6] = "printer-error-policy=abort-job";
-		program[7] = "-o";
-		program[8] = "PageSize=A4";
-		program[9] = "-v";
-		program[10]= "socket://"+ name;
-				
-		OSSShellTools.exec(program, reply, stderr, null);
-		logger.debug(stderr.toString());
-		logger.debug(reply.toString());
-		roomController.systemctl("try-restart", "samba-printserver");
-		//Now we have to check if the printer is already visible in samba
-		int tries = 6;
-		program = new String[6];
-		program[0] = "/usr/bin/rpcclient";
-		program[1] = "-U";
-		program[2] = "Administrator%" + session.getPassword();
-		program[3] = roomController.getConfigValue("PRINTSERVER");
-		program[4] = "-c";
-		program[5] = "getprinter "+name;
-		do {
-			try {
-				TimeUnit.SECONDS.sleep(1);
-			} catch (Exception e) {
-				logger.error(e.getMessage(), e);
-			}
-			reply   = new StringBuffer();
-			stderr  = new StringBuffer();
-			OSSShellTools.exec(program, reply, stderr, null);
-			logger.debug("activateWindowsDriver error" + stderr.toString());
-		} while( !stderr.toString().isEmpty() && tries > -1  );
-		
-		if(windowsDriver) {
-			ossResponse = activateWindowsDriver(session,name);
-
-			if( ossResponse.getCode().equals("ERROR")) { 
-				return ossResponse;
-			}
-		}
-		enablePrinter(session,name);
-
-		return new OssResponse(
-				session,"OK",
-				"Printer was created succesfully.",
-				new DeviceController(session).getByName(name).getId()
-				);
+		return new PrinterController(session).addPrinter(name,mac,roomId,model,windowsDriver,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
@@ -401,14 +178,13 @@ public class PrinterResourceImpl implements PrinterResource {
 	}
 
 	@Override
-	public OssResponse setDriver(Session session, Long printerId, InputStream fileInputStream,
+	public OssResponse setDriver(Session session,
+			Long printerId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		Device printer = new DeviceController(session).getById(printerId);
+
+		Printer printer = new PrinterController(session).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
-		}
-		if( !printer.getHwconf().getDeviceType().equals("Printer")) {
-			throw new WebApplicationException(405);
 		}
 		File file = null;
 		try {
@@ -441,5 +217,14 @@ public class PrinterResourceImpl implements PrinterResource {
 		return new OssResponse(session,"OK", "Printer driver was set succesfully.");
 	}
 
+	@Override
+	public OssResponse addPrinterQueue(Session session, String name, Long deviceId, String model, boolean windowsDriver,
+			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
+		return new PrinterController(session).addPrinterQueue(session,name,deviceId,model,windowsDriver,fileInputStream,contentDispositionHeader);
+	}
 
+	@Override
+	public List<Device> getPrinterDevices(Session session) {
+		return new CloneToolController(session).getByName("Printer").getDevices();
+	}
 }

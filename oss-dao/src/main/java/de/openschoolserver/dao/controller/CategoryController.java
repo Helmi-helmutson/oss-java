@@ -170,6 +170,39 @@ public class CategoryController extends Controller {
 			if( !em.contains(category)) {
 				category = em.merge(category);
 			}
+			for(Device o : category.getDevices() ) {
+				o.getCategories().remove(category);
+				em.merge(o);
+			}
+			for(Group o : category.getGroups() ) {
+				o.getCategories().remove(category);
+				em.merge(o);
+			}
+			for(HWConf o : category.getHWConfs() ) {
+				o.getCategories().remove(category);
+				em.merge(o);
+			}
+			for(Room o : category.getRooms() ) {
+				o.getCategories().remove(category);
+				em.merge(o);
+			}
+			for(Software o : category.getSoftwares() ) {
+				o.getCategories().remove(category);
+				em.merge(o);
+			}
+			for(User o : category.getUsers() ) {
+				o.getCategories().remove(category);
+				em.merge(o);
+			}
+			for(FAQ o : category.getFaqs() ) {
+				em.remove(o);
+			}
+			for(Contact o : category.getContacts() ) {
+				em.remove(o);
+			}
+			for(Announcement o : category.getAnnouncements() ) {
+				em.remove(o);
+			}
 			em.remove(category);
 			em.getTransaction().commit();
 			em.getEntityManagerFactory().getCache().evictAll();

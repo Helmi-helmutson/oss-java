@@ -186,7 +186,7 @@ public class UserResourceImpl implements UserResource {
 			for( Group group : user.getGroups() ) {
 				groups.add(group.getName());
 			}
-			return String.join(" ", groups);
+			return String.join(userController.getNl(), groups);
 		default:
 			//This is a config or mconfig. We have to merge it from the groups from actual room and from the user
 			List<String> configs = new ArrayList<String>();
@@ -483,4 +483,23 @@ public class UserResourceImpl implements UserResource {
 		return new OssResponse(session,"OK", "All teachers was put into all classes.");
 	}
 
+	@Override
+	public OssResponse allClasses(Session session, long userId) {
+		User user = new UserController(session).getById(userId);
+		final GroupController groupController = new GroupController(session);
+		for( Group group : groupController.getByType("class")) {
+			groupController.addMember(group, user);
+		}
+		return new OssResponse(session,"OK", "User was put into all classes.");
+	}
+
+	@Override
+	public String adllClasses(Session session, String userName) {
+		User user = new UserController(session).getByUid(userName);
+		final GroupController groupController = new GroupController(session);
+		for( Group group : groupController.getByType("class")) {
+			groupController.addMember(group, user);
+		}
+		return "OK";
+	}
 }

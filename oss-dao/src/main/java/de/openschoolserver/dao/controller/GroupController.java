@@ -234,6 +234,9 @@ public class GroupController extends Controller {
 
 	public OssResponse delete(long groupId){
 		Group group = this.getById(groupId);
+		if( group == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find the group with id %s.",null,String.valueOf(groupId));
+		}
 		return delete(group);
 	}
 

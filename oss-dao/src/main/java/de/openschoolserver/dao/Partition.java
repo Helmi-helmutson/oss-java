@@ -2,6 +2,8 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
+
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -10,7 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The persistent class for the Partitions database table.
- * 
+ *
  */
 @Entity
 @Table(name="Partitions")
@@ -49,11 +51,14 @@ public class Partition implements Serializable {
 	@ManyToOne
 	@JsonIgnore
 	private HWConf hwconf;
-	
+
     //bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
 	private User creator;
+
+	@Transient
+	private Timestamp lastCloned;
 
 	public Partition() {
 	}
@@ -69,7 +74,7 @@ public class Partition implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	@Override
 	public String toString() {
 		try {
@@ -78,7 +83,7 @@ public class Partition implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
+
 
 	@Override
 	public int hashCode() {
@@ -104,7 +109,7 @@ public class Partition implements Serializable {
 			return false;
 		return true;
 	}
-	
+
 
 	public String getDescription() {
 		return this.description;
@@ -168,6 +173,14 @@ public class Partition implements Serializable {
 
 	public void setCreator(User creator) {
 		this.creator = creator;
+	}
+
+	public Timestamp getLastCloned() {
+		return lastCloned;
+	}
+
+	public void setLastCloned(Timestamp lastCloned) {
+		this.lastCloned = lastCloned;
 	}
 
 }

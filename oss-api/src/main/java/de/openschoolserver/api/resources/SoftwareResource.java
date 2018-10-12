@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
 import de.openschoolserver.dao.Category;
+import de.openschoolserver.dao.OssBaseObject;
 import de.openschoolserver.dao.Software;
 import de.openschoolserver.dao.SoftwareLicense;
 import de.openschoolserver.dao.SoftwareStatus;
@@ -693,7 +694,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getSoftwares(
+    List<OssBaseObject> getSoftwares(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -709,7 +710,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getDevices(
+    List<OssBaseObject> getDevices(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -725,7 +726,7 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getRooms(
+    List<OssBaseObject> getRooms(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );
@@ -741,7 +742,71 @@ public interface SoftwareResource {
             @ApiResponse(code = 404, message = "Software not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("software.install")
-    List<Long> getHWConfs(
+    List<OssBaseObject> getHWConfs(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
+    /*
+     * GET softwares/installations/{installationId}/available/softwares
+     */
+    @GET
+    @Path("installations/{installationId}/available/softwares")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of softwares in an installation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<OssBaseObject> getAvailableSoftwares(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
+    /*
+     * GET softwares/installations/{installationId}/available/devices
+     */
+    @GET
+    @Path("installations/{installationId}/available/devices")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of devices in an installation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<OssBaseObject> getAvailableDevices(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
+    /*
+     * GET softwares/installations/{installationId}/available/rooms
+     */
+    @GET
+    @Path("installations/{installationId}/available/rooms")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of rooms in an installation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<OssBaseObject> getAvailableRooms(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("installationId") long installationId
+    );
+
+    /*
+     * GET softwares/installations/{installationId}/available/hwconfs
+     */
+    @GET
+    @Path("installations/{installationId}/available/hwconfs")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Gets the list of hwconfs in an installation.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Software not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<OssBaseObject> getAvailableHWConfs(
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("installationId") long installationId
     );

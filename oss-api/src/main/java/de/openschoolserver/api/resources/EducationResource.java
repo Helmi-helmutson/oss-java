@@ -22,6 +22,7 @@ import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.PositiveList;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SmartRoom;
@@ -486,7 +487,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    OssResponse downloadFilesFromRoom(@ApiParam(hidden = true) @Auth Session session,
+    OssResponse collectFileFromRoom(@ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId,
             @FormDataParam("projectName") String projectName,
             @FormDataParam("sortInDirs")  boolean sortInDirs,
@@ -710,40 +711,30 @@ public interface EducationResource {
                  @ApiResponse(code = 500, message = "Server broken, please contact administrator")
      })
      OssResponse uploadFileToGroup(@ApiParam(hidden = true) @Auth Session session,
-              @PathParam("groupId")  Long  groupId,
+             @PathParam("groupId")  Long  groupId,
+             @FormDataParam("studentsOnly") boolean studentsOnly,
              @FormDataParam("file") final InputStream fileInputStream,
              @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
              );
 
 
      @GET
-     @Path("groups/{groupId}/collect/{projectName}/")
+     @Path("groups/{groupId}/collect")
      @Produces(JSON_UTF8)
      @ApiOperation( value = "Collects data from the students member of the corresponding group." )
      @ApiResponses(value = {
                  @ApiResponse(code = 500, message = "Server broken, please contact administrator")
      })
      @RolesAllowed("education.groups")
-     OssResponse collectFileFromStudentsOfGroup(
-         @ApiParam(hidden = true) @Auth Session session,
-         @PathParam("groupId")     Long groupId,
-         @PathParam("projectName") String projectName
-     );
+     OssResponse collectFileFromfGroup(@ApiParam(hidden = true) @Auth Session session,
+             @PathParam("roomId") Long roomId,
+             @FormDataParam("projectName") String projectName,
+             @FormDataParam("sortInDirs")  boolean sortInDirs,
+             @FormDataParam("cleanUpExport") boolean cleanUpExport,
+             @FormDataParam("studentsOnly") boolean studentsOnly
 
-     @GET
-     @Path("groups/{groupId}/collect/{projectName}/all")
-     @Produces(JSON_UTF8)
-     @ApiOperation( value = "Collects data from the all member of the corresponding group." )
-     @ApiResponses(value = {
-                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-     })
-     @RolesAllowed("education.groups")
-     OssResponse collectFileFromMembersOfGroup(
-         @ApiParam(hidden = true) @Auth Session session,
-         @PathParam("groupId")     Long groupId,
-         @PathParam("projectName") String projectName
-     );
-
+             );
+     
     /************************************************************/
     /* Actions on logged in users and smart rooms and groups. */
     /************************************************************/
@@ -959,7 +950,7 @@ public interface EducationResource {
     @PUT
     @Path("devices/{deviceId}/{action}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy, .")
+    @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, cleanuploggedin.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -977,7 +968,7 @@ public interface EducationResource {
     @POST
     @Path("devices/{deviceId}/actionWithMap/{action}")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, openProxy, closeProxy."
+    @ApiOperation(value = "Manage a device. Valid actions are open, close, reboot, shutdown, wol, logout, cleanuploggedin."
                     + "This version of call allows to send a map with some parametrs:"
                     + "graceTime : seconds to wait befor execute action."
                     + "message : the message to shown befor/during execute the action.")
@@ -1037,7 +1028,7 @@ public interface EducationResource {
         @PathParam("projectName") String projectName
     );
 
- /*
+    /*
      * Get informations from the printers in the room
      */
     @GET
@@ -1048,7 +1039,7 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    Device getDefaultPrinter(
+    Printer getDefaultPrinter(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );
@@ -1064,7 +1055,7 @@ public interface EducationResource {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.rooms")
-    List<Device> getAvailablePrinters(
+    List<Printer> getAvailablePrinters(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("roomId") Long roomId
     );

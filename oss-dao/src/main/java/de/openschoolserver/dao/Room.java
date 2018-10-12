@@ -60,58 +60,50 @@ public class Room implements Serializable {
 
 	private String roomControl;
 
-        //bi-directional many-to-many association to Category
-	@ManyToMany(mappedBy="rooms", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    //bi-directional many-to-many association to Category
+	@ManyToMany(mappedBy="rooms")
 	@JsonIgnore
-	private List<Category> categories;
+	private List<Category> categories = new ArrayList<Category>();
 
 	//bi-directional many-to-one association to AccessInRoom
 	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
-	private List<AccessInRoom> accessInRooms;
+	private List<AccessInRoom> accessInRooms = new ArrayList<AccessInRoom>();
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="room")
 	@JsonIgnore
-	private List<Device> devices;
+	private List<Device> devices = new ArrayList<Device>();
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
-			name="AvailablePrinters"
-			, joinColumns={
-					@JoinColumn(name="room_id")
-			}
-			, inverseJoinColumns={
-					@JoinColumn(name="printer_id")
-			}
+			name="AvailablePrinters",
+			joinColumns={ @JoinColumn(name="room_id") },
+			inverseJoinColumns={@JoinColumn(name="printer_id")}
 			)
 	@JsonIgnore
-	private List<Device> availablePrinters;
+	private List<Printer> availablePrinters = new ArrayList<Printer>();
 
 	//bi-directional many-to-one association to Device
 	@ManyToOne( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
-			name="DefaultPrinter"
-			, joinColumns={
-					@JoinColumn(name="room_id")
-			}
-			, inverseJoinColumns={
-					@JoinColumn(name="printer_id")
-			}
+			name="DefaultPrinter",
+			joinColumns={ @JoinColumn(name="room_id") },
+			inverseJoinColumns={ @JoinColumn(name="printer_id") }
 			)
 	@JsonIgnore
-	private Device defaultPrinter;
+	private Printer defaultPrinter;
 
 	//bi-directional many-to-one association to Test
 	@OneToMany(mappedBy="room")
 	@JsonIgnore
-	private List<Test> tests;
+	private List<Test> tests = new ArrayList<Test>();
 
 	//bi-directional many-to-one association to RoomSmartControl
 	@OneToMany(mappedBy="room")
 	@JsonIgnore
-	private List<RoomSmartControl> smartControls;
+	private List<RoomSmartControl> smartControls = new ArrayList<RoomSmartControl>();
 		
 	@Transient
 	private String network;
@@ -124,7 +116,7 @@ public class Room implements Serializable {
 	@Column(name="hwconf_id", insertable=false, updatable=false)
 	private Long hwconfId;
 	
-    //bi-directional many-to-one association to User
+	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
 	private User creator;
@@ -132,10 +124,11 @@ public class Room implements Serializable {
 	public Room() {
 		this.network           = "";
 		this.roomControl       = "inRoom";
+		this.roomType		   = "ComputerRoom";
 		this.startIP           = "";
 		this.categories        = new ArrayList<Category>();
 		this.accessInRooms     = new ArrayList<AccessInRoom>();
-		this.availablePrinters = new ArrayList<Device>();
+		this.availablePrinters = new ArrayList<Printer>();
 		this.devices           = new ArrayList<Device>();
 		this.smartControls     = new ArrayList<RoomSmartControl>();
 	}
@@ -291,19 +284,19 @@ public class Room implements Serializable {
 		return device;
 	}
 
-	public List<Device> getAvailablePrinters() {
+	public List<Printer> getAvailablePrinters() {
 		return this.availablePrinters;
 	}
 
-	public void setAvailablePrinters(List<Device> availablePrinters) {
+	public void setAvailablePrinters(List<Printer> availablePrinters) {
 		this.availablePrinters = availablePrinters;
 	}
 
-	public Device getDefaultPrinter() {
+	public Printer getDefaultPrinter() {
 		return this.defaultPrinter;
 	}
 
-	public void setDefaultPrinter(Device defaultPrinter) {
+	public void setDefaultPrinter(Printer defaultPrinter) {
 		this.defaultPrinter = defaultPrinter;
 	}
 

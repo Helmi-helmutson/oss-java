@@ -42,6 +42,7 @@ public class SmartRoom {
 		RoomController      rc = new RoomController(session);
 		UserController      uc = new UserController(session);
 		this.loggedIns         = ec.getRoom(roomId);
+		rc.organizeRoom(roomId);
 		Room              room = rc.getById(roomId);
 		this.id          = room.getId();
 		this.description = room.getDescription();

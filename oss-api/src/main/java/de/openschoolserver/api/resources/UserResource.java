@@ -14,7 +14,6 @@ import javax.ws.rs.*;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -283,6 +282,22 @@ public interface UserResource {
     );
 
     /*
+    * PUT users/<groupId>/<userId>
+    */
+   @PUT
+   @Path("{userId}/allClasses")
+   @Produces(JSON_UTF8)
+   @ApiOperation(value = "Add user to a group.")
+   @ApiResponses(value = {
+       @ApiResponse(code = 404, message = "User not found"),
+       @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+   @RolesAllowed("user.manage")
+   OssResponse allClasses(
+           @ApiParam(hidden = true) @Auth Session session,
+           @PathParam("userId") long userId
+   );
+
+    /*
      * POST syncFsQuotas
      */
     @POST
@@ -325,12 +340,12 @@ public interface UserResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-     @RolesAllowed("user.search")
-     String getUserAttribute(
-  @ApiParam(hidden = true) @Auth Session session,
+    @RolesAllowed("user.search")
+    String getUserAttribute(
+    @ApiParam(hidden = true) @Auth Session session,
             @PathParam("uid")  String uid,
             @PathParam("attribute") String attribute
-  );
+    );
 
     /*
      * GET users/byRole/<role>
@@ -461,6 +476,19 @@ OssResponse addGuestUsers(
                 @ApiParam(hidden = true) @Auth Session session,
                 @PathParam("userName")     String    userName,
                 @PathParam("groupName")    String    groupName
+    );
+
+@PUT
+@Path("text/{userName}/allClassess")
+@Produces(TEXT)
+@ApiOperation(value = "Add a user to a group.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    String  adllClasses(
+                @ApiParam(hidden = true) @Auth Session session,
+                @PathParam("userName")     String    userName
     );
 
 @POST

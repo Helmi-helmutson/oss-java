@@ -15,6 +15,8 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Strings;
+
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +29,7 @@ import javax.validation.ValidatorFactory;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -50,23 +53,6 @@ public class DeviceController extends Controller {
 		try {
 			return em.find(Device.class, deviceId);
 		} catch (Exception e) {
-			return null;
-		} finally {
-			em.close();
-		}
-	}
-
-	/*
-	 * Delivers a list of devices wit the given device type
-	 */
-	public List<Device> getByTpe(String type) {
-		EntityManager em = getEntityManager();
-		try {
-			Query query = em.createNamedQuery("Device.getDeviceByType");
-			query.setParameter("deviceType", type);
-			return query.getResultList();
-		} catch (Exception e) {
-			logger.error("DeviceType:" + type + " " + e.getMessage(),e);
 			return null;
 		} finally {
 			em.close();
@@ -141,6 +127,10 @@ public class DeviceController extends Controller {
 		UserController userController = new UserController(this.session);
 		boolean needWriteSalt = false;
 		Device device = em.find(Device.class, deviceId);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find device with id %s.",null,String.valueOf(deviceId));
+		}
+		User user = null;
 		try {
 			em.getTransaction().begin();
 			if( this.isProtected(device) ) {
@@ -151,13 +141,21 @@ public class DeviceController extends Controller {
 			}
 			if(device.getHwconf() != null &&  device.getHwconf().getDeviceType().equals("FatClient")) {
 				needWriteSalt = true;
-				User user = userController.getByUid(device.getName());
-				if( user != null ) {
-					userController.delete(user);
-				}
+			}
+			user = userController.getByUid(device.getName());
+			if( user != null ) {
+				userController.delete(user);
 			}
 			this.startPlugin("delete_device", device);
-			em.merge(device);
+			if( device.getOwner() != null ) {
+				User owner = device.getOwner();
+				logger.debug("Deleting private device owner:" + owner + " device " + device);
+				owner.getOwnedDevices().remove(device);
+				if( session.getUser().equals(owner)) {
+					session.getUser().getOwnedDevices().remove(device);
+				}
+				em.merge(owner);
+			}
 			em.remove(device);
 			em.getTransaction().commit();
 			if( atomic ) {
@@ -353,9 +351,9 @@ public class DeviceController extends Controller {
 	 * Find the default printer for a device
 	 * If no printer was defined by the device find this from the room
 	 */
-	public Device getDefaultPrinter(long deviceId) {
+	public Printer getDefaultPrinter(long deviceId) {
 		Device device = this.getById(deviceId);
-		Device printer = device.getDefaultPrinter();
+		Printer printer = device.getDefaultPrinter();
 		if( printer != null) {
 			return printer;
 		}
@@ -370,14 +368,14 @@ public class DeviceController extends Controller {
 	 * Find the available printer for a device
 	 * If no printer was defined by the device find these from the room
 	 */
-	public List<Device> getAvailablePrinters(long deviceId) {
+	public List<Printer> getAvailablePrinters(long deviceId) {
 		Device device = this.getById(deviceId);
-		List<Device> printers   = new ArrayList<Device>();
-		for( Device printer : device.getAvailablePrinters() ) {
+		List<Printer> printers   = new ArrayList<Printer>();
+		for( Printer printer : device.getAvailablePrinters() ) {
 			printers.add(printer);
 		}
 		if( printers.isEmpty() ){
-			for(Device printer : device.getRoom().getAvailablePrinters()){
+			for(Printer printer : device.getRoom().getAvailablePrinters()){
 				printers.add(printer);
 			}
 		}
@@ -493,11 +491,14 @@ public class DeviceController extends Controller {
 			if(header.containsKey("wlanip")) {
 				device.setWlanIp(values[header.get("wlanip")]);
 			}
-			if(header.containsKey("raw")) {
-				device.setRow(Integer.parseInt(values[header.get("raw")]));
+			if(header.containsKey("row")) {
+				device.setRow(Integer.parseInt(values[header.get("row")]));
+			}
+			if(header.containsKey("place")) {
+				device.setPlace(Integer.parseInt(values[header.get("place")]));
 			}
 			if(header.containsKey("serial")) {
-				device.setPlace(Integer.parseInt(values[header.get("raw")]));
+				device.setSerial(values[header.get("serial")]);
 			}
 			if(header.containsKey("owner")) {
 				device.setOwner(userController.getByUid(values[header.get("owner")]));
@@ -522,14 +523,17 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"ERROR","End error:" + Error.toString());
 	}
 
-	public OssResponse setDefaultPrinter(long deviceId, long defaultPrinterId) {
-		// TODO Auto-generated method stub
-		Device device         = this.getById(deviceId);
-		Device defaultPrinter = this.getById(defaultPrinterId);
-		device.setDefaultPrinter(defaultPrinter);
+	public OssResponse setDefaultPrinter(long deviceId, long printerId) {
 		EntityManager em = getEntityManager();
 		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Device device   = em.find(Device.class, deviceId);
+			if( device == null || printer == null) {
+				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
+			}
 			em.getTransaction().begin();
+			device.setDefaultPrinter(printer);
+			printer.getDefaultForDevices().add(device);
 			em.merge(device);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -540,25 +544,76 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Default printer was set succesfully.");
 	}
 
-	public OssResponse setAvailablePrinters(long deviceId, List<Long> availablePrinterIds) {
-		// TODO Auto-generated method stub
-		Device device         = this.getById(deviceId);
-		List<Device> availablePrinters = new ArrayList<Device>();
-		for( Long aP : availablePrinterIds ) {
-			availablePrinters.add(this.getById(aP));
+
+	public OssResponse deleteDefaultPrinter(long deviceId) {
+		EntityManager em = getEntityManager();
+		Device  device  = em.find(Device.class, deviceId);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Device cannot be found.");
 		}
-		device.setAvailablePrinters(availablePrinters);
+		Printer printer = device.getDefaultPrinter();
+		if( printer != null  ) {
+			try {
+				em.getTransaction().begin();
+				device.setDefaultPrinter(null);
+				printer.getDefaultForDevices().remove(device);
+				em.merge(device);
+				em.merge(printer);
+				em.getTransaction().commit();
+			} catch (Exception e) {
+				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			} finally {
+				em.close();
+			}
+		}
+		return new OssResponse(this.getSession(),"OK","The default printer of the room was deleted succesfully.");
+	}
+
+	public OssResponse addAvailablePrinter(long deviceId, long printerId) {
 		EntityManager em = getEntityManager();
 		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Device device   = em.find(Device.class, deviceId);
+			if( device == null || printer == null) {
+				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
+			}
+			if( device.getAvailablePrinters().contains(printer) ) {
+				return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
+			}
 			em.getTransaction().begin();
+			device.getAvailablePrinters().add(printer);
+			printer.getDefaultForDevices().add(device);
 			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK", "Available printers were set succesfully.");
+		return new OssResponse(this.getSession(),"OK","The selected printer was added to the room.");
+	}
+
+	public OssResponse deleteAvailablePrinter(long deviceId, long printerId) {
+		EntityManager em = getEntityManager();
+		try {
+			Printer printer = em.find(Printer.class, printerId);
+			Device device   = em.find(Device.class, deviceId);
+			if( device == null || printer == null) {
+				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
+			}
+			em.getTransaction().begin();
+			device.getAvailablePrinters().remove(printer);
+			printer.getDefaultForDevices().remove(device);
+			em.merge(device);
+			em.merge(printer);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","The selected printer was removed from room.");
 	}
 
 	public OssResponse addLoggedInUser(String IP, String userName) {
@@ -814,8 +869,7 @@ public class DeviceController extends Controller {
 		String[] program    = null;
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
-		switch(action) {
-		case "shutDown":
+		switch(action.toLowerCase()) {
 		case "shutdown":
 			if( message.isEmpty() ) {
 				message = "System will shutdown in " + graceTime + "minutes";
@@ -836,13 +890,6 @@ public class DeviceController extends Controller {
 			program[3] = "system.reboot";
 			program[4] = graceTime;
 			break;
-		case "logout":
-			program = new String[4];
-			program[0] = "/usr/bin/salt";
-			program[1] = "--async";
-			program[2] = FQHN.toString();
-			program[3] = "oss_client.logout";
-			break;
 		case "close":
 			program = new String[4];
 			program[0] = "/usr/bin/salt";
@@ -857,21 +904,21 @@ public class DeviceController extends Controller {
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.unLockClient";
 			break;
-		case "lockInput":
+		case "lockinput":
 			program = new String[4];
 			program[0] = "/usr/bin/salt";
 			program[1] = "--async";
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.blockInput";
 			break;
-		case "unlockInput":
+		case "unlockinput":
 			program = new String[4];
 			program[0] = "/usr/bin/salt";
 			program[1] = "--async";
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.unBlockInput";
 			break;
-		case "applyState":
+		case "applystate":
 			program = new String[4];
 			program[0] = "/usr/bin/salt";
 			program[1] = "--async";
@@ -887,7 +934,7 @@ public class DeviceController extends Controller {
 		case "controlProxy":
 			//TODO
 			break;
-		case "saveFile":
+		case "savefile":
 			List<String>   fileContent =new ArrayList<String>();
 			fileContent.add(actionContent.get("content"));
 			String fileName = actionContent.get("fileName");
@@ -904,7 +951,14 @@ public class DeviceController extends Controller {
 			program[2] = file.toPath().toString();
 			program[3] = actionContent.get("path");
 			break;
-		case "cleanUpLoggedIn":
+		case "logoff":
+		case "logout":
+			program = new String[4];
+			program[0] = "/usr/bin/salt";
+			program[1] = "--async";
+			program[2] = FQHN.toString();
+			program[3] = "oss_client.logOff";
+		case "cleanuploggedin":
 			EntityManager em = getEntityManager();
 			em.getTransaction().begin();
 			for( User user : device.getLoggedIn() ) {
@@ -1013,6 +1067,7 @@ public class DeviceController extends Controller {
 		}
 		return this.setLoggedInUsers(device, user);
 	}
+
 	public OssResponse setLoggedInUsers(Long deviceId, Long userId) {
 		Device device = this.getById(deviceId);
 		if( device == null ) {
@@ -1024,8 +1079,8 @@ public class DeviceController extends Controller {
 		}
 		return this.setLoggedInUsers(device, user);
 	}
-	public OssResponse setLoggedInUsers(Device device, User user) {
 
+	public OssResponse setLoggedInUsers(Device device, User user) {
 		parameters = new ArrayList<String>();
 		parameters.add(device.getName());
 		parameters.add(device.getIp());
@@ -1036,6 +1091,7 @@ public class DeviceController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
+			device.setLoggedIn(new ArrayList<User>());
 			device.getLoggedIn().add(user);
 			user.getLoggedOn().add(device);
 			em.merge(device);
