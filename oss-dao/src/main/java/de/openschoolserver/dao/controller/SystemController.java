@@ -210,31 +210,7 @@ public class SystemController extends Controller {
 		return statusList;
 	}
 
-	/*
-	 * Returns the list of the member of an enumerate.
-	 *
-	 * @param		type	Name of the enumerates: roomType, groupType, deviceType ...
-	 * @return				The list of the member of the enumerate
-	 * @see					addEnumerate
-	 */
-	public List<String> getEnumerates(String type ) {
-		EntityManager em = getEntityManager();
-		try {
-			Query query = em.createNamedQuery("Enumerate.getByType").setParameter("type", type);
-			List<String> results = new ArrayList<String>();
-			for( Enumerate e :  (List<Enumerate>) query.getResultList() ) {
-				results.add(e.getValue());
-			}
-			return results;
-		} catch (Exception e) {
-			logger.error(e.getMessage());
-			return null;
-		} finally {
-			em.close();
-		}
-	}
-
-	/*
+	/**
 	 * Add a new enumerate
 	 *
 	 * @param		type	Name of the enumerates: roomType, groupType, deviceType ...
@@ -262,7 +238,7 @@ public class SystemController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Enumerate was created succesfully.");
 	}
 
-	/*
+	/**
 	 * Deletes an existing enumerate
 	 *
 	 * @param		type	Name of the enumerates: roomType, groupType, deviceType ...
