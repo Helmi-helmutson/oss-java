@@ -79,7 +79,7 @@ public class EducationController extends Controller {
 	public List<Room> getMyRooms() {
 		List<Room> rooms = new ArrayList<Room>();
 		if( this.session.getRoom() == null || this.session.getRoom().getRoomControl().equals("no")){
-			for( Room room : new RoomController(this.session).getAll() ) {
+			for( Room room : new RoomController(this.session).getAllToUse() ) {
 				switch(room.getRoomControl()) {
 				case "no":
 				case "inRoom":
