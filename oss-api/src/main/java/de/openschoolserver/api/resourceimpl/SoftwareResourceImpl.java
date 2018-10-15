@@ -214,7 +214,17 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse setSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
 			String version) {
-		return new SoftwareController(session).setSoftwareStatusOnDeviceByName(deviceName, softwareName, version, "I");
+		return new SoftwareController(session).setSoftwareStatusOnDeviceByName(deviceName, softwareName, softwareName, version, "I");
+	}
+
+	@Override
+	public OssResponse setSoftwareInstalledOnDevice(Session session, String deviceName, Map<String, String> software) {
+		return new SoftwareController(session).setSoftwareStatusOnDeviceByName(
+				deviceName,
+				software.get("name"),
+				software.get("description"),
+				software.get("version"),
+				"I");
 	}
 
 	@Override
@@ -238,8 +248,8 @@ public class SoftwareResourceImpl implements SoftwareResource {
 			Session     session,
 			long        softwareId,
 			Character   licenseType,
-    		Integer     count,
-    		String      value,
+			Integer     count,
+			String      value,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 
@@ -259,8 +269,8 @@ public class SoftwareResourceImpl implements SoftwareResource {
 			Session     session,
 			long        licenseId,
 			Character   licenseType,
-    		Integer     count,
-    		String      value,
+			Integer     count,
+			String      value,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader
 		) {
@@ -444,4 +454,5 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		}
 		return objects;
 	}
+
 }

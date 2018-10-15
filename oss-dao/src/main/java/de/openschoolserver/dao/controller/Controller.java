@@ -85,7 +85,7 @@ public class Controller extends Config {
 		}
 		return null;
 	}
-	
+
 	public String getNl() {
 		return System.getProperty("line.separator");
 	}
@@ -130,7 +130,7 @@ public class Controller extends Config {
 		em.close();
 		return true;
 	}
-	
+
 	public OssResponse checkPassword(String password) {
 		String[] program    = new String[1];
 		StringBuffer reply  = new StringBuffer();
@@ -222,7 +222,7 @@ public class Controller extends Config {
 			}
 			break;
 		case "de.openschoolserver.dao.Group":
-			//TODO 
+			//TODO
 			Group group = (Group)object;
 			switch(pluginName){
 			case "add_group":
@@ -291,7 +291,7 @@ public class Controller extends Config {
 		OSSShellTools.exec(program, reply, error, data.toString());
 		logger.debug(pluginName + " : " + data.toString() + " : " + error);
 	}
-	
+
 	public void changeMemberPlugin(String type, Group group, List<User> users){
 		//type can be only add or remove
 		StringBuilder data = new StringBuilder();
@@ -309,7 +309,7 @@ public class Controller extends Config {
 		OSSShellTools.exec(program, reply, error, data.toString());
 		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
-	
+
 	public void changeMemberPlugin(String type, Group group, User user){
 		//type can be only add or remove
 		StringBuilder data = new StringBuilder();
@@ -365,7 +365,7 @@ public class Controller extends Config {
 		if( this.session.getUser().getId() == 0 ) {
 			return true;
 		}
-		
+
 		User owner   = null;
 		Long ownerId = null;
 		switch(object.getClass().getName()) {
@@ -448,7 +448,7 @@ public class Controller extends Config {
 		if( owner != null && this.session.getUser().equals(owner) ) {
 				return true;
 		}
-				
+
 		//TODO some other acls based on object
 		return false;
 	}
@@ -506,7 +506,7 @@ public class Controller extends Config {
 		return false;
 
 	}
-	
+
 	public List<String> allowedModules(User user) {
 		List<String> modules = new ArrayList<String>();
 		//Is it allowed by the groups.
@@ -528,7 +528,7 @@ public class Controller extends Config {
 		}
 		return modules;
 	}
-	
+
 	public boolean isAllowed(User user, String acl) {
 		return this.allowedModules(user).contains(acl);
 	}
@@ -536,7 +536,7 @@ public class Controller extends Config {
 	public boolean isAllowed(String acl) {
 			return this.isAllowed(session.getUser(), acl);
 	}
-	
+
 	public boolean systemctl(String action, String service) {
 		 String[] program = new String[3];
 		 program[0] = "systemctl";
@@ -576,7 +576,7 @@ public class Controller extends Config {
 		}
 		return (OSSMConfig) query.getResultList().get(0);
 	}
-	
+
 	public boolean checkMConfig(Object object, String key, String value) {
 		if( this.getMConfigObject(object, key, value) == null ) {
 			return false;
@@ -611,6 +611,51 @@ public class Controller extends Config {
 			return null;
 		}
 		return (OSSConfig) query.getResultList().get(0);
+	}
+
+	/**
+	 * Checks if a value of an enumerate is allowed.
+	 * @param name  The of the enumerate.
+	 * @param value The value of the enumerate
+	 * @return Boolean True if the enumerate value is allowed.
+	 *         False if the enumerate is not allowed and in case of error.
+	 */
+	public boolean checkEnumerate(String type, String value) {
+		EntityManager em = this.getEntityManager();
+		Query query      = em.createNamedQuery("Enumerate.get");
+		try {
+			query.setParameter("type",type).setParameter("value",value);
+			return  !query.getResultList().isEmpty() ;
+		}	catch  (Exception e) {
+			logger.error("checkEnumerate: " + e.getMessage());
+			return false;
+		} finally {
+			em.close();
+		}
+	}
+
+	/**
+	 * Returns the list of the member of an enumerate.
+	 *
+	 * @param		type	Name of the enumerates: roomType, groupType, deviceType ...
+	 * @return				The list of the member of the enumerate
+	 * @see					addEnumerate
+	 */
+	public List<String> getEnumerates(String type ) {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Enumerate.getByType").setParameter("type", type);
+			List<String> results = new ArrayList<String>();
+			for( Enumerate e :  (List<Enumerate>) query.getResultList() ) {
+				results.add(e.getValue());
+			}
+			return results;
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return null;
+		} finally {
+			em.close();
+		}
 	}
 
 	public boolean checkConfig(Object object, String key) {
@@ -680,7 +725,7 @@ public class Controller extends Config {
 		em.close();
 		return values;
 	}
-	
+
 	public StringBuilder getImportDir(String startTime) {
 		StringBuilder importDir = new StringBuilder();
 		importDir.append(getConfigValue("HOME_BASE")).append("/groups/SYSADMINS/userimports/").append(startTime);

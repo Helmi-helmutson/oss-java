@@ -448,7 +448,7 @@ public class DeviceController extends Controller {
 		StringBuilder Error                       = new StringBuilder();
 
 		//Initialize the the hash for the rooms
-		for( Room r : roomController.getAll() ) {
+		for( Room r : roomController.getAllToUse() ) {
 			devicesToImport.put(r.getId(), new ArrayList<Device>() );
 		}
 		String headerLine = importFile.get(0);
@@ -509,7 +509,7 @@ public class DeviceController extends Controller {
 			devicesToImport.get(room.getId()).add(device);
 		}
 
-		for( Room r : roomController.getAll() ) {
+		for( Room r : roomController.getAllToUse() ) {
 			if( !devicesToImport.get(r.getId()).isEmpty() ) {
 				OssResponse ossResponse = roomController.addDevices(r.getId(), devicesToImport.get(r.getId()));
 				if( ossResponse.getCode().equals("ERROR")) {

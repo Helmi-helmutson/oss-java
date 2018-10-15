@@ -41,7 +41,21 @@ public class RoomRescourceImpl implements RoomResource {
     @Override
     public List<Room> getAll(Session session) {
         final RoomController roomController = new RoomController(session);
-        final List<Room> rooms = roomController.getAll();
+        final List<Room> rooms = roomController.getAllToUse();
+        return rooms;
+    }
+
+    @Override
+    public List<Room> allWithControl(Session session) {
+        final RoomController roomController = new RoomController(session);
+        final List<Room> rooms = roomController.getAllWithControl();
+        return rooms;
+    }
+
+    @Override
+    public List<Room> allWithFirewallControl(Session session) {
+        final RoomController roomController = new RoomController(session);
+        final List<Room> rooms = roomController.getAllWithFirewallControl();
         return rooms;
     }
 

@@ -406,9 +406,9 @@ public interface SoftwareResource {
     );
 
     /*
-     * POST softwares/listUpdatesForSoftwarePackages
+     * GET softwares/listUpdatesForSoftwarePackages
      */
-    @POST
+    @GET
     @Path("listUpdatesForSoftwarePackages")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "List the status of the downloaded software. ",
@@ -832,6 +832,21 @@ public interface SoftwareResource {
             @ApiParam(value = "Name of the device",  required = true) @PathParam("deviceName")   String deviceName,
             @ApiParam(value = "Name of the software",required = true) @PathParam("softwareName") String softwareName,
             @ApiParam(value = "Software version",    required = true) @PathParam("version")  String version
+            );
+
+    @POST
+    @Path("devicesByName/{deviceName}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Set a software on a device as installed in a given version."
+            + " This will be called by the tool read_installed_software.pl by starting the clients.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No category was found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    OssResponse setSoftwareInstalledOnDevice(
+            @ApiParam(hidden = true) @Auth Session session,
+            @ApiParam(value = "Name of the device",  required = true) @PathParam("deviceName")   String deviceName,
+            Map<String,String> software
             );
 
     @GET

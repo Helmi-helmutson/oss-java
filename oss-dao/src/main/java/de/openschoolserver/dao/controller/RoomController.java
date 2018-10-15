@@ -58,6 +58,21 @@ public class RoomController extends Controller {
 		put("4096",  20);
 	}};
 
+	@SuppressWarnings("serial")
+	static Map<Integer, Integer> nmToRowsPlaces = new HashMap<Integer, Integer>() {{
+		put(30,2);
+		put(29,3);
+		put(28,4);
+		put(27,6);
+		put(26,8);
+		put(25,11);
+		put(24,16);
+		put(23,23);
+		put(22,32);
+		put(21,46);
+		put(20,64);
+	}};
+
 	public RoomController(Session session) {
 		super(session);
 	}
@@ -107,7 +122,7 @@ public class RoomController extends Controller {
 		}
 	}
 
-	public List<Room> getAll() {
+	public List<Room> getAllToUse() {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Room.findAllToUse");
@@ -118,6 +133,64 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
+	}
+
+	public List<Room> getAll() {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Room.findAll");
+			return (List<Room>) query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new ArrayList<>();
+		} finally {
+			em.close();
+		}
+	}
+
+	public List<Room> getAllWithControl() {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Room.findAllWithControl");
+			return (List<Room>) query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new ArrayList<>();
+		} finally {
+			em.close();
+		}
+	}
+
+	public List<Room> getAllWithFirewallControl() {
+		EntityManager em = getEntityManager();
+		List<Room> rooms = new ArrayList<Room>();
+		for( String network : this.getEnumerates("network") ) {
+			String[] net = network.split("/");
+
+			if( net.length != 2 ) {
+				logger.error("Bad network");
+			} else {
+				logger.debug("net:" + net[0]);
+				logger.debug("net:" + net[1]);
+				Room room = new Room();
+				room.setName(net[0]);
+				room.setDescription(net[0]);
+				room.setStartIP(net[0]);
+				room.setNetMask(Integer.parseInt(net[1]));
+				rooms.add(room);
+			}
+		}
+		try {
+			Query query = em.createNamedQuery("Room.findAllWithFirewallControl");
+			for( Room room : (List<Room>) query.getResultList() ) {
+				rooms.add(room);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		} finally {
+			em.close();
+		}
+		return rooms;
 	}
 
 	public List<Room> getByType(String roomType) {
@@ -705,13 +778,13 @@ public class RoomController extends Controller {
 		return this.getAccessStatus(room);
 	}
 
-	/*
-	 * Sets the actual access status in all rooms.
+	/**
+	 * Gets the actual access status in all rooms.
 	 * Room is given by roomId
 	 */
 	public List<AccessInRoom> getAccessStatus() {
 		List<AccessInRoom> accesses = new ArrayList<AccessInRoom>();
-		for(Room room : this.getAll()) {
+		for(Room room : this.getAllWithControl()) {
 			accesses.add(this.getAccessStatus(room));
 		}
 		return accesses;
@@ -1293,7 +1366,7 @@ public class RoomController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Acces was deleted succesfully");	
+		return new OssResponse(this.getSession(),"OK","Acces was deleted succesfully");
 	}
 
 	public OssResponse importRooms(InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
@@ -1311,7 +1384,7 @@ public class RoomController extends Controller {
 		Map<String,Integer> header                = new HashMap<>();
 		OssResponse ossResponse;
 		String headerLine = importFile.get(0);
-		int i = 0;
+		Integer i = 0;
 		for(String field : headerLine.split(";")) {
 			header.put(field.toLowerCase(), i);
 			i++;
@@ -1319,14 +1392,22 @@ public class RoomController extends Controller {
 		if( !header.containsKey("name") || !header.containsKey("hwconf")) {
 			return new OssResponse(this.getSession(),"ERROR", "Fields name and hwconf are mandatory.");
 		}
+		i = 1;
 		for(String line : importFile.subList(1, importFile.size()) ) {
 			String[] values = line.split(";");
 			Room room = new Room();
+			if( values.length != header.size() ) {
+				logger.error("Value count mismatch in room import file in line:" + i);
+				continue;
+			}
+			i++;
 			if(header.containsKey("name")) {
 				room.setName(values[header.get("name")]);
 			}
 			if(header.containsKey("description")) {
-				room.setName(values[header.get("description")]);
+				room.setDescription(values[header.get("description")]);
+			} else {
+				room.setDescription(values[header.get("name")]);
 			}
 			if(header.containsKey("count")) {
 				if( ! countToNm.containsKey(values[header.get("count")]) ) {
@@ -1336,11 +1417,22 @@ public class RoomController extends Controller {
 			}
 			if(header.containsKey("rows")) {
 				room.setRows(Integer.parseInt(values[header.get("rows")]));
+			} else {
+				room.setRows(nmToRowsPlaces.get(room.getNetMask()));
 			}
 			if(header.containsKey("places")) {
 				room.setPlaces(Integer.parseInt(values[header.get("places")]));
+			} else {
+				room.setPlaces(nmToRowsPlaces.get(room.getNetMask()));
 			}
 			if(header.containsKey("control")) {
+				if( ! checkEnumerate("roomControl", values[header.get("control")])){
+					List<String> parameters = new ArrayList<String>();
+					parameters.add(values[header.get("hwconf")]);
+					parameters.add(i.toString());
+					parameters.add(String.join(",",getEnumerates("roomControl")));
+					return new OssResponse(this.getSession(),"ERROR", "Can not find hwconf %s in line %s. Allowed values are: %s.",null,parameters);
+				}
 				room.setRoomControl(values[header.get("control")]);
 			}
 			if(header.containsKey("type")) {
@@ -1350,13 +1442,19 @@ public class RoomController extends Controller {
 				room.setNetwork(values[header.get("network")]);
 			}
 			if(header.containsKey("hwconf")) {
-				room.setHwconf(cloneToolController.getByName(values[header.get("hwconf")]));
+				HWConf hwconf = cloneToolController.getByName(values[header.get("hwconf")]);
+				if( hwconf == null ) {
+					List<String> parameters = new ArrayList<String>();
+					parameters.add(values[header.get("hwconf")]);
+					parameters.add(i.toString());
+					return new OssResponse(this.getSession(),"ERROR", "Can not find hwconf %s in line %s.",null,parameters);
+				}
+				room.setHwconfId(hwconf.getId());
 			}
 			ossResponse = this.add(room);
 			if( ossResponse.getCode().equals("ERROR") ) {
 				return ossResponse;
 			}
-			this.organizeRoom(room.getId());
 		}
 		return new OssResponse(this.getSession(),"OK","Rooms was imported succesfully.");
 	}
