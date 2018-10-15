@@ -1326,7 +1326,7 @@ public class RoomController extends Controller {
 		try {
 			Room room = em.find(Room.class, roomId);
 			if( room.getRoomControl() != null && room.getRoomControl().equals("no") ) {
-				em.close();
+			// wird bereits im finally erledigt: 	em.close();
 				return new OssResponse(this.getSession(),"ERROR", "You must not set access control in a room with no room control.");
 			}
 			em.getTransaction().begin();
