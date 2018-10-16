@@ -133,16 +133,23 @@ public class SoftwareController extends Controller {
 		Software oldSoftware = this.getByName(software.getName());
 		SoftwareVersion softwareVersion = software.getSoftwareVersions().get(0);
 		if( oldSoftware != null ) {
+			//First we check if the given version is already present
+			for( SoftwareVersion sv : oldSoftware.getSoftwareVersions() ) {
+				if( sv.getVersion().equals(softwareVersion.getVersion()) ) {
+					return new OssResponse(this.getSession(),"OK","This software was already added in the same version.");
+				}
+			}
 			try {
+				em.getTransaction().begin();
 				if( replace ) {
 					for( SoftwareVersion sv : oldSoftware.getSoftwareVersions() ) {
 						sv.setStatus("R");
+						em.merge(sv);
 					}
 					softwareVersion.setStatus("C");
 				}
 				oldSoftware.getSoftwareVersions().add(softwareVersion);
 				softwareVersion.setSoftware(oldSoftware);
-				em.getTransaction().begin();
 				em.persist(softwareVersion);
 				em.merge(oldSoftware);
 				em.getTransaction().commit();
@@ -151,14 +158,11 @@ public class SoftwareController extends Controller {
 				em.close();
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 			}
-			return new OssResponse(this.getSession(),"OK","Software was created succesfully",software.getId());
+			return new OssResponse(this.getSession(),"OK","New software version was created succesfully",softwareVersion.getId());
 		}
 		software.addSoftwareVersion(softwareVersion);
 		softwareVersion.setSoftware(software);
 		software.setCreator(this.session.getUser());
-		if( replace ) {
-			softwareVersion.setStatus("C");
-		}
 		try {
 			em.getTransaction().begin();
 			em.persist(software);
