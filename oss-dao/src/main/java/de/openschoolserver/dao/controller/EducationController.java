@@ -510,7 +510,7 @@ public class EducationController extends Controller {
 		/*
 		* This is a very special action
 		*/
-		if( action.equals("organizeRoom")) {
+		if( action.startsWith("organize")) {
 			return new RoomController(session).organizeRoom(roomId);
 		}
 
@@ -524,8 +524,8 @@ public class EducationController extends Controller {
 			logger.debug("manageRoom " + roomId + " user:" + loggedOn.get(0) + " device:" +  loggedOn.get(1));
 			//Do not control the own workstation
 			if( this.session.getUser().getId().equals(loggedOn.get(0)) ||
-				(this.session.getDevice() != null && this.session.getDevice().getId().equals(loggedOn.get(1)))
-				 ) {
+				(this.session.getDevice() != null && this.session.getDevice().getId().equals(loggedOn.get(1))))
+			{
 				continue;
 			}
 			ossResponse = dc.manageDevice(loggedOn.get(1), action, actionContent);
