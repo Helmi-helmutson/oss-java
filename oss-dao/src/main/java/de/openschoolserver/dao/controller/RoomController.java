@@ -711,6 +711,7 @@ public class RoomController extends Controller {
 		AccessInRoom access = new AccessInRoom();
 		access.setAccessType("FW");
 		access.setRoomId(room.getId());
+		access.setRoomName(room.getName());
 
 		String[] program = new String[3];
 		program[0] = "/usr/sbin/oss_get_access_state.sh";
@@ -1249,7 +1250,16 @@ public class RoomController extends Controller {
 			}
 		}
 		for( Device device : room.getDevices() ) {
-			if( this.getDevicesOnMyPlace(room, device).size() > 1) {
+			changed=false;
+			if( device.getRow() == 0 ) {
+				device.setRow(1);
+				changed = true;
+			}
+			if( device.getPlace() == 0) {
+				device.setPlace(1);
+				changed = true;
+			}
+			if( changed || this.getDevicesOnMyPlace(room, device).size() > 1) {
 				coordinates = this.getNextFreePlace(room);
 				device.setRow(coordinates.get(0));
 				device.setPlace(coordinates.get(1));

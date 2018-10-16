@@ -47,6 +47,9 @@ public class AccessInRoom implements Serializable {
 	@Column(name="room_id", insertable = false, updatable = false)
 	private Long roomId;
 
+	@Transient
+	private String roomName;
+
 	/*
 	 * If the corresponding access should be applied Mondays
 	 */
@@ -375,5 +378,13 @@ public class AccessInRoom implements Serializable {
 		if(  this.pointInTime.length() == 4 ) {
 			this.pointInTime = "0" + pointInTime;
 		}
+	}
+
+	public String getRoomName() {
+		return roomName;
+	}
+
+	public void setRoomName(String roomName) {
+		this.roomName = roomName;
 	}
 }
