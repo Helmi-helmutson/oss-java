@@ -726,7 +726,7 @@ public interface EducationResource {
                  @ApiResponse(code = 500, message = "Server broken, please contact administrator")
      })
      @RolesAllowed("education.groups")
-     OssResponse collectFileFromfGroup(@ApiParam(hidden = true) @Auth Session session,
+     OssResponse collectFileFromGroup(@ApiParam(hidden = true) @Auth Session session,
              @PathParam("roomId") Long roomId,
              @FormDataParam("projectName") String projectName,
              @FormDataParam("sortInDirs")  boolean sortInDirs,

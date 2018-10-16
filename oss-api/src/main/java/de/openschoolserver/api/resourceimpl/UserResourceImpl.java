@@ -494,7 +494,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public String adllClasses(Session session, String userName) {
+	public String addToAllClasses(Session session, String userName) {
 		User user = new UserController(session).getByUid(userName);
 		final GroupController groupController = new GroupController(session);
 		for( Group group : groupController.getByType("class")) {

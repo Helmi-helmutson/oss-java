@@ -481,12 +481,12 @@ OssResponse addGuestUsers(
 @PUT
 @Path("text/{userName}/allClassess")
 @Produces(TEXT)
-@ApiOperation(value = "Add a user to a group.")
+@ApiOperation(value = "Add a user to all classes.")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "User not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
     @RolesAllowed("user.manage")
-    String  adllClasses(
+    String  addToAllClasses(
                 @ApiParam(hidden = true) @Auth Session session,
                 @PathParam("userName")     String    userName
     );

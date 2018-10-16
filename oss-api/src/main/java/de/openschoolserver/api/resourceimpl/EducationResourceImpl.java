@@ -344,7 +344,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse collectFileFromfGroup(Session session,
+	public OssResponse collectFileFromGroup(Session session,
 			Long groupId,
 			String projectName,
 			boolean sortInDirs,
