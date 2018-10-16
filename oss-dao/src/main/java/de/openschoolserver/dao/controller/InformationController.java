@@ -230,9 +230,9 @@ public class InformationController extends Controller {
 				List<Category> categories = new ArrayList<Category>();
 				categories.add(category);
 				for(Announcement announcement : category.getAnnouncements() ) {
-					if( this.now().after(announcement.getValidFrom()) &&
-						this.now().before(announcement.getValidUntil()) &&
-						! user.getReadAnnouncements().contains(announcement) )
+					if( !this.now().before(announcement.getValidFrom()) &&
+						!this.now().after(announcement.getValidUntil()) &&
+						!user.getReadAnnouncements().contains(announcement) )
 					{
 						announcement.setCategories(categories);
 						announcements.add(announcement);
