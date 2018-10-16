@@ -126,7 +126,7 @@ public interface SoftwareResource {
     @Path("add")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Add a new version of software. If the software does not exists this will be create.<br>" +
-                          "If the software does exists all older versions will be set to 'R'eplaced and the actuell version to 'A'.<br>" +
+                          "If the software does exists all older versions will be set to 'R'eplaced and the current version to 'C'.<br>" +
                           "The software version must be given! Now we only provides one actual version.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
