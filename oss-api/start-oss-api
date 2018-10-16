@@ -4,14 +4,14 @@
 
 #Create a session for local services
 TOKEN=$( grep de.openschoolserver.api.auth.localhost= /opt/oss-java/conf/oss-api.properties | sed 's/de.openschoolserver.api.auth.localhost=//' )
-LOCAL_TOKEN=$( echo "SELECT COUNT(*) FROM Sessions WHERE token='$TOKEN'" | mysql OSS | tail -n 1 )
+SQLUSER=$( grep javax.persistence.jdbc.user= /opt/oss-java/conf/oss-api.properties | sed 's/javax.persistence.jdbc.user=//' )
+SQLPW=$( grep javax.persistence.jdbc.password= /opt/oss-java/conf/oss-api.properties | sed 's/javax.persistence.jdbc.password=//' )
+LOCAL_TOKEN=$( echo "SELECT COUNT(*) FROM Sessions WHERE token='$TOKEN'" | mysql OSS -u $SQLUSER -p${SQLPW} | tail -n 1 )
 if [  "${LOCAL_TOKEN}" = 0 -o "${SCHOOL_RESET_REGISTER_PASSWORD}" = "yes" ]; then
 	grep -q de.openschoolserver.api.auth.localhost= /opt/oss-java/conf/oss-api.properties || echo de.openschoolserver.api.auth.localhost=TOKEN >> /opt/oss-java/conf/oss-api.properties
 	TOKEN="localhost_"$(uuidgen)
 	sed -i s/de.openschoolserver.api.auth.localhost=.*/de.openschoolserver.api.auth.localhost=$TOKEN/ /opt/oss-java/conf/oss-api.properties
 	chmod 600            /opt/oss-java/conf/oss-api.properties
-	SQLUSER=$( grep javax.persistence.jdbc.user= /opt/oss-java/conf/oss-api.properties | sed 's/javax.persistence.jdbc.user=//' )
-	SQLPW=$( grep javax.persistence.jdbc.password= /opt/oss-java/conf/oss-api.properties | sed 's/javax.persistence.jdbc.password=//' )
 	echo "DELETE FROM Sessions WHERE IP='127.0.0.1'" | mysql -u $SQLUSER -p${SQLPW} OSS
 	echo "INSERT INTO Sessions VALUES(NULL,1,NULL,NULL,NOW(),'127.0.0.1','$TOKEN')" | mysql -u $SQLUSER -p${SQLPW} OSS
 fi

@@ -335,6 +335,15 @@ public class SoftwareController extends Controller {
 	 * Functions to interact with the CEPHALIX repository.
 	 */
 
+	/**
+	 * Delivers a list from the softwares downlowded from the CEPHALIX server.
+	 * @return A list of hashes in the format: [ 
+	 * 	       { "name":"<package name>", 
+	 *           "version":"package version",
+	 *           "description":"...",
+	 *           "update":"version of the new package",
+	 *           "updateDescription":"..." } 
+	 */
 	public List<Map<String, String>> listDownloadedSoftware() {
 		Map<String,String>        software;
 		List<Map<String, String>> softwares = new ArrayList<>();
@@ -397,6 +406,10 @@ public class SoftwareController extends Controller {
 		return softwares;
 	}
 
+	/**
+	 * Delivers a list from Software available on the CEPHALIX repository server.
+	 * @return A list of hashes in the format: [ { "name":"<package name>", "version":"package version" } 
+	 */
 	public List<Map<String, String>> getAvailableSoftware() {
 		Map<String,String>        software;
 		List<Map<String, String>> softwares = new ArrayList<Map<String,String>>();
@@ -446,6 +459,11 @@ public class SoftwareController extends Controller {
 	}
 
 
+	/**
+	 * Downloads softwares from the CEPHALIX repository server
+	 * @param softwares List of softwares to download.
+	 * @return
+	 */
 	public OssResponse downloadSoftwares(List<String> softwares) {
 		File file = null;
 		try {
@@ -474,24 +492,6 @@ public class SoftwareController extends Controller {
 		program[3]   = "now";
 		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(this.getSession(),"OK","Download of the softwares was started succesfully");
-	}
-
-	public OssResponse removeSoftwares(List<String> softwares) {
-		String[] program    = new String[7+ softwares.size()];
-		StringBuffer reply  = new StringBuffer();
-		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/bin/zypper";
-		program[1] = "-nx";
-		program[2] = "-D";
-		program[3] = "/srv/salt/repos.d/";
-		program[4] = "install";
-		program[5] = "-r";
-		program[6] = "salt-packages";
-		for(int i = 0; i < softwares.size(); i++) {
-			program[8+i] = softwares.get(i);
-		}
-		OSSShellTools.exec(program, reply, stderr, null);
-		return new OssResponse(this.getSession(),"OK","Softwares were removed succesfully");
 	}
 
 	public OssResponse refreshSoftwareRepositories() {
@@ -549,7 +549,37 @@ public class SoftwareController extends Controller {
 		return softwares;
 	}
 
-	public OssResponse updatesSoftwares(List<String> softwares) {
+	public OssResponse updateSoftwares(List<String> softwares) {
+		File file = null;
+		try {
+			file = File.createTempFile("oss_update_softwares_job", ".ossb", new File("/opt/oss-java/tmp/"));
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		}
+		StringBuilder command = new StringBuilder();
+		command.append("/usr/sbin/oss_update_packages ");
+		for(int i = 0; i < softwares.size(); i++) {
+			command.append("oss-pkg-").append(softwares.get(i)).append(" ");
+		}
+		try(  PrintWriter out = new PrintWriter( file.toPath().toString() )  ){
+		    out.println( command.toString() );
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+		}
+
+		String[] program    = new String[4];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0]   = "at";
+		program[1]   = "-f";
+		program[2]   = file.toPath().toString();
+		program[3]   = "now";
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new OssResponse(this.getSession(),"OK","Update of the softwares was started succesfully");
+	}
+
+	public OssResponse updateSoftwaresDirectly(List<String> softwares) {
 		String[] program    = new String[7+ softwares.size()];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();

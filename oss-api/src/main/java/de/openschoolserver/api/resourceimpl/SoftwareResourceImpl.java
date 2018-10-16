@@ -395,7 +395,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public OssResponse updatesSoftwares(Session session, List<String> softwares) {
-		return new SoftwareController(session).updatesSoftwares(softwares);
+		return new SoftwareController(session).updateSoftwares(softwares);
 	}
 
 	@Override
