@@ -162,6 +162,7 @@ public class SoftwareController extends Controller {
 		}
 		software.addSoftwareVersion(softwareVersion);
 		softwareVersion.setSoftware(software);
+		softwareVersion.setStatus("C");
 		software.setCreator(this.session.getUser());
 		try {
 			em.getTransaction().begin();
