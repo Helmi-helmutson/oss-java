@@ -515,6 +515,10 @@ public class DeviceController extends Controller {
 			}
 			if(values.containsKey("hwconf") && !values.get("hwconf").isEmpty() ) {
 				device.setHwconf(cloneToolController.getByName(values.get("hwconf")));
+				device.setHwconfId(cloneToolController.getByName(values.get("hwconf")).getId());
+			} else if( room.getHwconf() != null ) {
+				device.setHwconf(room.getHwconf());
+				device.setHwconfId(room.getHwconf().getId());
 			}
 			devicesToImport.get(room.getId()).add(device);
 		}
