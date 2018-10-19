@@ -220,6 +220,10 @@ public class GroupController extends Controller {
 					em.remove(category);
 				}
 			}
+			for( User user : group.getUsers() ) {
+				user.getGroups().remove(group);
+				em.merge(user);
+			}
 			em.remove(group);
 			em.getTransaction().commit();
 			//em.getEntityManagerFactory().getCache().evictAll();
@@ -242,6 +246,9 @@ public class GroupController extends Controller {
 
 	public OssResponse delete(String groupName){
 		Group group = this.getByName(groupName);
+		if( group == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find the group with id %s.",null,groupName);
+		}
 		return delete(group);
 	}
 
