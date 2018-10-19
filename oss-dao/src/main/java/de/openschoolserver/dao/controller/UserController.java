@@ -337,6 +337,10 @@ public class UserController extends Controller {
 		if (!em.contains(user)) {
 			user = em.merge(user);
 		}
+		for( Group group : user.getGroups() ) {
+			group.getUsers().remove(user);
+			em.merge(user);
+		}
 		em.remove(user);
 		em.getTransaction().commit();
 		em.getEntityManagerFactory().getCache().evictAll();
