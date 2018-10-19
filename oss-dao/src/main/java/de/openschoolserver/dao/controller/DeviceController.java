@@ -226,7 +226,7 @@ public class DeviceController extends Controller {
 				parameters.add(name);
 				return new OssResponse(this.session,"ERROR","The WLAN MAC address will be used allready '%s'.",null,parameters);
 			}
-			if( ! IPv4.validateMACAddress(device.getMac())) {
+			if( ! IPv4.validateMACAddress(device.getWlanMac())) {
 				parameters.add(device.getMac());
 				return new OssResponse(this.session,"ERROR","The WLAN-MAC address '%s' is not valid.",null,parameters);
 			}
@@ -444,8 +444,8 @@ public class DeviceController extends Controller {
 		CloneToolController   cloneToolController = new CloneToolController(this.session);
 		UserController        userController      = new UserController(this.session);
 		Map<Long,List<Device>> devicesToImport    = new HashMap<>();
-		Map<String,Integer> header                = new HashMap<>();
-		StringBuilder Error                       = new StringBuilder();
+		Map<Integer,String> header                = new HashMap<>();
+		StringBuilder error                       = new StringBuilder();
 
 		//Initialize the the hash for the rooms
 		for( Room r : roomController.getAllToUse() ) {
@@ -454,57 +454,66 @@ public class DeviceController extends Controller {
 		String headerLine = importFile.get(0);
 		int i = 0;
 		for(String field : headerLine.split(";")) {
-			header.put(field.toLowerCase(), i);
+			header.put(i,field.toLowerCase());
 			i++;
 		}
+
+		logger.debug("header" + header);
 		if( !header.containsKey("mac") || !header.containsKey("room")) {
 			return new OssResponse(this.getSession(),"ERROR", "MAC and Room are mandatory fields.");
 		}
 		for(String line : importFile.subList(1, importFile.size()) ) {
-			String[] values = line.split(";");
-			Room room = roomController.getByName(values[header.get("room")]);
+			Map<String,String> values = new HashMap<>();
+			i = 0;
+			for ( String value : line.split(";") ) {
+				values.put(header.get(i),value);
+				i++;
+			}
+			logger.debug("values" + values);
+			Room room = roomController.getByName(values.get("room"));
 			if( room == null ) {
-				logger.debug("Can Not find the Room" +values[header.get("room")] );
-				return new OssResponse(this.getSession(),"ERROR","Can Not find the Room" +values[header.get("room")]);
+				logger.debug("Can Not find the Room" +values.get("room") );
+				error.append("Can not find the Room: ").append(values.get("room")).append("<br>");
+				continue;
 			}
 			Device device = new Device();
 			device.setRoom(room);
-			device.setMac(values[header.get("mac")]);
-			if(header.containsKey("serial")) {
-				device.setSerial(values[header.get("serial")]);
+			device.setMac(values.get("mac"));
+			if(values.containsKey("serial") && !values.get("invetary").isEmpty() ) {
+				device.setSerial(values.get("serial"));
 			}
-			if(header.containsKey("inventary")) {
-				device.setInventary(values[header.get("inventary")]);
+			if(values.containsKey("inventary") && !values.get("inventary").isEmpty() ) {
+				device.setInventary(values.get("inventary"));
 			}
-			if(header.containsKey("locality")) {
-				device.setLocality(values[header.get("locality")]);
+			if(values.containsKey("locality") && !values.get("locality").isEmpty()) {
+				device.setLocality(values.get("locality"));
 			}
-			if(header.containsKey("name")) {
-				device.setName(values[header.get("name")]);
+			if(values.containsKey("name") && !values.get("name").isEmpty() ) {
+				device.setName(values.get("name"));
 			}
-			if(header.containsKey("wlanmac")) {
-				device.setWlanMac(values[header.get("wlanmac")]);
+			if(values.containsKey("wlanmac") && !values.get("wlanmac").isEmpty()) {
+				device.setWlanMac(values.get("wlanmac"));
 			}
-			if(header.containsKey("ip")) {
-				device.setIp(values[header.get("ip")]);
+			if(values.containsKey("ip") && !values.get("ip").isEmpty() ) {
+				device.setIp(values.get("ip"));
 			}
-			if(header.containsKey("wlanip")) {
-				device.setWlanIp(values[header.get("wlanip")]);
+			if(values.containsKey("wlanip") && !values.get("wlanip").isEmpty() ) {
+				device.setWlanIp(values.get("wlanip"));
 			}
-			if(header.containsKey("row")) {
-				device.setRow(Integer.parseInt(values[header.get("row")]));
+			if(values.containsKey("row") && !values.get("row").isEmpty()) {
+				device.setRow(Integer.parseInt(values.get("row")));
 			}
-			if(header.containsKey("place")) {
-				device.setPlace(Integer.parseInt(values[header.get("place")]));
+			if(values.containsKey("place") && !values.get("place").isEmpty()) {
+				device.setRow(Integer.parseInt(values.get("place")));
 			}
-			if(header.containsKey("serial")) {
-				device.setSerial(values[header.get("serial")]);
+			if(values.containsKey("serial") && !values.get("serial").isEmpty() ) {
+				device.setSerial(values.get("serial"));
 			}
-			if(header.containsKey("owner")) {
-				device.setOwner(userController.getByUid(values[header.get("owner")]));
+			if(values.containsKey("owner") && !values.get("owner").isEmpty() ) {
+				device.setOwner(userController.getByUid(values.get("owner")));
 			}
-			if(header.containsKey("hwconf")) {
-				device.setHwconf(cloneToolController.getByName(values[header.get("hwconf")]));
+			if(values.containsKey("hwconf") && !values.get("hwconf").isEmpty() ) {
+				device.setHwconf(cloneToolController.getByName(values.get("hwconf")));
 			}
 			devicesToImport.get(room.getId()).add(device);
 		}
@@ -513,14 +522,14 @@ public class DeviceController extends Controller {
 			if( !devicesToImport.get(r.getId()).isEmpty() ) {
 				OssResponse ossResponse = roomController.addDevices(r.getId(), devicesToImport.get(r.getId()));
 				if( ossResponse.getCode().equals("ERROR")) {
-					Error.append(ossResponse.getValue()).append("<br>");
+					error.append(ossResponse.getValue()).append("<br>");
 				}
 			}
 		}
-		if( Error.length() == 0 ) {
+		if( error.length() == 0 ) {
 			return new OssResponse(this.getSession(),"OK", "Devices were imported succesfully.");
 		}
-		return new OssResponse(this.getSession(),"ERROR","End error:" + Error.toString());
+		return new OssResponse(this.getSession(),"ERROR","End error:" + error.toString());
 	}
 
 	public OssResponse setDefaultPrinter(long deviceId, long printerId) {
