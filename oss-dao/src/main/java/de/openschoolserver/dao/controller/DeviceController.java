@@ -446,6 +446,7 @@ public class DeviceController extends Controller {
 		Map<Long,List<Device>> devicesToImport    = new HashMap<>();
 		Map<Integer,String> header                = new HashMap<>();
 		StringBuilder error                       = new StringBuilder();
+		List<String>  parameters				  = new ArrayList<String>();
 
 		//Initialize the the hash for the rooms
 		for( Room r : roomController.getAllToUse() ) {
@@ -459,7 +460,7 @@ public class DeviceController extends Controller {
 		}
 
 		logger.debug("header" + header);
-		if( !header.containsKey("mac") || !header.containsKey("room")) {
+		if( !header.containsValue("mac") || !header.containsValue("room")) {
 			return new OssResponse(this.getSession(),"ERROR", "MAC and Room are mandatory fields.");
 		}
 		for(String line : importFile.subList(1, importFile.size()) ) {
@@ -523,12 +524,16 @@ public class DeviceController extends Controller {
 				OssResponse ossResponse = roomController.addDevices(r.getId(), devicesToImport.get(r.getId()));
 				if( ossResponse.getCode().equals("ERROR")) {
 					error.append(ossResponse.getValue()).append("<br>");
+					if( !ossResponse.getParameters().isEmpty() ) {
+						parameters.addAll(ossResponse.getParameters());
+					}
 				}
 			}
 		}
 		if( error.length() == 0 ) {
 			return new OssResponse(this.getSession(),"OK", "Devices were imported succesfully.");
 		}
+		logger.error("ImportDevices:" + error.toString() + " Parameters: " + String.join(";",parameters));
 		return new OssResponse(this.getSession(),"ERROR","End error:" + error.toString());
 	}
 
