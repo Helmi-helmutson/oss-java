@@ -15,7 +15,9 @@ import static javax.persistence.GenerationType.IDENTITY;
 
 @Entity
 @Table(name = "Sessions")
-@NamedQueries({ @NamedQuery(name = "Session.getByToken", query = "SELECT s FROM Session s WHERE s.token=:token") })
+@NamedQueries({
+	@NamedQuery(name = "Session.getByToken", query = "SELECT s FROM Session s WHERE s.token=:token")
+})
 public class Session implements Principal {
 
 	@Id
@@ -33,30 +35,28 @@ public class Session implements Principal {
 	@Transient
 	private String schoolId = "dummy";
 	
-	@Column(name="device_id")
+	@Column(name="device_id", insertable = false, updatable = false )
 	private Long deviceId;
 	
 	//@OneToOne
-	@JoinColumn(name = "device_id", insertable = false, updatable = false)
+	@ManyToOne
 	@JsonIgnore
 	private Device device;
 	    
-	@Column(name = "user_id")
+	@Column(name = "user_id", insertable = false, updatable = false )
 	private Long userId;
 	
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "user_id", insertable = false, updatable = false)
+	@ManyToOne
 	@JsonIgnore
 	private User user;
 	
 	@Transient
 	private String role = "dummy";
 	
-	@Column(name = "room_id")
+	@Column(name = "room_id", insertable = false, updatable = false)
 	private Long roomId;
 	
-	@OneToOne
-	@JoinColumn(name = "room_id", insertable = false, updatable = false)
+	@ManyToOne
 	@JsonIgnore
 	private Room room;
 

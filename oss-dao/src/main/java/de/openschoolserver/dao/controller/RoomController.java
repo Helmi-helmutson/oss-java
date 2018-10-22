@@ -374,28 +374,24 @@ public class RoomController extends Controller {
 		if( !this.mayModify(room) ) {
 			return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
 		}
+		DeviceController devController = new DeviceController(this.getSession());
+		if( this.isProtected(room) ) {
+			return new OssResponse(this.getSession(),"ERROR","This room must not be deleted.");
+		}
+		List<Long> deviceIds = new ArrayList<Long>();
+		for( Device device : room.getDevices()) {
+			deviceIds.add(device.getId());
+		}
+		OssResponse ossResponse = devController.delete(deviceIds);
+		//If an error happened during deleting the devices the room must not be removed.
+		if( ossResponse.getCode().equals("ERROR") ) {
+			return ossResponse;
+		}
 		try {
-
 			em.getTransaction().begin();
-			DeviceController devController = new DeviceController(this.getSession());
-			if( this.isProtected(room) ) {
-				return new OssResponse(this.getSession(),"ERROR","This room must not be deleted.");
-			}
-			List<Long> deviceIds = new ArrayList<Long>();
-			for( Device device : room.getDevices()) {
-				deviceIds.add(device.getId());
-			}
-			OssResponse ossResponse = devController.delete(deviceIds);
-			//If an error happened during deleting the devices the room must not be removed.
-			if( ossResponse.getCode().equals("ERROR") ) {
-				return ossResponse;
-			}
-			if( ! em.contains(room)) {
-				room = em.merge(room);
-			}
+			room = em.find(Room.class, roomId);
 			em.remove(room);
 			em.getTransaction().commit();
-			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());

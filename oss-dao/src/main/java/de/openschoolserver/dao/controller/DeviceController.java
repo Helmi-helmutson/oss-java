@@ -26,12 +26,15 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.SoftwareLicense;
+import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.*;
 
@@ -100,7 +103,7 @@ public class DeviceController extends Controller {
 		try {
 			for( Long deviceId : deviceIds) {
 				Device device = em.find(Device.class, deviceId);
-				if( device.getHwconf().getDeviceType().equals("FatClient")) {
+				if(device.getHwconf() != null &&  device.getHwconf().getDeviceType().equals("FatClient")) {
 					needWriteSalt = true;
 				}
 				this.delete(deviceId, false);
@@ -132,6 +135,8 @@ public class DeviceController extends Controller {
 		}
 		User user = null;
 		try {
+			HWConf hwconf = device.getHwconf();
+			Room   room   = device.getRoom();
 			em.getTransaction().begin();
 			if( this.isProtected(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","This device must not be deleted.");
@@ -139,8 +144,13 @@ public class DeviceController extends Controller {
 			if( !this.mayModify(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
 			}
-			if(device.getHwconf() != null &&  device.getHwconf().getDeviceType().equals("FatClient")) {
-				needWriteSalt = true;
+			if(hwconf != null )
+			{
+				hwconf.getDevices().remove(device);
+				em.merge(hwconf);
+				if( hwconf.getDeviceType().equals("FatClient")) {
+					needWriteSalt = true;
+				}
 			}
 			user = userController.getByUid(device.getName());
 			if( user != null ) {
@@ -155,6 +165,37 @@ public class DeviceController extends Controller {
 					session.getUser().getOwnedDevices().remove(device);
 				}
 				em.merge(owner);
+			}
+			//Clean up room
+			room.getDevices().remove(device);
+			em.merge(room);
+			//Clean up softwareStatus
+			for( SoftwareStatus st : device.getSoftwareStatus() ) {
+				em.remove(st);
+			}
+			//Clean up softwareLicences
+			for( SoftwareLicense sl : device.getSoftwareLicenses()  ) {
+				sl.getDevices().remove(device);
+				em.merge(sl);
+			}
+			//Clean up printers
+			for( Printer pr : device.getAvailablePrinters() ) {
+				pr.getAvailableForDevices().remove(device);
+				em.merge(pr);
+			}
+			if( device.getDefaultPrinter() != null ) {
+				Printer pr = device.getDefaultPrinter();
+				pr.getDefaultForDevices().remove(device);
+				em.merge(pr);
+			}
+			//Clean up categories
+			for( Category cat : device.getCategories() ) {
+				cat.getDevices().remove(device);
+				em.merge(cat);
+			}
+			//Clean up sessions
+			for( Session session : device.getSessions() ) {
+				em.remove(session);
 			}
 			em.remove(device);
 			em.getTransaction().commit();
@@ -514,8 +555,11 @@ public class DeviceController extends Controller {
 				device.setOwner(userController.getByUid(values.get("owner")));
 			}
 			if(values.containsKey("hwconf") && !values.get("hwconf").isEmpty() ) {
-				device.setHwconf(cloneToolController.getByName(values.get("hwconf")));
-				device.setHwconfId(cloneToolController.getByName(values.get("hwconf")).getId());
+				HWConf hwconf = cloneToolController.getByName(values.get("hwconf"));
+				if( hwconf != null ) {
+					device.setHwconf(hwconf);
+					device.setHwconfId(hwconf.getId());
+				}
 			} else if( room.getHwconf() != null ) {
 				device.setHwconf(room.getHwconf());
 				device.setHwconfId(room.getHwconf().getId());

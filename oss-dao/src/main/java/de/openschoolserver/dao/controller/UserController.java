@@ -891,7 +891,11 @@ public class UserController extends Controller {
 				o.setCreator(newCreator);
 				em.merge(o);
 			}
-			creator.setCreatedRooms(null);
+			creator.setCreatedUsers(null);
+			//Sessions will be deleted
+			for( Session o : creator.getSessions() ) {
+				em.remove(o);
+			}
 			em.merge(creator);
 			em.merge(newCreator);
 			em.getTransaction().commit();
@@ -953,7 +957,13 @@ public class UserController extends Controller {
 			for( User o : creator.getCreatedUsers() ) {
 				em.remove(o);
 			}
-			creator.setCreatedRooms(null);em.merge(creator);
+			creator.setCreatedUsers(null);
+			//Sessions will be deleted
+			for( Session o : creator.getSessions() ) {
+				em.remove(o);
+			}
+			creator.setSessions(null);
+			em.merge(creator);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("inheritCreatedObjects:" + e.getMessage());

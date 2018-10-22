@@ -91,6 +91,11 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<User> createdUsers = new ArrayList<User>();
 
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
+	private List<Session> sessions = new ArrayList<Session>();
+
 	public List<Partition> getCreatedPartitions() {
 		return createdPartitions;
 	}
@@ -201,20 +206,20 @@ public class User implements Serializable {
 	//bi-directional many-to-many association to Device
 	@ManyToMany
 	@JoinTable(
-			name="LoggedOn", 
-			joinColumns={ @JoinColumn(name="user_id") },
-			inverseJoinColumns={@JoinColumn(name="device_id")}
-			)
+		name="LoggedOn",
+		joinColumns={ @JoinColumn(name="user_id") },
+		inverseJoinColumns={@JoinColumn(name="device_id")}
+	)
 	@JsonIgnore
 	private List<Device> loggedOn = new ArrayList<Device>();
 
 	//bi-directional many-to-many association to Group
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
-			name="GroupMember",
-			joinColumns={@JoinColumn(name="user_id")},
-			inverseJoinColumns={@JoinColumn(name="group_id")}
-			)
+		name="GroupMember",
+		joinColumns={@JoinColumn(name="user_id")},
+		inverseJoinColumns={@JoinColumn(name="group_id")}
+	)
 	//@JsonManagedReference
 	@JsonIgnore
 	private List<Group> groups = new ArrayList<Group>();
@@ -222,10 +227,10 @@ public class User implements Serializable {
 	//bi-directional many-to-many association to Announcements
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
-			name="HaveSeen",
-			joinColumns={@JoinColumn(name="user_id")},
-			inverseJoinColumns={@JoinColumn(name="announcement_id")}
-			)
+		name="HaveSeen",
+		joinColumns={@JoinColumn(name="user_id")},
+		inverseJoinColumns={@JoinColumn(name="announcement_id")}
+	)
 	//@JsonManagedReference
 	@JsonIgnore
 	private List<Announcement> readAnnouncements = new ArrayList<Announcement>();
@@ -549,11 +554,11 @@ public class User implements Serializable {
 	public List<Category> getCategories() {
 		return this.categories;
 	}
-	
+
 	public void setCategories(List<Category> categories) {
 		this.categories = categories;
 	}
-	
+
 	public List<RoomSmartControl> getSmartControls() {
 		return this.smartControls;
 	}
@@ -639,5 +644,13 @@ public class User implements Serializable {
 
 	public void setCreatedAccessInRoom(List<AccessInRoom> createdAccessInRoom) {
 		this.createdAccessInRoom = createdAccessInRoom;
+	}
+
+	public List<Session> getSessions() {
+		return sessions;
+	}
+
+	public void setSessions(List<Session> sessions) {
+		this.sessions = sessions;
 	}
 }

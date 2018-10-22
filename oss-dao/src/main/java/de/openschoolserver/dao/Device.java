@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The persistent class for the Devices database table.
- * 
+ *
  */
 @Entity
 @Table(name="Devices")
@@ -78,7 +78,7 @@ public class Device implements Serializable {
 
 	@Size(max=32, message="Locality must not be longer then 32 characters.")
 	private String locality;
-	
+
 	private Long   counter;
 
 	//bi-directional many-to-many association to Category
@@ -107,7 +107,7 @@ public class Device implements Serializable {
 	private Printer defaultPrinter;
 
 	//bi-directional many-to-one association to SoftwareStatus
-	@OneToMany(mappedBy="device")
+	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true)
 	@JsonIgnore
 	private List<Printer> printerQueue = new ArrayList<Printer>();
 
@@ -134,6 +134,11 @@ public class Device implements Serializable {
 	@ManyToOne
 	@JsonIgnore
 	private Room room;
+
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true)
+	@JsonIgnore
+	private List<Session> sessions = new ArrayList<Session>();
 
 	@Column(name="room_id", insertable=false, updatable=false)
 	private Long roomId;
@@ -179,7 +184,6 @@ public class Device implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
 
 	@Override
 	public int hashCode() {
@@ -411,5 +415,13 @@ public class Device implements Serializable {
 
 	public void setPrinterQueue(List<Printer> printerQueue) {
 		this.printerQueue = printerQueue;
+	}
+
+	public List<Session> getSessions() {
+		return sessions;
+	}
+
+	public void setSessions(List<Session> sessions) {
+		this.sessions = sessions;
 	}
 }

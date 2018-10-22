@@ -192,4 +192,24 @@ public class SoftwareStatus implements Serializable {
 	public void setVersion(String version) {
 		this.version = version;
 	}
+
+
+	public Long getDeviceId() {
+		return deviceId;
+	}
+
+
+	public void setDeviceId(Long deviceId) {
+		this.deviceId = deviceId;
+	}
+
+
+	public Long getSoftwareId() {
+		return softwareId;
+	}
+
+
+	public void setSoftwareId(Long softwareId) {
+		this.softwareId = softwareId;
+	}
 }

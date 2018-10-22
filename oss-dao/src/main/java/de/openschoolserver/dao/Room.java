@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * The persistent class for the Rooms database table.
- * 
+ *
  */
 @Entity
 @Table(name="Rooms")
@@ -77,6 +77,11 @@ public class Room implements Serializable {
 	@JsonIgnore
 	private List<Device> devices = new ArrayList<Device>();
 
+	//bi-directional many-to-one association to Device
+	@OneToMany(mappedBy="room",cascade=CascadeType.ALL, orphanRemoval=true )
+	@JsonIgnore
+	private List<Session> sessions = new ArrayList<Session>();
+
 	//bi-directional many-to-many association to Device
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
@@ -106,7 +111,7 @@ public class Room implements Serializable {
 	@OneToMany(mappedBy="room")
 	@JsonIgnore
 	private List<RoomSmartControl> smartControls = new ArrayList<RoomSmartControl>();
-		
+
 	@Transient
 	private String network;
 
@@ -117,7 +122,7 @@ public class Room implements Serializable {
 
 	@Column(name="hwconf_id", insertable=false, updatable=false)
 	private Long hwconfId;
-	
+
 	//bi-directional many-to-one association to User
 	@ManyToOne
 	@JsonIgnore
@@ -151,7 +156,7 @@ public class Room implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
+
 
 	@Override
 	public int hashCode() {
@@ -265,7 +270,7 @@ public class Room implements Serializable {
 		accessinroom.setRoom(null);
 		return accessinroom;
 	}
-	
+
 	public List<Device> getDevices() {
 		return this.devices;
 	}
@@ -347,29 +352,37 @@ public class Room implements Serializable {
         public void setCategories(List<Category> categories) {
                 this.categories = categories;
         }
-        
+
         public List<RoomSmartControl> getSmartControls() {
         	return this.smartControls;
         }
 
-		public User getCreator() {
-			return creator;
-		}
+	public User getCreator() {
+		return creator;
+	}
 
-		public void setCreator(User creator) {
-			this.creator = creator;
-		}
+	public void setCreator(User creator) {
+		this.creator = creator;
+	}
 
-		public void setAccessInRooms(List<AccessInRoom> accessInRooms) {
-			this.accessInRooms = accessInRooms;
-		}
+	public void setAccessInRooms(List<AccessInRoom> accessInRooms) {
+		this.accessInRooms = accessInRooms;
+	}
 
-		public void setSmartControls(List<RoomSmartControl> smartControls) {
-			this.smartControls = smartControls;
-		}
+	public void setSmartControls(List<RoomSmartControl> smartControls) {
+		this.smartControls = smartControls;
+	}
 
-		public void setHwconfId(Long hwconfId) {
-			this.hwconfId = hwconfId;
-		}
+	public void setHwconfId(Long hwconfId) {
+		this.hwconfId = hwconfId;
+	}
+
+	public List<Session> getSessions() {
+		return sessions;
+	}
+
+	public void setSessions(List<Session> sessions) {
+		this.sessions = sessions;
+	}
 
 }
