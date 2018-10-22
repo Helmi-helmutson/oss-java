@@ -491,6 +491,9 @@ public class UserController extends Controller {
 
 	public OssResponse resetUserPassword(List<Long> userIds, String password, boolean mustChange) {
 		logger.debug("resetUserPassword: " + password);
+		if( password.length() < 7 ) {
+			return new OssResponse(this.getSession(),"ERROR","Password must contains minimum 7 character.");
+		}
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[5];
@@ -511,7 +514,18 @@ public class UserController extends Controller {
 		program[4] = "--newpassword=" + password;
 
 		for (Long id : userIds) {
-			program[3] = this.getById(id).getUid();
+			User user = this.getById(id);
+			if( user == null ) {
+				logger.error("resetUserPassword: Can not find user with id: %s",null,id);
+				continue;
+			}
+			if( user.getRole().equals(roleWorkstation) ) {
+				logger.error("resetUserPassword: Must not change workstation users password.");
+				continue;
+			}
+			error = new StringBuffer();
+			reply = new StringBuffer();
+			program[3] = user.getUid();
 			OSSShellTools.exec(program, reply, error, null);
 			logger.debug(program[0] + " " + program[1] + " " + program[2] + " " + program[3] + " " + program[4] + " R:"
 					+ reply.toString() + " E:" + error.toString());
