@@ -178,19 +178,19 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public OssResponse uploadFileToRoom(Session session, Long roomId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("room",roomId,fileInputStream,contentDispositionHeader);
+		return new EducationController(session).uploadFileTo("room",roomId,fileInputStream,contentDispositionHeader,false);
 	}
 
 	@Override
 	public OssResponse uploadFileToUser(Session session, Long userId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("user",userId,fileInputStream,contentDispositionHeader);
+		return new EducationController(session).uploadFileTo("user",userId,fileInputStream,contentDispositionHeader,false);
 	}
 
 	@Override
 	public OssResponse uploadFileToDevice(Session session, Long deviceId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("device",deviceId,fileInputStream,contentDispositionHeader);
+		return new EducationController(session).uploadFileTo("device",deviceId,fileInputStream,contentDispositionHeader,false);
 
 	}
 
@@ -200,7 +200,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			boolean studentsOnly,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("group",groupId,fileInputStream,contentDispositionHeader);
+		return new EducationController(session).uploadFileTo("group",groupId,fileInputStream,contentDispositionHeader,studentsOnly);
 	}
 
 	@Override

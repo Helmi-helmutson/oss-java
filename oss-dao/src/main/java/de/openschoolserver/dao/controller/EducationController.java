@@ -31,7 +31,7 @@ public class EducationController extends Controller {
 		super(session);
 	}
 
-	/* 
+	/*
 	 * Return the Category to a smart room
 	 */
 	public Category getCategoryToRoom(Long roomId){
@@ -43,7 +43,6 @@ public class EducationController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			 
 			em.close();
 		}
 		for( Category category : room.getCategories() ) {
@@ -198,7 +197,7 @@ public class EducationController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Smart Room was created succesfully."); 
+		return new OssResponse(this.getSession(),"OK","Smart Room was created succesfully.");
 	}
 
 	public OssResponse modifySmartRoom(long roomId, Category smartRoom) {
@@ -345,8 +344,11 @@ public class EducationController extends Controller {
 		return loggedOns;
 	}
 
-	public OssResponse uploadFileTo(String what, long objectId, InputStream fileInputStream,
-			FormDataContentDisposition contentDispositionHeader) {
+	public OssResponse uploadFileTo(String what,
+			long objectId,
+			InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader,
+			boolean studentsOnly ) {
 		String fileName = contentDispositionHeader.getFileName();
 		File file = null;
 		try {
@@ -370,10 +372,13 @@ public class EducationController extends Controller {
 			Group group = new GroupController(this.session).getById(objectId);
 			if( group != null ) {
 				for( User myUser : group.getUsers() ) {
-					error.append(this.saveFileToUserImport(myUser, file, fileName));
+					if( !this.session.getUser().equals(myUser) &&
+						( !studentsOnly  || myUser.getRole().equals(roleStudent) )) {
+						error.append(this.saveFileToUserImport(myUser, file, fileName));
+					}
 				}
 			} else {
-				error.append("User does not exists.");
+				error.append("Group does not exists.");
 			}
 			break;
 		case "device":
@@ -387,9 +392,17 @@ public class EducationController extends Controller {
 			}
 			break;
 		case "room":
-			UserController userController = new UserController(this.session);
+			UserController   userController   = new UserController(this.session);
+			DeviceController deviceController = new DeviceController(this.session);
 			for( List<Long> loggedOn : this.getRoom(objectId) ) {
 				User myUser = userController.getById(loggedOn.get(0));
+				if( myUser == null ) {
+					//no user logged in we try the workstation user
+					Device dev = deviceController.getById(loggedOn.get(1));
+					if( dev != null ){
+						myUser=userController.getByUid(dev.getName());
+					}
+				}
 				if( myUser != null ) {
 					error.append(this.saveFileToUserImport(myUser, file, fileName));
 				}
