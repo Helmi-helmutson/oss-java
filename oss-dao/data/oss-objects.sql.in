@@ -337,6 +337,14 @@ CREATE TABLE IF NOT EXISTS SoftwareRequirements (
 	PRIMARY KEY(software_id,requirement_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
+CREATE TABLE IF NOT EXISTS SoftwareFullNames (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        software_id    BIGINT UNSIGNED,
+	fullName       VARCHAR(64) NOT NULL,
+        FOREIGN KEY(software_id)    REFERENCES Softwares(id),
+        PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+
 # status C -> current this is the most recent version and does exists on the server and can be installed
 # status R -> replaced this version does not exists on the server but is installed on some clients
 # status D -> this is an older version which does exists on the server and can be installed
