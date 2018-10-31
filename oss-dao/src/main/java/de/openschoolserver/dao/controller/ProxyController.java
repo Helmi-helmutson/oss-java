@@ -181,7 +181,7 @@ public class ProxyController extends Controller {
 	public PositiveList getPositiveListByName( String name ) {
 		EntityManager em = getEntityManager();
 		try {
-			Query query = em.createNamedQuery("PostiveList.byName").setParameter("name", name);
+			Query query = em.createNamedQuery("PositiveList.byName").setParameter("name", name);
 			return (PositiveList) query.getResultList().get(0);
 		} catch (Exception e) {
 			return null;
@@ -307,6 +307,7 @@ public class ProxyController extends Controller {
 		StringBuilder acls = new StringBuilder();
 		OSSShellTools.exec(program, reply, error, acls.toString());
 		for( String roomName : reply.toString().split(" ") ) {
+			roomName = roomName.trim();
 			PositiveList positiveList = this.getPositiveListByName(roomName);
 			if( positiveList != null ) {
 				positiveLists.add(positiveList);
