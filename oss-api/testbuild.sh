@@ -26,11 +26,12 @@ fi
 mv de.openschoolserver.api-1.0-SNAPSHOT  oss-java
 chmod 644 oss-java/lib/*
 tar cjf /data1/OSC/home:varkoly:OSS-4-0/oss-java/oss-java.tar.bz2 oss-java
-cd ../oss-dao/
-tar cjf /data1/OSC/home:varkoly:OSS-4-0/oss-java/data.tar.bz2 data
 cd ${HERE}/src/main/java/de/openschoolserver/api/resources/
 ./find-rolles.pl >> /data1/OSC/home:varkoly:OSS-4-0/oss-java/school-INSERT.sql
 ./find-rolles.pl >> /data1/OSC/home:varkoly:OSS-4-0/oss-java/business-INSERT.sql
+cd ${HERE}
+cd ../oss-dao/
+tar cjf /data1/OSC/home:varkoly:OSS-4-0/oss-java/data.tar.bz2 data
 cd ${HERE}
 CLASSPATH=$( grep "^CLASSPATH=" oss-java/bin/de.openschoolserver.api )
 sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > /data1/OSC/home:varkoly:OSS-4-0/oss-java/start-oss-api

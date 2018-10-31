@@ -22,6 +22,7 @@ Requires: 	systemd
 Requires:	oss-base
 BuildArch:      noarch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+BuildRequires:  -post-build-checks
 
 # For update from OSS-3-4
 Provides:       lmd
