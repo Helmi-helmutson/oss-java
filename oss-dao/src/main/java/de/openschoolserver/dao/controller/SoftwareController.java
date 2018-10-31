@@ -166,6 +166,10 @@ public class SoftwareController extends Controller {
 		software.setCreator(this.session.getUser());
 		try {
 			em.getTransaction().begin();
+			for( SoftwareFullName sfn : software.getSoftwareFullNames() ) {
+				sfn.setSoftware(software);
+				em.persist(sfn);
+			}
 			em.persist(software);
 			em.persist(softwareVersion);
 			em.getTransaction().commit();
@@ -315,7 +319,13 @@ public class SoftwareController extends Controller {
 
 	public Software getByNameOrDescription(String name, String description) {
 		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("Software.getByNameOrDescription")
+		Query query = em.createNamedQuery("SoftwareFullName.getByName")
+				.setParameter("fullName", description);
+		if( !query.getResultList().isEmpty() ) {
+			SoftwareFullName softwareFullName = (SoftwareFullName) query.getResultList().get(0);
+			return softwareFullName.getSoftware();
+		}
+		query = em.createNamedQuery("Software.getByNameOrDescription")
 				.setParameter("name", name)
 				.setParameter("desc", name);
 		if( query.getResultList().isEmpty() ) {

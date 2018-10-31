@@ -17,10 +17,7 @@ Source1:	oss-api.properties
 Source2:	config.yml	
 Source3:	start-oss-api
 Source4:	oss-api.service
-Source5:	turn-to-new-printer.sh
-Source6:	oss-objects.sql
-Source7:	school-INSERT.sql
-Source8:	business-INSERT.sql
+Source5:	data.tar.bz2
 Requires: 	systemd 
 Requires:	oss-base
 BuildArch:      noarch
@@ -48,10 +45,7 @@ cp %{SOURCE1}  %{buildroot}/opt/oss-java/conf/
 cp %{SOURCE2}  %{buildroot}/opt/oss-java/conf/
 cp %{SOURCE3}  %{buildroot}/opt/oss-java/bin/
 cp %{SOURCE4}  %{buildroot}/usr/lib/systemd/system/
-cp %{SOURCE5}  %{buildroot}/opt/oss-java/bin/
-cp %{SOURCE6}  %{buildroot}/opt/oss-java/data/
-cp %{SOURCE7}  %{buildroot}/opt/oss-java/data/
-cp %{SOURCE8}  %{buildroot}/opt/oss-java/data/
+tar xjf %{SOURCE5} -C  %{buildroot}/opt/oss-java/
 
 %pre
 %service_add_pre oss-api.service
@@ -60,7 +54,14 @@ cp %{SOURCE8}  %{buildroot}/opt/oss-java/data/
 %service_del_preun oss-api.service
  
 %post
-/opt/oss-java/bin/turn-to-new-printer.sh
+
+for i in /opt/oss-java/data/updates/*.sh
+do
+   if [ -e $i ]; then
+      b=$(basename $i)
+      $i &> /var/log/oss-update/$b
+   fi
+done
 %service_add_post oss-api.service
 
 %postun
@@ -79,4 +80,5 @@ cp %{SOURCE8}  %{buildroot}/opt/oss-java/data/
 /usr/lib/systemd/system/oss-api.service
 %defattr(750,root,root,750)
 /opt/oss-java/bin/
+/opt/oss-java/data/updates
 

@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  * The persistent class for the Software database table.
- * 
+ *
  */
 @Entity
 @Table(name = "Softwares")
@@ -25,7 +25,7 @@ import java.util.List;
 })
 public class Software implements Serializable {
 	private static final long serialVersionUID = 1L;
-	
+
 	@Id
 	@SequenceGenerator(name="SOFTWARE_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARE_ID_GENERATOR")
@@ -41,10 +41,10 @@ public class Software implements Serializable {
 	private String name;
 
 	private Integer weight;
-	
+
 	@Transient
 	private boolean sourceAvailable = true;
-	
+
 	//bi-directional many-to-one association to SoftwareLicens
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	@JsonIgnore
@@ -53,7 +53,11 @@ public class Software implements Serializable {
 	//bi-directional many-to-one association to SoftwareVersion
 	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
 	private List<SoftwareVersion> softwareVersions;
-	
+
+	//bi-directional many-to-one association to SoftwareVersion
+	@OneToMany(mappedBy="software", cascade=CascadeType.REMOVE)
+	private List<SoftwareFullName> softwareFullNames;
+
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="softwares")
 	@JsonIgnore
@@ -78,7 +82,7 @@ public class Software implements Serializable {
 	)
 	@JsonIgnore
 	private List<Software> softwareRequirements = new ArrayList<Software>();
-	
+
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="softwareRequirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@JsonIgnore
@@ -100,7 +104,7 @@ public class Software implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
+
 
 	@Override
 	public int hashCode() {
@@ -211,21 +215,21 @@ public class Software implements Serializable {
 		return softwareVersion;
 	}
 
-    public List<Category> getCategories() {
-        return this.categories;
-    }
+	public List<Category> getCategories() {
+	    return this.categories;
+	}
 
-    public void setCategories(List<Category> categories) {
-        this.categories = categories;
-    }
-    
-    public List<Category> getRemovedFromCategories() {
-        return this.removedFromCategories;
-    }
+	public void setCategories(List<Category> categories) {
+	    this.categories = categories;
+	}
 
-    public void setRemovedFromCategories(List<Category> categories) {
-        this.removedFromCategories = categories;
-    }
+	public List<Category> getRemovedFromCategories() {
+	    return this.removedFromCategories;
+	}
+
+	public void setRemovedFromCategories(List<Category> categories) {
+	    this.removedFromCategories = categories;
+	}
 
 	public User getCreator() {
 		return creator;
@@ -259,4 +263,11 @@ public class Software implements Serializable {
 		this.requiredBy = requiredBy;
 	}
 
+	public List<SoftwareFullName> getSoftwareFullNames() {
+		return softwareFullNames;
+	}
+
+	public void setSoftwareFullNames(List<SoftwareFullName> softwareFullNames) {
+		this.softwareFullNames = softwareFullNames;
+	}
 }
