@@ -61,7 +61,7 @@ public class SoftwareController extends Controller {
 			if( f.exists() ) {
 				int count = 0;
 				for( String fileName : f.list() ) {
-					if( fileName.equals("init.sls") || fileName.equals("install.xml") ) {
+					if( fileName.equals("init.sls") || fileName.equals("install.xml") || fileName.equals("HASH.json")) {
 						continue;
 					}
 					count++;
@@ -131,6 +131,16 @@ public class SoftwareController extends Controller {
 	public OssResponse add(Software software, Boolean replace) {
 		EntityManager em = getEntityManager();
 		Software oldSoftware = this.getByName(software.getName());
+		if( software.getSoftwareVersions().size() > 1 ) {
+			List<SoftwareVersion> svs = new ArrayList<SoftwareVersion>();
+			for(SoftwareVersion sv : software.getSoftwareVersions() ) {
+				if( sv.getStatus().equals("C") ) {
+					svs.add(sv);
+					break;
+				}
+			}
+			software.setSoftwareVersions(svs);
+		}
 		SoftwareVersion softwareVersion = software.getSoftwareVersions().get(0);
 		if( oldSoftware != null ) {
 			//First we check if the given version is already present
@@ -151,6 +161,13 @@ public class SoftwareController extends Controller {
 				oldSoftware.getSoftwareVersions().add(softwareVersion);
 				softwareVersion.setSoftware(oldSoftware);
 				em.persist(softwareVersion);
+				for(SoftwareFullName sfn : oldSoftware.getSoftwareFullNames() ) {
+					em.remove(sfn);
+				}
+				for( SoftwareFullName sfn : software.getSoftwareFullNames() ) {
+					sfn.setSoftware(oldSoftware);
+					em.persist(sfn);
+				}
 				em.merge(oldSoftware);
 				em.getTransaction().commit();
 			} catch (Exception e) {
@@ -244,7 +261,7 @@ public class SoftwareController extends Controller {
 				if( f.exists() ) {
 					int count = 0;
 					for( String fileName : f.list() ) {
-						if( fileName.equals("init.sls") || fileName.equals("install.xml") ) {
+						if( fileName.equals("init.sls") || fileName.equals("install.xml") || fileName.equals("HASH.json") ) {
 							continue;
 						}
 						count++;
