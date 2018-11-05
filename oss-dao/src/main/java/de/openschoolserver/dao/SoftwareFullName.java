@@ -15,8 +15,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Table(name="SoftwareFullNames")
 @NamedQueries({
 	@NamedQuery(name="SoftwareFullName.findAll",    query="SELECT s FROM SoftwareFullName s"),
-	@NamedQuery(name="SoftwareFullName.getByName",  query="SELECT s FROM Software s WHERE s.fullName = :fullName"),
-	@NamedQuery(name="SoftwareFullName.findByName", query="SELECT s FROM Software s WHERE s.fullName LIKE :fullName")
+	@NamedQuery(name="SoftwareFullName.getByName",  query="SELECT s FROM SoftwareFullName s WHERE s.fullName = :fullName"),
+	@NamedQuery(name="SoftwareFullName.findByName", query="SELECT s FROM SoftwareFullName s WHERE s.fullName LIKE :fullName")
 })
 public class SoftwareFullName implements Serializable {
 
