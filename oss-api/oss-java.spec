@@ -55,7 +55,7 @@ tar xjf %{SOURCE5} -C  %{buildroot}/opt/oss-java/
 %service_del_preun oss-api.service
  
 %post
-
+mkdir -p /var/log/oss-update/
 for i in /opt/oss-java/data/updates/*.sh
 do
    if [ -e $i ]; then
