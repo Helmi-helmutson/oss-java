@@ -143,18 +143,14 @@ public class SoftwareController extends Controller {
 		}
 		SoftwareVersion softwareVersion = software.getSoftwareVersions().get(0);
 		if( oldSoftware != null ) {
-			//First we check if the given version is already present
-			for( SoftwareVersion sv : oldSoftware.getSoftwareVersions() ) {
-				if( sv.getVersion().equals(softwareVersion.getVersion()) ) {
-					return new OssResponse(this.getSession(),"OK","This software was already added in the same version.");
-				}
-			}
 			try {
 				em.getTransaction().begin();
 				if( replace ) {
 					for( SoftwareVersion sv : oldSoftware.getSoftwareVersions() ) {
-						sv.setStatus("R");
-						em.merge(sv);
+						if( !sv.getVersion().equals(softwareVersion.getVersion()) ) {
+							sv.setStatus("R");
+							em.merge(sv);
+						}
 					}
 					softwareVersion.setStatus("C");
 				}
@@ -369,12 +365,12 @@ public class SoftwareController extends Controller {
 
 	/**
 	 * Delivers a list from the softwares downlowded from the CEPHALIX server.
-	 * @return A list of hashes in the format: [ 
-	 * 	       { "name":"<package name>", 
+	 * @return A list of hashes in the format: [
+	 *       { "name":"<package name>",
 	 *           "version":"package version",
 	 *           "description":"...",
 	 *           "update":"version of the new package",
-	 *           "updateDescription":"..." } 
+	 *           "updateDescription":"..." }
 	 */
 	public List<Map<String, String>> listDownloadedSoftware() {
 		Map<String,String>        software;
@@ -440,7 +436,7 @@ public class SoftwareController extends Controller {
 
 	/**
 	 * Delivers a list from Software available on the CEPHALIX repository server.
-	 * @return A list of hashes in the format: [ { "name":"<package name>", "version":"package version" } 
+	 * @return A list of hashes in the format: [ { "name":"<package name>", "version":"package version" }
 	 */
 	public List<Map<String, String>> getAvailableSoftware() {
 		Map<String,String>        software;
