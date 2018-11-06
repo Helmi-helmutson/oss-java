@@ -10,7 +10,7 @@ fi
 echo "CREATE TABLE IF NOT EXISTS SoftwareFullNames (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
-        fullName       VARCHAR(64) NOT NULL,
+        fullName       VARCHAR(128) NOT NULL,
         FOREIGN KEY(software_id)    REFERENCES Softwares(id),
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
