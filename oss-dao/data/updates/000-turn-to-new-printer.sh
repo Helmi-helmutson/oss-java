@@ -67,5 +67,5 @@ mysql OSS < DefaultPrinter.sql
 
 echo "UPDATE Devices LEFT JOIN Users ON Devices.owner_id = Users.id set owner_id=NULL WHERE Users.role='sysadmins' OR Users.role='internal';" | mysql OSS;
 systemctl daemon-reload
-systemctl stop oss-api
+systemctl start oss-api
 
