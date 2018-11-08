@@ -588,15 +588,20 @@ public class DeviceController extends Controller {
 	public OssResponse setDefaultPrinter(long deviceId, long printerId) {
 		EntityManager em = getEntityManager();
 		try {
+			logger.debug("deviceId:" +deviceId + " printerId:" +  printerId);
 			Printer printer = em.find(Printer.class, printerId);
 			Device device   = em.find(Device.class, deviceId);
-			if( device == null || printer == null) {
-				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
+			if( device == null ) {
+				return new OssResponse(this.getSession(),"ERROR", "Device cannot be found.");
+			}
+			if( printer == null ) {
+				return new OssResponse(this.getSession(),"ERROR", "Printer cannot be found.");
 			}
 			em.getTransaction().begin();
 			device.setDefaultPrinter(printer);
 			printer.getDefaultForDevices().add(device);
 			em.merge(device);
+			em.merge(printer);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -628,7 +633,7 @@ public class DeviceController extends Controller {
 				em.close();
 			}
 		}
-		return new OssResponse(this.getSession(),"OK","The default printer of the room was deleted succesfully.");
+		return new OssResponse(this.getSession(),"OK","The default printer of the device was deleted succesfully.");
 	}
 
 	public OssResponse addAvailablePrinter(long deviceId, long printerId) {
@@ -640,7 +645,7 @@ public class DeviceController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
 			}
 			if( device.getAvailablePrinters().contains(printer) ) {
-				return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
+				return new OssResponse(this.getSession(),"OK","The printer is already assigned to device.");
 			}
 			em.getTransaction().begin();
 			device.getAvailablePrinters().add(printer);
@@ -653,7 +658,7 @@ public class DeviceController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","The selected printer was added to the room.");
+		return new OssResponse(this.getSession(),"OK","The selected printer was added to the device.");
 	}
 
 	public OssResponse deleteAvailablePrinter(long deviceId, long printerId) {
@@ -675,7 +680,7 @@ public class DeviceController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","The selected printer was removed from room.");
+		return new OssResponse(this.getSession(),"OK","The selected printer was removed from device.");
 	}
 
 	public OssResponse addLoggedInUser(String IP, String userName) {

@@ -245,7 +245,7 @@ public interface DeviceResource {
      * PUT devices/{deviceId}/defaultPrinter/{printerId}
      */
     @PUT
-    @Path("{deviceId}/defaultPrinter/{defaultPrinterId}")
+    @Path("{deviceId}/defaultPrinter/{printerId}")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Set default printer for the device.")
         @ApiResponses(value = {
