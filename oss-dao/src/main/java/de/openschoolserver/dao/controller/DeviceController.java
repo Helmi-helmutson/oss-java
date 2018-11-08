@@ -378,7 +378,7 @@ public class DeviceController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.search");
-			query.setParameter("search", search + "%");
+			query.setParameter("search", "%" + search + "%");
 			return (List<Device>) query.getResultList();
 		} catch (Exception e) {
 			logger.debug("search " + search + " " + e.getMessage(),e);

@@ -33,13 +33,21 @@ public class PrinterController extends Controller {
 		// TODO Auto-generated constructor stub
 	}
 	
-	/*
-	 * Return a device found by the Id
+	/**
+	 * Find a printer by id
+	 * @param printerId
+	 * @return
 	 */
 	public Printer getById(long printerId) {
 		EntityManager em = getEntityManager();
 		try {
-			return em.find(Printer.class, printerId);
+			Printer printer = em.find(Printer.class, printerId);
+			if( printer != null ) {
+				if( printer.getDevice() != null ) {
+					printer.setDeviceName(printer.getDevice().getName());
+				}
+			}
+			return printer;
 		} catch (Exception e) {
 			return null;
 		} finally {
@@ -47,8 +55,10 @@ public class PrinterController extends Controller {
 		}
 	}
 
-	/*
-	 * Find a device given by the name
+	/**
+	 * Find a printer by the name
+	 * @param name
+	 * @return
 	 */
 	public Printer getByName(String name) {
 		EntityManager em = getEntityManager();
@@ -66,6 +76,10 @@ public class PrinterController extends Controller {
 		}
 	}
 
+	/**
+	 * Delivers a list of all available printer
+	 * @return
+	 */
 	public List<Printer> getPrinters() {
 		List<Printer> printers = new ArrayList<Printer>();
 		String[] program = new String[3];
@@ -102,6 +116,9 @@ public class PrinterController extends Controller {
 				if( file.exists() ) {
 					printer.setWindowsDriver(true);
 				}
+				if( printer.getDevice() != null ) {
+					printer.setDeviceName(printer.getDevice().getName());
+				}
 				program = new String[5];
 				program[0] = "/usr/bin/gawk";
 				program[1] = "-F";
@@ -118,6 +135,11 @@ public class PrinterController extends Controller {
 		return printers;
 	}
 	
+	/**
+	 * Deletes a printer found by name.
+	 * @param printerId
+	 * @return
+	 */
 	public OssResponse deletePrinter(Long printerId) {
 
 		EntityManager em = getEntityManager();

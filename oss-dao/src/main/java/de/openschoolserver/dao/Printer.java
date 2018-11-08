@@ -88,6 +88,9 @@ public class Printer implements Serializable  {
 	private Long      roomId;
 
 	@Transient
+	private String     deviceName;
+
+	@Transient
 	private boolean   windowsDriver;
 
 	/*
@@ -103,44 +106,6 @@ public class Printer implements Serializable  {
 	private int       activeJobs;
 
 	public Printer() {
-	}
-
-	public Printer(String name, Session session) {
-		this.name = name;
-		DeviceController deviceController = new DeviceController(session);
-		this.device = deviceController.getByName(name);
-		this.device = deviceController.getByName(name);
-		String[] program = new String[3];
-		StringBuffer reply  = new StringBuffer();
-		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/bin/ipptool";
-		program[1] = "ipp://localhost/printers/" +name;
-		program[2] = "get-printers.test";
-		OSSShellTools.exec(program, reply, stderr, null);
-		String[] lines = reply.toString().split(deviceController.getNl());
-		Pattern pattern = Pattern.compile("\\S+");
-		if( lines.length > 2) {
-			Matcher matcher = pattern.matcher(lines[2]);
-			if( matcher.find() ) {
-				this.state = matcher.group(0);
-			}
-			if( matcher.find() ) {
-				this.acceptingJobs = matcher.group(1).equals("true");
-			}
-		}
-		program[2] = "get-jobs.test";
-		OSSShellTools.exec(program, reply, stderr, null);
-		lines = reply.toString().split(deviceController.getNl());
-		this.activeJobs = lines.length-2;
-		this.windowsDriver = false;
-	}
-
-	public Printer(String name, DeviceController deviceController) {
-		this.name = name;
-		this.device = deviceController.getByName(name);
-		if( device != null ) {
-			this.setId(device.getId());
-		}
 	}
 
 	public String getName() {
@@ -269,5 +234,21 @@ public class Printer implements Serializable  {
 
 	public void setDefaultInRooms(List<Room> defaultInRooms) {
 		this.defaultInRooms = defaultInRooms;
+	}
+
+	public String getRoomName() {
+		return roomName;
+	}
+
+	public void setRoomName(String roomName) {
+		this.roomName = roomName;
+	}
+
+	public String getDeviceName() {
+		return deviceName;
+	}
+
+	public void setDeviceName(String deviceName) {
+		this.deviceName = deviceName;
 	}
 }
