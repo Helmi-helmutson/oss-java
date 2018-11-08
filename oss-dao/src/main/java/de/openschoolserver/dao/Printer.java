@@ -236,14 +236,6 @@ public class Printer implements Serializable  {
 		this.defaultInRooms = defaultInRooms;
 	}
 
-	public String getRoomName() {
-		return roomName;
-	}
-
-	public void setRoomName(String roomName) {
-		this.roomName = roomName;
-	}
-
 	public String getDeviceName() {
 		return deviceName;
 	}
