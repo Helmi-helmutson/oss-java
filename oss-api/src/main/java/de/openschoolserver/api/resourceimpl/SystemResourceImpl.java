@@ -196,6 +196,16 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
+	public Map<String, List<ProxyRule>> getProxyDefaults(Session session) {
+		return new ProxyController(session).readDefaults();
+	}
+
+	@Override
+	public OssResponse setProxyDefaults(Session session, String role, Map<String, List<ProxyRule>> acls) {
+		return new ProxyController(session).setDefaults(acls);
+	}
+
+	@Override
 	public List<String> getTheCustomList(Session session, String list) {
 		try {
 			return	Files.readAllLines(Paths.get("/var/lib/squidGuard/db/custom/" +list + "/domains"));
@@ -292,9 +302,15 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
-	public String validateRegcode(UriInfo ui, HttpServletRequest req) {
+	public String getName(UriInfo ui, HttpServletRequest req) {
 		Session session  = new SessionController().getLocalhostSession();
 		return new SystemController(session).getConfigValue("NAME");
+	}
+
+	@Override
+	public String getType(UriInfo ui, HttpServletRequest req) {
+		Session session  = new SessionController().getLocalhostSession();
+		return new SystemController(session).getConfigValue("TYPE");
 	}
 
 	@Override
@@ -340,5 +356,4 @@ public class SystemResourceImpl implements SystemResource {
 	public OssResponse deleteDnsRecord(Session session, DnsRecord dnsRecord) {
 		return new SystemController(session).deleteDnsRecord(dnsRecord);
 	}
-
 }

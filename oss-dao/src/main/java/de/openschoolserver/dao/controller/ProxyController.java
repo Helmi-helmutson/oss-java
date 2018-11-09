@@ -137,6 +137,43 @@ public class ProxyController extends Controller {
 		return acl;
 	}
 
+	public Map<String, List<ProxyRule>> readDefaults() {
+		List<String> roles = new SystemController(session).getEnumerates("role");
+		roles.add("default");
+		Map<String, List<ProxyRule>> acls = new HashMap<String, List<ProxyRule>>();
+		for (String role : roles ) {
+			acls.put(role, readDefaults(role));
+		}
+		return acls;
+	}
+
+	public OssResponse setDefaults(Map<String, List<ProxyRule>> acls) {
+		List<String> roles = new SystemController(session).getEnumerates("role");
+		roles.add("default");
+		StringBuilder output = new StringBuilder();
+		for (String role : roles ) {
+			output.append(role).append(":").append("cephalix:true").append(this.getNl());
+			output.append(role).append(":").append("good:true").append(this.getNl());
+			output.append(role).append(":").append("bad:false").append(this.getNl());
+			for(ProxyRule proxyRule : acls.get(role) ) {
+				output.append(role).append(":").append(proxyRule.getName()).append(":");
+				if( proxyRule.isEnabled() ) {
+					output.append("true");
+				} else {
+					output.append("false");
+				}
+				output.append(this.getNl());
+			}
+		}
+		String[] program   = new String[2];
+		program[0] = "/usr/share/oss/tools/squidGuard.pl";
+		program[1] = "write";
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		logger.debug(output.toString());
+		OSSShellTools.exec(program, reply, error, output.toString());
+		return new OssResponse(this.session,"OK","Proxy Setting was saved succesfully.");
+	}
 	/*
 	 * Writes the default proxy setting
 	 * @param acls The list of the default acl setting
@@ -315,7 +352,7 @@ public class ProxyController extends Controller {
 		}
 		return positiveLists;
 	}
-	/*
+	/**
 	 * Sets positive lists in a room
 	 * @param roomId The room id.
 	 * @param positiveListIds list of positiveList ids which have to be set in this room
@@ -355,7 +392,7 @@ public class ProxyController extends Controller {
 		return new OssResponse(this.session,"OK","Proxy Setting was saved succesfully in your room.");
 	}
 
-	/*
+	/**
 	 * Removes all positive list in a room and the default settings occurs
 	 * @param roomId The room id
 	 */

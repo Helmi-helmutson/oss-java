@@ -40,7 +40,19 @@ public interface SystemResource {
             @ApiResponse(code = 401, message = "No regcode was found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    String validateRegcode(
+    String getName(
+            @Context UriInfo ui,
+            @Context HttpServletRequest req
+    );
+
+    @GET
+    @Path("type")
+    @Produces(TEXT)
+    @ApiOperation(value = "Gets the type of the institute.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    String getType(
             @Context UriInfo ui,
             @Context HttpServletRequest req
     );
@@ -377,6 +389,32 @@ public interface SystemResource {
         @PathParam("role") String role,
         List<ProxyRule> acl
         );
+
+    /*
+     * Proxy default handling
+    */
+    @GET
+    @Path("proxy/defaults")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the default setting for proxy.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    Map<String,List<ProxyRule>> getProxyDefaults(
+        @ApiParam(hidden = true) @Auth Session session
+    );
+
+    @POST
+    @Path("proxy/defaults")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the default setting for proxy.")
+    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    @RolesAllowed("system.proxy")
+    OssResponse setProxyDefaults(
+        @ApiParam(hidden = true) @Auth Session session,
+        @PathParam("role") String role,
+        Map<String,List<ProxyRule>> acls
+        );
+
 
     @GET
     @Path("proxy/custom/{list}")
