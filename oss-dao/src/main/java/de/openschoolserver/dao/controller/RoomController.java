@@ -848,6 +848,7 @@ public class RoomController extends Controller {
 					}
 				}
 				device.setHwconf(hwconf);
+				device.setRoomId(room.getId());
 				em.persist(device);
 				hwconf.getDevices().add(device);
 				room.addDevice(device);
