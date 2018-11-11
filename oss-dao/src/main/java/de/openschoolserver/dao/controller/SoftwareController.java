@@ -130,38 +130,46 @@ public class SoftwareController extends Controller {
 
 	public OssResponse add(Software software, Boolean replace) {
 		EntityManager em = getEntityManager();
-		Software oldSoftware = this.getByName(software.getName());
-		if( software.getSoftwareVersions().size() > 1 ) {
-			List<SoftwareVersion> svs = new ArrayList<SoftwareVersion>();
-			for(SoftwareVersion sv : software.getSoftwareVersions() ) {
+		SoftwareVersion softwareVersion = new SoftwareVersion(software,software.getSoftwareVersions().get(0).getVersion(),"C");
+		for(SoftwareVersion sv : software.getSoftwareVersions() ) {
 				if( sv.getStatus().equals("C") ) {
-					svs.add(sv);
+					softwareVersion = new SoftwareVersion(software,sv.getVersion(),"C");
 					break;
 				}
-			}
-			software.setSoftwareVersions(svs);
 		}
-		SoftwareVersion softwareVersion = software.getSoftwareVersions().get(0);
+		Software oldSoftware = this.getByName(software.getName());
 		if( oldSoftware != null ) {
 			try {
+				boolean newVersion = true;
 				em.getTransaction().begin();
 				if( replace ) {
 					for( SoftwareVersion sv : oldSoftware.getSoftwareVersions() ) {
 						if( !sv.getVersion().equals(softwareVersion.getVersion()) ) {
 							sv.setStatus("R");
 							em.merge(sv);
+						} else {
+							softwareVersion = sv;
+							softwareVersion.setStatus("C");
+							em.merge(sv);
+							newVersion = false;
 						}
 					}
+				}
+				if( newVersion ) {
 					softwareVersion.setStatus("C");
+					oldSoftware.getSoftwareVersions().add(softwareVersion);
+					softwareVersion.setSoftware(oldSoftware);
+					em.persist(softwareVersion);
 				}
-				oldSoftware.getSoftwareVersions().add(softwareVersion);
-				softwareVersion.setSoftware(oldSoftware);
-				em.persist(softwareVersion);
 				for(SoftwareFullName sfn : oldSoftware.getSoftwareFullNames() ) {
-					em.remove(sfn);
+					SoftwareFullName tmp = em.find(SoftwareFullName.class, sfn.getId());
+					em.remove(tmp);
 				}
+				oldSoftware.setSoftwareFullNames(new ArrayList<SoftwareFullName>());
 				for( SoftwareFullName sfn : software.getSoftwareFullNames() ) {
+					sfn.setId(null);
 					sfn.setSoftware(oldSoftware);
+					oldSoftware.getSoftwareFullNames().add(sfn);
 					em.persist(sfn);
 				}
 				em.merge(oldSoftware);
@@ -206,6 +214,23 @@ public class SoftwareController extends Controller {
 			em.getTransaction().begin();
 			if( !em.contains(software)) {
 				software = em.merge(software);
+			}
+			//Remove all child entries
+			for( SoftwareFullName sf : software.getSoftwareFullNames() ) {
+				em.remove(sf);
+			}
+			for( SoftwareVersion sv : software.getSoftwareVersions() ) {
+				for( SoftwareStatus st : sv.getSoftwareStatuses() ) {
+					st.getDevice().getSoftwareStatus().remove(st);
+					em.remove(st);
+				}
+				em.remove(sv);
+			}
+			for( SoftwareLicense sl : software.getSoftwareLicenses() ) {
+				for( Device device : sl.getDevices() ) {
+					device.getSoftwareLicenses().remove(sl);
+				}
+				em.remove(sl);
 			}
 			em.remove(software);
 			em.getTransaction().commit();
