@@ -224,6 +224,9 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<Group> groups = new ArrayList<Group>();
 
+	@Transient
+	private String classes;
+
 	//bi-directional many-to-many association to Announcements
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
@@ -652,5 +655,13 @@ public class User implements Serializable {
 
 	public void setSessions(List<Session> sessions) {
 		this.sessions = sessions;
+	}
+
+	public String getClasses() {
+		return classes;
+	}
+
+	public void setClasses(String classes) {
+		this.classes = classes;
 	}
 }

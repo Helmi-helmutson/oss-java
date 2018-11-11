@@ -124,25 +124,28 @@ public class UserController extends Controller {
 
 	public List<User> getAll() {
 		EntityManager em = getEntityManager();
+		List<User> users = new ArrayList<User>();
+		boolean userManage = this.isAllowed("user.manage");
 		try {
 			Query query = em.createNamedQuery("User.findAll");
-			if (this.isAllowed("user.manage")) {
-				return query.getResultList();
-			} else {
-				List<User> users = new ArrayList<User>();
-				for (User user : (List<User>) query.getResultList()) {
-					if (user.getRole().equals(roleStudent)) {
-						users.add(user);
+			for (User user : (List<User>) query.getResultList()) {
+				if (userManage || user.getRole().equals(roleStudent) ) {
+					List<String> classes = new ArrayList<String>();
+					for( Group group : user.getGroups()) {
+						if (group.getGroupType().equals("class")) {
+							classes.add(group.getName());
+						}
 					}
+					user.setClasses(String.join(",", classes));
+					users.add(user);
 				}
-				return users;
 			}
 		} catch (Exception e) {
 			logger.error("getAll: " + e.getMessage());
-			return new ArrayList<>();
 		} finally {
 			em.close();
 		}
+		return users;
 	}
 
 	public String createUid(String givenName, String surName, Date birthDay) {
