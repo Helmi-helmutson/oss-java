@@ -46,16 +46,16 @@ public class Software implements Serializable {
 	private boolean sourceAvailable = true;
 
 	//bi-directional many-to-one association to SoftwareLicens
-	@OneToMany(mappedBy="software", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="software")
 	@JsonIgnore
 	private List<SoftwareLicense> softwareLicenses;
 
 	//bi-directional many-to-one association to SoftwareVersion
-	@OneToMany(mappedBy="software", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="software")
 	private List<SoftwareVersion> softwareVersions;
 
 	//bi-directional many-to-one association to SoftwareVersion
-	@OneToMany(mappedBy="software", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy="software")
 	private List<SoftwareFullName> softwareFullNames;
 
 	//bi-directional many-to-many association to Category
@@ -74,7 +74,7 @@ public class Software implements Serializable {
 	private User creator;
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany()
 	@JoinTable(
 			name="SoftwareRequirements",
 			joinColumns={ @JoinColumn(name="software_id")	},
@@ -84,7 +84,7 @@ public class Software implements Serializable {
 	private List<Software> softwareRequirements = new ArrayList<Software>();
 
 	//bi-directional many-to-many association to Device
-	@ManyToMany(mappedBy="softwareRequirements",cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+	@ManyToMany(mappedBy="softwareRequirements")
 	@JsonIgnore
 	private List<Software> requiredBy = new ArrayList<Software>();
 

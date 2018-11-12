@@ -163,6 +163,13 @@ public class CloneToolController extends Controller {
 				hwconf.setDeviceType("FatClient");
 			}
 			em.getTransaction().begin();
+			if( hwconf.getPartitions() != null ) {
+				for( Partition partition : hwconf.getPartitions() ) {
+					partition.setId(null);
+					partition.setHwconf(hwconf);
+					partition.setCreator(session.getUser());
+				}
+			}
 			em.persist(hwconf);
 			em.getTransaction().commit();
 			logger.debug("Created HWConf:" + hwconf );
@@ -179,14 +186,31 @@ public class CloneToolController extends Controller {
 		//TODO make some checks!!
 		//If the name will be modified then some files must be moved too!!! TODO
 		EntityManager em = getEntityManager();
-		hwconf.setId(hwconfId);
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(hwconf.getName())){
 			return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
 		}
 		try {
 			em.getTransaction().begin();
-			em.merge(hwconf);
+			HWConf oldHwconf = em.find(HWConf.class, hwconfId);
+			if( hwconf.getPartitions() != null && hwconf.getPartitions().size() > 0 ) {
+				for( Partition partition : oldHwconf.getPartitions()) {
+					Partition tmp = em.find(Partition.class, partition.getId());
+					em.remove(tmp);
+				}
+				oldHwconf.setPartitions(new ArrayList<Partition>());
+				for( Partition partition : hwconf.getPartitions() ) {
+					partition.setId(null);
+					partition.setHwconf(oldHwconf);
+					partition.setCreator(session.getUser());
+					em.persist(partition);
+					oldHwconf.addPartition(partition);
+				}
+			}
+			oldHwconf.setName(hwconf.getName());
+			oldHwconf.setDescription(hwconf.getDescription());
+			oldHwconf.setDeviceType(hwconf.getDeviceType());
+			em.merge(oldHwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());

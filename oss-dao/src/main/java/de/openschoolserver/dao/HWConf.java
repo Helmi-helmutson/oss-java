@@ -46,7 +46,7 @@ public class HWConf implements Serializable {
 	private List<Device> devices;
 
 	//bi-directional many-to-one association to Partition
-	@OneToMany(mappedBy="hwconf", cascade=CascadeType.ALL, orphanRemoval = true )
+	@OneToMany(mappedBy="hwconf", cascade={CascadeType.REMOVE, CascadeType.PERSIST}, orphanRemoval = true )
 	private List<Partition> partitions;
 
 	//bi-directional many-to-one association to Room

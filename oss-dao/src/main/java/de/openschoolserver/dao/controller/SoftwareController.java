@@ -172,6 +172,9 @@ public class SoftwareController extends Controller {
 					oldSoftware.getSoftwareFullNames().add(sfn);
 					em.persist(sfn);
 				}
+				if( software.getWeight() != null ) {
+					oldSoftware.setWeight(software.getWeight());
+				}
 				em.merge(oldSoftware);
 				em.getTransaction().commit();
 			} catch (Exception e) {
@@ -258,8 +261,8 @@ public class SoftwareController extends Controller {
 
 	public OssResponse modify(Software software) {
 		EntityManager em = getEntityManager();
-		//TODO it may be too simple
 		try {
+			//Modifying only the software entry itself
 			em.getTransaction().begin();
 			em.merge(software);
 			em.getTransaction().commit();
