@@ -418,7 +418,7 @@ OssResponse addGuestUsers(
 		@FormDataParam("name")          String  name,
 		@FormDataParam("description")   String  description,
 		@FormDataParam("roomId") Long    roomId,
-		@FormDataParam("count") int     count,
+		@FormDataParam("count")  Long    count,
 		@FormDataParam("validUntil")    Date    validUntil
 		);
 

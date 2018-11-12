@@ -10,6 +10,7 @@ public interface OSSConstants {
 	String roleTeacher  = "teachers";
 	String roleStudent  = "students";
 	String roleSysadmin = "sysadmins";
+	String roleGuest    = "guest";
 	String roleAdministratrion = "administration";
 	String roleWorkstation = "workstations";
 	String winLineSeparator = "\r\n";

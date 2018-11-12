@@ -240,7 +240,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, int count,
+	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
 		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
 	}

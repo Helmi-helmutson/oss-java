@@ -373,7 +373,7 @@ public class EducationController extends Controller {
 			if( group != null ) {
 				for( User myUser : group.getUsers() ) {
 					if( !this.session.getUser().equals(myUser) &&
-						( !studentsOnly  || myUser.getRole().equals(roleStudent) )) {
+						( !studentsOnly  || myUser.getRole().equals(roleStudent) || myUser.getRole().equals(roleGuest) )) {
 						error.append(this.saveFileToUserImport(myUser, file, fileName));
 					}
 				}

@@ -21,6 +21,7 @@ import java.util.List;
 	@NamedQuery(name="Room.findAll",        query="SELECT r    FROM Room r WHERE r.roomType != 'smartRoom'"),
 	@NamedQuery(name="Room.findAllId",      query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom'"),
 	@NamedQuery(name="Room.findAllWithControl",query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomControl != 'no'"),
+	@NamedQuery(name="Room.findAllWithTeacherControl",query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomControl != 'no' AND r.roomControl != 'sysadminsOnly'"),
 	@NamedQuery(name="Room.findAllWithFirewallControl", query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom'"),
 	@NamedQuery(name="Room.findAllToUse",   query="SELECT r    FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP' AND r.roomType != 'ANON_DHCP'"),
 	@NamedQuery(name="Room.findAllToUseId", query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP' AND r.roomType != 'ANON_DHCP'"),

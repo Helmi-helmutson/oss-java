@@ -161,6 +161,19 @@ public class RoomController extends Controller {
 		}
 	}
 
+	public List<Room> getAllWithTeacherControl() {
+		EntityManager em = getEntityManager();
+		try {
+			Query query = em.createNamedQuery("Room.findAllWithTeacherControl");
+			return (List<Room>) query.getResultList();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new ArrayList<>();
+		} finally {
+			em.close();
+		}
+	}
+
 	public List<Room> getAllWithFirewallControl() {
 		EntityManager em = getEntityManager();
 		List<Room> rooms = new ArrayList<Room>();

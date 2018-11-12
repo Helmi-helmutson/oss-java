@@ -129,7 +129,8 @@ public class UserController extends Controller {
 		try {
 			Query query = em.createNamedQuery("User.findAll");
 			for (User user : (List<User>) query.getResultList()) {
-				if (userManage || user.getRole().equals(roleStudent) ) {
+				if (userManage || user.getRole().equals(roleStudent)
+					|| ( user.getRole().equals(roleGuest) && user.getCreator().equals(session.getUser()) ) ) {
 					List<String> classes = new ArrayList<String>();
 					for( Group group : user.getGroups()) {
 						if (group.getGroupType().equals("class")) {
@@ -745,15 +746,17 @@ public class UserController extends Controller {
 				this.delete(user);
 			}
 		}
+		category.setUsers(new ArrayList<User>());
 		for (Group group : category.getGroups()) {
 			if (group.getGroupType().equals("guest")) {
 				groupController.delete(group);
 			}
 		}
+		category.setGroups(new ArrayList<Group>());
 		return categoryController.delete(category);
 	}
 
-	public OssResponse addGuestUsers(String name, String description, Long roomId, int count, Date validUntil) {
+	public OssResponse addGuestUsers(String name, String description, Long roomId, Long count, Date validUntil) {
 		final CategoryController categoryController = new CategoryController(this.session);
 		final GroupController groupController = new GroupController(this.session);
 		Category category = new Category();
@@ -793,16 +796,18 @@ public class UserController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		}
-		for (int i = 1; i < count + 1; i++) {
+		for (Long i = 1l; i < count + 1; i++) {
 			String userName = String.format("%s%02d", name, i);
 			User user = new User();
 			user.setUid(userName);
+			user.setSurName("GuestUser");
 			user.setGivenName(userName);
-			user.setGivenName("GuestUser");
 			user.setRole("guest");
 			ossResponse = this.add(user);
-			user = this.getById(ossResponse.getId());
-			groupController.addMember(group, user);
+			logger.debug("Create user ossResponse:" + ossResponse);
+			user = this.getById(ossResponse.getObjectId());
+			ossResponse = groupController.addMember(group, user);
+			logger.debug("Create user " + ossResponse);
 			categoryController.addMember(category.getId(), "user", user.getId());
 		}
 		ossResponse.setObjectId(category.getId());

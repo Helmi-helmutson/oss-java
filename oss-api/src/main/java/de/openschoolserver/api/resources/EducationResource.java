@@ -718,7 +718,7 @@ public interface EducationResource {
              );
 
 
-     @GET
+     @POST
      @Path("groups/{groupId}/collect")
      @Produces(JSON_UTF8)
      @ApiOperation( value = "Collects data from the students member of the corresponding group." )
@@ -727,14 +727,14 @@ public interface EducationResource {
      })
      @RolesAllowed("education.groups")
      OssResponse collectFileFromGroup(@ApiParam(hidden = true) @Auth Session session,
-             @PathParam("roomId") Long roomId,
+             @PathParam("groupId") Long roomId,
              @FormDataParam("projectName") String projectName,
              @FormDataParam("sortInDirs")  boolean sortInDirs,
              @FormDataParam("cleanUpExport") boolean cleanUpExport,
              @FormDataParam("studentsOnly") boolean studentsOnly
 
              );
-     
+
     /************************************************************/
     /* Actions on logged in users and smart rooms and groups. */
     /************************************************************/
@@ -1221,9 +1221,21 @@ public interface EducationResource {
                          @ApiParam(hidden = true) @Auth Session session,
                          @FormDataParam("name")          String  name,
                          @FormDataParam("description")   String  description,
-                         @FormDataParam("roomId")                   Long    roomId,
-                         @FormDataParam("count")                   int     count,
+                         @FormDataParam("roomId")        Long    roomId,
+                         @FormDataParam("count")         Long    count,
                          @FormDataParam("validUntil")    Date    validUntil
                          );
+
+         @GET
+         @Path("guestUsers/rooms")
+         @Produces(JSON_UTF8)
+         @ApiOperation(value = "Gets the list of rooms can be reserved for guest users. At the moment this are all the rooms which can be controlled.")
+         @ApiResponses(value = {
+                 @ApiResponse(code = 404, message = "User not found"),
+                 @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+         @RolesAllowed("education.guestusers")
+         List<Room> getGuestRooms(
+                     @ApiParam(hidden = true) @Auth Session session
+         );
 
 }

@@ -342,6 +342,7 @@ public class CategoryController extends Controller {
 				Device device = em.find(Device.class, objectId);
 				if(!category.getDevices().contains(device)) {
 					category.getDevices().add(device);
+					category.getDeviceIds().add(device.getId());
 					device.getCategories().add(category);
 					em.merge(device);
 					changes = true;
@@ -351,6 +352,7 @@ public class CategoryController extends Controller {
 				Group group = em.find(Group.class, objectId);
 				if(!category.getGroups().contains(group)) {
 					category.getGroups().add(group);
+					category.getGroupIds().add(group.getId());
 					group.getCategories().add(category);
 					em.merge(group);
 					changes = true;
@@ -360,6 +362,7 @@ public class CategoryController extends Controller {
 				HWConf hwconf = em.find(HWConf.class, objectId);
 				if(!category.getHWConfs().contains(hwconf)) {
 					category.getHWConfs().add(hwconf);
+					category.getHWConfIds().add(hwconf.getId());
 					hwconf.getCategories().add(category);
 					em.merge(hwconf);
 					changes = true;
@@ -369,6 +372,7 @@ public class CategoryController extends Controller {
 				Room room = em.find(Room.class, objectId);
 				if(!category.getRooms().contains(room)) {
 					category.getRooms().add(room);
+					category.getRoomIds().add(room.getId());
 					room.getCategories().add(category);
 					em.merge(room);
 					changes = true;
@@ -378,6 +382,7 @@ public class CategoryController extends Controller {
 				Software software = em.find(Software.class, objectId);
 				if(!category.getSoftwares().contains(software)) {
 					category.getSoftwares().add(software);
+					category.getSoftwareIds().add(software.getId());
 					software.getCategories().add(category);
 					em.merge(software);
 					changes = true;
@@ -387,6 +392,7 @@ public class CategoryController extends Controller {
 				User user = em.find(User.class, objectId);
 				if(!category.getUsers().contains(user)) {
 					category.getUsers().add(user);
+					category.getUserIds().add(user.getId());
 					user.getCategories().add(category);
 					em.merge(user);
 					changes = true;
@@ -396,6 +402,7 @@ public class CategoryController extends Controller {
 				FAQ faq = em.find(FAQ.class, objectId);
 				if(!category.getFaqs().contains(faq)) {
 					category.getFaqs().add(faq);
+					category.getFAQIds().add(faq.getId());
 					faq.getCategories().add(category);
 					em.merge(faq);
 					changes = true;
@@ -405,6 +412,7 @@ public class CategoryController extends Controller {
 				Announcement info = em.find(Announcement.class, objectId);
 				if(!category.getAnnouncements().contains(info)) {
 					category.getAnnouncements().add(info);
+					category.getAnnouncementIds().add(info.getId());
 					info.getCategories().add(category);
 					em.merge(info);
 					changes = true;
@@ -414,6 +422,7 @@ public class CategoryController extends Controller {
 				Contact contact = em.find(Contact.class, objectId);
 				if(!category.getContacts().contains(contact)) {
 					category.getContacts().add(contact);
+					category.getContactIds().add(contact.getId());
 					contact.getCategories().add(category);
 					em.merge(contact);
 					changes = true;

@@ -354,7 +354,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		UserController userController = new UserController(session);
 		Group group        = new GroupController(session).getById(groupId);
 		for( User user : group.getUsers() ) {
-			if( !studentsOnly ||  user.getRole().equals(roleStudent)) {
+			if( !studentsOnly ||  user.getRole().equals(roleStudent) || user.getRole().equals(roleGuest)) {
 				if( user.getRole().equals(roleTeacher) ) {
 					userController.collectFileFromUser(user, projectName, false, sortInDirs);
 				} else {
@@ -425,9 +425,14 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, int count,
+	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
 		return new UserController(session).addGuestUsers(name, description, roomId, count, validUntil);
+	}
+
+	@Override
+	public List<Room> getGuestRooms(Session session) {
+		return new RoomController(session).getAllWithTeacherControl();
 	}
 
 	@Override
@@ -460,7 +465,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public List<User> getMembers(Session session, long groupId) {
 		List<User> users = new ArrayList<User>();
 		for( User user :  new GroupController(session).getMembers(groupId) ) {
-			if( user.getRole().equals("students")) {
+			if( user.getRole().equals(roleStudent) || user.getRole().equals(roleGuest)) {
 				users.add(user);
 			}
 		}
@@ -593,4 +598,5 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 }
