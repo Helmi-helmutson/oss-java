@@ -427,11 +427,13 @@ public class SystemController extends Controller {
 			   String[] rule = outRule.split(",");
 			   if (rule!=null && rule.length>=4) {
 				   Device device = deviceController.getByIP(rule[1]);
-				   statusMap.put("ext", rule[3]);
-				   statusMap.put("id",  Long.toString(device.getId()) );
-				   statusMap.put("name", device.getName() );
-				   statusMap.put("port", rule[4]);
-				   firewallList.add(statusMap);
+				   if( device != null ) {
+					   statusMap.put("ext", rule[3]);
+					   statusMap.put("id",  Long.toString(device.getId()) );
+					   statusMap.put("name", device.getName() );
+					   statusMap.put("port", rule[4]);
+					   firewallList.add(statusMap);
+				   }
 			   }
 		   }
 		}
