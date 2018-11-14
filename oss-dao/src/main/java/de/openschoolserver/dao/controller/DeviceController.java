@@ -99,18 +99,19 @@ public class DeviceController extends Controller {
 	 */
 	public OssResponse delete(List<Long> deviceIds) {
 		EntityManager em = getEntityManager();
-		boolean needWriteSalt = false;
+		boolean needReloadSalt = false;
 		try {
 			for( Long deviceId : deviceIds) {
 				Device device = em.find(Device.class, deviceId);
 				if(device.getHwconf() != null &&  device.getHwconf().getDeviceType().equals("FatClient")) {
-					needWriteSalt = true;
+					needReloadSalt = true;
 				}
+				//TODO Evaluate the response
 				this.delete(deviceId, false);
 			}
 			em.getEntityManagerFactory().getCache().evictAll();
 			new DHCPConfig(this.session).Create();
-			if( needWriteSalt ) {
+			if( needReloadSalt ) {
 				new SoftwareController(this.session).applySoftwareStateToHosts();
 			}
 			return new OssResponse(this.getSession(),"OK", "Devices were deleted succesfully.");
@@ -122,13 +123,16 @@ public class DeviceController extends Controller {
 		}
 	}
 
-	/*
-	 * Deletes a device given by the device Ids.
+	/**
+	 * Deletes a device given by the device id.
+	 * @param deviceId The technical id of the device to be deleted
+	 * @param atomic If it is true means no other devices will be deleted. DHCP and salt should be reloaded.
+	 * @return
 	 */
 	public OssResponse delete(Long deviceId, boolean atomic) {
 		EntityManager em = getEntityManager();
 		UserController userController = new UserController(this.session);
-		boolean needWriteSalt = false;
+		boolean needReloadSalt = false;
 		Device device = em.find(Device.class, deviceId);
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "Can not find device with id %s.",null,String.valueOf(deviceId));
@@ -149,7 +153,7 @@ public class DeviceController extends Controller {
 				hwconf.getDevices().remove(device);
 				em.merge(hwconf);
 				if( hwconf.getDeviceType().equals("FatClient")) {
-					needWriteSalt = true;
+					needReloadSalt = true;
 				}
 			}
 			user = userController.getByUid(device.getName());
@@ -197,12 +201,22 @@ public class DeviceController extends Controller {
 			for( Session session : device.getSessions() ) {
 				em.remove(session);
 			}
+			//Remove salt sls file if exists
+			File saltFile = new File("/srv/salt/oss_device_" + device.getName() + ".sls");
+			if( saltFile.exists() ) {
+				try {
+					saltFile.delete();
+					needReloadSalt = true;
+				} catch( Exception e ) {
+					logger.error("Deleting salt file:" + e.getMessage());
+				}
+			}
 			em.remove(device);
 			em.getTransaction().commit();
 			if( atomic ) {
 				em.getEntityManagerFactory().getCache().evictAll();
 				new DHCPConfig(this.session).Create();
-				if( needWriteSalt ) {
+				if( needReloadSalt ) {
 					new SoftwareController(this.session).applySoftwareStateToHosts();
 				}
 			}
@@ -215,6 +229,12 @@ public class DeviceController extends Controller {
 		}
 	}
 
+	/**
+	 * Deletes a device.
+	 * @param device The device to be deleted
+	 * @param atomic If it is true means no other devices will be deleted. DHCP and salt should be reloaded.
+	 * @return
+	 */
 	public OssResponse delete(Device device, boolean atomic) {
 		return this.delete(device.getId(), atomic);
 	}
