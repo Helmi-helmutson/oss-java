@@ -61,7 +61,7 @@ public class CategoryResourceImpl implements CategoryResource {
 	@Override
 	public OssResponse removeMember(Session session, long categoryId, String memberType, long memberId) {
 		final CategoryController categoryController = new CategoryController(session);
-		return categoryController.deleteMember(memberId, memberType, memberId);
+		return categoryController.deleteMember(categoryId, memberType, memberId);
 	}
 
 	@Override

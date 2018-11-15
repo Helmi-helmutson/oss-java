@@ -17,6 +17,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -746,6 +747,20 @@ public interface SystemResource {
     OssResponse deleteDnsRecord(
         @ApiParam(hidden = true) @Auth Session session,
         DnsRecord dnsRecord
+    );
+
+    @POST
+    @Path("find/{objectType}")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Searches for an object giben by the objectType and the object.")
+    @ApiResponses(value = {
+	@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.configuration")
+    OssResponse findObject(
+	@ApiParam(hidden = true) @Auth Session session,
+	@PathParam("objectType") String objectType,
+	LinkedHashMap<String,Object> object
     );
 
 }
