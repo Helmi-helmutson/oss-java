@@ -541,7 +541,7 @@ public class DeviceController extends Controller {
 			Device device = new Device();
 			device.setRoom(room);
 			device.setMac(values.get("mac"));
-			if(values.containsKey("serial") && !values.get("invetary").isEmpty() ) {
+			if(values.containsKey("serial") && !values.get("inventary").isEmpty() ) {
 				device.setSerial(values.get("serial"));
 			}
 			if(values.containsKey("inventary") && !values.get("inventary").isEmpty() ) {
