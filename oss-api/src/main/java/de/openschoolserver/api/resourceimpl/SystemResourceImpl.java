@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -355,5 +356,10 @@ public class SystemResourceImpl implements SystemResource {
 	@Override
 	public OssResponse deleteDnsRecord(Session session, DnsRecord dnsRecord) {
 		return new SystemController(session).deleteDnsRecord(dnsRecord);
+	}
+
+	@Override
+	public OssResponse findObject(Session session, String objectType, LinkedHashMap<String,Object> object) {
+		return new SystemController(session).findObject(objectType, object);
 	}
 }

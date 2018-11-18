@@ -130,15 +130,18 @@ public class SoftwareController extends Controller {
 
 	public OssResponse add(Software software, Boolean replace) {
 		EntityManager em = getEntityManager();
-		SoftwareVersion softwareVersion = new SoftwareVersion(software,software.getSoftwareVersions().get(0).getVersion(),"C");
-		for(SoftwareVersion sv : software.getSoftwareVersions() ) {
+		logger.debug("Add software" + software);
+
+		Software oldSoftware = this.getByName(software.getName());
+		if( oldSoftware != null ) {
+			logger.debug("Old software found:" + oldSoftware);
+			SoftwareVersion softwareVersion = new SoftwareVersion(oldSoftware,software.getSoftwareVersions().get(0).getVersion(),"C");
+			for(SoftwareVersion sv : software.getSoftwareVersions() ) {
 				if( sv.getStatus().equals("C") ) {
 					softwareVersion = new SoftwareVersion(software,sv.getVersion(),"C");
 					break;
 				}
-		}
-		Software oldSoftware = this.getByName(software.getName());
-		if( oldSoftware != null ) {
+			}
 			try {
 				boolean newVersion = true;
 				em.getTransaction().begin();
@@ -178,24 +181,37 @@ public class SoftwareController extends Controller {
 				em.merge(oldSoftware);
 				em.getTransaction().commit();
 			} catch (Exception e) {
-				logger.error(e.getMessage());
+				logger.error("Updating the software:" + e.getMessage());
 				em.close();
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 			}
 			return new OssResponse(this.getSession(),"OK","New software version was created succesfully",softwareVersion.getId());
 		}
-		software.addSoftwareVersion(softwareVersion);
-		softwareVersion.setSoftware(software);
-		softwareVersion.setStatus("C");
-		software.setCreator(this.session.getUser());
+		//This is an new software
+		Software newSoftware = new Software();
+		newSoftware.setCreator(this.session.getUser());
+		newSoftware.setName(software.getName());
+		if( software.getDescription() != null ) {
+			newSoftware.setDescription(software.getDescription());
+		}
+		if( software.getManually() !=  null ) {
+			newSoftware.setManually(software.getManually());
+		}
+		if( software.getWeight() !=  null ) {
+			newSoftware.setWeight(software.getWeight());
+		}
+		logger.debug("New software" + newSoftware);
 		try {
 			em.getTransaction().begin();
 			for( SoftwareFullName sfn : software.getSoftwareFullNames() ) {
-				sfn.setSoftware(software);
-				em.persist(sfn);
+				SoftwareFullName newSoftwareFullName = new SoftwareFullName(newSoftware,sfn.getFullName());
+				newSoftware.getSoftwareFullNames().add(newSoftwareFullName);
 			}
-			em.persist(software);
-			em.persist(softwareVersion);
+			logger.debug("New software after adding full names:" + newSoftware);
+			SoftwareVersion newSoftwareVersion = new SoftwareVersion(newSoftware,software.getSoftwareVersions().get(0).getVersion(),"C");
+			logger.debug("New software after adding version:" + newSoftware);
+			newSoftware.getSoftwareVersions().add(newSoftwareVersion);
+			em.persist(newSoftware);
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -203,7 +219,7 @@ public class SoftwareController extends Controller {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Software was created succesfully",software.getId());
+		return new OssResponse(this.getSession(),"OK","Software was created succesfully.",newSoftware.getId());
 	}
 
 	public OssResponse delete(Long softwareId) {

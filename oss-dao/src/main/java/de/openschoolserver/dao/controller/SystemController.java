@@ -65,9 +65,9 @@ public class SystemController extends Controller {
 	 * If the translation already exists this will be updated.
 	 * If there are an entry in MissedTranslations table this will be removed.
 	 *
-	 * @param	translation 	Two letter description of the language of the translation.
-	 * 							The text to be translated. Must not be longer then 256 characters
-	 * 							The translated text. Must not be longer then 256 characters
+	 * @param	translationTwo letter description of the language of the translation.
+	 *						The text to be translated. Must not be longer then 256 characters
+	 *						The translated text. Must not be longer then 256 characters
 	 * @return			The result of the DB operations
 	 * @see				Translate
 	 */
@@ -123,21 +123,21 @@ public class SystemController extends Controller {
 	 * Delivers a list of the status of the system
 	 *
 	 * @return		List of status hashes:
-	 * 				[
-	 * 					{
-	 * 						"name"			: "groups"
-	 * 						"primary"		: 5,
-	 * 						"class"			: 40,
-	 * 						"workgroups"	: 122
-	 * 					},
-	 * 					{
-	 * 						"name"			: "users",
-	 * 						"students"		: 590,
-	 * 						"students-loggedOn"	205,
-	 * 						...
-	 * 					}
-	 * 					....
-	 * 				]
+	 *			[
+	 *				{
+	 *					"name"			: "groups"
+	 *					"primary"		: 5,
+	 *					"class"			: 40,
+	 *					"workgroups"	: 122
+	 *				},
+	 *				{
+	 *					"name"			: "users",
+	 *					"students"		: 590,
+	 *					"students-loggedOn"	205,
+	 *					...
+	 *				}
+	 *				....
+	 *			]
 	 *
 	 */
 	public List<Map<String, String>> getStatus() {
@@ -595,7 +595,7 @@ public class SystemController extends Controller {
 
 	public List<Acl> getAvailableAcls() {
 		List<Acl> acls = new ArrayList<Acl>();
-		for( String aclName : 	this.getEnumerates("apiAcl") ) {
+		for( String aclName :this.getEnumerates("apiAcl") ) {
 			acls.add(new Acl(aclName,false));
 		}
 		return acls;
@@ -608,7 +608,7 @@ public class SystemController extends Controller {
 	public List<Acl> getAvailableAclsForGroup(Long groupId) {
 		List<Acl> acls	= new ArrayList<Acl>();
 		List<Acl> ownAcls = this.getAclsOfGroup(groupId);
-		for( String aclName : 	this.getEnumerates("apiAcl") ) {
+		for( String aclName :this.getEnumerates("apiAcl") ) {
 			boolean have = false;
 			for( Acl ownAcl : ownAcls ) {
 				if( ownAcl.getAcl().equals(aclName) ) {
@@ -694,7 +694,7 @@ public class SystemController extends Controller {
 	public List<Acl> getAvailableAclsForUser(Long userId) {
 		List<Acl> acls	= new ArrayList<Acl>();
 		List<Acl> ownAcls = this.getAclsOfUser(userId);
-		for( String aclName : 	this.getEnumerates("apiAcl") ) {
+		for( String aclName :this.getEnumerates("apiAcl") ) {
 			boolean have = false;
 			for( Acl ownAcl : ownAcls ) {
 				if( ownAcl.getAcl().equals(aclName) ) {
@@ -795,7 +795,7 @@ public class SystemController extends Controller {
 		for( String line : reply.toString().split(this.getNl()) ) {
 			Matcher matcher = patternName.matcher(line);
 			while(matcher.find()) {
-				name = matcher.group(1); 
+				name = matcher.group(1);
 				continue;
 			}
 			matcher = patternType.matcher(line);
@@ -879,5 +879,59 @@ public class SystemController extends Controller {
 		OSSShellTools.exec(program, reply, error, null);
 		//TODO evaluate error
 		return new OssResponse(session,"OK","DNS Zone was created succesfully.");	}
+
+	public OssResponse findObject(String objectType, LinkedHashMap<String,Object> object) {
+		Long objectId = null;
+		String name = null;
+		//TODO Implement all searches
+		switch(objectType.toLowerCase()) {
+		case "acl":
+
+			break;
+		case "accessinroom":
+			break;
+		case "announcement":
+			break;
+		case "contact":
+			break;
+		case "category":
+			name = (String) object.get("name");
+			Category category = new CategoryController(session).getByName(name);
+			if( category != null ) {
+				objectId = category.getId();
+			}
+			break;
+		case "faq":
+			break;
+		case "device":
+			break;
+		case "group":
+			break;
+		case "hwconf":
+			break;
+		case "ossonfig":
+			break;
+		case "ossmonfig":
+			break;
+		case "room":
+			break;
+		case "software":
+			name = (String) object.get("name");
+			Software software = new SoftwareController(session).getByName(name);
+			if( software != null ) {
+				objectId = software.getId();
+			}
+			break;
+		case "softwarelicence":
+			break;
+		case "user":
+			break;
+		}
+		if( objectId == null ) {
+			return new OssResponse(session,"ERROR","Object was not found.");
+		} else {
+			return new OssResponse(session,"OK","Object was found.",objectId);
+		}
+	}
 
 }

@@ -36,7 +36,13 @@ public class SoftwareFullName implements Serializable {
 
 	public SoftwareFullName() {
 		super();
-	}   
+	}
+
+	public SoftwareFullName(Software software, String fullName) {
+		super();
+		this.software = software;
+		this.fullName = fullName;
+	}
 
 	public Long getId() {
 		return this.id;
@@ -45,14 +51,14 @@ public class SoftwareFullName implements Serializable {
 	public void setId(Long id) {
 		this.id = id;
 	}
-	
+
 	public Software getSoftware() {
 		return this.software;
 	}
 
 	public void setSoftware(Software software) {
 		this.software = software;
-	}   
+	}
 	public String getFullName() {
 		return this.fullName;
 	}

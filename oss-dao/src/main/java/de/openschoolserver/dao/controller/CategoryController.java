@@ -446,6 +446,7 @@ public class CategoryController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			Category category = em.find(Category.class, categoryId);
+			logger.debug("CategoryId:" + categoryId + " Category " + category);
 			em.getTransaction().begin();
 			switch(objectName.toLowerCase()){
 			case("device"):
@@ -482,6 +483,7 @@ public class CategoryController extends Controller {
 			break;
 			case("software"):
 				Software software = em.find(Software.class, objectId);
+			    logger.debug("Software:" + software);
 				if( category.getSoftwares().contains(software) ) {
 					category.getSoftwares().remove(software);
 					category.getRemovedSoftwares().add(software);
@@ -526,7 +528,7 @@ public class CategoryController extends Controller {
 			em.merge(category);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("deleteMember:" +e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 			em.close();

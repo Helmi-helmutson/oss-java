@@ -51,11 +51,11 @@ public class Software implements Serializable {
 	private List<SoftwareLicense> softwareLicenses;
 
 	//bi-directional many-to-one association to SoftwareVersion
-	@OneToMany(mappedBy="software")
+	@OneToMany(mappedBy="software", cascade = CascadeType.PERSIST)
 	private List<SoftwareVersion> softwareVersions;
 
 	//bi-directional many-to-one association to SoftwareVersion
-	@OneToMany(mappedBy="software")
+	@OneToMany(mappedBy="software", cascade = CascadeType.PERSIST)
 	private List<SoftwareFullName> softwareFullNames;
 
 	//bi-directional many-to-many association to Category
@@ -94,6 +94,8 @@ public class Software implements Serializable {
 		this.weight   = 50;
 		this.softwareRequirements = new ArrayList<Software>();
 		this.requiredBy           = new ArrayList<Software>();
+		this.softwareFullNames    = new ArrayList<SoftwareFullName>();
+		this.softwareVersions     = new ArrayList<SoftwareVersion>();
 	}
 
 	@Override
