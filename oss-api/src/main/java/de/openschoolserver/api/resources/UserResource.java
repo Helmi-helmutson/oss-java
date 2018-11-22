@@ -329,6 +329,26 @@ public interface UserResource {
                 List<List<String>> Quotas
     );
 
+
+
+    /**
+     * PUT users/sync Synchronize user to other systems. In first case the role membership for squid is concerned
+     * This must be called if new user was created or removed or after import of users.
+     * @param session
+     * @return The result in an ossResponse object.
+     */
+    @POST
+    @Path("sync")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Synchronize the file system quota values into the JPA")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("user.manage")
+    OssResponse sync(
+                @ApiParam(hidden = true) @Auth Session session
+    );
+
     /*
      * GET users/byUid/{uid}/{attribute}
      * Get's an attribute from a user

@@ -502,4 +502,15 @@ public class UserResourceImpl implements UserResource {
 		}
 		return "OK";
 	}
+
+	@Override
+	public OssResponse sync(Session session) {
+		//TODO make it over plugin
+		String[] program = new String[1];
+		program[0] = "/usr/sbin/oss_refres_squidGuard_user.sh";
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new OssResponse(session,"OK", "Import was started.");
+	}
 }
