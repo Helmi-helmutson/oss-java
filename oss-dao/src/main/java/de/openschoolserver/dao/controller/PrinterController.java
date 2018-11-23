@@ -176,6 +176,9 @@ public class PrinterController extends Controller {
 
 	public OssResponse activateWindowsDriver(String printerName) {
 		logger.debug("Activating windows driver for: " + printerName);
+		if( session.getPassword() == null || session.getPassword().isEmpty() ) {
+			return new OssResponse(session,"ERROR", "The session password of the administrator is expiered. Please login into the web interface again.");
+		}
 		String printserver   = new RoomController(session).getConfigValue("PRINTSERVER");
 		String[] program     = new String[7];
 		StringBuffer reply   = new StringBuffer();
