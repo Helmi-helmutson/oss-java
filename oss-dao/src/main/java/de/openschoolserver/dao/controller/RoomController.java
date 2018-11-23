@@ -578,9 +578,11 @@ public class RoomController extends Controller {
 	 * Sets the actual access status in a room
 	 */
 	public void setAccessStatus(Room room, AccessInRoom access) {
+		logger.debug("setAccessStatus Access: " + access + " Room " + room );
 		if( room.getRoomControl() != null  && room.getRoomControl().equals("no")) {
 			return;
 		}
+
 		String[] program = new String[4];
 		program[0] = "/usr/sbin/oss_set_access_state.sh";
 		program[2] = room.getStartIP() + "/" + room.getNetMask();
