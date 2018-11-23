@@ -1775,6 +1775,10 @@ public class SoftwareController extends Controller {
 	public String getSoftwareLicencesOnDevice(String deviceName) {
 
 		Device        device    =  new DeviceController(this.session).getByName(deviceName);
+		if( device == null ) {
+			logger.info("getSoftwareLicencesOnDevice: Device " + deviceName + " does not exists.");
+			return "";
+		}
 		Map<String,String>        licenses   = new HashMap<String,String>();
 		for( SoftwareLicense license : device.getSoftwareLicenses() ) {
 			licenses.put("LIC_" + license.getSoftware().getName(), license.getValue());
