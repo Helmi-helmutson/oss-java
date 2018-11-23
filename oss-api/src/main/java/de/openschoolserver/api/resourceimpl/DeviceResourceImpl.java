@@ -209,6 +209,11 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
+	public OssResponse manageDevice(Session session, String deviceName, String action) {
+		return new DeviceController(session).manageDevice(deviceName,action,null);
+	}
+
+	@Override
 	public OssResponse manageDevice(Session session, Long deviceId, String action, Map<String, String> actionContent) {
 		return new DeviceController(session).manageDevice(deviceId,action,actionContent);
 	}

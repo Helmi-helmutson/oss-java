@@ -15,8 +15,6 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Strings;
-
 import java.util.List;
 import java.util.Map;
 
@@ -932,7 +930,18 @@ public class DeviceController extends Controller {
 	}
 
 	public OssResponse manageDevice(long deviceId, String action, Map<String, String> actionContent) {
-		Device device = new DeviceController(this.session).getById(deviceId);
+		Device device = this.getById(deviceId);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find the client.");
+		}
+		return this.manageDevice(device, action, actionContent);
+	}
+
+	public OssResponse manageDevice(String deviceName, String action, Map<String, String> actionContent) {
+		Device device = this.getByName(deviceName);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find the client.");
+		}
 		return this.manageDevice(device, action, actionContent);
 	}
 
