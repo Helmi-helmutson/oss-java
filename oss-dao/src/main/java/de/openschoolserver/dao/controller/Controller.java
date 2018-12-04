@@ -237,32 +237,20 @@ public class Controller extends Config {
 			}
 			break;
 		case "de.openschoolserver.dao.Device":
-			//TODO
 			Device device = (Device)object;
-			switch(pluginName){
-			case "add_device":
-			case "modify_device":
-				data.append(String.format("name: %s%n", device.getName()));
-				data.append(String.format("ip: %s%n", device.getIp()));
-				data.append(String.format("mac: %s%n", device.getMac()));
-				if( ! device.getWlanIp().isEmpty() ) {
-					data.append(String.format("wlanIp: %s%n", device.getWlanIp()));
-					data.append(String.format("wlanMac: %s%n", device.getWlanMac()));
-				}
-				break;
-			case "delete_device":
-				data.append(String.format("name: %s%n", device.getName()));
-				data.append(String.format("ip: %s%n", device.getIp()));
-				data.append(String.format("mac: %s%n", device.getMac()));
-				if( ! device.getWlanIp().isEmpty() ) {
-					data.append(String.format("wlanIp: %s%n", device.getWlanIp()));
-					data.append(String.format("wlanMac: %s%n", device.getWlanMac()));
-				}
-				break;
+			data.append(String.format("name: %s%n", device.getName()));
+			data.append(String.format("ip: %s%n", device.getIp()));
+			data.append(String.format("mac: %s%n", device.getMac()));
+			if( ! device.getWlanIp().isEmpty() ) {
+				data.append(String.format("wlanIp: %s%n", device.getWlanIp()));
+				data.append(String.format("wlanMac: %s%n", device.getWlanMac()));
+			}
+			if( device.getHwconf() != null ) {
+				data.append(String.format("hwconf: %s%n", device.getHwconf().getName()));
+				data.append(String.format("hwconfId: %s%n", device.getHwconfId()));
 			}
 			break;
 		case "de.openschoolserver.dao.Room":
-			//TODO
 			Room room = (Room)object;
 			switch(pluginName){
 			case "add_doom":
