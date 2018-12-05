@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -763,4 +764,17 @@ public interface SystemResource {
 	LinkedHashMap<String,Object> object
     );
 
+    @POST
+    @Path("file")
+    @Produces("*/*")
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation(value = "Delivers a file from the file system.")
+    @ApiResponses(value = {
+	@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("system.superuser")
+    Response getFile(
+	@ApiParam(hidden = true) @Auth Session session,
+	@FormDataParam("path")   String  path
+    );
 }

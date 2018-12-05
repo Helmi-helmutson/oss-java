@@ -12,6 +12,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -361,5 +365,14 @@ public class SystemResourceImpl implements SystemResource {
 	@Override
 	public OssResponse findObject(Session session, String objectType, LinkedHashMap<String,Object> object) {
 		return new SystemController(session).findObject(objectType, object);
+	}
+
+	@Override
+	public Response getFile(Session session, String path) {
+		logger.debug("getFile" + path);
+		File file = new File(path);
+		ResponseBuilder response = Response.ok((Object) file);
+		response.header("Content-Disposition","attachment; filename=\""+ file.getName() + "\"");
+		return response.build();
 	}
 }
