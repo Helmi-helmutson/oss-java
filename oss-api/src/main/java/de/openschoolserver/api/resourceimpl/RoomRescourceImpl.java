@@ -4,11 +4,11 @@ package de.openschoolserver.api.resourceimpl;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
+import de.openschoolserver.dao.OSSMConfig;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.controller.DeviceController;
 import de.openschoolserver.dao.controller.EducationController;
 import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.api.resources.RoomResource;
@@ -292,4 +292,31 @@ public class RoomRescourceImpl implements RoomResource {
 		return new RoomController(session).importRooms(fileInputStream, contentDispositionHeader);
 	}
 
+	@Override
+	public List<OSSMConfig> getDHCP(Session session, Long roomId) {
+		List<OSSMConfig> dhcpParameters = new ArrayList<OSSMConfig>();
+		RoomController roomController = new RoomController(session);
+		Room room = roomController.getById(roomId);
+		for(OSSMConfig config : roomController.getMConfigObjects(room, "dhcpStatements") ) {
+			dhcpParameters.add(config);
+		}
+		for(OSSMConfig config : roomController.getMConfigObjects(room, "dhcpOptions") ) {
+			dhcpParameters.add(config);
+		}
+		return dhcpParameters;
+	}
+
+	@Override
+	public OssResponse addDHCP(Session session, Long roomId, OSSMConfig dhcpParameter) {
+		RoomController roomController = new RoomController(session);
+		Room room = roomController.getById(roomId);
+		return roomController.addMConfig(room, dhcpParameter.getKeyword(), dhcpParameter.getValue());
+	}
+
+	@Override
+	public OssResponse deleteDHCP(Session session, Long roomId, Long parameterId) {
+		RoomController roomController = new RoomController(session);
+		Room room = roomController.getById(roomId);
+		return roomController.deleteMConfig(room,parameterId);
+	}
 }

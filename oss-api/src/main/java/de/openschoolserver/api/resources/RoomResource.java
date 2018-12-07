@@ -18,6 +18,8 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
+import de.openschoolserver.dao.OSSConfig;
+import de.openschoolserver.dao.OSSMConfig;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Session;
@@ -702,4 +704,64 @@ public interface RoomResource {
 	        @PathParam("action") String action,
 	        Map<String, String> actionContent
 	);
+
+	/*
+	 * DHCP-Management
+	 */
+	/**
+	 * Gets the active dhcp parameter of a room
+	 * @param session
+	 * @param roomId
+	 * @return a list of OSSMConfig objects representing the DHCP parameters
+	 */
+	@GET
+	@Path("{roomId}/dhcp")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the active dhcp parameter of a room<br>"
+			+ "How to evaluate the OSSMConfig object:<br>"
+			+ "id: ID of the dhcp parameter object"
+			+ "objectType: this can be dhcpOptions or dhcpStatements"
+			+ "objectId: the room id"
+			+ "keyword: the name of the dhcpOption or dhcpStatement"
+			+ "value: the value of the dhcpOption or dhcpStatement."
+			)
+	@ApiResponses(value = {
+	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("room.dhcp")
+	List<OSSMConfig> getDHCP(
+			@ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("roomId") Long roomId
+	        );
+
+	@POST
+	@Path("{roomId}/dhcp")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Adds a new dhcp parameter to a room")
+	@ApiResponses(value = {
+	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("room.dhcp")
+	OssResponse addDHCP(
+			@ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("roomId") Long roomId,
+	        OSSMConfig dhcpParameter
+	        );
+
+	@DELETE
+	@Path("{roomId}/dhcp/{parameterId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "ADeletes dhcp parameter to a room")
+	@ApiResponses(value = {
+	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("room.dhcp")
+	OssResponse deleteDHCP(
+			@ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("roomId") Long roomId,
+	        @PathParam("parameterId") Long parameterId
+	        );
 }

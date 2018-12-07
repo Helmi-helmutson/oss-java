@@ -714,6 +714,37 @@ public class Controller extends Config {
 		return values;
 	}
 
+	public List<OSSMConfig> getMConfigObjects(Object object, String key) {
+		Long id = null;
+		EntityManager em = this.getEntityManager();
+		Query query = em.createNamedQuery("OSSMConfig.get");
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Group":
+			 query.setParameter("type","Group");
+			 id    = ((Group) object ).getId();
+			 break;
+		case "de.openschoolserver.dao.User":
+			query.setParameter("type","User");
+			id    = ((User) object ).getId();
+			break;
+		case "de.openschoolserver.dao.Room":
+			query.setParameter("type","Room");
+			id    = ((Room) object ).getId();
+			break;
+		case "de.openschoolserver.dao.Device":
+			query.setParameter("type","Device");
+			id    = ((Device) object ).getId();
+			break;
+		}
+		query.setParameter("id", id).setParameter("keyword", key);
+		ArrayList<OSSMConfig> values = new ArrayList<OSSMConfig>();
+		for(OSSMConfig config : (List<OSSMConfig>) query.getResultList() ) {
+			values.add(config);
+		}
+		em.close();
+		return values;
+	}
+
 	public StringBuilder getImportDir(String startTime) {
 		StringBuilder importDir = new StringBuilder();
 		importDir.append(getConfigValue("HOME_BASE")).append("/groups/SYSADMINS/userimports/").append(startTime);
@@ -850,6 +881,40 @@ public class Controller extends Config {
 			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Config was updated");
+	}
+
+	public OssResponse deleteConfig(Object object, Long configId) {
+		EntityManager em = getEntityManager();
+		try {
+			OSSConfig config = em.find(OSSConfig.class, configId);
+			em.getTransaction().begin();
+			em.merge(config);
+			em.remove(config);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error("deleteConfig: " + e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Config was deleted");
+	}
+
+	public OssResponse deleteMConfig(Object object, Long configId) {
+		EntityManager em = getEntityManager();
+		try {
+			OSSMConfig config = em.find(OSSMConfig.class, configId);
+			em.getTransaction().begin();
+			em.merge(config);
+			em.remove(config);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error("deleteConfig: " + e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}
 
 	public OssResponse deleteConfig(Object object, String key) {

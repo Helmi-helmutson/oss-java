@@ -18,6 +18,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.OSSMConfig;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
@@ -63,7 +64,7 @@ public interface DeviceResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("hwconfId") Long id
     );
-    
+
     /*
      * GET devices/getAll
      */
@@ -79,7 +80,7 @@ public interface DeviceResource {
     List<Device> getAll(
             @ApiParam(hidden = true) @Auth Session session
     );
-    
+
     /*
      * GET devices/getAll
      */
@@ -113,7 +114,7 @@ public interface DeviceResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("search") String search
     );
-    
+
     /*
    	 * POST devices/getDevices
    	 */
@@ -128,7 +129,7 @@ public interface DeviceResource {
                @ApiParam(hidden = true) @Auth Session session,
                List<Long> deviceIds
        );
-    
+
     /*
      * GET devices/byIP/<IPAddress>
      */
@@ -224,7 +225,7 @@ public interface DeviceResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
     );
-    
+
     /*
      * GET devices/{deviceId}/defaultPrinter
      */
@@ -289,7 +290,7 @@ public interface DeviceResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
     );
-    
+
     /*
      * GET devices/{deviceId}/availablePrinters
      */
@@ -305,7 +306,7 @@ public interface DeviceResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP
     );
-    
+
     /*
      * PUT devices/{deviceId}/availablePrinters
      */
@@ -355,7 +356,7 @@ public interface DeviceResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("IP") String IP
     );
-    
+
     /*
      * GET devices/loggedIn/{IP-Address}
      */
@@ -385,7 +386,7 @@ public interface DeviceResource {
             @PathParam("IP") String IP,
             @PathParam("userName") String userName
     );
-    
+
     /*
      * DELETE devices/loggedInUsers/{IP-Address}/{userName}
      */
@@ -402,7 +403,7 @@ public interface DeviceResource {
             @PathParam("IP") String IP,
             @PathParam("userName") String userName
     );
-    
+
     /*
      * GET devices/{deviceId}/loggedInUsers
      */
@@ -418,7 +419,7 @@ public interface DeviceResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("deviceId") long deviceId
     );
-    
+
     /*
      * GET devices/refreshConfig
      */
@@ -433,7 +434,7 @@ public interface DeviceResource {
     void refreshConfig(
             @ApiParam(hidden = true) @Auth Session session
     );
-    
+
     /*
      * PUSH devices/modify
      */
@@ -449,9 +450,9 @@ public interface DeviceResource {
     		@ApiParam(hidden = true) @Auth Session session,
             Device device
     );
-    
+
     /*
-     * DELETE 
+     * DELETE
      */
     @DELETE
     @Path("{deviceId}")
@@ -465,7 +466,7 @@ public interface DeviceResource {
     		@ApiParam(hidden = true) @Auth Session session,
     		@PathParam("deviceId") long deviceId
     );
-    
+
     @POST
     @Path("import")
     @Produces(JSON_UTF8)
@@ -485,7 +486,7 @@ public interface DeviceResource {
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
     );
-    
+
     /*
     * GET devices/{deviceId}/actions
     */
@@ -560,7 +561,7 @@ public interface DeviceResource {
            @PathParam("action") String action,
            Map<String, String> actionContent
    );
-   
+
    @DELETE
    @Path("cleanUpLoggedIn")
    @Produces(JSON_UTF8)
@@ -574,4 +575,63 @@ public interface DeviceResource {
            @ApiParam(hidden = true) @Auth Session session
    );
 
+	/*
+	 * DHCP-Management
+	 */
+	/**
+	 * Gets the active dhcp parameter of a device
+	 * @param session
+	 * @param deviceId
+	 * @return a list of OSSMConfig objects representing the DHCP parameters
+	 */
+	@GET
+	@Path("{deviceId}/dhcp")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the active dhcp parameter of a device<br>"
+			+ "How to evaluate the OSSMConfig object:<br>"
+			+ "id: ID of the dhcp parameter object"
+			+ "objectType: this can be dhcpOptions or dhcpStatements"
+			+ "objectId: the device id"
+			+ "keyword: the name of the dhcpOption or dhcpStatement"
+			+ "value: the value of the dhcpOption or dhcpStatement."
+			)
+	@ApiResponses(value = {
+	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("room.dhcp")
+	List<OSSMConfig> getDHCP(
+			@ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("deviceId") Long deviceId
+	        );
+
+	@POST
+	@Path("{deviceId}/dhcp")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Adds a new dhcp parameter to a device")
+	@ApiResponses(value = {
+	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("room.dhcp")
+	OssResponse addDHCP(
+			@ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("deviceId") Long deviceId,
+	        OSSMConfig dhcpParameter
+	        );
+
+	@DELETE
+	@Path("{deviceId}/dhcp/{parameterId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Deletes dhcp parameter to a device")
+	@ApiResponses(value = {
+	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("room.dhcp")
+	OssResponse deleteDHCP(
+			@ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("deviceId") Long deviceId,
+	        @PathParam("parameterId") Long parameterId
+	        );
 }

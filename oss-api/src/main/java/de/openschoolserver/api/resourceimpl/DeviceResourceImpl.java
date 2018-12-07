@@ -13,6 +13,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.DeviceResource;
 import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.OSSMConfig;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Session;
@@ -254,5 +255,33 @@ public class DeviceResourceImpl implements DeviceResource {
 	@Override
 	public String getAllUsedDevices(Session session, Long saltClientOnly) {
 		return new DeviceController(session).getAllUsedDevices(saltClientOnly);
+	}
+
+	@Override
+	public List<OSSMConfig> getDHCP(Session session, Long deviceId) {
+		List<OSSMConfig> dhcpParameters = new ArrayList<OSSMConfig>();
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getById(deviceId);
+		for(OSSMConfig config : deviceController.getMConfigObjects(device, "dhcpStatements") ) {
+			dhcpParameters.add(config);
+		}
+		for(OSSMConfig config : deviceController.getMConfigObjects(device, "dhcpOptions") ) {
+			dhcpParameters.add(config);
+		}
+		return dhcpParameters;
+	}
+
+	@Override
+	public OssResponse addDHCP(Session session, Long deviceId, OSSMConfig dhcpParameter) {
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getById(deviceId);
+		return deviceController.addMConfig(device, dhcpParameter.getKeyword(), dhcpParameter.getValue());
+	}
+
+	@Override
+	public OssResponse deleteDHCP(Session session, Long deviceId, Long parameterId) {
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getById(deviceId);
+		return deviceController.deleteMConfig(device,parameterId);
 	}
 }
