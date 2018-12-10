@@ -9,6 +9,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.controller.DHCPConfig;
 import de.openschoolserver.dao.controller.EducationController;
 import de.openschoolserver.dao.controller.RoomController;
 import de.openschoolserver.api.resources.RoomResource;
@@ -25,7 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RoomRescourceImpl implements RoomResource {
-	
+
 	Logger logger = LoggerFactory.getLogger(RoomRescourceImpl.class);
 
     @Override
@@ -166,7 +167,7 @@ public class RoomRescourceImpl implements RoomResource {
 	public OssResponse setAccessStatus(Session session, long roomId, AccessInRoom access) {
 		return new RoomController(session).setAccessStatus(roomId, access);
 	}
-	
+
 	@Override
 	public OssResponse addDevices(Session session, long roomId, List<Device> devices) {
 		final RoomController roomController = new RoomController(session);
@@ -179,14 +180,14 @@ public class RoomRescourceImpl implements RoomResource {
 		final RoomController roomController = new RoomController(session);
 		return roomController.addDevice(roomId,macAddress,name);
 	}
-	
+
 	@Override
 	public OssResponse deleteDevices(Session session, long roomId, List<Long> deviceIds) {
 		// TODO Auto-generated method stub
 		final RoomController roomController = new RoomController(session);
 		return roomController.deleteDevices(roomId,deviceIds);
 	}
-	
+
 	@Override
 	public OssResponse deleteDevice(Session session, long roomId, Long deviceId) {
 		final RoomController roomController = new RoomController(session);
@@ -308,9 +309,23 @@ public class RoomRescourceImpl implements RoomResource {
 
 	@Override
 	public OssResponse addDHCP(Session session, Long roomId, OSSMConfig dhcpParameter) {
+		if( !dhcpParameter.getKeyword().equals("dhcpStatements") && !dhcpParameter.getKeyword().equals("dhcpOptions") ) {
+			return new OssResponse(session,"ERROR","Bad DHCP parameter.");
+		}
 		RoomController roomController = new RoomController(session);
 		Room room = roomController.getById(roomId);
-		return roomController.addMConfig(room, dhcpParameter.getKeyword(), dhcpParameter.getValue());
+		OssResponse ossResponse = roomController.addMConfig(room, dhcpParameter.getKeyword(), dhcpParameter.getValue());
+		if( ossResponse.getCode().equals("ERROR") ) {
+			return ossResponse;
+		}
+		Long dhcpParameterId = ossResponse.getObjectId();
+		ossResponse = new DHCPConfig(session).Test();
+		if( ossResponse.getCode().equals("ERROR") ) {
+			roomController.deleteMConfig(null, dhcpParameterId);
+			return ossResponse;
+		}
+		new DHCPConfig(session).Create();
+		return new OssResponse(session,"OK","DHCP Parameter was added succesfully");
 	}
 
 	@Override

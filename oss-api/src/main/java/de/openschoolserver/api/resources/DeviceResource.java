@@ -587,12 +587,12 @@ public interface DeviceResource {
 	@GET
 	@Path("{deviceId}/dhcp")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets the active dhcp parameter of a device<br>"
-			+ "How to evaluate the OSSMConfig object:<br>"
-			+ "id: ID of the dhcp parameter object"
-			+ "objectType: this can be dhcpOptions or dhcpStatements"
-			+ "objectId: the device id"
-			+ "keyword: the name of the dhcpOption or dhcpStatement"
+	@ApiOperation(value = "Gets the active dhcp parameter of a device:",
+			notes =  "How to evaluate the OSSMConfig object:<br>"
+			+ "id: ID of the dhcp parameter object<br>"
+			+ "objectType: Device, but in this case it can be ignored.<br>"
+			+ "objectId: the device id<br>"
+			+ "keyword: this can be only dhcpOption or dhcpStatement<br>"
 			+ "value: the value of the dhcpOption or dhcpStatement."
 			)
 	@ApiResponses(value = {
@@ -608,7 +608,11 @@ public interface DeviceResource {
 	@POST
 	@Path("{deviceId}/dhcp")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Adds a new dhcp parameter to a device")
+	@ApiOperation(value = "Adds a new dhcp parameter to a device",
+			notes = "How to setup the OSSMConfig object:<br>"
+					+ "keyword: this can be dhcpOptions or dhcpStatements<br>"
+					+ "value: the value of the dhcpOption or dhcpStatement.<br>"
+					+ "Other parameter can be ignored.")
 	@ApiResponses(value = {
 	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")

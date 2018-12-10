@@ -819,7 +819,7 @@ public class Controller extends Config {
 		} finally {
 			em.close();
 		}
-		return new OssResponse(this.getSession(),"OK","Mconfig was created");
+		return new OssResponse(this.getSession(),"OK","Mconfig was created",mconfig.getId());
 	}
 
 	public OssResponse addConfig(Object object, String key, String value) {

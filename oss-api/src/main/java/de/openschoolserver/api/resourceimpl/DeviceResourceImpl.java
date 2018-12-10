@@ -273,9 +273,23 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public OssResponse addDHCP(Session session, Long deviceId, OSSMConfig dhcpParameter) {
+		if( !dhcpParameter.getKeyword().equals("dhcpStatements") && !dhcpParameter.getKeyword().equals("dhcpOptions") ) {
+			return new OssResponse(session,"ERROR","Bad DHCP parameter.");
+		}
 		DeviceController deviceController = new DeviceController(session);
 		Device device = deviceController.getById(deviceId);
-		return deviceController.addMConfig(device, dhcpParameter.getKeyword(), dhcpParameter.getValue());
+		OssResponse ossResponse = deviceController.addMConfig(device, dhcpParameter.getKeyword(), dhcpParameter.getValue());
+		if( ossResponse.getCode().equals("ERROR") ) {
+			return ossResponse;
+		}
+		Long dhcpParameterId = ossResponse.getObjectId();
+		ossResponse = new DHCPConfig(session).Test();
+		if( ossResponse.getCode().equals("ERROR") ) {
+			deviceController.deleteMConfig(null, dhcpParameterId);
+			return ossResponse;
+		}
+		new DHCPConfig(session).Create();
+		return new OssResponse(session,"OK","DHCP Parameter was added succesfully");
 	}
 
 	@Override
