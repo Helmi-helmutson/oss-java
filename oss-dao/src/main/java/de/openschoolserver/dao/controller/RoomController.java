@@ -598,13 +598,14 @@ public class RoomController extends Controller {
 		}
 		else
 		{
-			// Direct internet
-			program[3] = "direct";
-			if( access.getDirect() )
-				program[1] = "1";
-			else
-				program[1] = "0";
-			OSSShellTools.exec(program, reply, error, null);
+			if( this.isAllowed("room.direct") ) {
+				program[3] = "direct";
+				if( access.getDirect() )
+					program[1] = "1";
+				else
+					program[1] = "0";
+				OSSShellTools.exec(program, reply, error, null);
+			}
 
 			// Portal Access
 			program[3] = "portal";
