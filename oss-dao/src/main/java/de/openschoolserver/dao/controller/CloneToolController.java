@@ -28,7 +28,7 @@ public class CloneToolController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(CloneToolController.class);
 	private List<String> parameters = new ArrayList<String>();
-	
+
 	protected Path PXE_BOOT   = Paths.get("/usr/share/oss/templates/pxeboot");
 	protected Path ELILO_BOOT = Paths.get("/usr/share/oss/templates/eliloboot");
 	protected String images   = "/srv/itool/images/";
@@ -102,7 +102,7 @@ public class CloneToolController extends Controller {
 	public String getDescription(Long hwconfId ) {
 		return this.getById(hwconfId).getName();
 	}
-	
+
 	public Partition getPartition(Long hwconfId, String partition) {
 		EntityManager em = getEntityManager();
 		try {
@@ -233,7 +233,7 @@ public class CloneToolController extends Controller {
 			em.getTransaction().begin();
 			em.persist(partition);
 			em.merge(hwconf);
-			em.getTransaction().commit();			
+			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -245,7 +245,7 @@ public class CloneToolController extends Controller {
 		parameters.add(hwconf.getDeviceType());
 		return new OssResponse(this.getSession(),"OK", "Partition: %s was created in %s (%s)",null,parameters);
 	}
-	
+
 	public OssResponse addPartitionToHWConf(Long hwconfId, Partition partition ) {
 		EntityManager em = getEntityManager();
 		HWConf hwconf = this.getById(hwconfId);
@@ -255,7 +255,7 @@ public class CloneToolController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.merge(hwconf);
-			em.getTransaction().commit();			
+			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -302,7 +302,7 @@ public class CloneToolController extends Controller {
 		try {
 			em.getTransaction().begin();
 			em.merge(partition);
-			em.getTransaction().commit();			
+			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -313,18 +313,19 @@ public class CloneToolController extends Controller {
 		parameters.add(value);
 		return new OssResponse(this.getSession(),"OK", "Partitions key: %s was set to %s.",partition.getId(),parameters);
 	}
-	
+
 	public OssResponse delete(Long hwconfId){
 		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
-			HWConf hwconf = this.getById(hwconfId);
+			HWConf hwconf = em.find(HWConf.class, hwconfId);
 	        if( this.isProtected(hwconf)) {
 	            return new OssResponse(this.getSession(),"ERROR","This hardware configuration must not be deleted.");
 	        }
 	        if( !this.mayModify(hwconf) ) {
 	        	return new OssResponse(this.getSession(),"ERROR","You must not delete this hardware configuration.");
 	        }
+	        this.startPlugin("delete_hwconf", hwconf);
 			if( ! em.contains(hwconf)) {
 				hwconf = em.merge(hwconf);
 			}
@@ -432,7 +433,7 @@ public class CloneToolController extends Controller {
 			pxeBoot   = Files.readAllLines(PXE_BOOT);
 			eliloBoot = Files.readAllLines(ELILO_BOOT);
 		}
-		catch( IOException e ) { 
+		catch( IOException e ) {
 			e.printStackTrace();
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
@@ -452,7 +453,7 @@ public class CloneToolController extends Controller {
 			}
 			eliloBoot.set(i, temp);
 		}
-		
+
 		List<Device> devices = new ArrayList<Device>();
 		switch(type) {
 			case "device":
@@ -463,16 +464,16 @@ public class CloneToolController extends Controller {
 				break;
 			case "room":
 				devices = new RoomController(this.session).getById(id).getDevices();
-				
+
 		}
-		
+
 		for( Device device : devices ) {
 			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
 			String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
 			try {
 				Files.write(Paths.get(pathPxe), pxeBoot);
 				Files.write(Paths.get(pathElilo), eliloBoot);
-			}catch( IOException e ) { 
+			}catch( IOException e ) {
 				e.printStackTrace();
 				ERROR.append(e.getMessage());
 			}
@@ -483,7 +484,7 @@ public class CloneToolController extends Controller {
 		parameters.add(ERROR.toString());
 		return new OssResponse(this.getSession(),"ERROR","Error(s) accoured during saving the boot configuration: %s",null,parameters);
 	}
-	
+
 	public OssResponse startCloning(Long hwconfId, Clone parameters) {
 		List<String> partitions = new ArrayList<String>();
 		List<String> pxeBoot;
@@ -494,7 +495,7 @@ public class CloneToolController extends Controller {
 			pxeBoot   = Files.readAllLines(PXE_BOOT);
 			eliloBoot = Files.readAllLines(ELILO_BOOT);
 		}
-		catch( IOException e ) { 
+		catch( IOException e ) {
 			e.printStackTrace();
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
@@ -531,7 +532,7 @@ public class CloneToolController extends Controller {
 			try {
 				Files.write(Paths.get(pathPxe), pxeBoot);
 				Files.write(Paths.get(pathElilo), eliloBoot);
-			}catch( IOException e ) { 
+			}catch( IOException e ) {
 				e.printStackTrace();
 				ERROR.append(e.getMessage());
 			}
@@ -555,7 +556,6 @@ public class CloneToolController extends Controller {
 				break;
 			case "room":
 				devices = new RoomController(this.session).getById(id).getDevices();
-				
 		}
 		for( Device device : devices ) {
 			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
@@ -563,7 +563,7 @@ public class CloneToolController extends Controller {
 			try {
 				Files.deleteIfExists(Paths.get(pathPxe));
 				Files.deleteIfExists(Paths.get(pathElilo));
-			}catch( IOException e ) { 
+			}catch( IOException e ) {
 				e.printStackTrace();
 				ERROR.append(e.getMessage());
 			}

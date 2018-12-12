@@ -250,6 +250,12 @@ public class Controller extends Config {
 				data.append(String.format("hwconfId: %s%n", device.getHwconfId()));
 			}
 			break;
+		case "de.openschoolserver.dao.HWconf":
+			HWConf hwconf = (HWConf)object;
+			data.append(String.format("name: %s%n", hwconf.getName()));
+			data.append(String.format("id: %d%n", hwconf.getId()));
+			data.append(String.format("deviceType: %s%n", hwconf.getDeviceType()));
+			break;
 		case "de.openschoolserver.dao.Room":
 			Room room = (Room)object;
 			switch(pluginName){
