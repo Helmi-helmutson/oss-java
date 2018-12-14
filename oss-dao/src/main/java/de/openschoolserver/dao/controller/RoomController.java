@@ -400,9 +400,22 @@ public class RoomController extends Controller {
 		if( ossResponse.getCode().equals("ERROR") ) {
 			return ossResponse;
 		}
+		//The categories connected to a room must handled too
+		List<Category> categoriesToModify = new ArrayList<Category>();
+		for( Category category : room.getCategories() ) {
+			if( category.getCategoryType().equals("samrtRoom") ) {
+				new CategoryController(this.session).delete(category);
+			} else {
+				categoriesToModify.add(category);
+			}
+		}
 		try {
 			em.getTransaction().begin();
 			room = em.find(Room.class, roomId);
+			for(Category category : categoriesToModify) {
+				category.getRooms().remove(room);
+				em.merge(category);
+			}
 			em.remove(room);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -1366,7 +1379,6 @@ public class RoomController extends Controller {
 		try {
 			Room room = em.find(Room.class, roomId);
 			if( room.getRoomControl() != null && room.getRoomControl().equals("no") ) {
-			// wird bereits im finally erledigt: 	em.close();
 				return new OssResponse(this.getSession(),"ERROR", "You must not set access control in a room with no room control.");
 			}
 			em.getTransaction().begin();
