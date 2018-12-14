@@ -195,13 +195,28 @@ public class CategoryController extends Controller {
 				em.merge(o);
 			}
 			for(FAQ o : category.getFaqs() ) {
-				em.remove(o);
+				if( o.getCategories().size() == 1 ) {
+					em.remove(o);
+				} else {
+					o.getCategories().remove(category);
+					em.merge(o);
+				}
 			}
 			for(Contact o : category.getContacts() ) {
-				em.remove(o);
+				if( o.getCategories().size() == 1 ) {
+					em.remove(o);
+				} else {
+					o.getCategories().remove(category);
+					em.merge(o);
+				}
 			}
 			for(Announcement o : category.getAnnouncements() ) {
-				em.remove(o);
+				if( o.getCategories().size() == 1 ) {
+					em.remove(o);
+				} else {
+					o.getCategories().remove(category);
+					em.merge(o);
+				}
 			}
 			em.remove(category);
 			em.getTransaction().commit();
