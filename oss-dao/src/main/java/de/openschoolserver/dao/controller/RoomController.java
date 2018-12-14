@@ -418,54 +418,71 @@ public class RoomController extends Controller {
 	}
 
 
-	/*
-	 * Return the list of the available adresses in the room
+	/**
+	 * Get the list of all available IP-addresses from a room
+	 * @param roomId The room id
+	 * @return The list of the IP-addresses in human readable form as List<String>
 	 */
 	public List<String> getAvailableIPAddresses(long roomId){
 		Room room   = this.getById(roomId);
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
 		List<String> allIPs  = net.getAvailableIPs(0);
 		List<String> usedIPs = new ArrayList<String>();
-		//TODO it is only for the school network. We need to check for all other subnets
-		String subnet = this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK");
-	    IPv4Net subNetwork = new IPv4Net( subnet );
-	    usedIPs.add(subNetwork.getBase());
-	    usedIPs.add(subNetwork.getLast());
-		for( Device dev : room.getDevices() ){
-			usedIPs.add(dev.getIp());
-			if( dev.getWlanIp() != "" ) {
-				usedIPs.add(dev.getWlanIp());
+		IPv4Net subNetwork = null;
+		for( String subnet : this.getEnumerates("network") ) {
+			subNetwork = new IPv4Net( subnet );
+			if( subNetwork.contains( room.getStartIP())) {
+				break;
 			}
 		}
-		allIPs.removeAll(usedIPs);
+		if( subNetwork != null ) {
+			usedIPs.add(subNetwork.getBase());
+			usedIPs.add(subNetwork.getLast());
+			for( Device dev : room.getDevices() ){
+				usedIPs.add(dev.getIp());
+				if( dev.getWlanIp() != "" ) {
+					usedIPs.add(dev.getWlanIp());
+				}
+			}
+			allIPs.removeAll(usedIPs);
+		}
 		return allIPs;
 	}
 
-	/*
-	 * Return the list of the available adresses in the room
+	/**
+	 * Get the list of "count" available IP-addresses from a room with the corresponding default name.
+	 * @param roomId The room id
+	 * @param count The count of the free IP-addresses of interest. If count == 0 all free IP-addresses will be delivered
+	 * @return The list of the IP-addresses and predefined host names as List<String>
 	 */
 	public List<String> getAvailableIPAddresses(long roomId, long count){
 		Room room   = this.getById(roomId);
-		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
-		//TODO it is only for the school network. We need to check for all other subnets
-		String subnet = this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK");
-	    IPv4Net subNetwork = new IPv4Net( subnet );
-	    String firstIP = subNetwork.getBase();
-	    String lastIP  = subNetwork.getLast();
 		List<String> availableIPs = new ArrayList<String>();
-		int i = 0;
-		for( String IP : net.getAvailableIPs(0) ){
-			if( IP.equals(lastIP) || IP.equals(firstIP)) {
-				continue;
-			}
-			String name =  this.isIPUnique(IP);
-			if( name.isEmpty() ){
-				availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName().replace("_", "-").toLowerCase(),i));
-			}
-			if( count > 0 && availableIPs.size() == count ) {
+		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
+		IPv4Net subNetwork = null;
+		for( String subnet : this.getEnumerates("network") ) {
+			subNetwork = new IPv4Net( subnet );
+			if( subNetwork.contains( room.getStartIP())) {
 				break;
 			}
-			i++;
+		}
+		if( subNetwork != null ) {
+			String firstIP = subNetwork.getBase();
+			String lastIP  = subNetwork.getLast();
+			int i = 0;
+			for( String IP : net.getAvailableIPs(0) ){
+				if( IP.equals(lastIP) || IP.equals(firstIP)) {
+					continue;
+				}
+				String name =  this.isIPUnique(IP);
+				if( name.isEmpty() ){
+					availableIPs.add(String.format("%s %s-pc%02d", IP,room.getName().replace("_", "-").toLowerCase(),i));
+				}
+				if( count > 0 && availableIPs.size() == count ) {
+					break;
+				}
+				i++;
+			}
 		}
 		return availableIPs;
 	}
