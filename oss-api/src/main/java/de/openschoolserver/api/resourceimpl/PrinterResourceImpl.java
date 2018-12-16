@@ -227,4 +227,9 @@ public class PrinterResourceImpl implements PrinterResource {
 	public List<Device> getPrinterDevices(Session session) {
 		return new CloneToolController(session).getByName("Printer").getDevices();
 	}
+
+	@Override
+	public Printer getPrinterById(Session session, Long printerId) {
+		return new PrinterController(session).getById(printerId);
+	}
 }
