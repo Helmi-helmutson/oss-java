@@ -45,6 +45,7 @@ public class RoomController extends Controller {
 
 	@SuppressWarnings("serial")
 	static Map<String, Integer> countToNm = new HashMap<String, Integer>() {{
+		put("2",  31);
 		put("4",  30);
 		put("8",  29);
 		put("16",  28);
@@ -56,10 +57,12 @@ public class RoomController extends Controller {
 		put("1024",  22);
 		put("2048",  21);
 		put("4096",  20);
+		put("8192",  19);
 	}};
 
 	@SuppressWarnings("serial")
 	static Map<Integer, Integer> nmToRowsPlaces = new HashMap<Integer, Integer>() {{
+		put(31,2);
 		put(30,2);
 		put(29,3);
 		put(28,4);
@@ -71,6 +74,7 @@ public class RoomController extends Controller {
 		put(22,32);
 		put(21,46);
 		put(20,64);
+		put(19,91);
 	}};
 
 	public RoomController(Session session) {
@@ -1456,44 +1460,47 @@ public class RoomController extends Controller {
 			if(header.containsKey("name")) {
 				room.setName(values[header.get("name")]);
 			}
-			if(header.containsKey("description")) {
+			if(header.containsKey("description") && !values[header.get("description")].isEmpty() ) {
 				room.setDescription(values[header.get("description")]);
 			} else {
 				room.setDescription(values[header.get("name")]);
 			}
-			if(header.containsKey("count")) {
+			if(header.containsKey("count") && !values[header.get("count")].isEmpty()) {
 				if( ! countToNm.containsKey(values[header.get("count")]) ) {
 					return new OssResponse(this.getSession(),"ERROR", "Bad computer count. Allowed values are 4,8,16,32,64,128.256,512,1024,2048,4096");
 				}
 				room.setNetMask(countToNm.get(values[header.get("count")]));
 			}
-			if(header.containsKey("rows")) {
+			if(header.containsKey("rows") && !values[header.get("rows")].isEmpty() ) {
 				room.setRows(Integer.parseInt(values[header.get("rows")]));
 			} else {
 				room.setRows(nmToRowsPlaces.get(room.getNetMask()));
 			}
-			if(header.containsKey("places")) {
+			if(header.containsKey("places") && !values[header.get("places")].isEmpty() ) {
 				room.setPlaces(Integer.parseInt(values[header.get("places")]));
 			} else {
 				room.setPlaces(nmToRowsPlaces.get(room.getNetMask()));
 			}
-			if(header.containsKey("control")) {
+			if(header.containsKey("control") && !values[header.get("control")].isEmpty() ) {
 				if( ! checkEnumerate("roomControl", values[header.get("control")])){
 					List<String> parameters = new ArrayList<String>();
-					parameters.add(values[header.get("hwconf")]);
+					parameters.add(values[header.get("control")]);
 					parameters.add(i.toString());
 					parameters.add(String.join(",",getEnumerates("roomControl")));
 					return new OssResponse(this.getSession(),"ERROR", "Can not find hwconf %s in line %s. Allowed values are: %s.",null,parameters);
 				}
 				room.setRoomControl(values[header.get("control")]);
 			}
-			if(header.containsKey("type")) {
+			if(header.containsKey("type") && !values[header.get("type")].isEmpty() ) {
 				room.setRoomType(values[header.get("type")]);
 			}
-			if(header.containsKey("network")) {
+			if(header.containsKey("network") && !values[header.get("network")].isEmpty() ) {
 				room.setNetwork(values[header.get("network")]);
 			}
-			if(header.containsKey("hwconf")) {
+			if(header.containsKey("startip") && !values[header.get("startip")].isEmpty() ) {
+				room.setStartIP(values[header.get("startip")]);
+			}
+			if(header.containsKey("hwconf") && !values[header.get("hwconf")].isEmpty() ) {
 				HWConf hwconf = cloneToolController.getByName(values[header.get("hwconf")]);
 				if( hwconf == null ) {
 					List<String> parameters = new ArrayList<String>();
