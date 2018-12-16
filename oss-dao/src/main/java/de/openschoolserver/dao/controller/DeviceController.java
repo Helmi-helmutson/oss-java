@@ -570,7 +570,10 @@ public class DeviceController extends Controller {
 				device.setSerial(values.get("serial"));
 			}
 			if(values.containsKey("owner") && !values.get("owner").isEmpty() ) {
-				device.setOwner(userController.getByUid(values.get("owner")));
+				User user = userController.getByUid(values.get("owner"));
+				if( user != null ) {
+					device.setOwner(user);
+				}
 			}
 			if(values.containsKey("hwconf") && !values.get("hwconf").isEmpty() ) {
 				HWConf hwconf = cloneToolController.getByName(values.get("hwconf"));
