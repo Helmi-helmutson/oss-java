@@ -36,8 +36,7 @@ import java.util.Map;
 @Path("printers")
 @Api(value = "printers")
 public interface PrinterResource {
-	
-	
+
 	@POST
 	@Path("add")
 	@Produces(JSON_UTF8)
@@ -89,7 +88,7 @@ public interface PrinterResource {
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 			);
-	
+
 	@GET
 	@Path("all")
 	@Produces(JSON_UTF8)
@@ -100,6 +99,19 @@ public interface PrinterResource {
 	@RolesAllowed("printers.manage")
 	List<Printer> getPrinters(
 			@ApiParam(hidden = true) @Auth Session session
+			);
+
+	@GET
+	@Path("{printerId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets thes lis of printers.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No device was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("printers.manage")
+	Printer getPrinterById(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("printerId")	Long printerId
 			);
 
 	@GET
@@ -127,7 +139,7 @@ public interface PrinterResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerId")		Long printerId
 			);
-	
+
 	@PUT
 	@Path("{printerId}/reset")
 	@Produces(JSON_UTF8)
@@ -197,7 +209,7 @@ public interface PrinterResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
 			);
-	
+
 	@PUT
 	@Path("byName/{printerName}/reset")
 	@Produces(JSON_UTF8)
@@ -253,7 +265,7 @@ public interface PrinterResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("printerName")		String printerName
 			);
-	
+
 	/*
 	 *
 	 */
@@ -275,7 +287,7 @@ public interface PrinterResource {
 	Map<String,String[]> getAvailableDrivers(
 			@ApiParam(hidden = true) @Auth Session session
 			);
-	
+
 	/*
 	 *
 	 */

@@ -294,4 +294,17 @@ public class CloneToolResourceImpl implements CloneToolResource {
 		}
 		return "";
 	}
+
+	@Override
+	public OssResponse importHWConfs(Session session, List<HWConf> hwconfs) {
+		CloneToolController  cloneToolController = new CloneToolController(session);
+		OssResponse ossResponse = null;
+		for( HWConf hwconf : hwconfs ) {
+			ossResponse = cloneToolController.addHWConf(hwconf);
+			if( ossResponse.getCode().equals("ERROR")) {
+				return ossResponse;
+			}
+		}
+		return ossResponse;
+	}
 }
