@@ -318,7 +318,7 @@ public interface CloneToolResource {
 	@POST
 	@Path("hwconf")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Creates a new hardware configuration. And returns the hwoconfId")
+	@ApiOperation(value = "Creates a new hardware configuration.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -326,6 +326,25 @@ public interface CloneToolResource {
 	OssResponse addHWConf(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        HWConf hwconf
+	);
+
+	/**
+	 * Import a list of ne hardware configurations.
+	 * @param session
+	 * @param hwconfs
+	 * @return
+	 */
+	@POST
+	@Path("hwconf/import")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Import a list of ne hardware configurations.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("hwconf.add")
+	OssResponse importHWConfs(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        List<HWConf> hwconfs
 	);
 
 	/*
