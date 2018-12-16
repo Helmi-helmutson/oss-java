@@ -33,7 +33,7 @@ public class SystemController extends Controller {
 		super(session);
 	}
 
-	/*
+	/**
 	 * Translate a sting in a required language.
 	 * If the translation does not exists the string will be written into the missed translations table.
 	 *
@@ -60,7 +60,7 @@ public class SystemController extends Controller {
 		return key;
 	}
 
-	/*
+	/**
 	 * Add a translated text to the Translations table.
 	 * If the translation already exists this will be updated.
 	 * If there are an entry in MissedTranslations table this will be removed.
@@ -104,7 +104,7 @@ public class SystemController extends Controller {
 		return new OssResponse(this.session,"OK",responseText);
 	}
 
-	/*
+	/**
 	 * Delivers a list of the missed translations to a language.
 	 *
 	 * @param	lang	Two letter description of the language of the translation.
@@ -119,7 +119,7 @@ public class SystemController extends Controller {
 	}
 
 
-	/*
+	/**
 	 * Delivers a list of the status of the system
 	 *
 	 * @return		List of status hashes:
@@ -431,7 +431,11 @@ public class SystemController extends Controller {
 					   statusMap.put("ext", rule[3]);
 					   statusMap.put("id",  Long.toString(device.getId()) );
 					   statusMap.put("name", device.getName() );
-					   statusMap.put("port", rule[4]);
+					   if( rule.length > 3 ) {
+						   statusMap.put("port", rule[4]);
+					   } else {
+						   statusMap.put("port", rule[3]);
+					   }
 					   firewallList.add(statusMap);
 				   }
 			   }
