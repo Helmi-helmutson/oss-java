@@ -32,7 +32,23 @@ public class PrinterController extends Controller {
 		super(session);
 		// TODO Auto-generated constructor stub
 	}
-	
+
+	public String getModel(String name){
+		try {
+			Pattern pattern = Pattern.compile(".NickName: \"(.*)\"");
+			logger.debug("getModel of:" + name);
+			for( String line : Files.readAllLines(Paths.get("/etc/cups/ppd/" + name + ".ppd")) ) {
+				Matcher matcher = pattern.matcher(line);
+				if( matcher.find() ) {
+					return matcher.group(1);
+				}
+			}
+		} catch (IOException e) {
+			logger.debug("getModel of: " + name + " ppd file not found");
+		}
+		return "";
+	}
+
 	/**
 	 * Find a printer by id
 	 * @param printerId
@@ -46,6 +62,7 @@ public class PrinterController extends Controller {
 				if( printer.getDevice() != null ) {
 					printer.setDeviceName(printer.getDevice().getName());
 				}
+				printer.setModel(getModel(printer.getName()));
 			}
 			return printer;
 		} catch (Exception e) {
@@ -119,16 +136,7 @@ public class PrinterController extends Controller {
 				if( printer.getDevice() != null ) {
 					printer.setDeviceName(printer.getDevice().getName());
 				}
-				program = new String[5];
-				program[0] = "/usr/bin/gawk";
-				program[1] = "-F";
-				program[2] = ":";
-				program[3] = "/*NickName/ { print $2 }";
-				program[4] = "/etc/cups/ppd/" + name + ".ppd";
-				StringBuffer reply2  = new StringBuffer();
-				logger.debug(stderr.toString());
-				OSSShellTools.exec(program, reply2, stderr, null);
-				printer.setModel(reply2.toString());
+				printer.setModel(getModel(name));
 				printers.add(printer);
 			}
 		}
@@ -222,7 +230,7 @@ public class PrinterController extends Controller {
 		HWConf hwconf = new CloneToolController(session).getByName("Printer");
 		Device device = new Device();
 		device.setMac(mac);
-		device.setName(name);
+		device.setName(name.toLowerCase());
 		device.setHwconfId(hwconf.getId());
 		logger.debug(hwconf.getName() + "#" + hwconf.getId() );
 		List<Device> devices = new ArrayList<Device>();
@@ -248,7 +256,7 @@ public class PrinterController extends Controller {
 			em.getTransaction().begin();
 			
 			printer.setDevice(device);
-			printer.setName(name);
+			printer.setName(name.toLowerCase());
 			em.persist(printer);
 			logger.debug("Created Printer: " + printer);
 			device.getPrinterQueue().add(printer);
