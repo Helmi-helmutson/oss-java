@@ -77,7 +77,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	}
 
 	@Override
-	public OssResponse deleteObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
+	public OssResponse deleteObjectInRoom(Session session, Long roomId, String objectType, Long objectId) {
 		return new AdHocLanController(session).deleteObjectInRoom(roomId,objectType,objectId);
 	}
 
@@ -212,6 +212,25 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		Category category = new AdHocLanController(session).getAdHocCategoryOfRoom(roomId);
 		category.setStudentsOnly(studentsOnly);
 		return new CategoryController(session).modify(category);
+	}
+
+	@Override
+	public List<Device> getDevicesOfRoom(Session session, Long adHocRoomId) {
+		Category category = new AdHocLanController(session).getAdHocCategoryOfRoom(adHocRoomId);
+		List<Device> devices = new ArrayList<Device>();
+		for( Room room : category.getRooms() ) {
+			if( room.getRoomType().equals("AdHocAccess")) {
+				for( Device device : room.getDevices() ) {
+					devices.add(device);
+				}
+			}
+		}
+		return devices;
+	}
+
+	@Override
+	public OssResponse delete(Session session, Long adHocRoomId) {
+		return new AdHocLanController(session).delete(adHocRoomId);
 	}
 
 }

@@ -250,15 +250,14 @@ public class RoomController extends Controller {
 		}
 	}
 
-	/*
+
+	/**
 	 * Return a list the rooms in which the session user can register devices
-	 *
 	 * @return For super user all rooms will be returned
-	 *         For normal user the list his AdHocAccess rooms of those of his groups
+	 * 			For normal user the list his AdHocAccess rooms of those of his groups
 	 */
 	public List<Room> getAllToRegister() {
 		EntityManager em = getEntityManager();
-		Room room  = null;
 		try {
 			if( this.isSuperuser() ) {
 				logger.debug("Is suberuser" + this.session.getUser().getUid());
@@ -268,15 +267,17 @@ public class RoomController extends Controller {
 				List<Room> rooms = new ArrayList<Room>();
 				for( Category category : this.session.getUser().getCategories() ) {
 					if( category.getCategoryType().equals("AdHocAccess") &&
-					  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent) )) {
+					  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent) ) &&
+					    !category.getRooms().isEmpty()) {
 							rooms.add(category.getRooms().get(0));
 					}
 				}
 				for(Group group : this.session.getUser().getGroups() ) {
 					for( Category category : group.getCategories() ) {
+						logger.debug("getAllToRegister: " + category);
 						if( category.getCategoryType().equals("AdHocAccess") &&
 						  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent)) &&
-						    !rooms.contains(room)) {
+						    !category.getRooms().isEmpty() ) {
 									rooms.add(category.getRooms().get(0));
 						}
 					}
@@ -291,8 +292,10 @@ public class RoomController extends Controller {
 		}
 	}
 
-	/*
+	/**
 	 * Search devices given by a substring
+	 * @param search The string which will be searched
+	 * @return The list of the devices have been found
 	 */
 	public List<Room> search(String search) {
 		EntityManager em = getEntityManager();

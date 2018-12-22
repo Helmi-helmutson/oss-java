@@ -90,7 +90,7 @@ public interface AdHocLanResource {
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId") long roomId
 			);
-	
+
 	/*
 	 * Get adhoclan/users
 	 */
@@ -105,7 +105,7 @@ public interface AdHocLanResource {
 	List<User> getUsers(
 			@ApiParam(hidden = true) @Auth Session session
 			);
-	
+
 	/*
 	 * Get adhoclan/groups
 	 */
@@ -120,7 +120,7 @@ public interface AdHocLanResource {
 	List<Group> getGroups(
 			@ApiParam(hidden = true) @Auth Session session
 			);
-	
+
     /*
      * POST addhoclan/rooms { hash }
      */
@@ -250,7 +250,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.manage")
-	OssResponse deleteObjectIntoRoom(
+	OssResponse deleteObjectInRoom(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId,
 			@PathParam("objectType")	String onjectType,
@@ -273,6 +273,45 @@ public interface AdHocLanResource {
 	@PermitAll
 	List<Room> getRooms(
 			@ApiParam(hidden = true) @Auth Session session
+			);
+
+	/**
+	 *
+	 * @param session
+	 * @param adHocRoomId
+	 * @return
+	 */
+	@GET
+	@Path("rooms/{adHocRoomId}/devices")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets all devices in an add hoc room.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No room was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	List<Device> getDevicesOfRoom(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("adHocRoomId")		Long adHocRoomId
+			);
+
+
+	/**
+	 * Delets an adhoc room inkl all devices.
+	 * @param session
+	 * @param adHocRoomId The id of the room to be deleted.
+	 * @return
+	 */
+	@DELETE
+	@Path("rooms/{adHocRoomId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets all devices in an add hoc room.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No room was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@PermitAll
+	OssResponse delete(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("adHocRoomId")		Long adHocRoomId
 			);
 
     /*

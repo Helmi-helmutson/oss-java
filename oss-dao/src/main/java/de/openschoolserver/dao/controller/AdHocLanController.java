@@ -3,6 +3,8 @@ package de.openschoolserver.dao.controller;
 
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,6 +119,37 @@ public class AdHocLanController extends Controller {
 			return new OssResponse(session,"ERROR","AdHocAccess not found");
 		}
 		return new CategoryController(session).deleteMember(categoryId, objectType, objectId);
+	}
+
+
+	public OssResponse delete(Long adHocRoomId) {
+		EntityManager em = getEntityManager();
+		try {
+			Category category = em.find(Category.class, adHocRoomId);
+			logger.debug("Delete adHocRoom:" + category);
+			RoomController roomController = new RoomController(this.session);
+			for( Room room : category.getRooms() ) {
+				roomController.delete(room.getId());
+			}
+			em.getTransaction().begin();
+			for( Object o : category.getFaqs())  {
+				em.remove(o);
+			}
+			for( Object o : category.getAnnouncements())  {
+				em.remove(o);
+			}
+			for( Object o : category.getContacts())  {
+				em.remove(o);
+			}
+			em.remove(category);
+			em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error("deleteMember:" +e.getMessage());
+			return new OssResponse(this.getSession(),"erease category ERROR",e.getMessage());
+		} finally {
+			em.close();
+		}
+		return new OssResponse(this.getSession(),"OK","Category was modified");
 	}
 }
 
