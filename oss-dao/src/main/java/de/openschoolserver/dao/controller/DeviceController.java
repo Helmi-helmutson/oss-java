@@ -480,12 +480,14 @@ public class DeviceController extends Controller {
 		return users;
 	}
 
-	/*
+	/**
 	 * Import devices from a CSV file. This MUST have following format:
 	 * Separator: semicolon
-	 * All fields MUST exists.
 	 * Fields: Room; MAC; Serial; Inventary; Locality; HWConf; Owner; Name; IP; WLANMAC; WLANIP; Row; Place;
 	 * Mandatory fields which must not be empty: Room and MAC;
+	 * @param fileInputStream
+	 * @param contentDispositionHeader
+	 * @return
 	 */
 	public OssResponse importDevices(InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
@@ -539,7 +541,7 @@ public class DeviceController extends Controller {
 			Device device = new Device();
 			device.setRoom(room);
 			device.setMac(values.get("mac"));
-			if(values.containsKey("serial") && !values.get("inventary").isEmpty() ) {
+			if(values.containsKey("serial") && !values.get("serial").isEmpty() ) {
 				device.setSerial(values.get("serial"));
 			}
 			if(values.containsKey("inventary") && !values.get("inventary").isEmpty() ) {
