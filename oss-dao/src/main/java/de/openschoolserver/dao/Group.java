@@ -65,6 +65,14 @@ public class Group implements Serializable {
 		this.owner = null;
 	}
 
+	public Group(String name, String description, String groupType) {
+		this.id   = null;
+		this.name = name;
+		this.description = description;
+		this.groupType = groupType;
+		this.owner = null;
+	}
+
 	public Long getId() {
 		return this.id;
 	}

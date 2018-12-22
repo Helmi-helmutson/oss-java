@@ -2,9 +2,14 @@
  * (c) 2017 EXTIS GmbH www.extis.de - all rights reserved */
 package de.openschoolserver.dao.controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
-
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -234,6 +239,59 @@ public class GroupController extends Controller {
 			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Group was deleted.");
+	}
+
+	/**
+	 * Import groups from a CSV file. This MUST have following format:
+	 * Separator: semicolon
+	 * No header
+	 * All fields are mandatory
+	 * No header
+	 * Fields: name;description;group type;member
+	 * Member: space separated list of user names (uid)
+	 * Group Type: can be class, primary or workgroup
+	 * @param fileInputStream
+	 * @param contentDispositionHeader
+	 * @return
+	 */
+	public OssResponse importGroups(InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		File file = null;
+		List<String> importFile;
+		OssResponse ossResponse;
+		try {
+			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
+			importFile = Files.readAllLines(file.toPath());
+		} catch (IOException e) {
+			logger.error("File error:" + e.getMessage(), e);
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		}
+		int count = 0;
+		for(String line : importFile ) {
+			String[] values = line.split(";");
+			count++;
+			if( values.length < 3 ) {
+				logger.error("importGroups bad line: " + count + ":" + line);
+				continue;
+			}
+			Group group = this.getByName(values[0]);
+			if( group == null ) {
+				group = new Group(values[0],values[1],values[2]);
+				ossResponse = this.add(group);
+				if( ossResponse.getCode().equals("ERROR") ) {
+					logger.error("importGroups. Erro in line: " + count + ". ERROR: " + ossResponse.getValue() );
+					continue;
+				}
+				group = this.getById(ossResponse.getObjectId());
+			}
+			if( values.length > 3 ) {
+				for( String uid : values[3].split(" ") ) {
+					this.addMember(values[0], uid);
+				}
+			}
+		}
+		return new OssResponse(this.getSession(),"OK","Groups were imported.");
 	}
 
 	public OssResponse delete(long groupId){

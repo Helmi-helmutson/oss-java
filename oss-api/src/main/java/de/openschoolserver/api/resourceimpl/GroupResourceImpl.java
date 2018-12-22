@@ -1,10 +1,11 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.GroupResource;
 import de.openschoolserver.dao.Group;
@@ -112,6 +113,12 @@ public class GroupResourceImpl implements GroupResource {
 		Group group = gc.getById(groupId);
 		return gc.cleanGrupDirectory(group);
 		
+	}
+
+	@Override
+	public OssResponse importGroups(Session session, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		return new GroupController(session).importGroups(fileInputStream, contentDispositionHeader);
 	}
 
 }
