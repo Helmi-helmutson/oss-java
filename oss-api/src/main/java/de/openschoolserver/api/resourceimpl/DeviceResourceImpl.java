@@ -45,6 +45,16 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
+	public String getAllNames(Session session) {
+		final DeviceController deviceController = new DeviceController(session);
+		StringBuilder devices = new StringBuilder();
+		for( Device device : deviceController.getAll() ) {
+			devices.append(device.getName()).append(deviceController.getNl());
+		}
+		return devices.toString();
+	}
+
+	@Override
 	public Device getByIP(Session session, String IP) {
 		final DeviceController deviceController = new DeviceController(session);
 		final Device device = deviceController.getByIP(IP);
