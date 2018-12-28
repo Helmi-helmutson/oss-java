@@ -178,19 +178,19 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public OssResponse uploadFileToRoom(Session session, Long roomId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("room",roomId,fileInputStream,contentDispositionHeader,false);
+		return new EducationController(session).uploadFileTo("room",roomId,null,fileInputStream,contentDispositionHeader,false);
 	}
 
 	@Override
 	public OssResponse uploadFileToUser(Session session, Long userId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("user",userId,fileInputStream,contentDispositionHeader,false);
+		return new EducationController(session).uploadFileTo("user",userId,null,fileInputStream,contentDispositionHeader,false);
 	}
 
 	@Override
 	public OssResponse uploadFileToDevice(Session session, Long deviceId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("device",deviceId,fileInputStream,contentDispositionHeader,false);
+		return new EducationController(session).uploadFileTo("device",deviceId,null,fileInputStream,contentDispositionHeader,false);
 
 	}
 
@@ -200,9 +200,19 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			boolean studentsOnly,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("group",groupId,fileInputStream,contentDispositionHeader,studentsOnly);
+		return new EducationController(session).uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly);
 	}
 
+	@Override
+	public OssResponse uploadFileToUsers(Session session, InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader, String sUserIds) {
+		List<Long> userIds = new ArrayList<Long>();
+		for( String id : sUserIds.split(",")) {
+			userIds.add(Long.valueOf(id));
+		}
+		logger.debug("uploadFileToUsers: " + sUserIds + " " + userIds);
+		return new EducationController(session).uploadFileTo("users",0l,userIds,fileInputStream,contentDispositionHeader,false);
+	}
 	@Override
 	public OssResponse getRoomControl(Session session, Long roomId, Long minutes) {
 		return new EducationController(session).getRoomControl(roomId,minutes);
@@ -598,5 +608,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+
 
 }

@@ -839,6 +839,21 @@ public interface EducationResource {
             );
 
     @POST
+    @Path("users/upload")
+    @Produces(JSON_UTF8)
+    @Consumes(MediaType.MULTIPART_FORM_DATA)
+    @ApiOperation( value = "Puts data to te member of the smart rooms" )
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.users")
+    OssResponse uploadFileToUsers(@ApiParam(hidden = true) @Auth Session session,
+            @FormDataParam("file") final InputStream fileInputStream,
+            @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader,
+            @FormDataParam("userIds") final String userIds
+            );
+
+    @POST
     @Path("users/applyAction")
     @Produces(JSON_UTF8)
     @ApiOperation(value = "Apply an action for a lot of user once.",

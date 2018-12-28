@@ -346,6 +346,7 @@ public class EducationController extends Controller {
 
 	public OssResponse uploadFileTo(String what,
 			long objectId,
+			List<Long> objectIds,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader,
 			boolean studentsOnly ) {
@@ -360,6 +361,17 @@ public class EducationController extends Controller {
 		}
 		StringBuilder error = new StringBuilder();
 		switch(what) {
+		case "users":
+			UserController uc = new UserController(this.session);
+			for( Long id : objectIds) {
+				User user = uc.getById(id);
+				if( user != null ) {
+					error.append(this.saveFileToUserImport(user, file, fileName));
+				} else {
+					error.append("User does not exists.");
+				}
+			}
+			break;
 		case "user":
 			User user = new UserController(this.session).getById(objectId);
 			if( user != null ) {
