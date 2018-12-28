@@ -47,6 +47,16 @@ public class RoomRescourceImpl implements RoomResource {
     }
 
     @Override
+    public String getAllNames(Session session) {
+   final RoomController roomController = new RoomController(session);
+   StringBuilder rooms = new StringBuilder();
+        for( Room room : roomController.getAllToUse() ) {
+       rooms.append(room.getName()).append(roomController.getNl());
+        }
+        return rooms.toString();
+    }
+
+    @Override
     public List<Room> allWithControl(Session session) {
         final RoomController roomController = new RoomController(session);
         final List<Room> rooms = roomController.getAllWithControl();
@@ -63,14 +73,14 @@ public class RoomRescourceImpl implements RoomResource {
     @Override
     public OssResponse delete(Session session, long roomId) {
         // TODO Auto-generated method stub
-    	final RoomController roomController = new RoomController(session);
-    	return roomController.delete(roomId);
+   final RoomController roomController = new RoomController(session);
+   return roomController.delete(roomId);
     }
 
     @Override
     public OssResponse add(Session session, Room room) {
-    	final RoomController roomController = new RoomController(session);
-    	return roomController.add(room);
+	final RoomController roomController = new RoomController(session);
+	return roomController.add(room);
     }
 
     @Override
@@ -82,15 +92,15 @@ public class RoomRescourceImpl implements RoomResource {
         }
         return ips;
     }
-    
-    @Override
+
+	@Override
 	public List<String> getAvailableIPAddresses(Session session, long roomId, long count) {
-    	final RoomController roomController = new RoomController(session);
-        final List<String> ips = roomController.getAvailableIPAddresses(roomId,count);
-        if ( ips == null) {
-            throw new WebApplicationException(404);
-        }
-        return ips;
+		final RoomController roomController = new RoomController(session);
+		final List<String> ips = roomController.getAvailableIPAddresses(roomId,count);
+		if ( ips == null) {
+		    throw new WebApplicationException(404);
+		}
+		return ips;
 	}
 
 	@Override
