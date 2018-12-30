@@ -579,8 +579,22 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	OssResponse setDefaultPrinter(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
+	        @PathParam("roomId") Long roomId,
 	        @PathParam("deviceId") Long deviceId
+	);
+
+	@PUT
+	@Path("text/{roomName}/defaultPrinter/{printerName}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Sets the default printer in a room.")
+	@ApiResponses(value = {
+	    @ApiResponse(code = 404, message = "Device not found"),
+	    @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("room.manage")
+	OssResponse setDefaultPrinter(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("roomName") String roomName,
+	        @PathParam("printerName") String printerName
 	);
 
 	@DELETE

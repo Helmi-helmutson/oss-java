@@ -474,8 +474,10 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<User> getMembers(Session session, long groupId) {
 		List<User> users = new ArrayList<User>();
+		Group group = new GroupController(session).getById(groupId);
+		Boolean myGroup = group.getOwner().equals(session.getUser());
 		for( User user :  new GroupController(session).getMembers(groupId) ) {
-			if( user.getRole().equals(roleStudent) || user.getRole().equals(roleGuest)) {
+			if( myGroup || user.getRole().equals(roleStudent) || user.getRole().equals(roleGuest) ) {
 				users.add(user);
 			}
 		}

@@ -248,8 +248,13 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse setDefaultPrinter(Session session, long roomId, Long printerIds) {
+	public OssResponse setDefaultPrinter(Session session, Long roomId, Long printerIds) {
 		return new RoomController(session).setDefaultPrinter(roomId, printerIds);
+	}
+
+	@Override
+	public OssResponse setDefaultPrinter(Session session, String roomName, String printerName) {
+		return new RoomController(session).setDefaultPrinter(roomName, printerName);
 	}
 
 	@Override

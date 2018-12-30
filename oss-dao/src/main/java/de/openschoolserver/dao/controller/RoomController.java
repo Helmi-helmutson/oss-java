@@ -1134,14 +1134,11 @@ public class RoomController extends Controller {
 		return rooms;
 	}
 
+
 	/*
 	 * Control of printer in this room
 	 */
-	public OssResponse setDefaultPrinter(Long roomId, Long deviceId) {
-
-		Room room = this.getById(roomId);
-		PrinterController printerController = new PrinterController(session);
-		Printer printer = printerController.getById(deviceId);
+	public OssResponse setDefaultPrinter(Room room, Printer printer) {
 		if( room.getDefaultPrinter() != null && room.getDefaultPrinter().equals(printer) ) {
 			return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
 		}
@@ -1159,6 +1156,18 @@ public class RoomController extends Controller {
 			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","The default printer of the room was set succesfully.");
+	}
+
+	public OssResponse setDefaultPrinter(Long roomId, Long deviceId) {
+		Room room = this.getById(roomId);
+		Printer printer = new PrinterController(session).getById(deviceId);
+		return this.setDefaultPrinter(room, printer);
+	}
+
+	public OssResponse setDefaultPrinter(String roomName, String printerName) {
+		Room room = this.getByName(roomName);
+		Printer printer = new PrinterController(session).getByName(printerName);
+		return this.setDefaultPrinter(room, printer);
 	}
 
 	public OssResponse deleteDefaultPrinter(long roomId) {
