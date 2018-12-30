@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
+import java.util.Random;
 import java.util.ArrayList;
 
 @SuppressWarnings( "unchecked" )
@@ -64,6 +65,32 @@ public class Controller extends Config {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String createRandomPassword()
+	{
+		String[] salt = new String[3];
+	    salt[0] = "ABCDEFGHIJKLMNOPQRSTVWXYZ";
+	    salt[1] = "1234567890";
+	    salt[2] = "abcdefghijklmnopqrstvwxyz";
+	    Random rand = new Random();
+	    StringBuilder builder = new StringBuilder();
+	    int saltIndex  = 2;
+	    int beginIndex = Math.abs(rand.nextInt() % salt[saltIndex].length());
+	    builder.append(salt[saltIndex].substring(beginIndex, beginIndex + 1));
+	    saltIndex  = 1;
+	    beginIndex = Math.abs(rand.nextInt() % salt[saltIndex].length());
+	    builder.append(salt[saltIndex].substring(beginIndex, beginIndex + 1));
+	    saltIndex  = 0;
+	    beginIndex = Math.abs(rand.nextInt() % salt[saltIndex].length());
+	    builder.append(salt[saltIndex].substring(beginIndex, beginIndex + 1));
+	    for (int i = 3; i < 8; i++)
+	    {
+	      saltIndex  = Math.abs(rand.nextInt() % 3 );
+	      beginIndex = Math.abs(rand.nextInt() % salt[saltIndex].length());
+	      builder.append(salt[saltIndex].substring(beginIndex, beginIndex + 1));
+	    }
+	    return builder.toString();
 	}
 
 	public EntityManager getEntityManager() {
