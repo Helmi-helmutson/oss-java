@@ -210,6 +210,45 @@ public interface InformationResource {
 		FAQ faq
 	);
 
+	@GET
+	@Path("announcements/{announcementId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Get an announcement by id.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@PermitAll
+	Announcement getAnnouncement(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("announcementId") Long announcementId
+	);
+
+	@GET
+	@Path("contacts/{contactId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Get a contact by id.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@PermitAll
+	Contact getContact(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("contactId") Long contactId
+	);
+
+	@GET
+	@Path("faqs/{faqId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Get a FAQ by id.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@PermitAll
+	FAQ getFAQ(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("faqId") Long faqId
+	);
+
 	@DELETE
 	@Path("announcements/{announcementId}")
 	@Produces(JSON_UTF8)

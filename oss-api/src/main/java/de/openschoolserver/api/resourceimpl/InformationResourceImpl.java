@@ -1,6 +1,7 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -106,7 +107,12 @@ public class InformationResourceImpl implements InformationResource {
 
 	@Override
 	public List<Announcement> getMyAnnouncements(Session session) {
-		return session.getUser().getMyAnnouncements();
+		List<Announcement> announcements = new ArrayList<Announcement>();
+		for( Announcement a :  session.getUser().getMyAnnouncements() ) {
+			a.setText("");
+			announcements.add(a);
+		}
+		return announcements;
 	}
 
 	@Override
@@ -116,12 +122,32 @@ public class InformationResourceImpl implements InformationResource {
 
 	@Override
 	public List<FAQ> getMyFAQs(Session session) {
-		return session.getUser().getMyFAQs();
+		List<FAQ> faqs = new ArrayList<FAQ>();
+		for( FAQ faq :  session.getUser().getMyFAQs() ) {
+			faq.setText("");
+			faqs.add(faq);
+		}
+		return faqs;
 	}
 
 	@Override
 	public List<Category> getInformationCategories(Session session) {
 		return new InformationController(session).getInfoCategories();
+	}
+
+	@Override
+	public Announcement getAnnouncement(Session session, Long announcementId) {
+		return new InformationController(session).getAnnouncementById(announcementId);
+	}
+
+	@Override
+	public Contact getContact(Session session, Long contactId) {
+		return new InformationController(session).getContactById(contactId);
+	}
+
+	@Override
+	public FAQ getFAQ(Session session, Long faqId) {
+		return new InformationController(session).getFAQById(faqId);
 	}
 
 	
