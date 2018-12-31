@@ -41,10 +41,12 @@ public class Group implements Serializable {
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="groups")
+	@JsonIgnore
 	private List<Category> categories;
 
 	//bi-directional many-to-one association to Acls
 	@OneToMany(mappedBy="group")
+	@JsonIgnore
 	private List<Acl> acls;
 
 	//bi-directional many-to-many association to User
@@ -56,6 +58,9 @@ public class Group implements Serializable {
 	@ManyToOne
 	@JsonIgnore
 	private User owner;
+
+	@Column(name="owner_id", insertable=false, updatable=false)
+	private Long ownerId;
 
 	public Group() {
 		this.id   = null;

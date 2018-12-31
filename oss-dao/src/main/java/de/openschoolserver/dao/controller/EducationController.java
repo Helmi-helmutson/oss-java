@@ -344,40 +344,41 @@ public class EducationController extends Controller {
 		return loggedOns;
 	}
 
-	public OssResponse uploadFileTo(String what,
-			long objectId,
+	public List<OssResponse> uploadFileTo(String what,
+			Long objectId,
 			List<Long> objectIds,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader,
 			boolean studentsOnly ) {
 		String fileName = contentDispositionHeader.getFileName();
 		File file = null;
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		try {
 			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
-			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+			responses.add(new OssResponse(this.getSession(),"ERROR", e.getMessage()));
+			return responses;
 		}
-		StringBuilder error = new StringBuilder();
 		switch(what) {
 		case "users":
 			UserController uc = new UserController(this.session);
 			for( Long id : objectIds) {
 				User user = uc.getById(id);
 				if( user != null ) {
-					error.append(this.saveFileToUserImport(user, file, fileName));
+					responses.add(this.saveFileToUserImport(user, file, fileName));
 				} else {
-					error.append("User does not exists.");
+					responses.add(new OssResponse(this.getSession(),"ERROR","User with id %s does not exists.",null,id.toString() ));
 				}
 			}
 			break;
 		case "user":
 			User user = new UserController(this.session).getById(objectId);
 			if( user != null ) {
-				error.append(this.saveFileToUserImport(user, file, fileName));
+				responses.add(this.saveFileToUserImport(user, file, fileName));
 			} else {
-				error.append("User does not exists.");
+				responses.add(new OssResponse(this.getSession(),"ERROR","User with id %s does not exists.",null,objectId.toString() ));
 			}
 			break;
 		case "group":
@@ -386,21 +387,21 @@ public class EducationController extends Controller {
 				for( User myUser : group.getUsers() ) {
 					if( !this.session.getUser().equals(myUser) &&
 						( !studentsOnly  || myUser.getRole().equals(roleStudent) || myUser.getRole().equals(roleGuest) )) {
-						error.append(this.saveFileToUserImport(myUser, file, fileName));
+						responses.add(this.saveFileToUserImport(myUser, file, fileName));
 					}
 				}
 			} else {
-				error.append("Group does not exists.");
+				responses.add(new OssResponse(this.getSession(),"ERROR","Group with id %s does not exists.",null,objectId.toString() ));
 			}
 			break;
 		case "device":
 			Device device = new DeviceController(this.session).getById(objectId);
 			if( device != null ) {
 				for( User myUser : device.getLoggedIn() ) {
-					error.append(this.saveFileToUserImport(myUser, file, fileName));
+					responses.add(this.saveFileToUserImport(myUser, file, fileName));
 				}
 			} else {
-				error.append("Device does not exists.");
+				responses.add(new OssResponse(this.getSession(),"ERROR","Device with id %s does not exists.",null,objectId.toString() ));
 			}
 			break;
 		case "room":
@@ -416,18 +417,18 @@ public class EducationController extends Controller {
 					}
 				}
 				if( myUser != null ) {
-					error.append(this.saveFileToUserImport(myUser, file, fileName));
+					responses.add(this.saveFileToUserImport(myUser, file, fileName));
 				}
 			}
 		}
 		file.delete();
-		return new OssResponse(this.getSession(),"OK", "File was copied succesfully.");
+		return responses;
 	}
 
-	public String saveFileToUserImport(User user, File file, String fileName) {
+	public OssResponse saveFileToUserImport(User user, File file, String fileName) {
 		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
 		if( user == null ) {
-			return "No user defined.";
+			return new OssResponse(this.getSession(),"ERROR","No user defined.");
 		} else {
 			logger.debug("File " + fileName + " saved to " + user.getUid());
 		}
@@ -460,9 +461,12 @@ public class EducationController extends Controller {
 			}
 		} catch (IOException e) {
 			logger.error(e.getMessage());
-			return e.getMessage() + System.lineSeparator();
+			return new OssResponse(this.getSession(),"ERROR","User:"+ user.getUid() + " File:" +fileName + " " +e.getMessage());
 		}
-		return "";
+		List<String> parameters = new ArrayList<String>();
+		parameters.add(fileName);
+		parameters.add(user.getUid());
+		return new OssResponse(this.getSession(),"File; %s successfully saved to user: %s",null,parameters);
 	}
 
 

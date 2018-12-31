@@ -669,7 +669,7 @@ public class UserController extends Controller {
 				"The files from the export directories of selected users were collected.");
 	}
 
-	public OssResponse collectFileFromUser(User user, String project, boolean cleanUpExport, boolean sortInDirs) {
+	public OssResponse collectFileFromUser(User user, String project, boolean sortInDirs, boolean cleanUpExport) {
 		String[] program = new String[11];
 		StringBuffer reply = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
@@ -694,7 +694,14 @@ public class UserController extends Controller {
 		}
 		OSSShellTools.exec(program, reply, stderr, null);
 		if (stderr.toString().isEmpty()) {
-			logger.debug("Collected project " + project + " from " + user.getUid());
+			if(logger.isDebugEnabled()) {
+				StringBuilder st = new StringBuilder();
+				for ( int faktor = 0; faktor < program.length; faktor ++ ) {
+					st.append(program[faktor]).append(" ");
+				}
+				logger.debug("Collect Program:" + st.toString());
+				logger.debug("Collected project " + project + " from " + user.getUid());
+			}
 			return new OssResponse(this.getSession(), "OK", "File was collected from: %s", null, user.getUid());
 		}
 		logger.error("Can not collect project " + project + " from " + user.getUid() + stderr.toString());

@@ -473,7 +473,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    OssResponse uploadFileToRoom(@ApiParam(hidden = true) @Auth Session session,
+    List<OssResponse> uploadFileToRoom(@ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
@@ -487,7 +487,7 @@ public interface EducationResource {
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    OssResponse collectFileFromRoom(@ApiParam(hidden = true) @Auth Session session,
+    List<OssResponse> collectFileFromRoom(@ApiParam(hidden = true) @Auth Session session,
             @PathParam("roomId") Long roomId,
             @FormDataParam("projectName") String projectName,
             @FormDataParam("sortInDirs")  boolean sortInDirs,
@@ -710,7 +710,7 @@ public interface EducationResource {
      @ApiResponses(value = {
                  @ApiResponse(code = 500, message = "Server broken, please contact administrator")
      })
-     OssResponse uploadFileToGroup(@ApiParam(hidden = true) @Auth Session session,
+     List<OssResponse> uploadFileToGroup(@ApiParam(hidden = true) @Auth Session session,
              @PathParam("groupId")  Long  groupId,
              @FormDataParam("studentsOnly") boolean studentsOnly,
              @FormDataParam("file") final InputStream fileInputStream,
@@ -726,7 +726,7 @@ public interface EducationResource {
                  @ApiResponse(code = 500, message = "Server broken, please contact administrator")
      })
      @RolesAllowed("education.groups")
-     OssResponse collectFileFromGroup(@ApiParam(hidden = true) @Auth Session session,
+     List<OssResponse> collectFileFromGroup(@ApiParam(hidden = true) @Auth Session session,
              @PathParam("groupId") Long roomId,
              @FormDataParam("projectName") String projectName,
              @FormDataParam("sortInDirs")  boolean sortInDirs,
@@ -827,7 +827,7 @@ public interface EducationResource {
     @Path("users/{userId}/upload")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Puts data to te member of the smart rooms" )
+    @ApiOperation( value = "Puts data to the member of the smart rooms" )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
@@ -842,15 +842,30 @@ public interface EducationResource {
     @Path("users/upload")
     @Produces(JSON_UTF8)
     @Consumes(MediaType.MULTIPART_FORM_DATA)
-    @ApiOperation( value = "Puts data to te member of the smart rooms" )
+    @ApiOperation( value = "Puts data to selected users." )
     @ApiResponses(value = {
                 @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
     @RolesAllowed("education.users")
-    OssResponse uploadFileToUsers(@ApiParam(hidden = true) @Auth Session session,
+    List<OssResponse> uploadFileToUsers(@ApiParam(hidden = true) @Auth Session session,
             @FormDataParam("file") final InputStream fileInputStream,
             @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader,
             @FormDataParam("userIds") final String userIds
+            );
+
+    @POST
+    @Path("users/collect")
+    @Produces(JSON_UTF8)
+    @ApiOperation( value = "Collect file from selected users" )
+    @ApiResponses(value = {
+                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("education.users")
+    List<OssResponse> collectFileFromUsers(@ApiParam(hidden = true) @Auth Session session,
+		@FormDataParam("projectName") String projectName,
+		@FormDataParam("sortInDirs")  boolean sortInDirs,
+		@FormDataParam("cleanUpExport") boolean cleanUpExport,
+		@FormDataParam("userIds") final String userIds
             );
 
     @POST
@@ -1026,20 +1041,6 @@ public interface EducationResource {
     OssResponse collectFileFromDevice(
         @ApiParam(hidden = true) @Auth Session session,
         @PathParam("deviceId") Long deviceId,
-        @PathParam("projectName") String projectName
-    );
-
-    @GET
-    @Path("rooms/{roomId}/collect/{projectName}")
-    @Produces(JSON_UTF8)
-    @ApiOperation( value = "Collects data from a users logged on the corresponding room." )
-    @ApiResponses(value = {
-                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @RolesAllowed("education.rooms")
-    OssResponse collectFileFromRoom(
-        @ApiParam(hidden = true) @Auth Session session,
-        @PathParam("roomId") Long roomId,
         @PathParam("projectName") String projectName
     );
 

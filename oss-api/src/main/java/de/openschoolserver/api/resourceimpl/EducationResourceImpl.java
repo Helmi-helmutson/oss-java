@@ -176,7 +176,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse uploadFileToRoom(Session session, Long roomId, InputStream fileInputStream,
+	public List<OssResponse> uploadFileToRoom(Session session, Long roomId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		return new EducationController(session).uploadFileTo("room",roomId,null,fileInputStream,contentDispositionHeader,false);
 	}
@@ -184,18 +184,17 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public OssResponse uploadFileToUser(Session session, Long userId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("user",userId,null,fileInputStream,contentDispositionHeader,false);
+		return new EducationController(session).uploadFileTo("user",userId,null,fileInputStream,contentDispositionHeader,false).get(0);
 	}
 
 	@Override
 	public OssResponse uploadFileToDevice(Session session, Long deviceId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session).uploadFileTo("device",deviceId,null,fileInputStream,contentDispositionHeader,false);
-
+		return new EducationController(session).uploadFileTo("device",deviceId,null,fileInputStream,contentDispositionHeader,false).get(0);
 	}
 
 	@Override
-	public OssResponse uploadFileToGroup(Session session,
+	public List<OssResponse> uploadFileToGroup(Session session,
 			Long groupId,
 			boolean studentsOnly,
 			InputStream fileInputStream,
@@ -204,7 +203,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse uploadFileToUsers(Session session, InputStream fileInputStream,
+	public List<OssResponse> uploadFileToUsers(Session session, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader, String sUserIds) {
 		List<Long> userIds = new ArrayList<Long>();
 		for( String id : sUserIds.split(",")) {
@@ -213,6 +212,21 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		logger.debug("uploadFileToUsers: " + sUserIds + " " + userIds);
 		return new EducationController(session).uploadFileTo("users",0l,userIds,fileInputStream,contentDispositionHeader,false);
 	}
+
+	@Override
+	public List<OssResponse> collectFileFromUsers(Session session, String projectName, boolean sortInDirs,
+			boolean cleanUpExport, String userIds) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
+		UserController userController = new UserController(session);
+		for( String id : userIds.split(",")) {
+			User user = userController.getById(Long.valueOf(id));
+			if( user != null ) {
+				responses.add(userController.collectFileFromUser(user, projectName,  sortInDirs, cleanUpExport));
+			}
+		}
+		return responses;
+	}
+
 	@Override
 	public OssResponse getRoomControl(Session session, Long roomId, Long minutes) {
 		return new EducationController(session).getRoomControl(roomId,minutes);
@@ -320,20 +334,10 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse collectFileFromRoom(Session session, Long roomId, String projectName) {
-		UserController userController = new UserController(session);
-		List<User> users = new ArrayList<User>();
-		for( List<Long> logged : new EducationController(session).getRoom(roomId) ) {
-				users.add(userController.getById(logged.get(0)));
-		}
-		return new UserController(session).collectFile(users, projectName);
-	}
-
-	@Override
-	public OssResponse collectFileFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs, boolean cleanUpExport) {
+	public List<OssResponse> collectFileFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs, boolean cleanUpExport) {
 		UserController userController     = new UserController(session);
 		DeviceController deviceController = new DeviceController(session);
-		StringBuilder result   = new StringBuilder();
+		List<OssResponse> responses       = new ArrayList<OssResponse>();
 		for( List<Long> logged : new EducationController(session).getRoom(roomId) ) {
 			User   user   = userController.getById(logged.get(0));
 			Device device =  deviceController.getById(logged.get(1));
@@ -341,20 +345,15 @@ public class EducationResourceImpl implements Resource, EducationResource {
 				user = userController.getByUid(device.getName());
 			}
 			if( user != null ) {
-				OssResponse ossResult = userController.collectFileFromUser(user,projectName,sortInDirs,cleanUpExport);
-				if( ossResult.getCode().equals("OK")) {
-					result.append("OK: ").append(user.getUid()).append(" (").append(user.getSurName()).append(", ").append(user.getGivenName()).append(")OK").append(userController.getNl());
-				} else {
-					result.append("ERROR: ").append(user.getUid()).append(" (").append(user.getSurName()).append(", ").append(user.getGivenName()).append(")").append(userController.getNl());
-				}
+				responses.add(userController.collectFileFromUser(user,projectName,sortInDirs,cleanUpExport));
 			}
 		}
-		return new  OssResponse(session,"OK", result.toString());
+		return responses;
 
 	}
 
 	@Override
-	public OssResponse collectFileFromGroup(Session session,
+	public List<OssResponse> collectFileFromGroup(Session session,
 			Long groupId,
 			String projectName,
 			boolean sortInDirs,
@@ -362,18 +361,18 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			boolean studentsOnly
 			) {
 		UserController userController = new UserController(session);
-		Group group        = new GroupController(session).getById(groupId);
+		Group          group          = new GroupController(session).getById(groupId);
+		List<OssResponse> responses   = new ArrayList<OssResponse>();
 		for( User user : group.getUsers() ) {
 			if( !studentsOnly ||  user.getRole().equals(roleStudent) || user.getRole().equals(roleGuest)) {
 				if( user.getRole().equals(roleTeacher) ) {
-					userController.collectFileFromUser(user, projectName, false, sortInDirs);
+					responses.add(userController.collectFileFromUser(user, projectName, sortInDirs, false));
 				} else {
-					userController.collectFileFromUser(user, projectName, cleanUpExport, sortInDirs);
+					responses.add(userController.collectFileFromUser(user, projectName, sortInDirs, cleanUpExport));
 				}
 			}
 		}
-		return new OssResponse(session, "OK",
-				"The files from the export directories of selected users were collected.");
+		return responses;
 	}
 
 	@Override
@@ -610,7 +609,4 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		// TODO Auto-generated method stub
 		return null;
 	}
-
-
-
 }
