@@ -409,15 +409,27 @@ public class GroupController extends Controller {
 		EntityManager em = getEntityManager();
 		Group group = em.find(Group.class, groupId);
 		User  user  = em.find(User.class, userId);
+		if( group == null ) {
+			return new OssResponse(this.getSession(),"ERROR","Group %s was not found.",null,String.valueOf(groupId));
+		}
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR","User %s was not found.",null,String.valueOf(userId));
+		}
 		return this.addMember(group, user);
 	}
 
 	public OssResponse addMember(String groupName, String uid) {
-		Long groupId = this.getByName(groupName).getId();
-		Long userId  = new UserController(session).getByUid(uid).getId();
+		Group group = this.getByName(groupName);
+		User  user  = new UserController(session).getByUid(uid);
+		if( group == null ) {
+			return new OssResponse(this.getSession(),"ERROR","Group %s was not found.",null,groupName);
+		}
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR","User %s was not found.",null,uid);
+		}
 		EntityManager em = getEntityManager();
-		Group group = em.find(Group.class, groupId);
-		User  user  = em.find(User.class, userId);
+		group = em.find(Group.class, group.getId());
+		user  = em.find(User.class,  user.getId());
 		return this.addMember(group, user);
 	}
 
