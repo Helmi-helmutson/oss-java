@@ -185,4 +185,12 @@ public class Group implements Serializable {
 	public void setOwner(User owner) {
 		this.owner = owner;
 	}
+
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
+	}
 }
