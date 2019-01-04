@@ -18,21 +18,21 @@ import java.util.List;
 @Entity
 @Table(name="Rooms")
 @NamedQueries ({
-	@NamedQuery(name="Room.findAll",        query="SELECT r    FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomType != 'adHocAccess'"),
-	@NamedQuery(name="Room.findAllId",      query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomType != 'adHocAccess'"),
-	@NamedQuery(name="Room.findAllWithControl",query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomControl != 'no'"),
-	@NamedQuery(name="Room.findAllWithTeacherControl",query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomControl != 'no' AND r.roomControl != 'sysadminsOnly'"),
-	@NamedQuery(name="Room.findAllWithFirewallControl", query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom'"),
-	@NamedQuery(name="Room.findAllToUse",   query="SELECT r    FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP' AND r.roomType != 'ANON_DHCP' AND r.roomType != 'adHocAccess'"),
-	@NamedQuery(name="Room.findAllToUseId", query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP' AND r.roomType != 'ANON_DHCP' AND r.roomType != 'adHocAccess'"),
-	@NamedQuery(name="Room.findAllToRegister", query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP' AND r.roomType != 'ANON_DHCP' AND r.roomType != 'adHocAccess'"),
-	@NamedQuery(name="Room.getByName", query="SELECT r FROM Room r WHERE r.name = :name"),
-	@NamedQuery(name="Room.getByDescription", query="SELECT r FROM Room r WHERE r.description = :description"),
-	@NamedQuery(name="Room.getByType", query="SELECT r FROM Room r WHERE r.roomType = :type"),
-	@NamedQuery(name="Room.getByControl", query="SELECT r FROM Room r WHERE r.roomControl = :control"),
-	@NamedQuery(name="Room.getByIp", query="SELECT r FROM Room r WHERE r.startIP = :ip"),
-	@NamedQuery(name="Room.search", query="SELECT r FROM Room r WHERE r.name LIKE :search OR r.description LIKE :search OR r.roomType LIKE :search AND r.roomType != 'smartRoom'"),
-	@NamedQuery(name="Room.getDeviceCount", query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id")
+	@NamedQuery(name="Room.findAll",                   query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomType != 'adHocAccess'"),
+	@NamedQuery(name="Room.findAllWithControl",        query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomControl != 'no'"),
+	@NamedQuery(name="Room.findAllWithTeacherControl", query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomControl != 'no' AND r.roomControl != 'sysadminsOnly'"),
+	@NamedQuery(name="Room.findAllWithFirewallControl",query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom'"),
+	@NamedQuery(name="Room.findAllToUse",              query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP' AND r.roomType != 'ANON_DHCP'"),
+	@NamedQuery(name="Room.findAllToRegister",         query="SELECT r FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP' AND r.roomType != 'ANON_DHCP'"),
+	@NamedQuery(name="Room.getByName",                 query="SELECT r FROM Room r WHERE r.name = :name"),
+	@NamedQuery(name="Room.getByDescription",          query="SELECT r FROM Room r WHERE r.description = :description"),
+	@NamedQuery(name="Room.getByType",                 query="SELECT r FROM Room r WHERE r.roomType = :type"),
+	@NamedQuery(name="Room.getByControl",              query="SELECT r FROM Room r WHERE r.roomControl = :control"),
+	@NamedQuery(name="Room.getByIp",                   query="SELECT r FROM Room r WHERE r.startIP = :ip"),
+	@NamedQuery(name="Room.search",                    query="SELECT r FROM Room r WHERE r.name LIKE :search OR r.description LIKE :search OR r.roomType LIKE :search AND r.roomType != 'smartRoom'"),
+	@NamedQuery(name="Room.findAllId",                 query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom' AND r.roomType != 'adHocAccess'"),
+	@NamedQuery(name="Room.findAllToUseId",            query="SELECT r.id FROM Room r WHERE r.roomType != 'smartRoom' AND r.name != 'ANON_DHCP' AND r.roomType != 'ANON_DHCP'"),
+	@NamedQuery(name="Room.getDeviceCount",            query="SELECT COUNT( d ) FROM  Device d WHERE d.room.id = :id")
 })
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Room implements Serializable {
@@ -63,7 +63,7 @@ public class Room implements Serializable {
 
 	private String roomControl;
 
-    //bi-directional many-to-many association to Category
+	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="rooms")
 	@JsonIgnore
 	private List<Category> categories = new ArrayList<Category>();
@@ -86,20 +86,20 @@ public class Room implements Serializable {
 	//bi-directional many-to-many association to Device
 	@ManyToMany( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
-			name="AvailablePrinters",
-			joinColumns={ @JoinColumn(name="room_id") },
-			inverseJoinColumns={@JoinColumn(name="printer_id")}
-			)
+		name="AvailablePrinters",
+		joinColumns={ @JoinColumn(name="room_id") },
+		inverseJoinColumns={@JoinColumn(name="printer_id")}
+		)
 	@JsonIgnore
 	private List<Printer> availablePrinters = new ArrayList<Printer>();
 
 	//bi-directional many-to-one association to Device
 	@ManyToOne( cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH} )
 	@JoinTable(
-			name="DefaultPrinter",
-			joinColumns={ @JoinColumn(name="room_id") },
-			inverseJoinColumns={ @JoinColumn(name="printer_id") }
-			)
+		name="DefaultPrinter",
+		joinColumns={ @JoinColumn(name="room_id") },
+		inverseJoinColumns={ @JoinColumn(name="printer_id") }
+		)
 	@JsonIgnore
 	private Printer defaultPrinter;
 
@@ -132,7 +132,7 @@ public class Room implements Serializable {
 	public Room() {
 		this.network           = "";
 		this.roomControl       = "inRoom";
-		this.roomType		   = "ComputerRoom";
+		this.roomType	       = "ComputerRoom";
 		this.startIP           = "";
 		this.categories        = new ArrayList<Category>();
 		this.accessInRooms     = new ArrayList<AccessInRoom>();
@@ -327,14 +327,12 @@ public class Room implements Serializable {
 	public Test addTest(Test test) {
 		getTests().add(test);
 		test.setRoom(this);
-
 		return test;
 	}
 
 	public Test removeTest(Test test) {
 		getTests().remove(test);
 		test.setRoom(null);
-
 		return test;
 	}
 
@@ -385,5 +383,4 @@ public class Room implements Serializable {
 	public void setSessions(List<Session> sessions) {
 		this.sessions = sessions;
 	}
-
 }
