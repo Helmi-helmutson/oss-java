@@ -63,7 +63,12 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public List<Room> getRooms(Session session) {
-		return new RoomController(session).getByType("AdHocAccess");
+		RoomController roomController = new RoomController(session);
+		if( roomController.isSuperuser() ) {
+			return roomController.getByType("AdHocAccess");
+		} else {
+			return roomController.getAllToRegister();
+		}
 	}
 
 	@Override
