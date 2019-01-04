@@ -183,6 +183,9 @@ public class SystemController extends Controller {
 			count = query.getResultList().size();
 			statusMap.put(roomType,count.toString());
 		}
+		query = em.createNamedQuery("Room.getByType").setParameter("type","adHocAccess");
+		count = query.getResultList().size();
+		statusMap.put("adHocAccess",count.toString());
 		statusList.add(statusMap);
 
 		//Devices
