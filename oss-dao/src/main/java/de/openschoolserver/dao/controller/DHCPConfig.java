@@ -107,12 +107,11 @@ public class DHCPConfig extends Controller {
 
 	private void Write(Path path) {
 		EntityManager em = getEntityManager();
-		Query query = em.createNamedQuery("Room.findAll");
+		Query query = em.createNamedQuery("Room.findAllToRegister");
 		saltGroupFile.add("nodegroups:");
 		for( Room room : (List<Room>) query.getResultList() ) {
-			Query subQuery = em.createNamedQuery("Room.getDeviceCount");
-			subQuery.setParameter("id", room.getId());
-			if( (Long) subQuery.getSingleResult() < 1) {
+			logger.debug("Write DHCP Room" + room.getName());
+			if( room.getDevices().isEmpty() ) {
 				continue;
 			}
 			dhcpConfigFile.add("group {");
@@ -152,6 +151,7 @@ public class DHCPConfig extends Controller {
 		List<String> line = new ArrayList<String>();
 		for( Device device : room.getDevices() ){
 			//Do not create configuration for devices without mac adress.
+			logger.debug("Write DHCP Device" + device.getName());
 			if( device.getMac().isEmpty() ) {
 				continue;
 			}
