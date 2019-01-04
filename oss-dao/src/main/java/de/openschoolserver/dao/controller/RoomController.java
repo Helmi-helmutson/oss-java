@@ -533,8 +533,7 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Room.findAll");
 		for( Room room : (List<Room>) query.getResultList() ) {
-			if( !subNetwork.contains(room.getStartIP()) ||
-					room.getId() < 3L ) {
+			if( !subNetwork.contains(room.getStartIP()) || room.getId() < 3L ) {
 				continue;
 			}
 			startIPAddresses.add(room.getStartIP());

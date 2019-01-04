@@ -194,12 +194,12 @@ public class SystemController extends Controller {
 		statusMap.put("non_typed","0");
 		DeviceController deviceController = new DeviceController(this.session);
 		for( Device device: deviceController.getAll() ){
-		String deviceType = "non_typed";
-		if( device.getHwconf() != null ) {
-			deviceType = device.getHwconf().getDeviceType();
-		}
-		Integer i = Integer.decode(statusMap.get(deviceType)) + 1 ;
-		statusMap.put(deviceType,String.valueOf(i));
+			String deviceType = "non_typed";
+			if( device.getHwconf() != null ) {
+				deviceType = device.getHwconf().getDeviceType();
+			}
+			Integer i = Integer.decode(statusMap.get(deviceType)) + 1 ;
+			statusMap.put(deviceType,String.valueOf(i));
 		}
 		statusList.add(statusMap);
 
