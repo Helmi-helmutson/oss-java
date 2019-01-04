@@ -260,7 +260,7 @@ public class RoomController extends Controller {
 		EntityManager em = getEntityManager();
 		try {
 			if( this.isSuperuser() ) {
-				logger.debug("Is suberuser" + this.session.getUser().getUid());
+				logger.debug("Is superuser" + this.session.getUser().getUid());
 				Query query = em.createNamedQuery("Room.findAllToRegister");
 				return query.getResultList();
 			} else {
