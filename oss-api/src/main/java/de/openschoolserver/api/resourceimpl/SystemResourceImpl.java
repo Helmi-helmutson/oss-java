@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -374,5 +372,45 @@ public class SystemResourceImpl implements SystemResource {
 		ResponseBuilder response = Response.ok((Object) file);
 		response.header("Content-Disposition","attachment; filename=\""+ file.getName() + "\"");
 		return response.build();
+	}
+
+	@Override
+	public Object getServicesStatus(Session session) {
+		String[] program    = new String[1];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/share/oss/tools/check_services.sh";
+		OSSShellTools.exec(program, reply, stderr, null);
+		return reply.toString();
+	}
+
+	@Override
+	public OssResponse setServicesStatus(Session session, String name, String what, String value) {
+		String[] program    = new String[3];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/bin/systemctl";
+		program[2] = name;
+		if( what.equals("enabled") ) {
+			if( value.toLowerCase().equals("true")) {
+				program[1] = "enable";
+			} else {
+				program[1] = "disable";
+			}
+		} else {
+			if( value.toLowerCase().equals("true")) {
+				program[1] = "start";
+			} else if(value.toLowerCase().equals("false") ) {
+				program[1] = "stop";
+			} else {
+				program[1] = "restart";
+			}
+		}
+		logger.debug(program[0] + " " + program[1] + " " + program[2]);
+		if( OSSShellTools.exec(program, reply, stderr, null) == 0 ) {
+			return new OssResponse(session,"OK","Service state was set successfully.");
+		} else {
+			return new OssResponse(session,"ERROR",stderr.toString());
+		}
 	}
 }
