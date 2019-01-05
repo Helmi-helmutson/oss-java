@@ -427,11 +427,14 @@ public class EducationController extends Controller {
 
 	public OssResponse saveFileToUserImport(User user, File file, String fileName) {
 		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
+		List<String> parameters = new ArrayList<String>();
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR","No user defined.");
 		} else {
 			logger.debug("File " + fileName + " saved to " + user.getUid());
 		}
+		parameters.add(fileName);
+		parameters.add(user.getUid());
 		try {
 			StringBuilder newFileName = new StringBuilder(this.getConfigValue("HOME_BASE"));
 			newFileName.append("/").append(user.getRole()).append("/").append(user.getUid()).append("/") .append("Import").append("/");
@@ -459,14 +462,12 @@ public class EducationController extends Controller {
 			for( String mist : exportDir.list() ) {
 				new File(mist).delete();
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new OssResponse(this.getSession(),"ERROR","User:"+ user.getUid() + " File:" +fileName + " " +e.getMessage());
+			parameters.add(e.getMessage());
+			return new OssResponse(this.getSession(),"ERROR","File %s could not be saved to user: %s: %s",null,parameters);
 		}
-		List<String> parameters = new ArrayList<String>();
-		parameters.add(fileName);
-		parameters.add(user.getUid());
-		return new OssResponse(this.getSession(),"File; %s successfully saved to user: %s",null,parameters);
+		return new OssResponse(this.getSession(),"OK","File '%s' successfully saved to user '%s'.",null,parameters);
 	}
 
 

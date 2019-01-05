@@ -723,8 +723,9 @@ public class UserController extends Controller {
 		return new OssResponse(this.getSession(), "OK", "The selected users were enabled.");
 	}
 
-	/*
-	 * GuestUsers
+	/**
+	 * Get the list of created guest users categories
+	 * @return The list of the guest users categories
 	 */
 	public List<Category> getGuestUsers() {
 		final CategoryController categoryController = new CategoryController(this.session);
@@ -740,10 +741,20 @@ public class UserController extends Controller {
 		return categories;
 	}
 
+	/**
+	 * Gets a guest user category by id.
+	 * @param guestUsersId The technical id of the category.
+	 * @return The list of the guest users.
+	 */
 	public Category getGuestUsersCategory(Long guestUsersId) {
 		return new CategoryController(this.session).getById(guestUsersId);
 	}
 
+	/**
+	 * Delete a guest user category. Only the guest members will be deleted.
+	 * @param guestUsersId The technical id of the category.
+	 * @return The result as an OssResponse
+	 */
 	public OssResponse deleteGuestUsers(Long guestUsersId) {
 		final CategoryController categoryController = new CategoryController(this.session);
 		final GroupController groupController = new GroupController(this.session);

@@ -203,6 +203,23 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
+	public List<OssResponse> uploadFileToGroups(Session session,
+			String groupIds,
+			boolean studentsOnly,
+			InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
+		EducationController ec = new EducationController(session);
+		for(String sgroupId : groupIds.split(",")) {
+			Long groupId = Long.valueOf(sgroupId);
+			if( groupId != null ) {
+				responses.addAll(ec.uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly));
+			}
+		}
+		return responses;
+	}
+
+	@Override
 	public List<OssResponse> uploadFileToUsers(Session session, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader, String sUserIds) {
 		List<Long> userIds = new ArrayList<Long>();
@@ -370,6 +387,23 @@ public class EducationResourceImpl implements Resource, EducationResource {
 				} else {
 					responses.add(userController.collectFileFromUser(user, projectName, sortInDirs, cleanUpExport));
 				}
+			}
+		}
+		return responses;
+	}
+	@Override
+	public List<OssResponse> collectFileFromGroups(Session session,
+			String groupIds,
+			String projectName,
+			boolean sortInDirs,
+			boolean cleanUpExport,
+			boolean studentsOnly
+			) {
+		List<OssResponse> responses   = new ArrayList<OssResponse>();
+		for(String sgroupId : groupIds.split(",")) {
+			Long groupId = Long.valueOf(sgroupId);
+			if(groupId != null ) {
+				responses.addAll(collectFileFromGroup(session,Long.valueOf(sgroupId),projectName,sortInDirs,cleanUpExport,studentsOnly));
 			}
 		}
 		return responses;
