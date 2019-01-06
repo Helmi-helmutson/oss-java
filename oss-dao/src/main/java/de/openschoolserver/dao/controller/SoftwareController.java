@@ -1,4 +1,4 @@
- /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+ /* (c) Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
@@ -604,6 +604,7 @@ public class SoftwareController extends Controller {
 				software = new HashMap<String,String>();
 				software.put("name", node.getAttributeValue("name").substring(8));
 				/*software.put("description", node.getAttributeValue("kind"));*/
+				software.put("version-old", node.getAttributeValue("edition-old"));
 				software.put("version", node.getAttributeValue("edition"));
 				softwares.add(software);
 			}
@@ -688,38 +689,55 @@ public class SoftwareController extends Controller {
 	/*
 	 * Functions to deliver installation status
 	 */
-	public Map<String, String> statistic() {
+	public List<Map<String, String>> statistic() {
+		List<Map<String, String>> softwareStatusList = new ArrayList<Map<String, String>>();
 		Map<String,String> statusMap = new HashMap<>();
-		statusMap.put("name","software");
 		EntityManager em = getEntityManager();
         Query query;
         Integer count;
 
         query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","I");
         count = query.getResultList().size();
-        statusMap.put("Installed", count.toString());
+        statusMap.put("name", "Installed");
+        statusMap.put("count", count.toString());
+        softwareStatusList.add(statusMap);
 
         query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","IS");
         count = query.getResultList().size();
-        statusMap.put("Installation scheduled", count.toString());
+        statusMap = new HashMap<>();
+        statusMap.put("name", "Installation Scheduled");
+        statusMap.put("count", count.toString());
+        softwareStatusList.add(statusMap);
 
         query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","IF");
         count = query.getResultList().size();
-        statusMap.put("Installation failed", count.toString());
+        statusMap = new HashMap<>();
+        statusMap.put("name", "Installation Failed");
+        statusMap.put("count", count.toString());
+        softwareStatusList.add(statusMap);
 
         query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","MI");
         count = query.getResultList().size();
-        statusMap.put("Installed manually", count.toString());
+        statusMap = new HashMap<>();
+        statusMap.put("name", "Manually Installed");
+        statusMap.put("count", count.toString());
+        softwareStatusList.add(statusMap);
 
         query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","DM");
         count = query.getResultList().size();
-        statusMap.put("Deinstalled manually", count.toString());
+        statusMap = new HashMap<>();
+        statusMap.put("name", "Manually Deinstalled");
+        statusMap.put("count", count.toString());
+        softwareStatusList.add(statusMap);
 
         query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","LM");
         count = query.getResultList().size();
-        statusMap.put("License missing", count.toString());
+        statusMap = new HashMap<>();
+        statusMap.put("name", "Licence Missing");
+        statusMap.put("count", count.toString());
+        softwareStatusList.add(statusMap);
 
-        return statusMap;
+        return softwareStatusList;
 	}
 
 	/**

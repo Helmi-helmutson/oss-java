@@ -1,5 +1,4 @@
 /* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
-/* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.*;
@@ -67,7 +66,23 @@ public interface SystemResource {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("system.status")
-	List<Map<String, String>> getStatus(
+	Object getStatus(
+	    @ApiParam(hidden = true) @Auth Session session
+	);
+
+	@GET
+	@Path("diskStatus")
+	@Produces(JSON_UTF8)
+	@ApiOperation(
+		value = "Gets the status of the disk(s) in system.",
+		notes = "The format of the response:<br>" +
+			"{\"Device Name\":{\"size\":Size in MB,\"used\":Used amount in MB,\"mount\":\"Mount point\"},"
+		)
+	@ApiResponses(value = {
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("system.status")
+	Object getDiskStatus(
 	    @ApiParam(hidden = true) @Auth Session session
 	);
 

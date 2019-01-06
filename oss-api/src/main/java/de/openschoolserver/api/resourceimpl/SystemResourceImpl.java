@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.File;
@@ -40,9 +40,19 @@ public class SystemResourceImpl implements SystemResource {
 	Logger logger = LoggerFactory.getLogger(SystemResourceImpl.class);
 
 	@Override
-	public List<Map<String, String>> getStatus(Session session) {
+	public Object getStatus(Session session) {
 		SystemController systemController = new SystemController(session);
 		return systemController.getStatus();
+	}
+
+	@Override
+	public Object getDiskStatus(Session session) {
+		String[] program    = new String[1];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/share/oss/tools/check_partitions.sh";
+		OSSShellTools.exec(program, reply, stderr, null);
+		return reply.toString();
 	}
 
 	@Override

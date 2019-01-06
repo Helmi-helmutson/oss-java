@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
 import de.openschoolserver.dao.tools.OSSShellTools;
@@ -7,6 +7,7 @@ import org.apache.http.client.fluent.*;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.filter.ElementFilter;
 import org.jdom.input.SAXBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,7 @@ import javax.ws.rs.WebApplicationException;
 import de.openschoolserver.dao.*;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -122,7 +124,7 @@ public class SystemController extends Controller {
 	/**
 	 * Delivers a list of the status of the system
 	 *
-	 * @return		List of status hashes:
+	 * @return		Hash of status lists:
 	 *			[
 	 *				{
 	 *					"name"			: "groups"
@@ -140,10 +142,11 @@ public class SystemController extends Controller {
 	 *			]
 	 *
 	 */
-	public List<Map<String, String>> getStatus() {
+	public Map<String, List<Map<String, String>>> getStatus() {
 		//Initialize of some variable
-		List<Map<String, String>> statusList = new ArrayList<>();
+		Map<String, List<Map<String, String>>> systemStatus = new HashMap<>();
 		EntityManager em = getEntityManager();
+		List<Map<String,String>> statusMapList; 
 		Map<String,String> statusMap;
 		Query query;
 		Integer count;
@@ -151,66 +154,74 @@ public class SystemController extends Controller {
 		//TODO System Load, HD, License, ....
 
 		//Groups;
-		statusMap = new HashMap<>();
-		statusMap.put("name","groups");
+		statusMapList = new ArrayList<Map<String,String>>();
 		for( String groupType : this.getEnumerates("groupType")) {
 			query = em.createNamedQuery("Group.getByType").setParameter("groupType",groupType);
 			count = query.getResultList().size();
-			statusMap.put(groupType,count.toString());
+			statusMap = new HashMap<>();
+			statusMap.put("name", groupType);
+			statusMap.put("count",count.toString());
+			statusMapList.add(statusMap);
 		}
-		statusList.add(statusMap);
+		systemStatus.put("groups", statusMapList);
 
 		//Users
-		statusMap = new HashMap<>();
-		statusMap.put("name","users");
+		statusMapList = new ArrayList<Map<String,String>>();
 		for( String role : this.getEnumerates("role")) {
 			query = em.createNamedQuery("User.getByRole").setParameter("role",role);
 			count = query.getResultList().size();
-			statusMap.put(role,count.toString());
 			Integer loggedOn = 0;
 			for( User u : (List<User>) query.getResultList() ) {
 				loggedOn += u.getLoggedOn().size();
 			}
-			statusMap.put(role + "-loggedOn", loggedOn.toString());
+			statusMap = new HashMap<>();
+			statusMap.put("name", role);
+			statusMap.put("count",count.toString());
+			statusMap.put("loggedOn",loggedOn.toString());
+			statusMapList.add(statusMap);
+			
 		}
-		statusList.add(statusMap);
+		systemStatus.put("users", statusMapList);
 
 		//Rooms
-		statusMap = new HashMap<>();
-		statusMap.put("name","rooms");
+		statusMapList = new ArrayList<Map<String,String>>();
 		for( String roomType : this.getEnumerates("roomType")) {
 			query = em.createNamedQuery("Room.getByType").setParameter("type",roomType);
 			count = query.getResultList().size();
-			statusMap.put(roomType,count.toString());
+			statusMap = new HashMap<>();
+			statusMap.put("name", roomType);
+			statusMap.put("count",count.toString());
+			statusMapList.add(statusMap);
 		}
 		query = em.createNamedQuery("Room.getByType").setParameter("type","adHocAccess");
 		count = query.getResultList().size();
-		statusMap.put("adHocAccess",count.toString());
-		statusList.add(statusMap);
-
-		//Devices
 		statusMap = new HashMap<>();
-		statusMap.put("name","devices");
-		for( String deviceType : this.getEnumerates("deviceType")) {
-			statusMap.put(deviceType,"0");
-		}
-		statusMap.put("non_typed","0");
-		DeviceController deviceController = new DeviceController(this.session);
-		for( Device device: deviceController.getAll() ){
-			String deviceType = "non_typed";
-			if( device.getHwconf() != null ) {
-				deviceType = device.getHwconf().getDeviceType();
-			}
-			Integer i = Integer.decode(statusMap.get(deviceType)) + 1 ;
-			statusMap.put(deviceType,String.valueOf(i));
-		}
-		statusList.add(statusMap);
+		statusMap.put("name", "adHocAccess");
+		statusMap.put("count",count.toString());
+		statusMapList.add(statusMap);
+		systemStatus.put("rooms", statusMapList);
 
+		Integer deviceCount = new DeviceController(this.session).getAll().size();
+		statusMapList = new ArrayList<Map<String,String>>();
+		CloneToolController ctc = new CloneToolController(this.session);
+		for( HWConf hwconf : ctc.getAllHWConf() ) {
+			count = hwconf.getDevices().size();
+			deviceCount -= count;
+			statusMap = new HashMap<>();
+			statusMap.put("name", hwconf.getName());
+			statusMap.put("count",count.toString());
+			statusMapList.add(statusMap);
+		}
+		statusMap = new HashMap<>();
+		statusMap.put("name","non_typed");
+		statusMap.put("count",deviceCount.toString());
+		statusMapList.add(statusMap);
+		systemStatus.put("devices", statusMapList);
 		//Software
 		SoftwareController softwareController = new SoftwareController(this.session);
-		statusList.add(softwareController.statistic());
+		systemStatus.put("softwares",softwareController.statistic());
 
-		return statusList;
+		return systemStatus;
 	}
 
 	/**
@@ -553,13 +564,64 @@ public class SystemController extends Controller {
 		}
 	}
 
+	/**
+	 * List of the available updates
+	 * @return The list of packages can be updated
+	 */
+	public List<Map<String, String>> listUpdates() {
+		Map<String,String>        update;
+		List<Map<String, String>> updates = new ArrayList<Map<String,String>>();
+		String[] program    = new String[3];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/bin/zypper";
+		program[1] = "-nx";
+		program[2] = "lu";
+		program[3] = "-r";
+		if( this.getConfigValue("TYPE").equals("cephalix") ) {
+			program[4] = "CEPHALIX";
+		} else {
+			program[4] = "OSS";
+		}
+		OSSShellTools.exec(program, reply, stderr, null);
+		try {
+			Document doc = new SAXBuilder().build( new StringReader(reply.toString()) );
+			logger.debug(reply.toString());
+			Element rootNode = doc.getRootElement();
+			Iterator<Element> processDescendants = rootNode.getDescendants(new ElementFilter("update"));
+			while(processDescendants.hasNext()) {
+				Element node = processDescendants.next();
+				update = new HashMap<String,String>();
+				update.put("name", node.getAttributeValue("name").substring(8));
+				/*software.put("description", node.getAttributeValue("kind"));*/
+				update.put("version-old", node.getAttributeValue("edition-old"));
+				update.put("version", node.getAttributeValue("edition"));
+				updates.add(update);
+			}
+		} catch(IOException e ) {
+			logger.error("1 " + reply.toString());
+			logger.error("1 " + stderr.toString());
+			logger.error("1 " + e.getMessage());
+			throw new WebApplicationException(500);
+		} catch(JDOMException e)  {
+			logger.error("2 " + reply.toString());
+			logger.error("2 " + stderr.toString());
+			logger.error("2 " + e.getMessage());
+			throw new WebApplicationException(500);
+		}
+		return updates;
+	}
+
+	/**
+	 * Update selected packages
+	 * @param packages The list of packages to update
+	 * @return The result of Update as OssResponse object
+	 */
 	public OssResponse updatePackages(List<String> packages) {
-		String[] program   = new String[3 + packages.size()];
+		String[] program   = new String[1 + packages.size()];
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
-		program[0] = "zypper";
-		program[1] = "-n";
-		program[2] = "update";
+		program[0] = "/usr/sbin/oss_update.sh";
 		int i = 3;
 		for(String prog : packages) {
 			program[i] = prog;
@@ -572,13 +634,15 @@ public class SystemController extends Controller {
 		}
 	}
 
+	/**
+	 * Update all packages
+	 * @return The result of Update as OssResponse object
+	 */
 	public OssResponse updateSystem() {
-		String[] program   = new String[3];
+		String[] program   = new String[1];
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
-		program[0] = "zypper";
-		program[1] = "-n";
-		program[2] = "update";
+		program[0] = "/usr/sbin/oss_update.sh";
 		if( OSSShellTools.exec(program, reply, error, null) == 0 ) {
 			return new OssResponse(this.getSession(),"OK","System was updated succesfully.");
 		} else {
@@ -586,8 +650,10 @@ public class SystemController extends Controller {
 		}
 	}
 
-	/*
-	 * Acl Management
+	/**
+	 * Returns an ACL searched by the technical id.
+	 * @param aclId
+	 * @return The found acl.
 	 */
 	public Acl getAclById(Long aclId) {
 		EntityManager em = getEntityManager();
