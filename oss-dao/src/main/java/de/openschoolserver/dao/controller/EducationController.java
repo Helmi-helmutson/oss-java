@@ -544,10 +544,43 @@ public class EducationController extends Controller {
 			return new RoomController(session).organizeRoom(roomId);
 		}
 
+		Room room = new RoomController(this.session).getById(roomId);
+		if( action.equals("setPassword" ) ) {
+			StringBuffer reply = new StringBuffer();
+			StringBuffer error = new StringBuffer();
+			String[] program = new String[5];
+			program[0] = "/usr/bin/samba-tool";
+			program[1] = "domain";
+			program[2] = "passwordsettings";
+			program[3] = "set";
+			program[4] = "--complexity=off";
+			OSSShellTools.exec(program, reply, error, null);
+			program[1] = "user";
+			program[2] = "setpassword";
+			program[4] = "--newpassword=" + actionContent.get("password");
+			for( Device device : room.getDevices() ) {
+				error = new StringBuffer();
+				reply = new StringBuffer();
+				program[3] = device.getName();
+				OSSShellTools.exec(program, reply, error, null);
+				logger.debug(program[0] + " " + program[1] + " " + program[2] + " " + program[3] + " " + program[4] + " R:"
+						+ reply.toString() + " E:" + error.toString());
+			}
+			if (this.getConfigValue("CHECK_PASSWORD_QUALITY").toLowerCase().equals("yes")) {
+				program = new String[5];
+				program[0] = "/usr/bin/samba-tool";
+				program[1] = "domain";
+				program[2] = "passwordsettings";
+				program[3] = "set";
+				program[4] = "--complexity=on";
+				OSSShellTools.exec(program, reply, error, null);
+			}
+			return new OssResponse(this.getSession(), "OK", "The password of the selected users was reseted.");
+		}
+
 		logger.debug("manageRoom called " + roomId + " action:");
 		if( action.equals("download") && actionContent == null ) {
 			actionContent = new HashMap<String,String>();
-			Room room = new RoomController(this.session).getById(roomId);
 			actionContent.put("projectName", this.nowString() + "." + room.getName() );
 		}
 		for( List<Long> loggedOn : this.getRoom(roomId) ) {

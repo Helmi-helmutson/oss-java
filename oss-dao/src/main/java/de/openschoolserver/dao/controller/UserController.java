@@ -523,10 +523,12 @@ public class UserController extends Controller {
 				logger.error("resetUserPassword: Can not find user with id: %s",null,id);
 				continue;
 			}
-			if( user.getRole().equals(roleWorkstation) ) {
-				logger.error("resetUserPassword: Must not change workstation users password.");
-				continue;
-			}
+		/* We allow it
+		 * 	if( user.getRole().equals(roleWorkstation) ) {
+		 *		logger.error("resetUserPassword: Must not change workstation users password.");
+		 *		continue;
+		 *	}
+		  */
 			error = new StringBuffer();
 			reply = new StringBuffer();
 			program[3] = user.getUid();
@@ -543,7 +545,7 @@ public class UserController extends Controller {
 			program[4] = "--complexity=on";
 			OSSShellTools.exec(program, reply, error, null);
 		}
-		return new OssResponse(this.getSession(), "OK", "The password of the selected users was reseted.");
+		return new OssResponse(this.getSession(), "OK", "The password of the workstation users was reseted.");
 	}
 
 	public OssResponse copyTemplate(List<Long> userIds, String stringValue) {
