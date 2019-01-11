@@ -96,7 +96,11 @@ public class Config {
 	}
 	
 	public String getConfigValue(String key){
-		return config.get(key);
+		if( config.containsKey(key)) {
+			return config.get(key);
+		} else {
+			return "";
+		}
 	}
 	
 	public String getConfigPath(String key){
