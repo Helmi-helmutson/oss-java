@@ -149,14 +149,30 @@ public interface UserResource {
     @POST
     @Path("add")
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create new user")
+    @ApiOperation(value = "Create new user and syncing it to squidGuard.")
     @ApiResponses(value = {
             // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
     })
-    //@PermitAll
     @RolesAllowed("user.add")
     OssResponse add(
+            @ApiParam(hidden = true) @Auth Session session,
+            User user
+    );
+
+    /*
+     * POST users/insert { hash }
+     */
+    @POST
+    @Path("insert")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Create new user without syncing it to squidGuard.")
+    @ApiResponses(value = {
+            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    @RolesAllowed("user.add")
+    OssResponse insert(
             @ApiParam(hidden = true) @Auth Session session,
             User user
     );

@@ -67,15 +67,25 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse add(Session session, User user) {
+	public OssResponse insert(Session session, User user) {
 		final UserController userController = new UserController(session);
 		return userController.add(user);
 	}
 
 	@Override
+	public OssResponse add(Session session, User user) {
+		OssResponse ossResponse =  new UserController(session).add(user);
+		if( ossResponse.getCode().equals("OK")) {
+			sync(session);
+		}
+		return ossResponse;
+	}
+
+	@Override
 	public List<OssResponse> add(Session session, List<User> users) {
-		final UserController userController = new UserController(session);
-		return userController.add(users);
+		List<OssResponse> ossResponses =  new UserController(session).add(users);
+		sync(session);
+		return ossResponses;
 	}
 
 	@Override
@@ -507,7 +517,7 @@ public class UserResourceImpl implements UserResource {
 	public OssResponse sync(Session session) {
 		//TODO make it over plugin
 		String[] program = new String[1];
-		program[0] = "/usr/sbin/oss_refres_squidGuard_user.sh";
+		program[0] = "/usr/sbin/oss_refresh_squidGuard_user.sh";
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
 		OSSShellTools.exec(program, reply, stderr, null);
