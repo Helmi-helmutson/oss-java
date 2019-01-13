@@ -360,7 +360,8 @@ CREATE TABLE IF NOT EXISTS SoftwareVersions (
 # status I  -> installed
 # status IS -> installation scheduled
 # status US -> update scheduled
-# status MD -> manuell deinstalled
+# status MI -> manually installed
+# status MD -> manually deinstalled
 # status DS -> deinstallation scheduled
 # status DF -> deinstallation failed
 # status IF -> installation failed

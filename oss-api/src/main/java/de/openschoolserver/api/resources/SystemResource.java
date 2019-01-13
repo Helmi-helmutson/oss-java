@@ -202,7 +202,7 @@ public interface SystemResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
-	@RolesAllowed("system.configuration.read")
+	@PermitAll
 	String getConfig(
 	    @ApiParam(hidden = true) @Auth Session session,
 	    @PathParam("key") String key

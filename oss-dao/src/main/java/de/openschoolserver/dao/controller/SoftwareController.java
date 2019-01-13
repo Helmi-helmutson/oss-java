@@ -723,7 +723,7 @@ public class SoftwareController extends Controller {
         statusMap.put("count", count.toString());
         softwareStatusList.add(statusMap);
 
-        query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","DM");
+        query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS","MD");
         count = query.getResultList().size();
         statusMap = new HashMap<>();
         statusMap.put("name", "Manually Deinstalled");
@@ -1617,6 +1617,9 @@ public class SoftwareController extends Controller {
 			}
 		}
 
+		if( status == "I" && software.getManually() ) {
+			status = "IM";
+		}
 		if( softwareStatus == null ) {
 			//This software version has no status on this device. Let's create it.
 			logger.debug("Create new software status:" + softwareName + " ## " + version + " ## " + status);
