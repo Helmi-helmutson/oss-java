@@ -34,7 +34,13 @@ public class UserController extends Controller {
 	public User getById(long userId) {
 		EntityManager em = getEntityManager();
 		try {
-			return em.find(User.class, userId);
+			User user = em.find(User.class, userId);
+			if( user != null ) {
+				for( Alias alias : user.getAliases() ) {
+					user.getMailAliases().add(alias.getAlias());
+				}
+			}
+			return user;
 		} catch (Exception e) {
 			logger.debug("getByID: " + e.getMessage());
 			return null;
@@ -276,6 +282,14 @@ public class UserController extends Controller {
 		oldUser.setPassword(user.getPassword());
 		oldUser.setFsQuota(user.getFsQuota());
 		oldUser.setMsQuota(user.getMsQuota());
+		List<Alias> newAliases = new ArrayList<Alias>();
+		for( String alias : user.getMailAliases() ) {
+			if( !this.isUserAliasUnique(alias) ) {
+				return new OssResponse(this.getSession(), "ERROR", "Alias '%s' is not unique",null,alias);
+			}
+			newAliases.add(new Alias(oldUser,alias));
+		}
+		oldUser.setAliases(newAliases);
 		// Check user parameter
 		StringBuilder errorMessage = new StringBuilder();
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();

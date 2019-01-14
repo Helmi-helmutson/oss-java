@@ -213,6 +213,15 @@ public class Controller extends Config {
 		return "";
 	}
 
+	public boolean isUserAliasUnique(String name){
+		EntityManager em = this.getEntityManager();
+		Query query = em.createNamedQuery("Alias.getByName");
+		query.setParameter("alias", name);
+		boolean result = query.getResultList().isEmpty();
+		em.close();
+		return result;
+	}
+
 	public void startPlugin(String pluginName, Object object){
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];

@@ -459,8 +459,14 @@ public class EducationController extends Controller {
 			File exportDir = new File( export.toString() );
 			Files.createDirectories(exportDir.toPath(), privatDirAttribute );
 			Files.setOwner(exportDir.toPath(), owner);
-			for( String mist : exportDir.list() ) {
-				new File(mist).delete();
+			if( user.getRole().equals(roleStudent) || user.getRole().equals(roleWorkstation) || user.getRole().equals(roleGuest) ) {
+				//Clean up Export by students workstations and guests
+				for( String mist : exportDir.list() ) {
+					File f = new File(mist);
+					if( !f.isDirectory() ) {
+						f.delete();
+					}
+				}
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());

@@ -96,6 +96,9 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<Session> sessions = new ArrayList<Session>();
 
+	@Transient
+	List<String> mailAliases = new ArrayList<String>();
+
 	public List<Partition> getCreatedPartitions() {
 		return createdPartitions;
 	}
@@ -663,5 +666,13 @@ public class User implements Serializable {
 
 	public void setClasses(String classes) {
 		this.classes = classes;
+	}
+
+	public List<String> getMailAliases() {
+		return mailAliases;
+	}
+
+	public void setMailAliases(List<String> mailAliases) {
+		this.mailAliases = mailAliases;
 	}
 }

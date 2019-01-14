@@ -13,7 +13,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 @Entity
 @Table(name="Aliases")
-@NamedQuery(name="Alias.findAll", query="SELECT a FROM Alias a")
+@NamedQueries( {
+	@NamedQuery(name="Alias.findAll",	query="SELECT a FROM Alias a"),
+	@NamedQuery(name="Alias.getByName",	query="SELECT a FROM Alias a where a.alias = :alias"),
+})
 @SequenceGenerator(name="seq", initialValue=1, allocationSize=100)
 public class Alias implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -65,6 +68,11 @@ public class Alias implements Serializable {
 	}
 
 	public Alias() {
+	}
+
+	public Alias(User user, String alias) {
+		this.user  = user;
+		this.alias = alias;
 	}
 
 	public Long getId() {
