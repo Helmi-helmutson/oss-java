@@ -13,7 +13,7 @@ foreach( split /\n/, $ROLES )
 		next if( $r eq "printers.add" );
 		next if( $r eq "system.superuser" );
 		$hroles->{$1} = 1;
-		if( $r =~ /.search/ || $r =~ /education/  || $r =~ /information/ ) {
+		if( $r =~ /education/  || $r =~ /information/ ) {
 			next if( $r =~ /softwares*/ );
 			$forTeachers->{$r} = 1;
 		}
