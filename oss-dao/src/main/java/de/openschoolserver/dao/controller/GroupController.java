@@ -152,7 +152,7 @@ public class GroupController extends Controller {
 			addMember(group,this.session.getUser());
 		}
 		if(group.getGroupType().equals("class")) {
-			createSmartRoomForGroup(group,true,true);
+			this.createCategoryForGroup(group, true, true, "informations");
 		}
 		return new OssResponse(this.getSession(),"OK","Group was created.",group.getId());
 	}
@@ -519,6 +519,27 @@ public class GroupController extends Controller {
 			}
 		}
 		return new OssResponse(this.getSession(),"OK","Class directories was cleaned.");
+	}
+
+	public OssResponse createCategoryForGroup(Long groupId, boolean studentsOnly, boolean publicAccess, String type) {
+		return createCategoryForGroup(this.getById(groupId),studentsOnly,publicAccess, type);
+	}
+
+	public OssResponse createCategoryForGroup(Group group, boolean studentsOnly, boolean publicAccess, String type) {
+		for ( Category cat : group.getCategories() ) {
+			if( cat.getCategoryType().equals(type) && cat.getName().equals(group.getName()) ) {
+				return new OssResponse(this.getSession(),"OK","Smart room is for this group already created.");
+			}
+		}
+		Category category = new Category();
+		category.setName(group.getName());
+		category.setDescription(group.getDescription());
+		category.setCategoryType(type);
+		category.setStudentsOnly(studentsOnly);
+		category.setPublicAccess(publicAccess);
+		category.setGroupIds(new ArrayList<Long>());
+		category.getGroupIds().add(group.getId());
+		return new CategoryController(this.session).add(category);
 	}
 
 	public OssResponse createSmartRoomForGroup(Long groupId, boolean studentsOnly, boolean publicAccess) {
