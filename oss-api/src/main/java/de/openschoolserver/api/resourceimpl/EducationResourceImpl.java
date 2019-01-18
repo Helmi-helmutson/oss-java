@@ -410,7 +410,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse applyAction(Session session, OssActionMap ossActionMap) {
+	public List<OssResponse> applyAction(Session session, OssActionMap ossActionMap) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		UserController userController = new UserController(session);
 		logger.debug(ossActionMap.toString());
 		switch(ossActionMap.getName()) {
@@ -446,10 +447,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			if( sessionController.authorize(session,"user.delete") || sessionController.authorize(session,"student.delete") ) {
 				return  userController.deleteStudents(ossActionMap.getUserIds());
 			} else {
-				return new OssResponse(session,"ERROR","You have no right to execute this action.");
+				responses.add(new OssResponse(session,"ERROR","You have no right to execute this action."));
+				return responses;
 			}
 		}
-		return new OssResponse(session,"ERROR","Unknown action");
+		responses.add(new OssResponse(session,"ERROR","Unknown action"));
+		return responses;
 	}
 
 	@Override

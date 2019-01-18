@@ -314,14 +314,15 @@ public class UserController extends Controller {
 		return new OssResponse(this.getSession(), "OK", "User was modified succesfully");
 	}
 
-	public OssResponse deleteStudents(List<Long> userIds) {
+	public List<OssResponse> deleteStudents(List<Long> userIds) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		for( Long userId : userIds ) {
 			User user = this.getById(userId);
-			if( user.getRole().equals(roleStudent)) {
-				this.delete(user);
+			if( user != null && user.getRole().equals(roleStudent)) {
+				responses.add(this.delete(user));
 			}
 		}
-		return new OssResponse(this.getSession(), "OK", "Users were deleted succesfully");
+		return responses;
 	}
 
 	public OssResponse delete(long userId) {
@@ -507,10 +508,12 @@ public class UserController extends Controller {
 		return users;
 	}
 
-	public OssResponse resetUserPassword(List<Long> userIds, String password, boolean mustChange) {
+	public List<OssResponse> resetUserPassword(List<Long> userIds, String password, boolean mustChange) {
 		logger.debug("resetUserPassword: " + password);
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		if( password.length() < 7 ) {
-			return new OssResponse(this.getSession(),"ERROR","Password must contains minimum 7 character.");
+			responses.add(new OssResponse(this.getSession(),"ERROR","Password must contains minimum 7 character."));
+			return responses;
 		}
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
@@ -549,6 +552,7 @@ public class UserController extends Controller {
 			OSSShellTools.exec(program, reply, error, null);
 			logger.debug(program[0] + " " + program[1] + " " + program[2] + " " + program[3] + " " + program[4] + " R:"
 					+ reply.toString() + " E:" + error.toString());
+			responses.add(new OssResponse(this.getSession(), "OK", "The password of '%s' was reseted.",null,user.getUid()));
 		}
 		if (this.getConfigValue("CHECK_PASSWORD_QUALITY").toLowerCase().equals("yes")) {
 			program = new String[5];
@@ -559,10 +563,11 @@ public class UserController extends Controller {
 			program[4] = "--complexity=on";
 			OSSShellTools.exec(program, reply, error, null);
 		}
-		return new OssResponse(this.getSession(), "OK", "The password of the workstation users was reseted.");
+		return responses;
 	}
 
-	public OssResponse copyTemplate(List<Long> userIds, String stringValue) {
+	public List<OssResponse> copyTemplate(List<Long> userIds, String stringValue) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[2];
@@ -572,25 +577,35 @@ public class UserController extends Controller {
 		}
 		program[0] = "/usr/sbin/oss_copy_template_home.sh";
 		for (Long id : userIds) {
-			program[1] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, null);
+			User user = this.getById(id);
+			if( user != null ) {
+				program[1] = user.getUid();
+				OSSShellTools.exec(program, reply, error, null);
+				responses.add(new OssResponse(this.getSession(), "OK", "The template for '%s' was copied.",null,user.getUid()));
+			}
 		}
-		return new OssResponse(this.getSession(), "OK", "The template for the selected users was copied.");
+		return responses;
 	}
 
-	public OssResponse removeProfile(List<Long> userIds) {
+	public List<OssResponse> removeProfile(List<Long> userIds) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[2];
 		program[0] = "/usr/sbin/oss_remove_profile.sh";
 		for (Long id : userIds) {
-			program[1] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, null);
+			User user = this.getById(id);
+			if( user != null ) {
+				program[1] = user.getUid();
+				OSSShellTools.exec(program, reply, error, null);
+				responses.add(new OssResponse(this.getSession(), "OK", "The windows profile of '%s' was removed.",null,user.getUid()));
+			}
 		}
-		return new OssResponse(this.getSession(), "OK", "The windows profile(s) of the user was removed.");
+		return responses;
 	}
 
-	public OssResponse disableLogin(List<Long> userIds, boolean disable) {
+	public List<OssResponse> disableLogin(List<Long> userIds, boolean disable) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[4];
@@ -602,41 +617,54 @@ public class UserController extends Controller {
 			program[2] = "enable";
 		}
 		for (Long id : userIds) {
-			program[3] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, null);
+			User user = this.getById(id);
+			if( user != null ) {
+				program[3] = user.getUid();
+				OSSShellTools.exec(program, reply, error, null);
+				if( disable ) {
+					responses.add(new OssResponse(this.getSession(), "OK", "The '%s' was disabled.",null,user.getUid()));
+				} else {
+					responses.add(new OssResponse(this.getSession(), "OK", "The '%s' was enabled.",null,user.getUid()));
+				}
+			}
 		}
-		if (disable) {
-			return new OssResponse(this.getSession(), "OK", "The selected users were disabled.");
-		}
-		return new OssResponse(this.getSession(), "OK", "The selected users were enabled.");
+		return responses;
 	}
 
-	public OssResponse setFsQuota(List<Long> userIds, Long fsQuota) {
+	public List<OssResponse> setFsQuota(List<Long> userIds, Long fsQuota) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[3];
 		program[0] = "/usr/sbin/oss_set_quota.sh";
 		program[2] = String.valueOf(fsQuota);
 		for (Long id : userIds) {
-			if( id != 1 ) {
-				program[1] = this.getById(id).getUid();
+			User user = this.getById(id);
+			if( user != null ) {
+				program[1] = user.getUid();
 				OSSShellTools.exec(program, reply, error, null);
+				responses.add(new OssResponse(this.getSession(), "OK", "The file system quota for '%s' was set.",null,user.getUid()));
 			}
 		}
-		return new OssResponse(this.getSession(), "OK", "The filesystem quota for selected users was set.");
+		return responses;
 	}
 
-	public OssResponse setMsQuota(List<Long> userIds, Long msQuota) {
+	public List<OssResponse> setMsQuota(List<Long> userIds, Long msQuota) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[3];
 		program[0] = "/usr/sbin/oss_set_mquota.pl";
 		program[2] = String.valueOf(msQuota);
 		for (Long id : userIds) {
-			program[1] = this.getById(id).getUid();
-			OSSShellTools.exec(program, reply, error, null);
+			User user = this.getById(id);
+			if( user != null ) {
+				program[1] = user.getUid();
+				OSSShellTools.exec(program, reply, error, null);
+				responses.add(new OssResponse(this.getSession(), "OK", "The mail system quota for '%s' was set.",null,user.getUid()));
+			}
 		}
-		return new OssResponse(this.getSession(), "OK", "The filesystem quota for selected users was set.");
+		return responses;
 	}
 
 	public OssResponse collectFile(List<User> users, String projectName) {
@@ -725,18 +753,21 @@ public class UserController extends Controller {
 		return new OssResponse(this.getSession(), "ERROR", stderr.toString());
 	}
 
-	public OssResponse disableInternet(List<Long> userIds, boolean disable) {
+	public List<OssResponse> disableInternet(List<Long> userIds, boolean disable) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
 		for (Long userId : userIds) {
-			if (disable) {
-				this.setConfig(this.getById(userId), "internetDisabled", "yes");
-			} else {
-				this.deleteConfig(this.getById(userId), "internetDisabled");
+			User user = this.getById(userId);
+			if( user != null ) {
+				if (disable) {
+					this.setConfig(this.getById(userId), "internetDisabled", "yes");
+					responses.add(new OssResponse(this.getSession(), "OK", "'%s' was disabled.",null,user.getUid()));
+				} else {
+					responses.add(new OssResponse(this.getSession(), "OK", "'%s' was enabled.",null,user.getUid()));
+					this.deleteConfig(this.getById(userId), "internetDisabled");
+				}
 			}
 		}
-		if (disable) {
-			return new OssResponse(this.getSession(), "OK", "The selected users were disabled.");
-		}
-		return new OssResponse(this.getSession(), "OK", "The selected users were enabled.");
+		return responses;
 	}
 
 	/**

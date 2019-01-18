@@ -913,7 +913,7 @@ public interface EducationResource {
 	                @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("education.users")
-	OssResponse applyAction(@ApiParam(hidden = true) @Auth Session session,
+	List<OssResponse> applyAction(@ApiParam(hidden = true) @Auth Session session,
 	                OssActionMap ossActionMap
 	                );
 
