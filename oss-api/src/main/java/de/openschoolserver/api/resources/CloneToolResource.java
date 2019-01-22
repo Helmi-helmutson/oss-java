@@ -42,9 +42,9 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
 	String getHWConf(
-	        @ApiParam(hidden = true) @Auth Session session
+			@Context UriInfo ui,
+	        @Context HttpServletRequest req
 	);
 
 	/*
@@ -215,9 +215,9 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
 	String getPartitions(
-	        @ApiParam(hidden = true) @Auth Session session,
+			@Context UriInfo ui,
+	        @Context HttpServletRequest req,
 	        @PathParam("hwconfId") Long hwconfId
 	);
 
@@ -249,9 +249,9 @@ public interface CloneToolResource {
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
 	String getConfigurationValue(
-	        @ApiParam(hidden = true) @Auth Session session,
+			@Context UriInfo ui,
+	        @Context HttpServletRequest req,
 	        @PathParam("hwconfId") Long hwconfId,
 	        @PathParam("partitionName") String partitionName,
 	        @PathParam("key") String key

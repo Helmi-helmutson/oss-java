@@ -30,9 +30,12 @@ import java.util.List;
 public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
-	public String getHWConf(Session session) {
-		if( session.getDevice() != null ) {
-			return Long.toString(session.getDevice().getHwconf().getId());
+	public String getHWConf(UriInfo ui, HttpServletRequest req) {
+		Session session  = new SessionController().getLocalhostSession();
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getByIP(req.getRemoteAddr());
+		if( device != null && device.getHwconf() != null ) {
+			return Long.toString(device.getHwconf().getId());
 		}
 		return "";
     }
@@ -113,7 +116,9 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	}
 
 	@Override
-	public String getPartitions(Session session, Long hwconfId) {
+	public String getPartitions(UriInfo ui,
+	        HttpServletRequest req, Long hwconfId) {
+		Session session  = new SessionController().getLocalhostSession();
 		return new CloneToolController(session).getPartitions(hwconfId);
 	}
 	
@@ -128,7 +133,12 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	}
 
 	@Override
-	public String getConfigurationValue(Session session, Long hwconfId, String partition, String key) {
+	public String getConfigurationValue(UriInfo ui,
+	        HttpServletRequest req,
+	        Long hwconfId,
+	        String partition,
+	        String key) {
+		Session session  = new SessionController().getLocalhostSession();
 		return new CloneToolController(session).getConfigurationValue(hwconfId,partition,key);
 	}
 
@@ -197,13 +207,18 @@ public class CloneToolResourceImpl implements CloneToolResource {
 
 	@Override
 	public OssResponse addDevice(Session session, long roomId, String macAddress, String IP, String name) {
+		RoomController rc = new RoomController(session);
+		Room room = rc.getById(roomId);
 		Device device = new Device();
 		device.setName(name);
 		device.setMac(macAddress);
 		device.setIp(IP);
+		if( room.getHwconf() != null ) {
+			device.setHwconfId(room.getHwconf().getId());
+		}
 		ArrayList<Device> devices = new ArrayList<Device>();
 		devices.add(device);
-		return new RoomController(session).addDevices(roomId, devices);
+		return rc.addDevices(roomId, devices);
 	}
 	
 	@Override
