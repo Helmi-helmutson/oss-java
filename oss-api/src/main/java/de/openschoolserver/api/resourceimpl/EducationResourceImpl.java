@@ -494,8 +494,19 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Group> getMyGroups(Session session) {
 		List<Group> groups = new ArrayList<Group>();
-		for( Group group : new GroupController(session).getAll() ) {
-			if(group.getOwner().equals(session.getUser()) || group.getGroupType().equals("class") ) {
+		for( Group group : session.getUser().getGroups() ) {
+			if( !group.getGroupType().equals("primary") ) {
+				groups.add(group);
+			}
+		}
+		return groups;
+	}
+
+	@Override
+	public List<Group> getMyAvailableClasses(Session session) {
+		List<Group> groups = new ArrayList<Group>();
+		for( Group group : new GroupController(session).getByType("class") ) {
+			if( !session.getUser().getGroups().contains(group)) {
 				groups.add(group);
 			}
 		}
@@ -521,7 +532,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse removeMember(Session session, long groupId, long userId) {
+	public OssResponse deleteMember(Session session, long groupId, long userId) {
 		return new GroupController(session).removeMember(groupId, userId);
 	}
 

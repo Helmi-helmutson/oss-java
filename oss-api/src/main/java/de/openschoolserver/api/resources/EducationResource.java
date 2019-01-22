@@ -565,6 +565,21 @@ public interface EducationResource {
 	);
 
 	/*
+	 * GET education/groups
+	 */
+	@GET
+	@Path("availableClasses")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the workgroups and classes of a usrer.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("education.groups")
+	List<Group>  getMyAvailableClasses(
+	        @ApiParam(hidden = true) @Auth Session session
+	);
+
+	/*
 	 * GET groups/<groupId>/availableMembers
 	 */
 	@GET
@@ -607,7 +622,7 @@ public interface EducationResource {
 	@ApiResponses(value = {
 	    @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("education.groups")
-	OssResponse removeMember(
+	OssResponse deleteMember(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("groupId") long groupId,
 	        @PathParam("userId") long userId
