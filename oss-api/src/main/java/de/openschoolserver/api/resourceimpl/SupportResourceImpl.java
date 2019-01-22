@@ -1,18 +1,17 @@
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-
-import org.glassfish.jersey.client.ClientProperties;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.openschoolserver.api.resources.SupportResource;
 import de.openschoolserver.dao.OssResponse;
@@ -24,14 +23,12 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 public class SupportResourceImpl implements SupportResource {
 	Logger logger = LoggerFactory.getLogger(SupportResourceImpl.class);
 
-	private Client jerseyClient;
 	private String supportUrl;
 	private String supportEmail;
 	private String supportEmailFrom;
 	private boolean isLinux = true;
 
-	public SupportResourceImpl(final Client jerseyClient) {
-		this.jerseyClient = jerseyClient;
+	public SupportResourceImpl() {
 		String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 		isLinux = !((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0));
 
@@ -70,23 +67,48 @@ public class SupportResourceImpl implements SupportResource {
 		loadConf(session);
 		List<String> parameters  = new ArrayList<String>();
 		logger.debug("URL: " + supportUrl);
+		logger.debug(supportRequest.toString());
+		File file = null;
+		try {
+			file = File.createTempFile("support", ".json", new File("/opt/oss-java/tmp/"));
+			PrintWriter writer = new PrintWriter(file.getPath(), "UTF-8");
+			writer.print(supportRequest.toString());
+			writer.close();
+		} catch (IOException e) {
+			logger.error(e.getMessage(), e);
+			return new OssResponse(session,"ERROR", e.getMessage());
+		}
 		if (supportUrl != null && supportUrl.length() > 0) {
-			// use oss support rest services
-			final WebTarget webTarget = jerseyClient.target(supportUrl);
-
-			Response response = webTarget.request().property(ClientProperties.READ_TIMEOUT, 10000)
-					.post(Entity.json(supportRequest));
-			if (response.getStatus() != 200 && response.getStatus() != 204) {
-				logger.error("error from support system at " + supportUrl + ": " + response.getStatus());
-				throw new WebApplicationException(response.getStatus());
+			String[] program    = new String[12];
+			StringBuffer reply  = new StringBuffer();
+			StringBuffer stderr = new StringBuffer();
+			program[0] = "/usr/bin/curl";
+			program[1] = "--insecure";
+			program[2] = "-s";
+			program[3] = "-X";
+			program[4] = "POST";
+			program[5] = "--header";
+			program[6] = "Content-Type: application/json";
+			program[7] = "--header";
+			program[8] = "Accept: application/json";
+			program[9] = "-d";
+			program[10] = "@"+file.getPath();
+			program[11] = supportUrl;
+			OSSShellTools.exec(program, reply, stderr, null);
+			logger.debug("Support reply" + reply.toString());
+			logger.debug("Support error" + stderr.toString());
+			try {
+				ObjectMapper mapper = new ObjectMapper();
+				SupportRequest suppres = mapper.readValue(IOUtils.toInputStream(reply.toString(), "UTF-8"), SupportRequest.class);
+				parameters.add(supportRequest.getSubject());
+				parameters.add(suppres.getTicketno());
+				parameters.add(supportRequest.getEmail());
+				parameters.add(suppres.getTicketResponseInfo());
+				return new OssResponse(session,"OK","Support request '%s' was created with ticket number '%s'. Answer will be sent to '%s'.",null,parameters);
+			} catch (Exception e) {
+				logger.error("GETObject :" + e.getMessage());
+				return new OssResponse(session,"ERROR","Can not sent supprt request");
 			}
-			parameters.add(supportRequest.getSubject());
-			SupportRequest suppres = response.readEntity(SupportRequest.class);
-			
-			parameters.add(suppres.getTicketno());
-			parameters.add(supportRequest.getEmail());
-			parameters.add(suppres.getTicketResponseInfo());
-			return new OssResponse(session,"OK","Support request '%s' was created with ticket number '%s'. Answer will be sent to '%s'.",null,parameters);
 		} else {
 			// use classic email
 			StringBuilder request = new StringBuilder();
