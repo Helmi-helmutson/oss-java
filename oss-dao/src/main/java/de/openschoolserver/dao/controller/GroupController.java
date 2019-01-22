@@ -137,6 +137,12 @@ public class GroupController extends Controller {
 				em.persist(enumerate);
 			}
 			em.persist(group);
+			if( group.getGroupType().equals("workgroup") || group.getGroupType().equals("guest")) {
+				this.session.getUser().getOwnedGroups().add(group);
+				User user = em.find(User.class, this.session.getUser().getId());
+				user.getOwnedGroups().add(group);
+				em.merge(user);
+			}
 			em.getTransaction().commit();
 			logger.debug("Created Group:" + group);
 		} catch (Exception e) {
