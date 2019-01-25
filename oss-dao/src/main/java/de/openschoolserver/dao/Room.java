@@ -43,7 +43,7 @@ public class Room implements Serializable {
 	private Long id;
 
 	@Column(name = "name", updatable = false)
-	@Size(max=32, message="Name must not be longer then 32 characters.")
+	@Size(max=9, message="Name must not be longer then 9 characters.")
 	private String name;
 
 	private int places;
