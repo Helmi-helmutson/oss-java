@@ -1,6 +1,7 @@
 #!/bin/bash
 
 . /etc/sysconfig/schoolserver
+. /etc/profile.d/profile.sh
 
 #Create a session for local services
 TOKEN=$( grep de.openschoolserver.api.auth.localhost= /opt/oss-java/conf/oss-api.properties | sed 's/de.openschoolserver.api.auth.localhost=//' )
