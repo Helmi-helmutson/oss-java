@@ -398,50 +398,66 @@ public class Controller extends Config {
 
 		User owner   = null;
 		Long ownerId = null;
+		List<String> neededRights = new ArrayList<>();
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Acl":
 			Acl Acl = (Acl)object;
 			owner = Acl.getCreator();
+			neededRights.add("acl.modify");
 			break;
 		case "de.openschoolserver.dao.AccessInRoom":
 			AccessInRoom AccessInRoom = (AccessInRoom)object;
 			owner = AccessInRoom.getCreator();
+			neededRights.add("room.modify");
 			break;
 		case "de.openschoolserver.dao.Announcement":
 			Announcement an = (Announcement)object;
 			owner = an.getOwner();
 			break;
+		case "de.openschoolserver.dao.Category":
+			Category cat = (Category)object;
+			owner = cat.getOwner();
+			neededRights.add("category.modify");
+			break;
 		case "de.openschoolserver.dao.Contact":
 			Contact con = (Contact)object;
 			owner = con.getOwner();
+			neededRights.add("contact.modify");
 			break;
 		case "de.openschoolserver.dao.FAQ":
 			FAQ faq = (FAQ)object;
 			owner = faq.getOwner();
+			neededRights.add("faq.modify");
 			break;
 		case "de.openschoolserver.dao.Device":
 			Device Device = (Device)object;
 			owner = Device.getOwner();
+			neededRights.add("device.modify");
 			break;
 		case "de.openschoolserver.dao.Group":
 			Group group = (Group)object;
 			owner = group.getOwner();
+			neededRights.add("group.modify");
 			break;
 		case "de.openschoolserver.dao.HWConf":
 			HWConf HWConf = (HWConf)object;
 			owner = HWConf.getCreator();
+			neededRights.add("hwconf.modify");
 			break;
 		case "de.openschoolserver.dao.OSSConfig":
 			OSSConfig ossConfig = (OSSConfig)object;
 			owner = ossConfig.getCreator();
+			neededRights.add("ossconfig.modify");
 			break;
 		case "de.openschoolserver.dao.OSSMConfig":
 			OSSMConfig ossMConfig = (OSSMConfig)object;
 			owner = ossMConfig.getCreator();
+			neededRights.add("ossmconfig.modify");
 			break;
 		case "de.openschoolserver.dao.Room":
 			Room room = (Room)object;
 			owner = room.getCreator();
+			neededRights.add("room.modify");
 			break;
 		case "de.openschoolserver.dao.RoomSmartControl":
 			RoomSmartControl rsc  = (RoomSmartControl)object;
@@ -450,18 +466,22 @@ public class Controller extends Config {
 		case "de.openschoolserver.dao.Partition":
 			Partition partition = (Partition)object;
 			owner = partition.getCreator();
+			neededRights.add("hwconf.modify");
 			break;
 		case "de.openschoolserver.dao.Software":
 			Software software = (Software)object;
 			owner = software.getCreator();
+			neededRights.add("software.modify");
 			break;
 		case "de.openschoolserver.dao.SoftwareLicence":
 			SoftwareLicense softwareLicense = (SoftwareLicense)object;
 			owner = softwareLicense.getCreator();
+			neededRights.add("softwarelicence.modify");
 			break;
 		case "de.openschoolserver.dao.User":
 			User user = (User)object;
 			ownerId = user.getCreator().getId();
+			neededRights.add("user.modify");
 			break;
 		}
 		if( ownerId == null ) {
@@ -478,7 +498,11 @@ public class Controller extends Config {
 		if( owner != null && this.session.getUser().equals(owner) ) {
 				return true;
 		}
-
+		for( String right : neededRights ) {
+			if( this.session.getAcls().contains(right) ) {
+				return true;
+			}
+		}
 		//TODO some other acls based on object
 		return false;
 	}

@@ -366,7 +366,6 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			}
 		}
 		return responses;
-
 	}
 
 	@Override
@@ -391,6 +390,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		}
 		return responses;
 	}
+
 	@Override
 	public List<OssResponse> collectFileFromGroups(Session session,
 			String groupIds,
