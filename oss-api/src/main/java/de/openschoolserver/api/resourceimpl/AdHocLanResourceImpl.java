@@ -199,7 +199,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 			return new OssResponse(session,"ERROR","This is not an AdHocLan room");
 		}
 		room.setId(oldRoom.getId());
-		return rc.modify(oldRoom);
+		return rc.modify(room);
 	}
 
 	@Override
