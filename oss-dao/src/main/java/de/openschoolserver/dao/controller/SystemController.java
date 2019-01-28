@@ -749,6 +749,7 @@ public class SystemController extends Controller {
 				}
 			}
 		}
+		acls.sort(Comparator.comparing(Acl::getAcl));
 		return acls;
 	}
 
@@ -779,6 +780,7 @@ public class SystemController extends Controller {
 				acls.add(new Acl(aclName,false));
 			}
 		}
+		acls.sort(Comparator.comparing(Acl::getAcl));
 		return acls;
 	}
 
@@ -796,7 +798,7 @@ public class SystemController extends Controller {
 			em.getTransaction().begin();
 			if( oldAcl != null && oldAcl.getUser() != null && oldAcl.getUser().equals(user) ) {
 				logger.debug("User old to modify: " + oldAcl);
-				if( this.hasUsersGroupAcl(user,acl)) {
+				if( !this.hasUsersGroupAcl(user,acl)) {
 					user.getAcls().remove(oldAcl);
 					em.remove(oldAcl);
 					em.merge(user);
