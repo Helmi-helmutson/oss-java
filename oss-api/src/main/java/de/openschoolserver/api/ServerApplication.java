@@ -53,7 +53,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
     @Override
     public void run(ServerConfiguration configuration, Environment environment) {
 
-    	
+
         @SuppressWarnings("rawtypes")
 		AuthFilter tokenAuthorizer = new OAuthCredentialAuthFilter.Builder<Session>()
                 .setAuthenticator(new OSSTokenAuthenticator())
@@ -64,16 +64,19 @@ public class ServerApplication extends Application<ServerConfiguration> {
         environment.jersey().register(new AuthDynamicFeature(tokenAuthorizer));
         environment.jersey().register(new AuthValueFactoryProvider.Binder<>(Session.class));
         environment.jersey().register(RolesAllowedDynamicFeature.class);
-          
+
         environment.jersey().register(MultiPartFeature.class);
+
+        final SchedulerResource schedulerResource = new SchedulerResourceImpl();
+        environment.jersey().register(schedulerResource);
 
         final SystemResource systemResource = new SystemResourceImpl();
         environment.jersey().register(systemResource);
- 
-	//TODO check if allowed 
+
+	//TODO check if allowed
         final AdHocLanResource adHocLanResource = new AdHocLanResourceImpl();
         environment.jersey().register(adHocLanResource);
-        
+
         final SessionsResource sessionsResource = new SessionsResourceImpl();
         environment.jersey().register(sessionsResource);
 
@@ -82,22 +85,22 @@ public class ServerApplication extends Application<ServerConfiguration> {
 
         final RoomResource roomsResource = new RoomRescourceImpl();
         environment.jersey().register(roomsResource);
-   
+
         final UserResource usersResource = new UserResourceImpl();
         environment.jersey().register(usersResource);
-        
+
         final GroupResource groupsResource = new GroupResourceImpl();
         environment.jersey().register(groupsResource);
-        
+
         final DeviceResource devicesResource = new DeviceResourceImpl();
         environment.jersey().register(devicesResource);
-        
+
         final PrinterResource printerResource = new PrinterResourceImpl();
         environment.jersey().register(printerResource);
-        
+
         final CloneToolResource cloneToolResource = new CloneToolResourceImpl();
         environment.jersey().register(cloneToolResource);
-        
+
         final CategoryResource categoryResource = new CategoryResourceImpl();
         environment.jersey().register(categoryResource);
 
@@ -113,11 +116,11 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final ImporterResource importerResource = new ImporterResourceImpl();
         environment.jersey().register(importerResource);
         PluginHandler.registerPlugins(environment);
-        
+
         final SupportResource supportResource = new SupportResourceImpl();
 		environment.jersey().register(supportResource);
 
-        
+
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
 
