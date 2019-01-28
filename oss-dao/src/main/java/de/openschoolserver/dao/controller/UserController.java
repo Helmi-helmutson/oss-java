@@ -632,38 +632,48 @@ public class UserController extends Controller {
 	}
 
 	public List<OssResponse> setFsQuota(List<Long> userIds, Long fsQuota) {
+		EntityManager em = getEntityManager();
 		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[3];
 		program[0] = "/usr/sbin/oss_set_quota.sh";
 		program[2] = String.valueOf(fsQuota);
+		Integer quota = Integer.valueOf(program[2]);
 		for (Long id : userIds) {
 			User user = this.getById(id);
 			if( user != null ) {
 				program[1] = user.getUid();
+				user.setFsQuota(quota);
+				em.merge(user);
 				OSSShellTools.exec(program, reply, error, null);
 				responses.add(new OssResponse(this.getSession(), "OK", "The file system quota for '%s' was set.",null,user.getUid()));
 			}
 		}
+		em.close();
 		return responses;
 	}
 
 	public List<OssResponse> setMsQuota(List<Long> userIds, Long msQuota) {
+		EntityManager em = getEntityManager();
 		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[3];
 		program[0] = "/usr/sbin/oss_set_mquota.pl";
 		program[2] = String.valueOf(msQuota);
+		Integer quota = Integer.valueOf(program[2]);
 		for (Long id : userIds) {
 			User user = this.getById(id);
 			if( user != null ) {
 				program[1] = user.getUid();
+				user.setMsQuota(quota);
+				em.merge(user);
 				OSSShellTools.exec(program, reply, error, null);
 				responses.add(new OssResponse(this.getSession(), "OK", "The mail system quota for '%s' was set.",null,user.getUid()));
 			}
 		}
+		em.close();
 		return responses;
 	}
 
