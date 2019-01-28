@@ -40,18 +40,7 @@ public class CloneToolResourceImpl implements CloneToolResource {
 		return "";
     }
 
-	@Override
-	public String isMaster(Session session) {
-		if( session.getDevice() == null ) {
-			return "";
-		}
-		final CloneToolController cloneToolController = new CloneToolController(session);
-		if( cloneToolController.checkConfig(session.getDevice(),"isMaster" ) ) {
-			return "true";
-		}
-		return "";
-	}
-	
+
 	@Override
 	public String isMaster(Session session, Long deviceId) {
 		final DeviceController deviceController = new DeviceController(session);
@@ -121,7 +110,7 @@ public class CloneToolResourceImpl implements CloneToolResource {
 		Session session  = new SessionController().getLocalhostSession();
 		return new CloneToolController(session).getPartitions(hwconfId);
 	}
-	
+
 	@Override
 	public String getDescription(Session session, Long hwconfId) {
 		return new CloneToolController(session).getDescription(hwconfId);
@@ -161,7 +150,7 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	public OssResponse addPartition(Session session, Long hwconfId, String partitionName) {
 		return new CloneToolController(session).addPartitionToHWConf(hwconfId, partitionName );
 	}
-	
+
 	@Override
 	public OssResponse setConfigurationValue(Session session, Long hwconfId, String partitionName, String key, String value) {
 		return new CloneToolController(session).setConfigurationValue(hwconfId,partitionName,key,value);
@@ -220,7 +209,7 @@ public class CloneToolResourceImpl implements CloneToolResource {
 		devices.add(device);
 		return rc.addDevices(roomId, devices);
 	}
-	
+
 	@Override
 	public OssResponse startCloning(Session session, Long hwconfId, Clone parameters) {
 		return new CloneToolController(session).startCloning(hwconfId,parameters);
@@ -300,12 +289,40 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	}
 
 	@Override
+	public String getHostname(UriInfo ui, HttpServletRequest req) {
+		Session session  = new SessionController().getLocalhostSession();
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getByIP(req.getRemoteAddr());
+		if( device != null ) {
+			return device.getName();
+		}
+		return "";
+	}
+
+	@Override
 	public String getFqhn(UriInfo ui, HttpServletRequest req) {
 		Session session  = new SessionController().getLocalhostSession();
 		DeviceController deviceController = new DeviceController(session);
 		Device device = deviceController.getByIP(req.getRemoteAddr());
 		if( device != null ) {
 			return device.getName().concat(".").concat(deviceController.getConfigValue("DOMAIN"));
+		}
+		return "";
+	}
+
+	@Override
+	public String getDomainName(UriInfo ui, HttpServletRequest req) {
+		SessionController sc = new SessionController();
+		return sc.getConfigValue("DOMAIN");
+	}
+
+	@Override
+	public String isMaster(UriInfo ui, HttpServletRequest req) {
+		Session session  = new SessionController().getLocalhostSession();
+		DeviceController deviceController = new DeviceController(session);
+		Device device = deviceController.getByIP(req.getRemoteAddr());
+		if( device != null  &&	deviceController.checkConfig(device, "isMaster") ) {
+			return "true";
 		}
 		return "";
 	}

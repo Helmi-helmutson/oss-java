@@ -78,20 +78,6 @@ public interface CloneToolResource {
 	        @PathParam("deviceId") Long deviceId
 	);
 
-	/*
-	 * Get clonetool/isMaster
-	 */
-	@GET
-	@Path("isMaster")
-	@Produces(TEXT)
-	@ApiOperation(value = "Returns 'true' if the workstation of the session is master. Returns empty if not.")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 404, message = "Device not found"),
-	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	String isMaster(
-	        @ApiParam(hidden = true) @Auth Session session
-	);
 
 	/*
 	 * Get clonetool/devices/{deviceId}/isMaster
@@ -642,6 +628,20 @@ public interface CloneToolResource {
 	 * Calls without authorization
 	 */
 	@GET
+	@Path("hostName")
+	@Produces(TEXT)
+	@ApiOperation(value = "Gets the fully qualified host name of the requester.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 401, message = "No regcode was found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	String getHostname(
+	        @Context UriInfo ui,
+	        @Context HttpServletRequest req
+	);
+
+
+	@GET
 	@Path("fqhn")
 	@Produces(TEXT)
 	@ApiOperation(value = "Gets the fully qualified host name of the requester.")
@@ -654,4 +654,31 @@ public interface CloneToolResource {
 	        @Context HttpServletRequest req
 	);
 
+	@GET
+	@Path("domainName")
+	@Produces(TEXT)
+	@ApiOperation(value = "Gets the fully qualified host name of the requester.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 401, message = "No regcode was found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	String getDomainName(
+	        @Context UriInfo ui,
+	        @Context HttpServletRequest req
+	);
+
+	/*
+	 * Get clonetool/isMaster
+	 */
+	@GET
+	@Path("isMaster")
+	@Produces(TEXT)
+	@ApiOperation(value = "Returns 'true' if the workstation of the session is master. Returns empty if not.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	String isMaster(
+	        @Context UriInfo ui,
+	        @Context HttpServletRequest req
+	);
 }
