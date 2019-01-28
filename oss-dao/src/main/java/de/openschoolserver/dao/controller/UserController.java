@@ -233,6 +233,11 @@ public class UserController extends Controller {
 		if (errorMessage.length() > 0) {
 			return new OssResponse(this.getSession(), "ERROR", errorMessage.toString());
 		}
+		for( String alias : user.getMailAliases() ) {
+			if( isUserAliasUnique(alias) ) {
+				user.addAlias(new Alias(user,alias));
+			}
+		}
 		try {
 			em.getTransaction().begin();
 			em.persist(user);
@@ -283,8 +288,12 @@ public class UserController extends Controller {
 		oldUser.setFsQuota(user.getFsQuota());
 		oldUser.setMsQuota(user.getMsQuota());
 		List<Alias> newAliases = new ArrayList<Alias>();
+		ArrayList<String> oldAliases = new ArrayList<String>();
+		for( Alias alias : oldUser.getAliases() ) {
+			oldAliases.add(alias.getAlias());
+		}
 		for( String alias : user.getMailAliases() ) {
-			if( !this.isUserAliasUnique(alias) ) {
+			if( !oldAliases.contains(alias) && !this.isUserAliasUnique(alias) ) {
 				return new OssResponse(this.getSession(), "ERROR", "Alias '%s' is not unique",null,alias);
 			}
 			newAliases.add(new Alias(oldUser,alias));
