@@ -25,7 +25,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 	@NamedQuery(name="Category.getByName",        query="SELECT c FROM Category c where c.name = :name"),
 	@NamedQuery(name="Category.getByDescription", query="SELECT c FROM Category c where c.description = :description"),
 	@NamedQuery(name="Category.getByType",        query="SELECT c FROM Category c where c.categoryType = :type"),
-	@NamedQuery(name="Category.search",           query="SELECT c FROM Category c WHERE c.name LIKE :search OR c.description = :search")
+	@NamedQuery(name="Category.search",           query="SELECT c FROM Category c WHERE c.name LIKE :search OR c.description = :search"),
+	@NamedQuery(name="Category.expired",		  query="SELECT c FROM Category c WHERE c.validUntil < CURRENT_TIMESTAMP"),
+	@NamedQuery(name="Category.expiredByType",	  query="SELECT c FROM Category c WHERE c.validUntil < CURRENT_TIMESTAMP AND c.categoryType = :type")
 })
 
 public class Category implements Serializable {
