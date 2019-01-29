@@ -528,54 +528,34 @@ public class RoomController extends Controller {
 		if(roomNetMask < subNetwork.getNetmaskNumeric() ) {
 			throw new NumberFormatException("The network netmask must be less then the room netmask:" + roomNetMask + ">" + subNetwork.getNetmaskNumeric() );
 		}
-
-		List<String>  startIPAddresses   = new ArrayList<String>();
 		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Room.findAll");
-		for( Room room : (List<Room>) query.getResultList() ) {
-			if( !subNetwork.contains(room.getStartIP()) || room.getId() < 3L ) {
-				continue;
+		List<Room> rooms = (List<Room>) query.getResultList();
+		em.close();
+		String nextNet = subNetwork.getBase();
+
+		if( subNetwork.contains(this.getConfigValue("FIRST_ROOM_NET"))) {
+			nextNet = this.getConfigValue("FIRST_ROOM_NET");
+		}
+
+		boolean used = true;
+		IPv4Net net = new IPv4Net(nextNet + "/" + roomNetMask );
+		String lastIp  = net.getBroadcastAddress();
+		while(used) {
+			used = false;
+			for(Room room : rooms ) {
+				IPv4Net roomNet = new IPv4Net( room.getStartIP() + "/" + room.getNetMask());
+				if(roomNet.contains(nextNet) || roomNet.contains(lastIp) ) {
+					nextNet = net.getNext();
+					net = new IPv4Net(nextNet + "/" + roomNetMask );
+					lastIp  = net.getBroadcastAddress();
+					used = true;
+					break;
+				}
 			}
-			startIPAddresses.add(room.getStartIP());
-		}
-		// When no room was found in this network we return the FIRST_ROOM_NET network address of the network.
-		if( startIPAddresses.isEmpty() ) {
-			if( subNetwork.contains(this.getConfigValue("FIRST_ROOM_NET"))) {
-				return this.getConfigValue("FIRST_ROOM_NET");
+			if( !subNetwork.contains(nextNet) ) {
+				return "";
 			}
-			return subNetwork.getBase();
-		}
-
-		List<String> sortedIPAddresses = IPv4.sortIPAddresses(startIPAddresses);
-		String lastNetworkIP = sortedIPAddresses.get(sortedIPAddresses.size()-1);
-
-		// Find the net of the last room
-		query = em.createQuery("SELECT r FROM Room r WHERE r.startIP = :startIP",Room.class);
-		query.setParameter("startIP", lastNetworkIP);
-		Room lastRoom = (Room)query.getSingleResult();
-		int lastNetMask = lastRoom.getNetMask();
-		//Find the next free net with the network mask of the last room
-		IPv4Net net = new IPv4Net( lastNetworkIP + "/" + lastNetMask );
-		String nextNet = net.getNext();
-
-		//Now set the last network IP to the last IP in the last network.
-		lastNetworkIP = net.getLast();
-
-		//This could be our net
-		net = new IPv4Net(nextNet + "/" + roomNetMask );
-		while ( net.contains(lastNetworkIP)) {
-			//If the end of the last network is in our net it is wrong.
-			//In this case get the next one net address
-			nextNet = net.getNext();
-			net = new IPv4Net(nextNet + "/" + roomNetMask );
-		}
-
-		// Check if the nextNet is in school net.
-		String lastIP = net.getNext();
-		if( ! subNetwork.contains(lastIP) )
-		{
-			//TODO What should happened when no more IP-address is available!?
-			return "";
 		}
 		return nextNet;
 	}
