@@ -367,7 +367,13 @@ public class UserController extends Controller {
 		}
 		for( Group group : user.getGroups() ) {
 			group.getUsers().remove(user);
-			em.merge(user);
+			em.merge(group);
+		}
+		if( restartDHCP ) {
+			DeviceController dc = new DeviceController(session);
+			for( Device device : devices ) {
+				dc.delete(device.getId(),false);
+			}
 		}
 		em.remove(user);
 		em.getTransaction().commit();
@@ -986,7 +992,8 @@ public class UserController extends Controller {
 			creator.setCreatedUsers(null);
 			//Sessions will be deleted
 			for( Session o : creator.getSessions() ) {
-				em.remove(o);
+				Session s = em.find(Session.class,o.getId());
+				em.remove(s);
 			}
 			em.merge(creator);
 			em.merge(newCreator);
@@ -1052,13 +1059,14 @@ public class UserController extends Controller {
 			creator.setCreatedUsers(null);
 			//Sessions will be deleted
 			for( Session o : creator.getSessions() ) {
-				em.remove(o);
+				Session s = em.find(Session.class,o.getId());
+				em.remove(s);
 			}
 			creator.setSessions(null);
 			em.merge(creator);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error("inheritCreatedObjects:" + e.getMessage());
+			logger.error("delete owned objects:" + e.getMessage());
 		}
 	}
 
