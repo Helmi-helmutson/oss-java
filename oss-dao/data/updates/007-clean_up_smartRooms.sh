@@ -1,4 +1,5 @@
 #!/bin/bash
+export HOME="/root"
 
 for i in $( echo "SELECT Rooms.id FROM Rooms LEFT JOIN (RoomInCategories, GroupInCategories, Groups) ON ( RoomInCategories.room_id = Rooms.id AND RoomInCategories.category_id = GroupInCategories.category_id AND GroupInCategories.group_id = Groups.id ) where Groups.groupType='class';" |  mysql OSS; )
 do
