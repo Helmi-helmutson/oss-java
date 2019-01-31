@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS Users (
 	FOREIGN KEY(creator_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+CREATE UNIQUE INDEX users_uid on Users(uid);
 
 CREATE TABLE IF NOT EXISTS Groups (
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -52,6 +53,7 @@ CREATE TABLE IF NOT EXISTS Groups (
 	FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+CREATE UNIQUE INDEX groups_name on Groups(name);
 
 CREATE TABLE IF NOT EXISTS GroupMember (
         user_id        BIGINT UNSIGNED NOT NULL,
@@ -110,6 +112,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
         FOREIGN KEY(hwconf_id) REFERENCES HWConfs(id),
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+CREATE UNIQUE INDEX rooms_name on Rooms(name);
 
 CREATE TABLE IF NOT EXISTS Devices (
         id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -132,6 +135,7 @@ CREATE TABLE IF NOT EXISTS Devices (
         FOREIGN KEY(owner_id)  REFERENCES Users(id),
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+CREATE UNIQUE INDEX device_names on Devices(name);
 
 CREATE TABLE IF NOT EXISTS AccessInRooms (
         id             BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
