@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -507,6 +508,7 @@ public class CloneToolController extends Controller {
 			}
 			partitions.add(partition.getName());
 		}
+		partitions.sort(Comparator.naturalOrder());
 		String parts = String.join(",",partitions);
 		for(int i = 0; i < pxeBoot.size(); i++) {
 			String temp = pxeBoot.get(i);
