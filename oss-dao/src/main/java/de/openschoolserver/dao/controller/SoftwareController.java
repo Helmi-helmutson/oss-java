@@ -1419,12 +1419,14 @@ public class SoftwareController extends Controller {
 
 			//Remove first the softwares.
 			if( softwaresToRemove.containsKey(device.getName()) ) {
+				List<Software> removed     = new ArrayList<Software>();
 				for( Software software : softwaresToRemove.get(device.getName()) ) {
-					if( this.isSoftwareInstalledOnDevice(device, software) ){
+					if(!removed.contains(software)) {
 						this.setSoftwareStatusOnDevice(device, software, "", "DS");
 						deviceRemove.add("       - " + software.getName());
+						this.deleteSoftwareLicenseFromDevice(software,device);
+						removed.add(software);
 					}
-					this.deleteSoftwareLicenseFromDevice(software,device);
 				}
 			}
 			if( softwaresToInstall.containsKey(device.getName()) ) {
