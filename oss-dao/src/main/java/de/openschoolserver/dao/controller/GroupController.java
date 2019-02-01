@@ -140,6 +140,7 @@ public class GroupController extends Controller {
 			if( group.getGroupType().equals("workgroup") || group.getGroupType().equals("guest")) {
 				this.session.getUser().getOwnedGroups().add(group);
 				User user = em.find(User.class, this.session.getUser().getId());
+				group.setOwnerId(user.getId());
 				user.getOwnedGroups().add(group);
 				em.merge(user);
 			}
