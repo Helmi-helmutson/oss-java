@@ -346,16 +346,19 @@ public class UserController extends Controller {
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "Can not find the user.");
 		}
-		if (this.isProtected(user)) {
+		if(this.isProtected(user)) {
 			return new OssResponse(this.getSession(), "ERROR", "This user must not be deleted.");
+		}
+		if( !this.mayModify(user)) {
+			return new OssResponse(this.getSession(),"ERROR", "You must not delete this user.");
 		}
 		this.startPlugin("delete_user", user);
 		//TODO make it configurable
 		User admin = getById(1L);
 		if( user.getRole().equals(roleStudent) || user.getRole().equals(roleWorkstation) ){
-			deleteCreatedObjects(user);
+			this.deleteCreatedObjects(user);
 		} else {
-			inheritCreatedObjects(user,admin);
+			this.inheritCreatedObjects(user,admin);
 		}
 		EntityManager em = getEntityManager();
 		user = em.find(User.class, user.getId());
