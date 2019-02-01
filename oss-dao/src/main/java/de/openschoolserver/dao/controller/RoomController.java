@@ -345,7 +345,11 @@ public class RoomController extends Controller {
 
 		// If the starIp is not given we have to search the next room IP
 		if( room.getStartIP() == null || room.getStartIP().isEmpty() ) {
-			room.setStartIP( getNextRoomIP(room.getNetwork(),room.getNetMask()) );
+			String nextRoomIP = getNextRoomIP(room.getNetwork(),room.getNetMask());
+			if( nextRoomIP.isEmpty() ) {
+				return new OssResponse(this.getSession(),"ERROR","The room can not be created. There is not enough IP-Adresses for its size.");
+			}
+			room.setStartIP( nextRoomIP );
 		}
 
 		//	Set default control mode
