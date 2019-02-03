@@ -33,6 +33,7 @@ public class Controller extends Config {
     Logger logger = LoggerFactory.getLogger(Controller.class);
 
 	protected Session session ;
+	protected EntityManager em;
 	private Map<String, String> properties;
 	private static String basePath;
 	static {
@@ -44,9 +45,10 @@ public class Controller extends Config {
 		}
 	}
 
-	public Controller(Session session) {
+	public Controller(Session session,EntityManager em) {
 		super();
 		this.session=session;
+		this.em     = em;
 		properties = new HashMap<String, String>();
 		try {
 			File file = new File("/opt/oss-java/conf/oss-api.properties");
@@ -93,15 +95,6 @@ public class Controller extends Config {
 	    return builder.toString();
 	}
 
-	public EntityManager getEntityManager() {
-		if( session != null) {
-			return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
-		}
-		else {
-			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		}
-	}
-
 	public Session getSession() {
 		return this.session;
 	}
@@ -121,13 +114,11 @@ public class Controller extends Config {
 		if( this.getConfigValue("WORKGROUP").equals(name)) {
 			return false;
 		}
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("User.getByUid");
 		query.setParameter("uid", name);
 		List<User> user = (List<User>) query.getResultList();
 		if( ! user.isEmpty() ){
 			logger.debug("Found user " + user);
-			em.close();
 			return false;
 		}
 		query = em.createNamedQuery("Group.getByName");
@@ -135,7 +126,6 @@ public class Controller extends Config {
 		List<Group> group = (List<Group>) query.getResultList();
 		if( ! group.isEmpty() ){
 			logger.debug("Found group " + group );
-			em.close();
 			return false;
 		}
 		query = em.createNamedQuery("Device.getByName");
@@ -143,7 +133,6 @@ public class Controller extends Config {
 		List<Device> device = (List<Device>) query.getResultList();
 		if( ! device.isEmpty() ){
 			logger.debug("Found device " + device );
-			em.close();
 			return false;
 		}
 		query = em.createNamedQuery("Room.getByName");
@@ -151,10 +140,8 @@ public class Controller extends Config {
 		List<Room> room = (List<Room>) query.getResultList();
 		if( ! room.isEmpty() ){
 			logger.debug("Found room " + room );
-			em.close();
 			return false;
 		}
-		em.close();
 		return true;
 	}
 
@@ -190,11 +177,9 @@ public class Controller extends Config {
 	}
 
 	public String isMacUnique(String name){
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("Device.getByMAC");
 		query.setParameter("MAC", name);
 		List<Device> devices = (List<Device>) query.getResultList();
-		em.close();
 		if( ! devices.isEmpty() ){
 			return devices.get(0).getName();
 		}
@@ -202,11 +187,9 @@ public class Controller extends Config {
 	}
 
 	public String isIPUnique(String name){
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("Device.getByIP");
 		query.setParameter("IP", name);
 		List<Device> devices = (List<Device>) query.getResultList();
-		em.close();
 		if( ! devices.isEmpty() ){
 			return devices.get(0).getName();
 		}
@@ -214,11 +197,9 @@ public class Controller extends Config {
 	}
 
 	public boolean isUserAliasUnique(String name){
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("Alias.getByName");
 		query.setParameter("alias", name);
 		boolean result = query.getResultList().isEmpty();
-		em.close();
 		return result;
 	}
 
@@ -604,7 +585,6 @@ public class Controller extends Config {
 
 	public OSSMConfig getMConfigObject(Object object, String key, String value) {
 		Long id = null;
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.check");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
@@ -640,7 +620,6 @@ public class Controller extends Config {
 
 	public OSSConfig getConfigObject(Object object, String key) {
 		Long id = null;
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
@@ -675,7 +654,6 @@ public class Controller extends Config {
 	 *         False if the enumerate is not allowed and in case of error.
 	 */
 	public boolean checkEnumerate(String type, String value) {
-		EntityManager em = this.getEntityManager();
 		Query query      = em.createNamedQuery("Enumerate.get");
 		try {
 			query.setParameter("type",type).setParameter("value",value);
@@ -684,7 +662,6 @@ public class Controller extends Config {
 			logger.error("checkEnumerate: " + e.getMessage());
 			return false;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -696,7 +673,6 @@ public class Controller extends Config {
 	 * @see					addEnumerate
 	 */
 	public List<String> getEnumerates(String type ) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Enumerate.getByType").setParameter("type", type);
 			List<String> results = new ArrayList<String>();
@@ -708,7 +684,6 @@ public class Controller extends Config {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -721,37 +696,30 @@ public class Controller extends Config {
 
 	public OSSConfig getConfig(String type, String key) {
 		OSSConfig     ossConfig = null;
-		EntityManager em = this.getEntityManager();
 		Query query      = em.createNamedQuery("OSSConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
 		if( ! query.getResultList().isEmpty() ) {
 			ossConfig = (OSSConfig)  query.getResultList().get(0);
 		}
-		em.close();
 		return ossConfig;
 	}
 
 	public List<OSSMConfig> getMConfigs(String key) {
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.getAllForKey");
 		query.setParameter("keyword",key);
 		List<OSSMConfig> ossMConfigs = (List<OSSMConfig>) query.getResultList();
-		em.close();
 		return ossMConfigs;
 	}
 
 	public List<OSSMConfig> getMConfigs(String type, String key) {
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
 		List<OSSMConfig> ossMConfigs = (List<OSSMConfig>) query.getResultList();
-		em.close();
 		return ossMConfigs;
 	}
 
 	public List<String> getMConfigs(Object object, String key) {
 		Long id = null;
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
@@ -776,13 +744,11 @@ public class Controller extends Config {
 		for(OSSMConfig config : (List<OSSMConfig>) query.getResultList() ) {
 			values.add(config.getValue());
 		}
-		em.close();
 		return values;
 	}
 
 	public List<OSSMConfig> getMConfigObjects(Object object, String key) {
 		Long id = null;
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
@@ -807,7 +773,6 @@ public class Controller extends Config {
 		for(OSSMConfig config : (List<OSSMConfig>) query.getResultList() ) {
 			values.add(config);
 		}
-		em.close();
 		return values;
 	}
 
@@ -819,7 +784,6 @@ public class Controller extends Config {
 
 	public String getConfig(Object object, String key) {
 		Long id = null;
-		EntityManager em = this.getEntityManager();
 		Query query = em.createNamedQuery("OSSConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
@@ -844,7 +808,6 @@ public class Controller extends Config {
 			return null;
 		}
 		OSSConfig config = (OSSConfig) query.getResultList().get(0);
-		em.close();
 		return config.getValue();
 	}
 
@@ -852,7 +815,6 @@ public class Controller extends Config {
 		if( this.checkMConfig(object, key, value) ){
 			return new OssResponse(this.getSession(),"ERROR","This mconfig value already exists.");
 		}
-		EntityManager em = this.getEntityManager();
 		OSSMConfig mconfig = new OSSMConfig();
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
@@ -883,7 +845,6 @@ public class Controller extends Config {
 			logger.error("addMConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Mconfig was created",mconfig.getId());
 	}
@@ -892,7 +853,6 @@ public class Controller extends Config {
 		if( this.checkConfig(object, key) ){
 			return new OssResponse(this.getSession(),"ERROR","This config already exists.");
 		}
-		EntityManager em = this.getEntityManager();
 		OSSConfig config = new OSSConfig();
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
@@ -923,7 +883,6 @@ public class Controller extends Config {
 			logger.error("addConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Config was created");
 	}
@@ -932,7 +891,6 @@ public class Controller extends Config {
 		if( ! this.checkConfig(object, key) ){
 			return this.addConfig(object, key, value);
 		}
-		EntityManager em = this.getEntityManager();
 		OSSConfig config = this.getConfigObject(object, key);
 		try {
 			config = em.find(OSSConfig.class, config.getId());
@@ -944,13 +902,11 @@ public class Controller extends Config {
 			logger.error("setConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Config was updated");
 	}
 
 	public OssResponse deleteConfig(Object object, Long configId) {
-		EntityManager em = getEntityManager();
 		try {
 			OSSConfig config = em.find(OSSConfig.class, configId);
 			em.getTransaction().begin();
@@ -961,13 +917,11 @@ public class Controller extends Config {
 			logger.error("deleteConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}
 
 	public OssResponse deleteMConfig(Object object, Long configId) {
-		EntityManager em = getEntityManager();
 		try {
 			OSSMConfig config = em.find(OSSMConfig.class, configId);
 			em.getTransaction().begin();
@@ -978,7 +932,6 @@ public class Controller extends Config {
 			logger.error("deleteConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}
@@ -988,7 +941,6 @@ public class Controller extends Config {
 		if( config == null ) {
 			return new OssResponse(this.getSession(),"ERROR","Config does not exists.");
 		}
-		EntityManager em = this.getEntityManager();
 		try {
 			em.getTransaction().begin();
 			config = em.find(OSSConfig.class, config.getId());
@@ -999,7 +951,6 @@ public class Controller extends Config {
 			logger.error("deleteConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}
@@ -1009,7 +960,6 @@ public class Controller extends Config {
 		if( config == null ) {
 			return new OssResponse(this.getSession(),"ERROR","MConfig does not exists.");
 		}
-		EntityManager em = this.getEntityManager();
 		try {
 			em.getTransaction().begin();
 			config = em.find(OSSMConfig.class, config.getId());
@@ -1020,7 +970,6 @@ public class Controller extends Config {
 			logger.error("deleteMConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Config was deleted");
 	}

@@ -34,8 +34,8 @@ public class CloneToolController extends Controller {
 	protected Path ELILO_BOOT = Paths.get("/usr/share/oss/templates/eliloboot");
 	protected String images   = "/srv/itool/images/";
 
-	public CloneToolController(Session session) {
-		super(session);
+	public CloneToolController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	public Long getHWConf(){
@@ -47,7 +47,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public HWConf getById(Long hwconfId ) {
-		EntityManager em = getEntityManager();
 
 		try {
 			HWConf hwconf = em.find(HWConf.class, hwconfId);
@@ -62,12 +61,10 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public HWConf getByName(String name) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("HWConf.getByName").setParameter("name",name);
 			return (HWConf) query.getSingleResult();
@@ -75,12 +72,10 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<HWConf> getByType(String deviceType) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("HWConf.getByType").setParameter("deviceType",deviceType);
 			return (List<HWConf>) query.getResultList();
@@ -88,7 +83,6 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -105,7 +99,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public Partition getPartition(Long hwconfId, String partition) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Partition.getPartitionByName");
 			query.setParameter("hwconfId", hwconfId).setParameter("name",partition);
@@ -114,19 +107,16 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public Partition getPartitionById(Long partitionId) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(Partition.class, partitionId);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -153,7 +143,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public OssResponse addHWConf(HWConf hwconf){
-		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
 		if( this.getByName(hwconf.getName()) != null){
 			return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
@@ -178,7 +167,6 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Hardware configuration was created.",hwconf.getId());
 	}
@@ -186,7 +174,6 @@ public class CloneToolController extends Controller {
 	public OssResponse modifyHWConf(Long hwconfId, HWConf hwconf){
 		//TODO make some checks!!
 		//If the name will be modified then some files must be moved too!!! TODO
-		EntityManager em = getEntityManager();
 		// First we check if the parameter are unique.
 		if( ! this.isNameUnique(hwconf.getName())){
 			return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
@@ -217,13 +204,11 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK", "Hardware configuration was modified.");
 	}
 
 	public OssResponse addPartitionToHWConf(Long hwconfId, String name ) {
-		EntityManager em = getEntityManager();
 		HWConf hwconf = this.getById(hwconfId);
 		Partition partition = new Partition();
 		partition.setName(name);
@@ -239,7 +224,6 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		parameters.add(name);
 		parameters.add(hwconf.getName());
@@ -248,7 +232,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public OssResponse addPartitionToHWConf(Long hwconfId, Partition partition ) {
-		EntityManager em = getEntityManager();
 		HWConf hwconf = this.getById(hwconfId);
 		partition.setCreator(this.session.getUser());
 		hwconf.addPartition(partition);
@@ -261,7 +244,6 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		parameters.add(partition.getName());
 		parameters.add(hwconf.getName());
@@ -299,7 +281,6 @@ public class CloneToolController extends Controller {
 		case "OS" :
 			partition.setOs(value);
 		}
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(partition);
@@ -308,7 +289,6 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		parameters.add(key);
 		parameters.add(value);
@@ -316,7 +296,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public OssResponse delete(Long hwconfId){
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			HWConf hwconf = em.find(HWConf.class, hwconfId);
@@ -345,7 +324,6 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK", "Hardware configuration was deleted succesfully.");
 	}
@@ -357,7 +335,6 @@ public class CloneToolController extends Controller {
         	return new OssResponse(this.getSession(),"ERROR","You must not delete this partition.");
         }
 		hwconf.removePartition(partition);
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.remove(partition);
@@ -368,7 +345,6 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		parameters.add(partitionName);
 		parameters.add(hwconf.getName());
@@ -398,7 +374,6 @@ public class CloneToolController extends Controller {
 			partition.setOs("");
 			break;
 		}
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(partition);
@@ -407,14 +382,12 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		parameters.add(key);
 		return new OssResponse(this.getSession(),"OK", "Partitions key: %s was deleted",null,parameters );
 	}
 
 	public List<HWConf> getAllHWConf() {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("HWConf.findAll");
 			return (List<HWConf>) query.getResultList();
@@ -422,7 +395,6 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -458,13 +430,13 @@ public class CloneToolController extends Controller {
 		List<Device> devices = new ArrayList<Device>();
 		switch(type) {
 			case "device":
-				devices.add(new DeviceController(this.session).getById(id));
+				devices.add(new DeviceController(session,em).getById(id));
 				break;
 			case "hwconf":
-				devices = new DeviceController(this.session).getByHWConf(id);
+				devices = new DeviceController(session,em).getByHWConf(id);
 				break;
 			case "room":
-				devices = new RoomController(this.session).getById(id).getDevices();
+				devices = new RoomController(session,em).getById(id).getDevices();
 
 		}
 
@@ -526,7 +498,7 @@ public class CloneToolController extends Controller {
 			}
 			eliloBoot.set(i, temp);
 		}
-		DeviceController dc = new DeviceController(this.session);
+		DeviceController dc = new DeviceController(session,em);
 		for( Long deviceId : parameters.getDeviceIds() ) {
 			Device device   = dc.getById(deviceId);
 			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
@@ -551,13 +523,13 @@ public class CloneToolController extends Controller {
 		List<Device> devices = new ArrayList<Device>();
 		switch(type) {
 			case "device":
-				devices.add(new DeviceController(this.session).getById(id));
+				devices.add(new DeviceController(session,em).getById(id));
 				break;
 			case "hwconf":
-				devices = new DeviceController(this.session).getByHWConf(id);
+				devices = new DeviceController(session,em).getByHWConf(id);
 				break;
 			case "room":
-				devices = new RoomController(this.session).getById(id).getDevices();
+				devices = new RoomController(session,em).getById(id).getDevices();
 		}
 		for( Device device : devices ) {
 			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
@@ -578,7 +550,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public String resetMinion(Long deviceId) {
-		EntityManager em = getEntityManager();
 		try {
 			Device device = em.find(Device.class, deviceId);
 			if( device == null ) {
@@ -619,7 +590,6 @@ public class CloneToolController extends Controller {
 	}
 
 	public OssResponse startMulticast(Long partitionId, String networkDevice) {
-		EntityManager em = getEntityManager();
 		Partition partition;
 		try {
 			partition = em.find(Partition.class, partitionId);
@@ -640,13 +610,11 @@ public class CloneToolController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Multicast imaging was started succesfully.");
 	}
 
 	public OssResponse modifyPartition(Long partitionId, Partition partition) {
-		EntityManager em = getEntityManager();
 		try {
 			if( partition.getId() != partitionId ) {
 				return new OssResponse(this.getSession(),"ERROR","Partition id mismatch.");
@@ -666,7 +634,6 @@ public class CloneToolController extends Controller {
 			logger.error("modifyPartition:" + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Multicast imaging was started succesfully.");
 	}

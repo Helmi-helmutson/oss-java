@@ -36,24 +36,21 @@ public class GroupController extends Controller {
 	Logger logger = LoggerFactory.getLogger(GroupController.class);
 	private List<String> parameters;
 
-	public GroupController(Session session) {
-		super(session);
+	public GroupController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	public Group getById(long groupId) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(Group.class, groupId);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<Group> getByType(String groupType) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Group.getByType");
 			query.setParameter("groupType", groupType);
@@ -62,12 +59,10 @@ public class GroupController extends Controller {
 			logger.error(e.getMessage(),e);
 			return new ArrayList<>();
 		} finally {
-			em.close();
 		}
 	}
 
 	public Group getByName(String name) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Group.getByName");
 			query.setParameter("name", name);
@@ -81,12 +76,10 @@ public class GroupController extends Controller {
 			logger.error(e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<Group> search(String search) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Group.search");
 			query.setParameter("search", search + "%");
@@ -95,12 +88,10 @@ public class GroupController extends Controller {
 			logger.error(e.getMessage());
 			return new ArrayList<>();
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<Group> getAll() {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Group.findAll");
 			return query.getResultList();
@@ -108,7 +99,6 @@ public class GroupController extends Controller {
 			logger.error(e.getMessage(),e);
 			return new ArrayList<>();
 		} finally {
-			em.close();
 		}
 	}
 
@@ -128,7 +118,6 @@ public class GroupController extends Controller {
 		if( ! this.isNameUnique(group.getName())){
 			return new OssResponse(this.getSession(),"ERROR","Group name is not unique.");
 		}
-		EntityManager em = getEntityManager();
 		group.setOwner(this.session.getUser());
 		try {
 			em.getTransaction().begin();
@@ -150,7 +139,6 @@ public class GroupController extends Controller {
 			logger.error("Error crating a group" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		this.startPlugin("add_group", group);
 		if( group.getGroupType().equals("workgroup") ) {
@@ -179,7 +167,6 @@ public class GroupController extends Controller {
 		if( errorMessage.length() > 0 ) {
 				return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(oldGroup);
@@ -188,7 +175,6 @@ public class GroupController extends Controller {
 			logger.error(e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		}  finally {
-			em.close();
 		}
 		this.startPlugin("modify_group", oldGroup);
 		return new OssResponse(this.getSession(),"OK","Group was modified.");
@@ -196,7 +182,6 @@ public class GroupController extends Controller {
 
 	public OssResponse delete(Group group){
 		// Remove group from GroupMember of table
-		EntityManager em = getEntityManager();
 		group =  em.find(Group.class, group.getId());
 		if( this.isProtected(group)) {
 			return new OssResponse(this.getSession(),"ERROR","This group must not be deleted.");
@@ -243,7 +228,6 @@ public class GroupController extends Controller {
 			logger.error(e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Group was deleted.");
 	}
@@ -318,7 +302,6 @@ public class GroupController extends Controller {
 	}
 
 	public List<User> getAvailableMember(long groupId){
-		EntityManager em = getEntityManager();
 		Group group = this.getById(groupId);
 		Query query = em.createNamedQuery("User.findAll");
 		List<User> allUsers = query.getResultList();
@@ -336,7 +319,6 @@ public class GroupController extends Controller {
 		if( !this.mayModify(group) ) {
        return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
         }
-		EntityManager em = getEntityManager();
 		List<User> usersToRemove = new ArrayList<User>();
 		List<User> usersToAdd    = new ArrayList<User>();
 		List<User> users = new ArrayList<User>();
@@ -374,7 +356,6 @@ public class GroupController extends Controller {
 		}catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		this.changeMemberPlugin("addmembers", group, usersToAdd);
 		this.changeMemberPlugin("removemembers", group, usersToRemove);
@@ -383,7 +364,6 @@ public class GroupController extends Controller {
 
 
 	public OssResponse addMember(Group group, User user) {
-		EntityManager em = getEntityManager();
 		if( !this.mayModify(group) ) {
 			return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
         }
@@ -406,14 +386,12 @@ public class GroupController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		this.changeMemberPlugin("addmembers", group, user);
 		return new OssResponse(this.getSession(),"OK","User %s was added to group %s.",null,parameters );
 	}
 
 	public OssResponse addMember(long groupId, long userId) {
-		EntityManager em = getEntityManager();
 		Group group = em.find(Group.class, groupId);
 		User  user  = em.find(User.class, userId);
 		if( group == null ) {
@@ -427,14 +405,13 @@ public class GroupController extends Controller {
 
 	public OssResponse addMember(String groupName, String uid) {
 		Group group = this.getByName(groupName);
-		User  user  = new UserController(session).getByUid(uid);
+		User  user  = new UserController(session,em).getByUid(uid);
 		if( group == null ) {
 			return new OssResponse(this.getSession(),"ERROR","Group %s was not found.",null,groupName);
 		}
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR","User %s was not found.",null,uid);
 		}
-		EntityManager em = getEntityManager();
 		group = em.find(Group.class, group.getId());
 		user  = em.find(User.class,  user.getId());
 		return this.addMember(group, user);
@@ -442,12 +419,11 @@ public class GroupController extends Controller {
 
 	public OssResponse removeMember(String groupName, String uid) {
 		Long groupId = this.getByName(groupName).getId();
-		Long userId  = new UserController(session).getByUid(uid).getId();
+		Long userId  = new UserController(session,em).getByUid(uid).getId();
 		return this.removeMember(groupId, userId);
 	}
 
 	public OssResponse removeMember(long groupId, long userId) {
-		EntityManager em = getEntityManager();
 		Group group = em.find(Group.class, groupId);
 		if( !this.mayModify(group) ) {
        return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
@@ -466,7 +442,6 @@ public class GroupController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		this.changeMemberPlugin("removemembers", group, user);
 		parameters = new ArrayList<String>();
@@ -485,8 +460,7 @@ public class GroupController extends Controller {
 
 	public OssResponse setOwner(String groupName, String userName) {
 		Long groupId = this.getByName(groupName).getId();
-		User user    = new UserController(session).getByUid(userName);
-		EntityManager em = getEntityManager();
+		User user    = new UserController(session,em).getByUid(userName);
 		Group group = em.find(Group.class, groupId);
 		group.setOwner(user);
 		user.getOwnedGroups().add(group);
@@ -498,7 +472,6 @@ public class GroupController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Group owner was changed.");
 	}
@@ -546,7 +519,7 @@ public class GroupController extends Controller {
 		category.setPublicAccess(publicAccess);
 		category.setGroupIds(new ArrayList<Long>());
 		category.getGroupIds().add(group.getId());
-		return new CategoryController(this.session).add(category);
+		return new CategoryController(session,em).add(category);
 	}
 
 	public OssResponse createSmartRoomForGroup(Long groupId, boolean studentsOnly, boolean publicAccess) {
@@ -568,6 +541,6 @@ public class GroupController extends Controller {
 		category.setPublicAccess(publicAccess);
 		category.setGroupIds(new ArrayList<Long>());
 		category.getGroupIds().add(group.getId());
-		return new EducationController(this.session).createSmartRoom(category);
+		return new EducationController(session,em).createSmartRoom(category);
 	}
 }

@@ -18,6 +18,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+
 import org.slf4j.LoggerFactory;
 
 import de.claxss.importlib.ImportOrder;
@@ -38,15 +40,17 @@ public class ImportHandler extends Thread {
 	private Session session;
 	private Importer importer;
 	private ImportOrder order;
+	EntityManager em;
 	StringBuilder responseString;
 	boolean done = false;
 
 	private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ImportHandler.class);
 
-	public ImportHandler(Session session, Importer importer, ImportOrder o) {
+	public ImportHandler(Session session, Importer importer, ImportOrder o, EntityManager em) {
 		this.session = session;
 		this.importer = importer;
 		this.order = o;
+		this.em = em;
 		responseString = new StringBuilder();
 	}
 
@@ -76,11 +80,11 @@ public class ImportHandler extends Thread {
 		ImporterObject object;
 		int ctr = 0;
 		String oldConfigValuePWCheck="yes";
-		final SystemController systemController = new SystemController(session);
+		final SystemController systemController = new SystemController(session,em);
 		
 		try {
-			final UserController userController = new UserController(session);
-			final GroupController groupController = new GroupController(session);
+			final UserController userController = new UserController(session,em);
+			final GroupController groupController = new GroupController(session, em);
 			
 			
 			

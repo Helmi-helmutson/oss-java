@@ -37,8 +37,8 @@ public class DHCPConfig extends Controller {
 	private List<String>       saltGroupFile;
 	final String domainName     = "." + getConfigValue("DOMAIN");
 
-	public DHCPConfig(Session session) {
-		super(session);
+	public DHCPConfig(Session session,EntityManager em) {
+		super(session,em);
 		try {
 			try {
 				dhcpConfigFile = Files.readAllLines(DHCP_TEMPLATE);
@@ -106,7 +106,6 @@ public class DHCPConfig extends Controller {
 	}
 
 	private void Write(Path path) {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Room.findAllToRegister");
 		saltGroupFile.add("nodegroups:");
 		for( Room room : (List<Room>) query.getResultList() ) {
@@ -143,7 +142,6 @@ public class DHCPConfig extends Controller {
 		} catch( IOException e ) {
 			e.printStackTrace();
 		} finally {
-			em.close();
 		}
 	}
 

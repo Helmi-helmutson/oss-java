@@ -28,8 +28,8 @@ public class InformationController extends Controller {
 	/**
 	 * @param session
 	 */
-	public InformationController(Session session) {
-		super(session);
+	public InformationController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	/**
@@ -49,7 +49,6 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
 		User user = this.session.getUser();
-		EntityManager em = getEntityManager();
 		announcement.setOwner(user);
 		announcement.setCategories( new ArrayList<Category>() );
 		Category category;
@@ -76,7 +75,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -97,7 +95,6 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
 		User user = this.session.getUser();
-		EntityManager em = getEntityManager();
 		contact.setOwner(user);
 		Category category;
 		try {
@@ -123,7 +120,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -144,7 +140,6 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
 		User user = this.session.getUser();
-		EntityManager em = getEntityManager();
 		faq.setOwner(user);
 		Category category;
 		try {
@@ -170,7 +165,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -182,15 +176,12 @@ public class InformationController extends Controller {
 	public List<Announcement> getAnnouncements() {
 		List<Announcement> announcements = new ArrayList<Announcement>();
 		User user;
-		EntityManager em = getEntityManager();
 		try {
 			user = em.find(User.class, this.session.getUser().getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			em.close();
 			return null;
 		} finally {
-			em.close();
 		}
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
@@ -215,15 +206,12 @@ public class InformationController extends Controller {
 	public List<Announcement> getNewAnnouncements() {
 		List<Announcement> announcements = new ArrayList<Announcement>();
 		User user;
-		EntityManager em = getEntityManager();
 		try {
 			user = em.find(User.class, this.session.getUser().getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			em.close();
 			return null;
 		} finally {
-			em.close();
 		}
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
@@ -244,7 +232,6 @@ public class InformationController extends Controller {
 	}
 
 	public OssResponse setAnnouncementHaveSeen(Long announcementId) {
-		EntityManager em = getEntityManager();
 		try {
 			Announcement announcement = em.find(Announcement.class, announcementId);
 			User user = this.session.getUser();
@@ -258,7 +245,6 @@ public class InformationController extends Controller {
 			logger.error("setAnnouncementHaveSeen:" + this.getSession().getUserId() + " " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR","Annoncement could not be set as seen.");
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Annoncement was set as seen.");
 	}
@@ -270,15 +256,12 @@ public class InformationController extends Controller {
 	public List<FAQ> getFAQs() {
 		List<FAQ> faqs = new ArrayList<FAQ>();
 		User user;
-		EntityManager em = getEntityManager();
 		try {
 			user = em.find(User.class, this.session.getUser().getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			em.close();
 			return null;
 		} finally {
-			em.close();
 		}
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
@@ -302,15 +285,12 @@ public class InformationController extends Controller {
 	public List<Contact> getContacts() {
 		List<Contact> contacts = new ArrayList<Contact>();
 		User user;
-		EntityManager em = getEntityManager();
 		try {
 			user = em.find(User.class, this.session.getUser().getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
-			em.close();
 			return null;
 		} finally {
-			em.close();
 		}
 		for(Group group : user.getGroups() ) {
 			for(Category category : group.getCategories() ) {
@@ -326,38 +306,32 @@ public class InformationController extends Controller {
 	}
 
 	public Announcement getAnnouncementById(Long AnnouncementId) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(Announcement.class, AnnouncementId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public Contact getContactById(Long ContactId) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(Contact.class, ContactId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public FAQ getFAQById(Long FAQId) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(FAQ.class, FAQId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -371,7 +345,6 @@ public class InformationController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
-		EntityManager em = getEntityManager();
 		if( !this.mayModify(announcement) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this Announcement");
@@ -397,7 +370,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -411,7 +383,6 @@ public class InformationController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
-		EntityManager em = getEntityManager();
 		if( !this.mayModify(contact) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this contact");
@@ -431,7 +402,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -445,7 +415,6 @@ public class InformationController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
-		EntityManager em = getEntityManager();
 		if( !this.mayModify(faq) )
 		{
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this FAQ ");
@@ -463,7 +432,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -473,7 +441,6 @@ public class InformationController extends Controller {
 	 * @return The result in form of OssResponse
 	 */
 	public OssResponse deleteAnnouncement(Long announcementId) {
-		EntityManager em = getEntityManager();
 		Announcement announcement;
 		try {
 			announcement = em.find(Announcement.class, announcementId);
@@ -499,7 +466,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -509,7 +475,6 @@ public class InformationController extends Controller {
 	 * @return The result in form of OssResponse
 	 */
 	public OssResponse deleteContact(Long contactId) {
-		EntityManager em = getEntityManager();
 		Contact contact;
 		try {
 			contact = em.find(Contact.class, contactId);
@@ -535,7 +500,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -545,7 +509,6 @@ public class InformationController extends Controller {
 	 * @return The result in form of OssResponse
 	 */
 	public OssResponse deleteFAQ(Long faqId) {
-		EntityManager em = getEntityManager();
 		FAQ faq;
 		try {
 			faq = em.find(FAQ.class, faqId);
@@ -571,7 +534,6 @@ public class InformationController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -582,7 +544,7 @@ public class InformationController extends Controller {
 	 * @return The list of the found categories.
 	 */
 	public List<Category> getInfoCategories() {
-		CategoryController categoryController = new CategoryController(this.session);
+		CategoryController categoryController = new CategoryController(session,em);
 		boolean isSuperuser = this.isSuperuser();
 		List<Category> categories = new ArrayList<Category>();
 		for(Category category : this.session.getUser().getOwnedCategories() ) {

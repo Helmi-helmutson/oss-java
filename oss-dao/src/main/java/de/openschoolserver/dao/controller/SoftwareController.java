@@ -46,15 +46,14 @@ public class SoftwareController extends Controller {
 	private static String SALT_PACKAGE_DIR = "/srv/salt/packages/";
 	private static String SALT_SOURCE_DIR  = "/srv/salt/win/repo-ng/";
 
-	public SoftwareController(Session session) {
-		super(session);
+	public SoftwareController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	/*
 	 * Functions to create and modify softwares
 	 */
 	public Software getById(long softwareId) {
-		EntityManager em = getEntityManager();
 		try {
 			Software software =  em.find(Software.class, softwareId);
 			File f = new File(SALT_SOURCE_DIR + software.getName() );
@@ -75,48 +74,40 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public SoftwareVersion getSoftwareVersionById(long id) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(SoftwareVersion.class, id);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public SoftwareStatus getSoftwareStatusById(long id) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(SoftwareStatus.class, id);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public SoftwareLicense getSoftwareLicenseById(long id) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(SoftwareLicense.class, id);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<Software> search(String search) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("SoftwareStatus.search").setParameter("search",search);
 			return query.getResultList();
@@ -124,12 +115,10 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public OssResponse add(Software software, Boolean replace) {
-		EntityManager em = getEntityManager();
 		logger.debug("Add software" + software);
 
 		Software oldSoftware = this.getByName(software.getName());
@@ -182,7 +171,6 @@ public class SoftwareController extends Controller {
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error("Updating the software:" + e.getMessage());
-				em.close();
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 			}
 			return new OssResponse(this.getSession(),"OK","New software version was created succesfully",softwareVersion.getId());
@@ -217,13 +205,11 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Software was created succesfully.",newSoftware.getId());
 	}
 
 	public OssResponse delete(Long softwareId) {
-		EntityManager em = getEntityManager();
 		try {
 			Software software =  em.find(Software.class, softwareId);
 			String softwareName = software.getName();
@@ -270,13 +256,11 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Software was deleted succesfully");
 	}
 
 	public OssResponse modify(Software software) {
-		EntityManager em = getEntityManager();
 		try {
 			//Modifying only the software entry itself
 			em.getTransaction().begin();
@@ -286,13 +270,11 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Software was created succesfully");
 	}
 
 	public List<Software> getAll() {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Software.findAll");
 		List<Software> softwares = new ArrayList<Software>();
 		for( Software software : (List<Software>)query.getResultList() ) {
@@ -320,7 +302,6 @@ public class SoftwareController extends Controller {
 	}
 
 	public List<Software> getAllInstallable() {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Software.findAll");
 		List<Software> softwares = new ArrayList<Software>();
 		for( Software software : (List<Software>)query.getResultList() ) {
@@ -354,7 +335,6 @@ public class SoftwareController extends Controller {
 	}
 
 	public Software getByName(String name) {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Software.getByName")
 				.setParameter("name", name);
 		if( query.getResultList().isEmpty() ) {
@@ -364,7 +344,6 @@ public class SoftwareController extends Controller {
 	}
 
 	public Software getByNameOrDescription(String name) {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Software.getByNameOrDescription")
 				.setParameter("name", name)
 				.setParameter("desc", name);
@@ -375,7 +354,6 @@ public class SoftwareController extends Controller {
 	}
 
 	public Software getByNameOrDescription(String name, String description) {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("SoftwareFullName.getByName")
 				.setParameter("fullName", description);
 		if( !query.getResultList().isEmpty() ) {
@@ -397,7 +375,6 @@ public class SoftwareController extends Controller {
 	}
 
 	public List<SoftwareVersion> getAllVersion() {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("SoftwareVersion.findAll");
 		return (List<SoftwareVersion>)query.getResultList();
 	}
@@ -692,7 +669,6 @@ public class SoftwareController extends Controller {
 	public List<Map<String, String>> statistic() {
 		List<Map<String, String>> softwareStatusList = new ArrayList<Map<String, String>>();
 		Map<String,String> statusMap = new HashMap<>();
-		EntityManager em = getEntityManager();
         Query query;
         Integer count;
 
@@ -747,7 +723,6 @@ public class SoftwareController extends Controller {
 	 * @see SoftwareStatus
 	 */
 	public List<SoftwareStatus> getAllStatus(String installationStatus) {
-		EntityManager em = getEntityManager();
         Query query = em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS",installationStatus);
         return (List<SoftwareStatus>) query.getResultList();
 	}
@@ -759,7 +734,7 @@ public class SoftwareController extends Controller {
 	 *  @return		The result in a OssResult.
 	 */
 	public OssResponse createInstallationCategory(Category category) {
-		CategoryController categoryController = new CategoryController(this.session);
+		CategoryController categoryController = new CategoryController(session,em);
 		category.setCategoryType("installation");
 		category.setPublicAccess(false);
 		return categoryController.add(category);
@@ -772,7 +747,6 @@ public class SoftwareController extends Controller {
 	 * @return The result in a OssResult.
 	 */
 	public OssResponse addSoftwareToCategory(Long softwareId,Long categoryId){
-		EntityManager em = getEntityManager();
 		try {
 			Software s = em.find(Software.class, softwareId);
 			Category c = em.find(Category.class, categoryId);
@@ -791,7 +765,6 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());;
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Software was added to the installation succesfully.");
 	}
@@ -803,7 +776,6 @@ public class SoftwareController extends Controller {
 	 * @return The result in a OssResult.
 	 */
 	public OssResponse deleteSoftwareFromCategory(Long softwareId,Long categoryId){
-		EntityManager em = getEntityManager();
 		try {
 			Software s = em.find(Software.class, softwareId);
 			Category c = em.find(Category.class, categoryId);
@@ -826,7 +798,6 @@ public class SoftwareController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","SoftwareState was added to category succesfully");
 	}
@@ -845,7 +816,6 @@ public class SoftwareController extends Controller {
 			FormDataContentDisposition contentDispositionHeader
 			)
 	{
-		EntityManager em = getEntityManager();
 		Software software = this.getById(softwareId);
 		softwareLicense.setCreator(this.session.getUser());
 		if(softwareLicense.getLicenseType().equals('F')) {
@@ -859,7 +829,6 @@ public class SoftwareController extends Controller {
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 			} finally {
-				em.close();
 			}
 			return this.uploadLicenseFile(softwareLicense, fileInputStream, contentDispositionHeader);
 		}
@@ -874,7 +843,6 @@ public class SoftwareController extends Controller {
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 			} finally {
-				em.close();
 			}
 		} else {
 			File file = null;
@@ -903,7 +871,6 @@ public class SoftwareController extends Controller {
 				logger.error(e.getMessage(), e);
 				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			} finally {
-				em.close();
 			}
 		}
 		return new OssResponse(this.getSession(),"OK","License was added to the software succesfully");
@@ -923,7 +890,6 @@ public class SoftwareController extends Controller {
 		}
 		oldLicense.setCount(softwareLicense.getCount());
 		oldLicense.setValue(softwareLicense.getValue());
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(oldLicense);
@@ -931,7 +897,6 @@ public class SoftwareController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		if( softwareLicense.getLicenseType().equals('F') && fileInputStream != null ) {
 			return this.uploadLicenseFile(softwareLicense, fileInputStream, contentDispositionHeader);
@@ -947,7 +912,6 @@ public class SoftwareController extends Controller {
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader)
 	{
-		EntityManager em = getEntityManager();
 		try {
 			String fileName = contentDispositionHeader.getFileName();
 			StringBuilder newFileName = new StringBuilder(SALT_PACKAGE_DIR);
@@ -965,13 +929,11 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage(), e);
 			throw new WebApplicationException(500);
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Software License File was uploaded succesfully");
 	}
 
 	public OssResponse deleteLicence(long licenseId) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			SoftwareLicense sl = em.find(SoftwareLicense.class, licenseId);
@@ -984,7 +946,6 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Software license was deleted successfully");
 	}
@@ -1010,7 +971,6 @@ public class SoftwareController extends Controller {
 					return new OssResponse(this.getSession(),"OK","License was already added to the device.");
 				}
 			}
-			EntityManager em = getEntityManager();
 			SoftwareLicense softwareLicense = this.getNextFreeLicenseId(software);
 			if( softwareLicense == null) {
 				return new OssResponse(this.getSession(),"ERROR","There is not enough licences.");
@@ -1022,10 +982,8 @@ public class SoftwareController extends Controller {
 					em.getTransaction().commit();
 				} catch (Exception e) {
 					logger.error(e.getMessage());
-					em.close();
 					return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 				} finally {
-					em.close();
 				}
 			}
 			return new OssResponse(this.getSession(),"OK","License was added to the device succesfully.");
@@ -1038,7 +996,6 @@ public class SoftwareController extends Controller {
 
 			for( SoftwareLicense myLicense : device.getSoftwareLicenses() ) {
 				if( myLicense.getSoftware().equals(software) ){
-					EntityManager em = getEntityManager();
 					try {
 						em.getTransaction().begin();
 						device.getSoftwareLicenses().remove(myLicense);
@@ -1048,10 +1005,8 @@ public class SoftwareController extends Controller {
 						em.getTransaction().commit();
 					} catch (Exception e) {
 						logger.error(e.getMessage());
-						em.close();
 						return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 					} finally {
-						em.close();
 					}
 					return new OssResponse(this.getSession(),"OK","License was removed from device.");
 				}
@@ -1066,7 +1021,6 @@ public class SoftwareController extends Controller {
 	 * Sets the software status on a device to a given version and remove the other status.
 	 */
 	public void setSoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
-		EntityManager em = getEntityManager();
 		List<SoftwareVersion> lsv;
 
 		List<SoftwareStatus> lss = new ArrayList<SoftwareStatus>();
@@ -1104,7 +1058,6 @@ public class SoftwareController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -1124,7 +1077,6 @@ public class SoftwareController extends Controller {
 	 * Modify the software status on a device. If there is no status nothing will be happenend.
 	 */
 	public void modifySoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			for( SoftwareStatus ss : this.getSoftwareStatusListFromDevice(d, s, version) ) {
@@ -1135,7 +1087,6 @@ public class SoftwareController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -1143,7 +1094,6 @@ public class SoftwareController extends Controller {
 	 * Remove the software status from a device.
 	 */
 	public void removeSoftwareStatusOnDevice(Device d, Software s,  String version) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			for( SoftwareStatus ss : this.getSoftwareStatusListFromDevice(d, s, version) ) {
@@ -1153,7 +1103,6 @@ public class SoftwareController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -1229,7 +1178,6 @@ public class SoftwareController extends Controller {
 	 * Set the software status on a device to a defined software version
 	 */
 	public void setInstallUpdateOnDevice(Software software, SoftwareVersion softwareVersion, Device device) {
-		EntityManager em = getEntityManager();
 		try {
 			boolean update    = false;
 			boolean installed = false;
@@ -1255,7 +1203,6 @@ public class SoftwareController extends Controller {
 		} catch (Exception e) {
 			logger.error("Error in setInstallUpdateOnDevice" + e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -1263,8 +1210,8 @@ public class SoftwareController extends Controller {
 	 * Save the software status what shall be installed to host sls files.
 	 */
 	public OssResponse applySoftwareStateToHosts(){
-		RoomController   roomController   = new RoomController(this.session);
-		DeviceController deviceController = new DeviceController(this.session);
+		RoomController   roomController   = new RoomController(session,em);
+		DeviceController deviceController = new DeviceController(session,em);
 		Map<String,List<String>>   softwaresToInstall = new HashMap<>();
 		Map<String,List<Software>> softwaresToRemove  = new HashMap<>();
 		List<String>   toInstall    = new ArrayList<String>();
@@ -1364,7 +1311,7 @@ public class SoftwareController extends Controller {
 		}
 
 		//Evaluate hwconf categories
-		for( HWConf hwconf : new CloneToolController(this.session).getAllHWConf() ) {
+		for( HWConf hwconf : new CloneToolController(session,em).getAllHWConf() ) {
 			logger.debug("HWConfs: " + hwconf.getName() + " " + hwconf.getDeviceType());
 			if( !hwconf.getDeviceType().equals("FatClient")) {
 				continue;
@@ -1557,7 +1504,6 @@ public class SoftwareController extends Controller {
 		SoftwareStatus  softwareStatus  = null;
 		Software        software        = this.getByNameOrDescription(softwareName,description);
 		SoftwareVersion softwareVersion = null;
-		EntityManager em = getEntityManager();
 		logger.debug("setSoftwareStatusOnDevice called: " + softwareName + " ## " + version +" ## " + status);
 		if( software == null ) {
 			// Software does not exist. It is a manually installed software.
@@ -1572,7 +1518,6 @@ public class SoftwareController extends Controller {
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error("Can not create software: " + e.getMessage());
-				em.close();
 				return new OssResponse(this.getSession(),"ERROR","Can not create software: " +e.getMessage());
 			}
 		}
@@ -1595,7 +1540,6 @@ public class SoftwareController extends Controller {
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error("Can not create software version: " + e.getMessage());
-				em.close();
 				return new OssResponse(this.getSession(),"ERROR","Can not create software version " + e.getMessage());
 			}
 		}
@@ -1636,7 +1580,6 @@ public class SoftwareController extends Controller {
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error("Can not create software status:" + e.getMessage());
-				em.close();
 				return new OssResponse(this.getSession(),"ERROR","Can not create software status:" + e.getMessage());
 			}
 		} else {
@@ -1647,7 +1590,6 @@ public class SoftwareController extends Controller {
 				em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error("Can not modify software status:" + e.getMessage());
-				em.close();
 				return new OssResponse(this.getSession(),"ERROR","Can not modify software status:" + e.getMessage());
 			}
 		}
@@ -1667,25 +1609,22 @@ public class SoftwareController extends Controller {
 			}
 		} catch (Exception e) {
 			logger.error("Can not remove software status:" + e.getMessage());
-			em.close();
 			return new OssResponse(this.getSession(),"ERROR","Can not remove software status:" + e.getMessage());
 		}
-		em.close();
 		return new OssResponse(this.getSession(),"OK","Software State was saved succesfully");
 	}
 
 	public OssResponse setSoftwareStatusOnDeviceById(Long deviceId, String softwareName, String description, String version, String status) {
-		Device device = new DeviceController(this.session).getById(deviceId);
+		Device device = new DeviceController(session,em).getById(deviceId);
 		return this.setSoftwareStatusOnDevice(device, softwareName, description, version, status);
 	}
 
 	public OssResponse setSoftwareStatusOnDeviceByName(String deviceName, String softwareName, String description, String version, String status) {
-		Device device =  new DeviceController(this.session).getByName(deviceName);
+		Device device =  new DeviceController(session,em).getByName(deviceName);
 		return this.setSoftwareStatusOnDevice(device, softwareName, description, version, status);
 	}
 
 	public OssResponse cleunUpSoftwareStatusOnDevice(Device device, Software software) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			for(SoftwareStatus st : device.getSoftwareStatus() ) {
@@ -1699,7 +1638,6 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","All software states was removed from device.");
 	}
@@ -1713,7 +1651,6 @@ public class SoftwareController extends Controller {
 	 * @return					An OssResponse object will be returned
 	 */
 	public OssResponse deleteSoftwareStatusFromDevice(Device device, String softwareName, String version ) {
-		EntityManager em = getEntityManager();
 		for(SoftwareStatus st : device.getSoftwareStatus() ) {
 			if( st.getSoftwareVersion().getVersion().equals(version) && st.getSoftwareVersion().getSoftware().getName().equals(softwareName) ) {
 				try {
@@ -1726,7 +1663,6 @@ public class SoftwareController extends Controller {
 					logger.error(e.getMessage());
 					return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 				} finally {
-					em.close();
 				}
 			}
 		}
@@ -1734,24 +1670,24 @@ public class SoftwareController extends Controller {
 	}
 
 	public OssResponse deleteSoftwareStatusFromDeviceByName(String deviceName, String softwareName, String version) {
-		Device device = new DeviceController(this.session).getByName(deviceName);
+		Device device = new DeviceController(session,em).getByName(deviceName);
 		return this.deleteSoftwareStatusFromDevice(device, softwareName, version);
 	}
 
 	public OssResponse deleteSoftwareStatusFromDeviceById(Long deviceId, String softwareName, String version) {
-		Device device = new DeviceController(this.session).getById(deviceId);
+		Device device = new DeviceController(session,em).getById(deviceId);
 		return this.deleteSoftwareStatusFromDevice(device, softwareName, version);
 	}
 
 	public String getSoftwareStatusOnDeviceByName(String deviceName, String softwareName,
 			String version) {
-		Device device = new DeviceController(this.session).getByName(deviceName);
+		Device device = new DeviceController(session,em).getByName(deviceName);
 		Software software = this.getByName(softwareName);
 		return this.getSoftwareStatusOnDevice(device, software, version);
 	}
 
 	public String getSoftwareStatusOnDeviceById(Long deviceId, String softwareName, String version) {
-		Device device = new DeviceController(this.session).getById(deviceId);
+		Device device = new DeviceController(session,em).getById(deviceId);
 		Software software = this.getByName(softwareName);
 		return this.getSoftwareStatusOnDevice(device, software, version);
 	}
@@ -1773,7 +1709,7 @@ public class SoftwareController extends Controller {
 		return softwareStatus;
 	}
 	public List<SoftwareStatus> getAllSoftwareStatusOnDeviceById(Long deviceId) {
-		return getAllSoftwareStatusOnDevice(new DeviceController(this.session).getById(deviceId));
+		return getAllSoftwareStatusOnDevice(new DeviceController(session,em).getById(deviceId));
 	}
 	public List<SoftwareStatus> getAllSoftwareStatusOnDevice(Device device) {
 		List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
@@ -1791,13 +1727,13 @@ public class SoftwareController extends Controller {
 	}
 
 	public List<SoftwareStatus> getSoftwareStatusOnDeviceById(Long deviceId, Long softwareId) {
-		Device  device = new DeviceController(this.session).getById(deviceId);
+		Device  device = new DeviceController(session,em).getById(deviceId);
 		return this.getSoftwareStatusOnDevice(device, softwareId);
 	}
 
 	public String getSoftwareLicencesOnDevice(String deviceName) {
 
-		Device        device    =  new DeviceController(this.session).getByName(deviceName);
+		Device        device    =  new DeviceController(session,em).getByName(deviceName);
 		if( device == null ) {
 			logger.info("getSoftwareLicencesOnDevice: Device " + deviceName + " does not exists.");
 			return "";
@@ -1822,7 +1758,6 @@ public class SoftwareController extends Controller {
 	}
 
 	public OssResponse addRequirements(Software software, Software requirement) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			software.getSoftwareRequirements().add(requirement);
@@ -1834,7 +1769,6 @@ public class SoftwareController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Software requirement was added successfully");
 	}

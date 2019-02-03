@@ -35,12 +35,11 @@ public class JobController extends Controller {
 
 	private static String basePath = "/home/groups/SYSADMINS/jobs/";
 
-	public JobController(Session session) {
-		super(session);
+	public JobController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	public Job getById(Long jobId) {
-		EntityManager em = getEntityManager();
 		try {
 			Job job = em.find(Job.class, jobId);
 			Path JOB_COMMAND = Paths.get(basePath + String.valueOf(jobId));
@@ -54,7 +53,6 @@ public class JobController extends Controller {
 			logger.error("DeviceId:" + jobId + " " + e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -84,7 +82,6 @@ public class JobController extends Controller {
 		/*
 		 * Create the Job entity
 		 */
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.persist(job);
@@ -93,7 +90,6 @@ public class JobController extends Controller {
 			logger.error("createJob" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 
 		/*
@@ -134,7 +130,6 @@ public class JobController extends Controller {
 	}
 
 	public OssResponse setExitCode(Long jobId, Integer exitCode) {
-		EntityManager em = getEntityManager();
 		try {
 			Job job = em.find(Job.class, jobId);
 			job.setExitCode(exitCode);
@@ -146,13 +141,11 @@ public class JobController extends Controller {
 			logger.error("createJob" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Jobs exit code was set successfully");
 	}
 
 	public OssResponse restartJob(Long jobId) {
-		EntityManager em = getEntityManager();
 		try {
 			Job job = em.find(Job.class, jobId);
 			job.setStartTime(new Timestamp(System.currentTimeMillis()));
@@ -163,7 +156,6 @@ public class JobController extends Controller {
 			logger.error("createJob" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		String[] program   = new String[4];
 		StringBuffer reply = new StringBuffer();
@@ -178,7 +170,6 @@ public class JobController extends Controller {
 
 	@SuppressWarnings("unchecked")
 	public List<Job> searchJobs(String description, Timestamp after, Timestamp befor) {
-		EntityManager em = getEntityManager();
 		Query query = null;
 		if( after.equals(befor) ) {
 			query = em.createNamedQuery("Job.getByDescription").setParameter("description", description);
@@ -189,34 +180,27 @@ public class JobController extends Controller {
 					.setParameter("befor", befor);
 		}
 		List<Job> jobs =  query.getResultList();
-		em.close();
 		return jobs;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Job> getRunningJobs() {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Job.getRunning");
 		List<Job> jobs =  query.getResultList();
-		em.close();
 		return jobs;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Job> getFailedJobs() {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Job.getFailed");
 		List<Job> jobs =  query.getResultList();
-		em.close();
 		return jobs;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Job> getSucceededJobs() {
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery("Job.getSucceeded");
 		List<Job> jobs =  query.getResultList();
-		em.close();
 		return jobs;
 	}
 }

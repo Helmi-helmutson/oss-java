@@ -4,6 +4,7 @@ package de.openschoolserver.api.auth;
 
 import java.util.Optional;
 
+import javax.persistence.EntityManager;
 
 import io.dropwizard.auth.AuthenticationException;
 import io.dropwizard.auth.Authenticator;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.SessionController;
+import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 
 public class OSSTokenAuthenticator implements Authenticator<String, Session> {
 
@@ -22,8 +24,8 @@ public class OSSTokenAuthenticator implements Authenticator<String, Session> {
     public Optional<Session> authenticate(String token) throws AuthenticationException {
 
         logger.debug("Token: " + token);
-        
-        final SessionController sessionController = new SessionController();
+        EntityManager em = new CommonEntityManagerFactory().getEntityManager(null);
+        final SessionController sessionController = new SessionController(em);
         final Session session = sessionController.validateToken(token);
        
         if (session != null) {

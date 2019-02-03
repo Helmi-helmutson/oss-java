@@ -3,6 +3,8 @@ package de.openschoolserver.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,11 +38,11 @@ public class SmartRoom {
 
 	private Long[][]  deviceMatrix;
 
-	public SmartRoom(Session session, Long roomId) {
-		DeviceController    dc = new DeviceController(session);
-		EducationController ec = new EducationController(session);
-		RoomController      rc = new RoomController(session);
-		UserController      uc = new UserController(session);
+	public SmartRoom(Session session, EntityManager em, Long roomId) {
+		DeviceController    dc = new DeviceController(session,em);
+		EducationController ec = new EducationController(session,em);
+		RoomController      rc = new RoomController(session,em);
+		UserController      uc = new UserController(session,em);
 		this.loggedIns         = ec.getRoom(roomId);
 		rc.organizeRoom(roomId);
 		Room              room = rc.getById(roomId);

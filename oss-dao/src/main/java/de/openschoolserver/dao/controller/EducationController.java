@@ -27,15 +27,14 @@ public class EducationController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(EducationController.class);
 
-	public EducationController(Session session) {
-		super(session);
+	public EducationController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	/*
 	 * Return the Category to a smart room
 	 */
 	public Category getCategoryToRoom(Long roomId){
-		EntityManager   em = getEntityManager();
 		Room room;
 		try {
 			room = em.find(Room.class, roomId);
@@ -43,7 +42,6 @@ public class EducationController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 		for( Category category : room.getCategories() ) {
 			if( room.getName().equals(category.getName()) && category.getCategoryType().equals("smartRoom")) {
@@ -55,7 +53,7 @@ public class EducationController extends Controller {
 
 	public List<Room> getMySmartRooms() {
 		List<Room> smartRooms = new ArrayList<Room>();
-		for( Category category  : new CategoryController(session).getByType("smartRoom") ) {
+		for( Category category  : new CategoryController(session,em).getByType("smartRoom") ) {
 			if( category.getOwner().equals(session.getUser())) {
 				logger.debug("getMySamrtRooms" + category);
 				if( category.getRooms() != null && category.getRooms().size() > 0 ) {
@@ -78,7 +76,7 @@ public class EducationController extends Controller {
 	public List<Room> getMyRooms() {
 		List<Room> rooms = new ArrayList<Room>();
 		if( this.session.getRoom() == null || this.session.getRoom().getRoomControl().equals("no")){
-			for( Room room : new RoomController(this.session).getAllToUse() ) {
+			for( Room room : new RoomController(session,em).getAllToUse() ) {
 				switch(room.getRoomControl()) {
 				case "no":
 				case "inRoom":
@@ -124,7 +122,6 @@ public class EducationController extends Controller {
 	 * }
 	 */
 	public OssResponse createSmartRoom(Category smartRoom) {
-		EntityManager   em = getEntityManager();
 		User   owner       = this.session.getUser();
 		/* Define the room */
 		Room     room      = new Room();
@@ -149,7 +146,6 @@ public class EducationController extends Controller {
 			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			em.close();
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
 		try {
@@ -157,7 +153,7 @@ public class EducationController extends Controller {
 			/*
 			 * Add groups to the smart room
 			 */
-			GroupController groupController = new GroupController(this.session);
+			GroupController groupController = new GroupController(session,em);
 			for( Long id : smartRoom.getGroupIds()) {
 				Group group = groupController.getById(id);
 				smartRoom.getGroups().add(group);
@@ -168,7 +164,7 @@ public class EducationController extends Controller {
 			/*
 			 * Add users to the smart room
 			 */
-			UserController  userController  = new UserController(this.session);
+			UserController  userController  = new UserController(session,em);
 			for( Long id : smartRoom.getUserIds()) {
 				User user = userController.getById(Long.valueOf(id));
 				if(smartRoom.getStudentsOnly() && ! user.getRole().equals(roleStudent)){
@@ -182,7 +178,7 @@ public class EducationController extends Controller {
 			/*
 			 * Add devices to the smart room
 			 */
-			DeviceController deviceController = new DeviceController(this.session);
+			DeviceController deviceController = new DeviceController(session,em);
 			for( Long id: smartRoom.getDeviceIds()) {
 				Device device = deviceController.getById(Long.valueOf(id));
 				smartRoom.getDevices().add(device);
@@ -195,13 +191,11 @@ public class EducationController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Smart Room was created succesfully.");
 	}
 
 	public OssResponse modifySmartRoom(long roomId, Category smartRoom) {
-		EntityManager   em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			Room room = smartRoom.getRooms().get(0);
@@ -214,13 +208,11 @@ public class EducationController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Smart Room was modified succesfully.");
 	}
 
 	public OssResponse deleteSmartRoom(Long roomId) {
-		EntityManager   em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			Room room         = em.find(Room.class, roomId);
@@ -240,7 +232,6 @@ public class EducationController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Smart Room was deleted succesfully.");
 	}
@@ -255,7 +246,7 @@ public class EducationController extends Controller {
 	public List<List<Long>> getRoom(long roomId) {
 		List<List<Long>> loggedOns = new ArrayList<List<Long>>();
 		List<Long> loggedOn;
-		RoomController roomController = new RoomController(this.session);
+		RoomController roomController = new RoomController(session,em);
 		Room room = roomController.getById(roomId);
 		User me   = this.session.getUser();
 		if( room.getRoomType().equals("smartRoom")) {
@@ -363,7 +354,7 @@ public class EducationController extends Controller {
 		}
 		switch(what) {
 		case "users":
-			UserController uc = new UserController(this.session);
+			UserController uc = new UserController(session,em);
 			for( Long id : objectIds) {
 				User user = uc.getById(id);
 				if( user != null ) {
@@ -374,7 +365,7 @@ public class EducationController extends Controller {
 			}
 			break;
 		case "user":
-			User user = new UserController(this.session).getById(objectId);
+			User user = new UserController(session,em).getById(objectId);
 			if( user != null ) {
 				responses.add(this.saveFileToUserImport(user, file, fileName));
 			} else {
@@ -382,7 +373,7 @@ public class EducationController extends Controller {
 			}
 			break;
 		case "group":
-			Group group = new GroupController(this.session).getById(objectId);
+			Group group = new GroupController(session,em).getById(objectId);
 			if( group != null ) {
 				for( User myUser : group.getUsers() ) {
 					if( !this.session.getUser().equals(myUser) &&
@@ -395,7 +386,7 @@ public class EducationController extends Controller {
 			}
 			break;
 		case "device":
-			Device device = new DeviceController(this.session).getById(objectId);
+			Device device = new DeviceController(session,em).getById(objectId);
 			if( device != null ) {
 				for( User myUser : device.getLoggedIn() ) {
 					responses.add(this.saveFileToUserImport(myUser, file, fileName));
@@ -405,8 +396,8 @@ public class EducationController extends Controller {
 			}
 			break;
 		case "room":
-			UserController   userController   = new UserController(this.session);
-			DeviceController deviceController = new DeviceController(this.session);
+			UserController   userController   = new UserController(session,em);
+			DeviceController deviceController = new DeviceController(session,em);
 			for( List<Long> loggedOn : this.getRoom(objectId) ) {
 				User myUser = userController.getById(loggedOn.get(0));
 				if( myUser == null ) {
@@ -478,14 +469,14 @@ public class EducationController extends Controller {
 
 
 	public OssResponse createGroup(Group group) {
-		GroupController groupController = new GroupController(this.session);
+		GroupController groupController = new GroupController(session,em);
 		group.setGroupType("workgroup");
 		group.setOwner(session.getUser());
 		return groupController.add(group);
 	}
 
 	public OssResponse modifyGroup(long groupId, Group group) {
-		GroupController groupController = new GroupController(this.session);
+		GroupController groupController = new GroupController(session,em);
 		Group emGroup = groupController.getById(groupId);
 		if( this.session.getUser().equals(emGroup.getOwner())) {
 			return groupController.modify(group);
@@ -495,7 +486,7 @@ public class EducationController extends Controller {
 	}
 
 	public OssResponse deleteGroup(long groupId) {
-		GroupController groupController = new GroupController(this.session);
+		GroupController groupController = new GroupController(session,em);
 		Group emGroup = groupController.getById(groupId);
 		if( this.session.getUser().equals(emGroup.getOwner())) {
 			return groupController.delete(groupId);
@@ -505,7 +496,7 @@ public class EducationController extends Controller {
 	}
 
 	public List<String> getAvailableRoomActions(long roomId) {
-		Room room = new RoomController(this.session).getById(roomId);
+		Room room = new RoomController(session,em).getById(roomId);
 		List<String> actions = new ArrayList<String>();
 		for( String action : this.getProperty("de.openschoolserver.dao.EducationController.RoomActions").split(",") ) {
 			if(! this.checkMConfig(room, "disabledActions", action )) {
@@ -516,7 +507,7 @@ public class EducationController extends Controller {
 	}
 
 	public List<String> getAvailableUserActions(long userId) {
-		User user = new UserController(this.session).getById(userId);
+		User user = new UserController(session,em).getById(userId);
 		List<String> actions = new ArrayList<String>();
 		for( String action : this.getProperty("de.openschoolserver.dao.EducationController.UserActions").split(",") ) {
 			if(! this.checkMConfig(user, "disabledActions", action )) {
@@ -527,7 +518,7 @@ public class EducationController extends Controller {
 	}
 
 	public List<String> getAvailableDeviceActions(long deviceId) {
-		Device device = new DeviceController(this.session).getById(deviceId);
+		Device device = new DeviceController(session,em).getById(deviceId);
 		List<String> actions = new ArrayList<String>();
 		for( String action : this.getProperty("de.openschoolserver.dao.EducationController.DeviceActions").split(",") ) {
 			if(! this.checkMConfig(device, "disabledActions", action )) {
@@ -541,16 +532,16 @@ public class EducationController extends Controller {
 	public OssResponse manageRoom(long roomId, String action, Map<String, String> actionContent) {
 		OssResponse ossResponse = null;
 		List<String> errors = new ArrayList<String>();
-		DeviceController dc = new DeviceController(this.session);
+		DeviceController dc = new DeviceController(session,em);
 
 		/*
 		* This is a very special action
 		*/
 		if( action.startsWith("organize")) {
-			return new RoomController(session).organizeRoom(roomId);
+			return new RoomController(session,em).organizeRoom(roomId);
 		}
 
-		Room room = new RoomController(this.session).getById(roomId);
+		Room room = new RoomController(session,em).getById(roomId);
 		if( action.equals("setPassword" ) ) {
 			StringBuffer reply = new StringBuffer();
 			StringBuffer error = new StringBuffer();
@@ -610,7 +601,6 @@ public class EducationController extends Controller {
 	}
 
 	public Long getRoomActualController(long roomId) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("SmartControl.getAllActiveInRoom");
 			query.setParameter("roomId", roomId);
@@ -624,7 +614,6 @@ public class EducationController extends Controller {
 		  logger.error(e.getMessage());
 		  return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -644,7 +633,7 @@ public class EducationController extends Controller {
 		}
 
 		// Get the list of the devices
-		DeviceController dc = new DeviceController(this.session);
+		DeviceController dc = new DeviceController(session,em);
 		List<String>  devices = new ArrayList<String>();
 		String domain         = "." + this.getConfigValue("DOMAIN");
 		for( List<Long> loggedOn : this.getRoom(roomId) ) {
@@ -665,7 +654,6 @@ public class EducationController extends Controller {
 		OSSShellTools.exec(program, reply, stderr, null);
 
 		RoomSmartControl roomSmartControl = new RoomSmartControl(roomId,this.session.getUserId(),minutes);
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.persist(roomSmartControl);
@@ -674,7 +662,6 @@ public class EducationController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK", "Now you have the control for the selected room.");
 	}

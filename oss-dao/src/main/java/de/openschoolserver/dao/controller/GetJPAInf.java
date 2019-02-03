@@ -12,17 +12,19 @@ import java.net.Socket;
 import de.openschoolserver.dao.User;
 import java.util.Scanner;
 
+import javax.persistence.EntityManager;
+
 
 public class GetJPAInf extends Controller implements Runnable {
 	private Socket client;
 
-	public GetJPAInf(Session session,Socket client) {
-		super(session);
+	public GetJPAInf(Session session,EntityManager em,Socket client) {
+		super(session,em);
 		this.client = client;
 	}
 
 	public void run(){
-		final DeviceController deviceController = new DeviceController(session);
+		final DeviceController deviceController = new DeviceController(session,em);;
 		String ip;
 	//	BufferedReader in = null;
 		Scanner in = null;

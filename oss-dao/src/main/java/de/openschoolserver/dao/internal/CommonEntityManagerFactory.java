@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import java.util.Map;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -19,12 +20,14 @@ import java.util.Properties;
 
 import org.eclipse.persistence.config.PersistenceUnitProperties;
 
+import de.openschoolserver.dao.Session;
+
 
 
 public class CommonEntityManagerFactory {
 
-	public static final int DB_VERSION = 1;
-	
+    public static final int DB_VERSION = 1;
+
     private static HashMap<String, CommonEntityManagerFactory> commonEmf = new HashMap<String, CommonEntityManagerFactory>();
     public static HashMap<Long, String> threadKeys = new HashMap<Long, String>();
 
@@ -85,13 +88,13 @@ public class CommonEntityManagerFactory {
 
     public EntityManagerFactory getEntityManagerFactory() {
         if (emf == null) {
-             Map<String, Object> props = getProperties();
-   
+            Map<String, Object> props = getProperties();
+
             emf = Persistence.createEntityManagerFactory("OSS", props);
 
             if (emf == null) {
             	System.err.println("getEntityManagerFactory : EntityManagerFactory still null."); //TODO
-            } 
+            }
         }
         return emf;
     }
@@ -102,7 +105,7 @@ public class CommonEntityManagerFactory {
         }
         return commonEmf.get(key);
     }
-    
+
     public  CommonEntityManagerFactory instanceI(String key) {
         if (!commonEmf.containsKey(key)) {
             commonEmf.put(key, new CommonEntityManagerFactory());
@@ -110,4 +113,12 @@ public class CommonEntityManagerFactory {
         return commonEmf.get(key);
     }
 
+    public EntityManager getEntityManager(Session session) {
+		if( session != null) {
+			return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
+		}
+		else {
+			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		}
+	}
 }

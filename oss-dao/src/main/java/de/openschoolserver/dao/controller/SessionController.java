@@ -35,12 +35,12 @@ public class SessionController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(SessionController.class);
 
-	public SessionController(Session session) {
-		super(session);
+	public SessionController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
-	public SessionController() {
-		super(null);
+	public SessionController(EntityManager em) {
+		super(null,em);
 	}
 
 	public static Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
@@ -57,8 +57,8 @@ public class SessionController extends Controller {
 	}
 
 	public Session createSessionWithUser(String username, String password, String deviceType) {
-		UserController userController = new UserController(this.session);
-		DeviceController deviceController = new DeviceController(this.session);
+		UserController userController = new UserController(session,em);
+		DeviceController deviceController = new DeviceController(session,em);
 		Room room = null;
 		String[]   program = new String[5];
 		StringBuffer reply = new StringBuffer();
@@ -154,7 +154,7 @@ public class SessionController extends Controller {
 			}
 		}
 		if( !this.isSuperuser() ) {
-			RoomController  roomController = new RoomController(session);
+			RoomController  roomController = new RoomController(session,em);;
 			if( ! roomController.getAllToRegister().isEmpty() ) {
 				modules.add("adhoclan.mydevices");
 			}
@@ -168,7 +168,6 @@ public class SessionController extends Controller {
 	}
 
 	private void save(Session obj) {
-		EntityManager em = getEntityManager();
 		if (em != null) {
 			try {
 				em.getTransaction().begin();
@@ -193,14 +192,12 @@ public class SessionController extends Controller {
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {
-				em.close();
 			}
 		}
 	}
 
 	private Session find(Long id) {
 		Session data = null;
-		EntityManager em = getEntityManager();
 		if (em != null) {
 			try {
 				em.getTransaction().begin();
@@ -210,7 +207,6 @@ public class SessionController extends Controller {
 				logger.error(e.getMessage());
 			} finally {
 				if ((em != null) && (em.isOpen())) {
-					em.close();
 				}
 			}
 		}
@@ -218,7 +214,6 @@ public class SessionController extends Controller {
 	}
 
 	private void remove(Session session) {
-		EntityManager em = getEntityManager();
 		if (em != null) {
 			try {
 				em.getTransaction().begin();
@@ -239,14 +234,12 @@ public class SessionController extends Controller {
 				logger.error(e.getMessage());
 			} finally {
 				if ((em != null) && (em.isOpen())) {
-					em.close();
 				}
 			}
 		}
 	}
 
 	public Session getByToken(String token) {
-		EntityManager em = getEntityManager();
 		Session data = null;
 		if (em != null) {
 			try {
@@ -259,7 +252,6 @@ public class SessionController extends Controller {
 				logger.error(e.getMessage());
 			} finally {
 				if ((em != null) && (em.isOpen())) {
-					em.close();
 				}
 			}
 		}
@@ -297,7 +289,6 @@ public class SessionController extends Controller {
 	}
 
 	public void updateSession(Session session) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			session.setCreateDate(now());
@@ -306,7 +297,6 @@ public class SessionController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 

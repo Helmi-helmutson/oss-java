@@ -27,12 +27,11 @@ public class UserController extends Controller {
 	Logger logger = LoggerFactory.getLogger(UserController.class);
 
 
-	public UserController(Session session) {
-		super(session);
+	public UserController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	public User getById(long userId) {
-		EntityManager em = getEntityManager();
 		try {
 			User user = em.find(User.class, userId);
 			if( user != null ) {
@@ -45,12 +44,10 @@ public class UserController extends Controller {
 			logger.debug("getByID: " + e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<User> getByRole(String role) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("User.getByRole");
 			query.setParameter("role", role);
@@ -59,12 +56,10 @@ public class UserController extends Controller {
 			logger.error("getByRole: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
-			em.close();
 		}
 	}
 
 	public User getByUid(String uid) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("User.getByUid");
 			query.setParameter("uid", uid);
@@ -78,13 +73,11 @@ public class UserController extends Controller {
 			logger.error("getByUid: uid=" + uid + " " + e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 		return null;
 	}
 
 	public List<User> search(String search) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("User.search");
 			query.setParameter("search", search + "%");
@@ -93,12 +86,10 @@ public class UserController extends Controller {
 			logger.error("search: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<User> findByName(String givenName, String surName) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("User.findByName");
 			query.setParameter("givenName", givenName);
@@ -108,12 +99,10 @@ public class UserController extends Controller {
 			logger.error("findByName: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<User> findByNameAndRole(String givenName, String surName, String role) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("User.findByNameAndRole");
 			query.setParameter("givenName", givenName);
@@ -124,12 +113,10 @@ public class UserController extends Controller {
 			logger.error("findByNameAndRole: " + e.getMessage());
 			return new ArrayList<>();
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<User> getAll() {
-		EntityManager em = getEntityManager();
 		List<User> users = new ArrayList<User>();
 		boolean userManage = this.isAllowed("user.manage");
 		try {
@@ -150,7 +137,6 @@ public class UserController extends Controller {
 		} catch (Exception e) {
 			logger.error("getAll: " + e.getMessage());
 		} finally {
-			em.close();
 		}
 		return users;
 	}
@@ -168,7 +154,6 @@ public class UserController extends Controller {
 	}
 
 	public OssResponse add(User user) {
-		EntityManager em = getEntityManager();
 		logger.debug("User to create:" + user);
 		// Check role
 		if (user.getRole() == null) {
@@ -248,11 +233,10 @@ public class UserController extends Controller {
 			logger.error("add: " + e.getMessage());
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		this.startPlugin("add_user", user);
-		GroupController groupController = new GroupController(this.session);
-		Group group = new GroupController(this.session).getByName(user.getRole());
+		GroupController groupController = new GroupController(session,em);
+		Group group = new GroupController(session,em).getByName(user.getRole());
 		if (group != null) {
 			groupController.addMember(group, user);
 		}
@@ -308,7 +292,6 @@ public class UserController extends Controller {
 		if (errorMessage.length() > 0) {
 			return new OssResponse(this.getSession(), "ERROR", errorMessage.toString());
 		}
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(oldUser);
@@ -317,7 +300,6 @@ public class UserController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		this.startPlugin("modify_user", oldUser);
 		return new OssResponse(this.getSession(), "OK", "User was modified succesfully");
@@ -360,7 +342,6 @@ public class UserController extends Controller {
 		} else {
 			this.inheritCreatedObjects(user,admin);
 		}
-		EntityManager em = getEntityManager();
 		user = em.find(User.class, user.getId());
 		List<Device> devices = user.getOwnedDevices();
 		boolean restartDHCP = !devices.isEmpty();
@@ -373,7 +354,7 @@ public class UserController extends Controller {
 			em.merge(group);
 		}
 		if( restartDHCP ) {
-			DeviceController dc = new DeviceController(session);
+			DeviceController dc = new DeviceController(session,em);;
 			for( Device device : devices ) {
 				dc.delete(device.getId(),false);
 			}
@@ -382,21 +363,18 @@ public class UserController extends Controller {
 		em.getTransaction().commit();
 		em.getEntityManagerFactory().getCache().evictAll();
 		if (restartDHCP) {
-			DHCPConfig dhcpConfig = new DHCPConfig(this.session);
+			DHCPConfig dhcpConfig = new DHCPConfig(session,em);
 			dhcpConfig.Create();
 		}
-		em.close();
 		return new OssResponse(this.getSession(), "OK", "User was deleted");
 	}
 
 	public List<Group> getAvailableGroups(long userId) {
-		EntityManager em = getEntityManager();
 
 		User user = this.getById(userId);
 		Query query = em.createNamedQuery("Group.findAll");
 		List<Group> allGroups = query.getResultList();
 		allGroups.removeAll(user.getGroups());
-		em.close();
 		return allGroups;
 	}
 
@@ -406,7 +384,6 @@ public class UserController extends Controller {
 	}
 
 	public OssResponse setGroups(long userId, List<Long> groupIds) {
-		EntityManager em = getEntityManager();
 		List<Group> groupsToRemove = new ArrayList<Group>();
 		List<Group> groupsToAdd = new ArrayList<Group>();
 		List<Group> groups = new ArrayList<Group>();
@@ -445,7 +422,6 @@ public class UserController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		for (Group group : groupsToAdd) {
 			this.changeMemberPlugin("addmembers", group, user);
@@ -457,7 +433,6 @@ public class UserController extends Controller {
 	}
 
 	public OssResponse syncFsQuotas(List<List<String>> quotas) {
-		EntityManager em = getEntityManager();
 		User user;
 		try {
 			em.getTransaction().begin();
@@ -475,13 +450,11 @@ public class UserController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(), "OK", "The filesystem quotas was synced succesfully");
 	}
 
 	public OssResponse syncMsQuotas(List<List<String>> quotas) {
-		EntityManager em = getEntityManager();
 		User user;
 		try {
 			em.getTransaction().begin();
@@ -499,7 +472,6 @@ public class UserController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(), "OK", "The mailsystem quotas was synced succesfully");
 	}
@@ -650,7 +622,6 @@ public class UserController extends Controller {
 	}
 
 	public List<OssResponse> setFsQuota(List<Long> userIds, Long fsQuota) {
-		EntityManager em = getEntityManager();
 		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
@@ -668,12 +639,10 @@ public class UserController extends Controller {
 				responses.add(new OssResponse(this.getSession(), "OK", "The file system quota for '%s' was set.",null,user.getUid()));
 			}
 		}
-		em.close();
 		return responses;
 	}
 
 	public List<OssResponse> setMsQuota(List<Long> userIds, Long msQuota) {
-		EntityManager em = getEntityManager();
 		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
@@ -691,7 +660,6 @@ public class UserController extends Controller {
 				responses.add(new OssResponse(this.getSession(), "OK", "The mail system quota for '%s' was set.",null,user.getUid()));
 			}
 		}
-		em.close();
 		return responses;
 	}
 
@@ -803,7 +771,7 @@ public class UserController extends Controller {
 	 * @return The list of the guest users categories
 	 */
 	public List<Category> getGuestUsers() {
-		final CategoryController categoryController = new CategoryController(this.session);
+		final CategoryController categoryController = new CategoryController(session,em);
 		if (categoryController.isSuperuser()) {
 			return categoryController.getByType("guestUsers");
 		}
@@ -822,7 +790,7 @@ public class UserController extends Controller {
 	 * @return The list of the guest users.
 	 */
 	public Category getGuestUsersCategory(Long guestUsersId) {
-		return new CategoryController(this.session).getById(guestUsersId);
+		return new CategoryController(session,em).getById(guestUsersId);
 	}
 
 	/**
@@ -831,8 +799,8 @@ public class UserController extends Controller {
 	 * @return The result as an OssResponse
 	 */
 	public OssResponse deleteGuestUsers(Long guestUsersId) {
-		final CategoryController categoryController = new CategoryController(this.session);
-		final GroupController groupController = new GroupController(this.session);
+		final CategoryController categoryController = new CategoryController(session,em);
+		final GroupController groupController = new GroupController(session,em);
 		Category category = categoryController.getById(guestUsersId);
 		for (User user : category.getUsers()) {
 			if (user.getRole().equals("guest")) {
@@ -850,8 +818,8 @@ public class UserController extends Controller {
 	}
 
 	public OssResponse addGuestUsers(String name, String description, Long roomId, Long count, Date validUntil) {
-		final CategoryController categoryController = new CategoryController(this.session);
-		final GroupController groupController = new GroupController(this.session);
+		final CategoryController categoryController = new CategoryController(session,em);
+		final GroupController groupController = new GroupController(session,em);
 		Category category = new Category();
 		category.setCategoryType("guestUsers");
 		category.setName(name);
@@ -875,7 +843,6 @@ public class UserController extends Controller {
 		}
 
 		group = groupController.getById(ossResponse.getObjectId());
-		EntityManager em = groupController.getEntityManager();
 		try {
 			em.getTransaction().begin();
 			category.setGroups(new ArrayList<Group>());
@@ -924,7 +891,6 @@ public class UserController extends Controller {
 	}
 
 	public void inheritCreatedObjects(User creator, User newCreator) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			//Acls
@@ -1007,7 +973,6 @@ public class UserController extends Controller {
 	}
 
 	public void deleteCreatedObjects(User creator) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			//Acls

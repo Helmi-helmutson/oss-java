@@ -42,21 +42,19 @@ public class DeviceController extends Controller {
 	Logger logger = LoggerFactory.getLogger(DeviceController.class);
 	private List<String>  parameters;
 
-	public DeviceController(Session session) {
-		super(session);
+	public DeviceController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	/*
 	 * Return a device found by the Id
 	 */
 	public Device getById(long deviceId) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(Device.class, deviceId);
 		} catch (Exception e) {
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -64,7 +62,6 @@ public class DeviceController extends Controller {
 	 * Delivers a list of all existing devices
 	 */
 	public List<Device> getAll() {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.findAll");
 			return query.getResultList();
@@ -72,7 +69,6 @@ public class DeviceController extends Controller {
 			logger.error("getAll " + e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -80,7 +76,6 @@ public class DeviceController extends Controller {
 	 * Delivers a list of all existing devices
 	 */
 	public List<Long> getAllId() {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.findAllId");
 			return query.getResultList();
@@ -88,7 +83,6 @@ public class DeviceController extends Controller {
 			logger.error("getAllId " + e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -96,7 +90,6 @@ public class DeviceController extends Controller {
 	 * Deletes a list of device given by the device Ids.
 	 */
 	public OssResponse delete(List<Long> deviceIds) {
-		EntityManager em = getEntityManager();
 		boolean needReloadSalt = false;
 		try {
 			for( Long deviceId : deviceIds) {
@@ -108,16 +101,15 @@ public class DeviceController extends Controller {
 				this.delete(deviceId, false);
 			}
 			em.getEntityManagerFactory().getCache().evictAll();
-			new DHCPConfig(this.session).Create();
+			new DHCPConfig(session,em).Create();
 			if( needReloadSalt ) {
-				new SoftwareController(this.session).applySoftwareStateToHosts();
+				new SoftwareController(session,em).applySoftwareStateToHosts();
 			}
 			return new OssResponse(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("delete: " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -128,8 +120,7 @@ public class DeviceController extends Controller {
 	 * @return
 	 */
 	public OssResponse delete(Long deviceId, boolean atomic) {
-		EntityManager em = getEntityManager();
-		UserController userController = new UserController(this.session);
+		UserController userController = new UserController(session,em);
 		boolean needReloadSalt = false;
 		Device device = em.find(Device.class, deviceId);
 		if( device == null ) {
@@ -213,9 +204,9 @@ public class DeviceController extends Controller {
 			em.getTransaction().commit();
 			if( atomic ) {
 				em.getEntityManagerFactory().getCache().evictAll();
-				new DHCPConfig(this.session).Create();
+				new DHCPConfig(session,em).Create();
 				if( needReloadSalt ) {
-					new SoftwareController(this.session).applySoftwareStateToHosts();
+					new SoftwareController(session,em).applySoftwareStateToHosts();
 				}
 			}
 			return new OssResponse(this.getSession(),"OK", "Device was deleted succesfully.");
@@ -223,7 +214,6 @@ public class DeviceController extends Controller {
 			logger.error("device: " + device.getName() + " " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -318,7 +308,6 @@ public class DeviceController extends Controller {
 	 * Creates devices
 	 */
 	public OssResponse add(List<Device> devices) {
-		EntityManager em = getEntityManager();
 		try {
 			for(Device dev: devices){
 				dev.setOwner(session.getUser());
@@ -331,7 +320,6 @@ public class DeviceController extends Controller {
 			logger.error("add " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 	}
 
@@ -339,7 +327,6 @@ public class DeviceController extends Controller {
 	 * Find a device given by the IP address
 	 */
 	public Device getByIP(String IP) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.getByIP");
 			query.setParameter("IP", IP);
@@ -351,7 +338,6 @@ public class DeviceController extends Controller {
 			logger.debug("device.getByIP " + IP + " "+ e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -359,7 +345,6 @@ public class DeviceController extends Controller {
 	 * Find a device given by the MAC address
 	 */
 	public Device getByMAC(String MAC) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.getByMAC");
 			query.setParameter("MAC", MAC);
@@ -368,7 +353,6 @@ public class DeviceController extends Controller {
 			logger.debug("MAC " + MAC + " " + e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -376,7 +360,6 @@ public class DeviceController extends Controller {
 	 * Find a device given by the name
 	 */
 	public Device getByName(String name) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.getByName");
 			query.setParameter("name", name);
@@ -385,7 +368,6 @@ public class DeviceController extends Controller {
 			logger.debug("name " + name  + " " + e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -393,7 +375,6 @@ public class DeviceController extends Controller {
 	 * Search devices given by a substring
 	 */
 	public List<Device> search(String search) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Device.search");
 			query.setParameter("search", "%" + search + "%");
@@ -402,7 +383,6 @@ public class DeviceController extends Controller {
 			logger.debug("search " + search + " " + e.getMessage(),e);
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -501,9 +481,9 @@ public class DeviceController extends Controller {
 			logger.error("File error:" + e.getMessage(), e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
-		RoomController        roomController      = new RoomController(this.session);
-		CloneToolController   cloneToolController = new CloneToolController(this.session);
-		UserController        userController      = new UserController(this.session);
+		RoomController        roomController      = new RoomController(session,em);
+		CloneToolController   cloneToolController = new CloneToolController(session,em);
+		UserController        userController      = new UserController(session,em);
 		Map<Long,List<Device>> devicesToImport    = new HashMap<>();
 		Map<Integer,String> header                = new HashMap<>();
 		StringBuilder error                       = new StringBuilder();
@@ -609,7 +589,6 @@ public class DeviceController extends Controller {
 	}
 
 	public OssResponse setDefaultPrinter(long deviceId, long printerId) {
-		EntityManager em = getEntityManager();
 		try {
 			logger.debug("deviceId:" +deviceId + " printerId:" +  printerId);
 			Printer printer = em.find(Printer.class, printerId);
@@ -629,14 +608,12 @@ public class DeviceController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK", "Default printer was set succesfully.");
 	}
 
 
 	public OssResponse deleteDefaultPrinter(long deviceId) {
-		EntityManager em = getEntityManager();
 		Device  device  = em.find(Device.class, deviceId);
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "Device cannot be found.");
@@ -653,14 +630,12 @@ public class DeviceController extends Controller {
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			} finally {
-				em.close();
 			}
 		}
 		return new OssResponse(this.getSession(),"OK","The default printer of the device was deleted succesfully.");
 	}
 
 	public OssResponse addAvailablePrinter(long deviceId, long printerId) {
-		EntityManager em = getEntityManager();
 		try {
 			Printer printer = em.find(Printer.class, printerId);
 			Device device   = em.find(Device.class, deviceId);
@@ -679,13 +654,11 @@ public class DeviceController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","The selected printer was added to the device.");
 	}
 
 	public OssResponse deleteAvailablePrinter(long deviceId, long printerId) {
-		EntityManager em = getEntityManager();
 		try {
 			Printer printer = em.find(Printer.class, printerId);
 			Device device   = em.find(Device.class, deviceId);
@@ -701,7 +674,6 @@ public class DeviceController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","The selected printer was removed from device.");
 	}
@@ -711,7 +683,7 @@ public class DeviceController extends Controller {
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP: %s",null,IP);
 		}
-		User user = new UserController(this.session).getByUid(userName);
+		User user = new UserController(session,em).getByUid(userName);
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
 		}
@@ -722,7 +694,7 @@ public class DeviceController extends Controller {
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with ID: %s",null,String.valueOf(deviceId));
 		}
-		User user = new UserController(this.session).getById(userId);
+		User user = new UserController(session,em).getById(userId);
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,String.valueOf(userId));
 		}
@@ -741,7 +713,6 @@ public class DeviceController extends Controller {
 		user.getLoggedOn().add(device);
 		logger.debug("addLoggedInUser: " + device.toString());
 		logger.debug("addLoggedInUser: " + user.toString());
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			em.merge(device);
@@ -750,7 +721,6 @@ public class DeviceController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}
@@ -758,7 +728,7 @@ public class DeviceController extends Controller {
 
 	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
-		User user = new UserController(this.session).getByUid(userName);
+		User user = new UserController(session,em).getByUid(userName);
 		if( device == null  || user == null ) {
 			return new OssResponse(this.getSession(),"ERROR","Can not find user or device");
 		}
@@ -766,7 +736,7 @@ public class DeviceController extends Controller {
 	}
 	public OssResponse removeLoggedInUser(Long deviceId, Long userId) {
 		Device device = this.getById(deviceId);
-		User   user   = new UserController(this.session).getById(userId);
+		User   user   = new UserController(session,em).getById(userId);
 		if( device == null  || user == null ) {
 			return new OssResponse(this.getSession(),"ERROR","Can not find user or device");
 		}
@@ -774,7 +744,6 @@ public class DeviceController extends Controller {
 	}
 	public OssResponse removeLoggedInUser(Device device, User user) {
 		parameters = new ArrayList<String>();
-		EntityManager em = getEntityManager();
 		if( !user.getLoggedOn().contains(device)) {
 			parameters.add(device.getName());
 			parameters.add(user.getUid());
@@ -790,7 +759,6 @@ public class DeviceController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		parameters.add(device.getName());
 		parameters.add(user.getUid());
@@ -802,14 +770,12 @@ public class DeviceController extends Controller {
 		Device oldDevice;
 		HWConf hwconf;
 		Room   room;
-		EntityManager em = getEntityManager();
 		try {
 			oldDevice= em.find(Device.class, device.getId());
 			hwconf   = em.find(HWConf.class, device.getHwconfId());
 			room     = em.find(Room.class, oldDevice.getRoom().getId());
 		} catch (Exception e) {
 			logger.debug("DeviceId:" + device.getId() + " " + e.getMessage(),e);
-			em.close();
 			return new OssResponse(this.getSession(),"ERROR","Device or HWConf can not be found.");
 		}
 		HWConf oldHwconf = oldDevice.getHwconf();
@@ -824,7 +790,6 @@ public class DeviceController extends Controller {
 		String   name = "";
 		//Check the MAC address
 		if( !this.mayModify(oldDevice) ) {
-			em.close();
 			return new OssResponse(this.getSession(),"ERROR","You must not modify this device: %s",null,oldDevice.getName());
 		}
 		device.setMac(device.getMac().toUpperCase().replaceAll("-", ":"));
@@ -858,7 +823,7 @@ public class DeviceController extends Controller {
 			}
 			if( oldDevice.getWlanMac().isEmpty() ) {
 				//There was no WLAN-Mac before we need a new IP-Address
-				RoomController rc = new RoomController(this.session);
+				RoomController rc = new RoomController(session,em);
 				List<String> wlanIps = rc.getAvailableIPAddresses(oldDevice.getRoom().getId());
 				if( wlanIps.isEmpty() ) {
 					error.add("The are no more IP addesses in room" );
@@ -875,7 +840,6 @@ public class DeviceController extends Controller {
 		}
 		logger.debug("ERROR" + error);
 		if(!error.isEmpty()){
-			em.close();
 			return new OssResponse(this.getSession(),"ERROR","ERROR" + String.join(System.lineSeparator(),error),null,parameters);
 		}
 		try {
@@ -912,11 +876,10 @@ public class DeviceController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", "ERROR-3"+  e.getMessage());
 		} finally {
-			em.close();
 		}
 		this.startPlugin("modify_device", oldDevice);
 		if( macChange ) {
-			new DHCPConfig(this.session).Create();
+			new DHCPConfig(session,em).Create();
 		}
 		return new OssResponse(this.getSession(),"OK", "Device was modified succesfully.");
 	}
@@ -930,7 +893,7 @@ public class DeviceController extends Controller {
 	}
 
 	public List<Device> getByHWConf(Long id) {
-		HWConf hwconf = new CloneToolController(this.session).getById(id);
+		HWConf hwconf = new CloneToolController(session,em).getById(id);
 		return hwconf.getDevices();
 	}
 
@@ -1060,7 +1023,6 @@ public class DeviceController extends Controller {
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.logOff";
 		case "cleanuploggedin":
-			EntityManager em = getEntityManager();
 			em.getTransaction().begin();
 			for( User user : device.getLoggedIn() ) {
 				user.getLoggedOn().remove(device);
@@ -1071,7 +1033,7 @@ public class DeviceController extends Controller {
 			em.getTransaction().commit();
 			break;
 		case "download":
-			UserController uc = new UserController(session);
+			UserController uc = new UserController(session,em);;
 			boolean cleanUpExport = true;
 			boolean sortInDirs    = true;
 			String  projectName   = this.nowString();
@@ -1105,7 +1067,6 @@ public class DeviceController extends Controller {
 	}
 
 	public OssResponse cleanUpLoggedIn(Device device) {
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			for( User user : device.getLoggedIn() ) {
@@ -1119,7 +1080,6 @@ public class DeviceController extends Controller {
 			logger.debug("cleanUpLoggedIn: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK", "LoggedIn attributes was cleaned up.");
 	}
@@ -1162,7 +1122,7 @@ public class DeviceController extends Controller {
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP: %s",null,IP);
 		}
-		User user = new UserController(this.session).getByUid(userName);
+		User user = new UserController(session,em).getByUid(userName);
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
 		}
@@ -1174,7 +1134,7 @@ public class DeviceController extends Controller {
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with ID: %s",null,String.valueOf(deviceId));
 		}
-		User user = new UserController(this.session).getById(userId);
+		User user = new UserController(session,em).getById(userId);
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,String.valueOf(userId));
 		}
@@ -1189,7 +1149,6 @@ public class DeviceController extends Controller {
 		logger.debug("addLoggedInUser: " + device.toString());
 		logger.debug("addLoggedInUser: " + user.toString());
 		cleanUpLoggedIn(device);
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			device.setLoggedIn(new ArrayList<User>());
@@ -1201,7 +1160,6 @@ public class DeviceController extends Controller {
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}

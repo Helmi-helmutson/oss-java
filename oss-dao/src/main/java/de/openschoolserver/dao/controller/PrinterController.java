@@ -28,8 +28,8 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 
 public class PrinterController extends Controller {
 	private Path DRIVERS   = Paths.get("/usr/share/oss/templates/drivers.txt");
-	public PrinterController(Session session) {
-		super(session);
+	public PrinterController(Session session,EntityManager em) {
+		super(session,em);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -55,7 +55,6 @@ public class PrinterController extends Controller {
 	 * @return
 	 */
 	public Printer getById(long printerId) {
-		EntityManager em = getEntityManager();
 		try {
 			Printer printer = em.find(Printer.class, printerId);
 			if( printer != null ) {
@@ -68,7 +67,6 @@ public class PrinterController extends Controller {
 		} catch (Exception e) {
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -78,7 +76,6 @@ public class PrinterController extends Controller {
 	 * @return
 	 */
 	public Printer getByName(String name) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Printer.getByName");
 			query.setParameter("name", name);
@@ -89,7 +86,6 @@ public class PrinterController extends Controller {
 			logger.debug("name " + name  + " " + e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -150,7 +146,6 @@ public class PrinterController extends Controller {
 	 */
 	public OssResponse deletePrinter(Long printerId) {
 
-		EntityManager em = getEntityManager();
 		OssResponse ossResponse = new OssResponse(session,"OK","Printer was deleted succesfully.");
 		try {
 			Printer printer = em.find(Printer.class, printerId);
@@ -171,13 +166,12 @@ public class PrinterController extends Controller {
 			em.merge(printerDevice);
 			em.getTransaction().commit();
 			if( printerDevice.getPrinterQueue().isEmpty() ) {
-				ossResponse = new DeviceController(session).delete(printerDevice, true);
+				ossResponse = new DeviceController(session,em).delete(printerDevice, true);
 			}
 		} catch (Exception e) {
 			logger.debug("deletePrinter :" + e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 		return ossResponse;
 	}
@@ -187,7 +181,7 @@ public class PrinterController extends Controller {
 		if( session.getPassword() == null || session.getPassword().isEmpty() ) {
 			return new OssResponse(session,"ERROR", "The session password of the administrator is expiered. Please login into the web interface again.");
 		}
-		String printserver   = new RoomController(session).getConfigValue("PRINTSERVER");
+		String printserver   = new RoomController(session,em).getConfigValue("PRINTSERVER");
 		String[] program     = new String[7];
 		StringBuffer reply   = new StringBuffer();
 		StringBuffer stderr  = new StringBuffer();
@@ -226,8 +220,8 @@ public class PrinterController extends Controller {
 			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
 		logger.debug("addPrinter: " + name + "#" + mac + "#" + roomId + "#" + model +"#" + ( windowsDriver ? "yes" : "no" ) );
 		//First we create a device object
-		RoomController roomController = new RoomController(session);
-		HWConf hwconf = new CloneToolController(session).getByName("Printer");
+		RoomController roomController = new RoomController(session,em);;
+		HWConf hwconf = new CloneToolController(session,em).getByName("Printer");
 		Device device = new Device();
 		device.setMac(mac);
 		device.setName(name.toLowerCase());
@@ -246,11 +240,10 @@ public class PrinterController extends Controller {
 	public OssResponse addPrinterQueue(Session session, String name, Long deviceId, String model, boolean windowsDriver,
 				InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
 		
-		RoomController roomController = new RoomController(session);
+		RoomController roomController = new RoomController(session,em);;
 		String deviceHostName;
 		Printer printer = new Printer();
 		//Create the printer object
-		EntityManager em = getEntityManager();
 		try {
 			Device device = em.find(Device.class, deviceId);
 			em.getTransaction().begin();
@@ -267,7 +260,6 @@ public class PrinterController extends Controller {
 			logger.debug("addPrinterQueue :" + e.getMessage());
 			return new OssResponse(session,"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		//Create the printer in CUPS
 		String driverFile = "/usr/share/cups/model/Postscript.ppd.gz";

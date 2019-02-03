@@ -18,12 +18,11 @@ public class CategoryController extends Controller {
 
 	Logger logger = LoggerFactory.getLogger(CategoryController.class);
 
-	public CategoryController(Session session) {
-		super(session);
+	public CategoryController(Session session,EntityManager em) {
+		super(session,em);
 	}
 
 	public List<Category> getAll() {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Category.findAll"); 
 			return query.getResultList();
@@ -31,24 +30,20 @@ public class CategoryController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public Category getById(long categoryId) {
-		EntityManager em = getEntityManager();
 		try {
 			return em.find(Category.class, categoryId);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<Category> search(String search) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Category.search");
 			query.setParameter("search", search + "%");
@@ -57,12 +52,10 @@ public class CategoryController extends Controller {
 			logger.error(e.getMessage());
 			return new ArrayList<>();
 		} finally {
-			em.close();
 		}
 	}
 
 	public List<Category> getByType(String search) {
-		EntityManager em = getEntityManager();
 		List<Category> categories = new ArrayList<Category>();
 		try {
 			Query query = em.createNamedQuery("Category.getByType").setParameter("type", search);
@@ -73,13 +66,11 @@ public class CategoryController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
-			em.close();
 		}
 		return categories;
 	}
 
 	public Category getByName(String name) {
-		EntityManager em = getEntityManager();
 		try {
 			Query query = em.createNamedQuery("Category.getByName").setParameter("name", name);
 			return (Category) query.getSingleResult();
@@ -87,7 +78,6 @@ public class CategoryController extends Controller {
 			logger.debug(e.getMessage());
 			return null;
 		} finally {
-			em.close();
 		}
 	}
 
@@ -101,7 +91,6 @@ public class CategoryController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", "Validation Error" + errorMessage.toString());
 		}
-		EntityManager em = getEntityManager();
 		try {
 			// First we check if the parameter are unique.
 			Query query = em.createNamedQuery("Category.getByName").setParameter("name",category.getName());
@@ -123,7 +112,6 @@ public class CategoryController extends Controller {
 			logger.error("Exeption: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Category was created",category.getId());
 	}
@@ -138,7 +126,6 @@ public class CategoryController extends Controller {
 		if( errorMessage.length() > 0 ) {
 			return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
-		EntityManager em = getEntityManager();
 		Category oldCategory = this.getById(category.getId());
 		oldCategory.setDescription(category.getDescription());
 		oldCategory.setName(category.getName());
@@ -164,7 +151,6 @@ public class CategoryController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR","This category must not be deleted.");
 		}
 		// Remove group from GroupMember of table
-		EntityManager em = getEntityManager();
 		try {
 			em.getTransaction().begin();
 			if( !em.contains(category)) {
@@ -226,7 +212,6 @@ public class CategoryController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Category was deleted");
 	}
@@ -237,7 +222,6 @@ public class CategoryController extends Controller {
 		if( c == null ) {
 			return objectIds;
 		}
-		EntityManager em = getEntityManager();
 		Query query = em.createNamedQuery(objectName + ".findAllId");
 		for(Long l : (List<Long>) query.getResultList() ) {
 			objectIds.add(l);
@@ -347,7 +331,6 @@ public class CategoryController extends Controller {
 	}
 
 	public OssResponse addMember(Long categoryId, String objectName,Long objectId ) {
-		EntityManager em = getEntityManager();
 		boolean changes = false;
 		try {
 			Category category = em.find(Category.class, categoryId);
@@ -452,13 +435,11 @@ public class CategoryController extends Controller {
 			logger.error("addMember: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Category was modified");
 	}
 
 	public OssResponse deleteMember(Long categoryId, String objectName, Long objectId ) {
-		EntityManager em = getEntityManager();
 		try {
 			Category category = em.find(Category.class, categoryId);
 			logger.debug("CategoryId:" + categoryId + " Category " + category);
@@ -546,7 +527,6 @@ public class CategoryController extends Controller {
 			logger.error("deleteMember:" +e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
-			em.close();
 		}
 		return new OssResponse(this.getSession(),"OK","Category was modified");
 	}
