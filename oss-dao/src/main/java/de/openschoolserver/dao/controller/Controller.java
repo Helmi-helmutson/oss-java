@@ -25,6 +25,7 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 
 @SuppressWarnings( "unchecked" )
@@ -67,6 +68,17 @@ public class Controller extends Config {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void beginTransaction() {
+		while(em.getTransaction().isActive()) {
+			try {
+				TimeUnit.MILLISECONDS.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		em.getTransaction().begin();
 	}
 
 	public String createRandomPassword()
@@ -838,7 +850,7 @@ public class Controller extends Config {
 		mconfig.setValue(value);
 		mconfig.setCreator(this.session.getUser());
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(mconfig);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -876,7 +888,7 @@ public class Controller extends Config {
 		config.setValue(value);
 		config.setCreator(this.session.getUser());
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(config);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -895,7 +907,7 @@ public class Controller extends Config {
 		try {
 			config = em.find(OSSConfig.class, config.getId());
 			config.setValue(value);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(config);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -909,7 +921,7 @@ public class Controller extends Config {
 	public OssResponse deleteConfig(Object object, Long configId) {
 		try {
 			OSSConfig config = em.find(OSSConfig.class, configId);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(config);
 			em.remove(config);
 			em.getTransaction().commit();
@@ -924,7 +936,7 @@ public class Controller extends Config {
 	public OssResponse deleteMConfig(Object object, Long configId) {
 		try {
 			OSSMConfig config = em.find(OSSMConfig.class, configId);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(config);
 			em.remove(config);
 			em.getTransaction().commit();
@@ -942,7 +954,7 @@ public class Controller extends Config {
 			return new OssResponse(this.getSession(),"ERROR","Config does not exists.");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			config = em.find(OSSConfig.class, config.getId());
 			em.merge(config);
 			em.remove(config);
@@ -961,7 +973,7 @@ public class Controller extends Config {
 			return new OssResponse(this.getSession(),"ERROR","MConfig does not exists.");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			config = em.find(OSSMConfig.class, config.getId());
 			em.merge(config);
 			em.remove(config);

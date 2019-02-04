@@ -133,7 +133,7 @@ public class SoftwareController extends Controller {
 			}
 			try {
 				boolean newVersion = true;
-				em.getTransaction().begin();
+				this.beginTransaction();
 				if( replace ) {
 					for( SoftwareVersion sv : oldSoftware.getSoftwareVersions() ) {
 						if( !sv.getVersion().equals(softwareVersion.getVersion()) ) {
@@ -190,7 +190,7 @@ public class SoftwareController extends Controller {
 		}
 		logger.debug("New software" + newSoftware);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for( SoftwareFullName sfn : software.getSoftwareFullNames() ) {
 				SoftwareFullName newSoftwareFullName = new SoftwareFullName(newSoftware,sfn.getFullName());
 				newSoftware.getSoftwareFullNames().add(newSoftwareFullName);
@@ -216,7 +216,7 @@ public class SoftwareController extends Controller {
 			if( !this.mayModify(software) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this software.");
 	        }
-			em.getTransaction().begin();
+			this.beginTransaction();
 			if( !em.contains(software)) {
 				software = em.merge(software);
 			}
@@ -263,7 +263,7 @@ public class SoftwareController extends Controller {
 	public OssResponse modify(Software software) {
 		try {
 			//Modifying only the software entry itself
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(software);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -757,7 +757,7 @@ public class SoftwareController extends Controller {
 			c.getSoftwares().add(s);
 			s.getRemovedFromCategories().remove(c);
 			c.getRemovedSoftwares().remove(s);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(s);
 			em.merge(c);
 			em.getTransaction().commit();
@@ -786,7 +786,7 @@ public class SoftwareController extends Controller {
 			c.getSoftwares().remove(s);
 			s.getRemovedFromCategories().add(c);
 			c.getRemovedSoftwares().add(s);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(s);
 			em.merge(c);
 			em.getTransaction().commit();
@@ -820,7 +820,7 @@ public class SoftwareController extends Controller {
 		softwareLicense.setCreator(this.session.getUser());
 		if(softwareLicense.getLicenseType().equals('F')) {
 			try {
-				em.getTransaction().begin();
+				this.beginTransaction();
 				softwareLicense.setSoftware(software);
 				em.persist(softwareLicense);
 				software.getSoftwareLicenses().add(softwareLicense);
@@ -834,7 +834,7 @@ public class SoftwareController extends Controller {
 		}
 		if(softwareLicense.getLicenseType().equals('C') && fileInputStream == null) {
 			try {
-				em.getTransaction().begin();
+				this.beginTransaction();
 				softwareLicense.setSoftware(software);
 				em.persist(softwareLicense);
 				software.getSoftwareLicenses().add(softwareLicense);
@@ -849,7 +849,7 @@ public class SoftwareController extends Controller {
 			try {
 				file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
 				Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
-				em.getTransaction().begin();
+				this.beginTransaction();
 				for( String line : Files.readAllLines(file.toPath())) {
 					SoftwareLicense sl = new SoftwareLicense();
 					String[] lic = line.split(";");
@@ -891,7 +891,7 @@ public class SoftwareController extends Controller {
 		oldLicense.setCount(softwareLicense.getCount());
 		oldLicense.setValue(softwareLicense.getValue());
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(oldLicense);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -922,7 +922,7 @@ public class SoftwareController extends Controller {
 			newFile = new File(newFileName.toString());
 			Files.copy(fileInputStream, newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			softwareLicense.setValue(fileName);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(softwareLicense);
 			em.getTransaction().commit();
 		} catch (IOException e) {
@@ -935,7 +935,7 @@ public class SoftwareController extends Controller {
 
 	public OssResponse deleteLicence(long licenseId) {
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			SoftwareLicense sl = em.find(SoftwareLicense.class, licenseId);
 			Software software = sl.getSoftware();
 			software.getSoftwareLicenses().remove(sl);
@@ -976,7 +976,7 @@ public class SoftwareController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR","There is not enough licences.");
 			} else {
 				try {
-					em.getTransaction().begin();
+					this.beginTransaction();
 					device.getSoftwareLicenses().add(softwareLicense);
 					softwareLicense.getDevices().add(device);
 					em.getTransaction().commit();
@@ -997,7 +997,7 @@ public class SoftwareController extends Controller {
 			for( SoftwareLicense myLicense : device.getSoftwareLicenses() ) {
 				if( myLicense.getSoftware().equals(software) ){
 					try {
-						em.getTransaction().begin();
+						this.beginTransaction();
 						device.getSoftwareLicenses().remove(myLicense);
 						myLicense.getDevices().remove(device);
 						em.merge(device);
@@ -1030,7 +1030,7 @@ public class SoftwareController extends Controller {
 			}
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			if( !lss.isEmpty()) {
 				for( SoftwareStatus ss : lss ) {
 					if( ss.getSoftwareVersion().getVersion().equals(version) ) {
@@ -1078,7 +1078,7 @@ public class SoftwareController extends Controller {
 	 */
 	public void modifySoftwareStatusOnDevice(Device d, Software s,  String version, String status) {
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for( SoftwareStatus ss : this.getSoftwareStatusListFromDevice(d, s, version) ) {
 					ss.setStatus(status);
 					em.merge(ss);
@@ -1095,7 +1095,7 @@ public class SoftwareController extends Controller {
 	 */
 	public void removeSoftwareStatusOnDevice(Device d, Software s,  String version) {
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for( SoftwareStatus ss : this.getSoftwareStatusListFromDevice(d, s, version) ) {
 					em.remove(ss);
 			}
@@ -1181,7 +1181,7 @@ public class SoftwareController extends Controller {
 		try {
 			boolean update    = false;
 			boolean installed = false;
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for(SoftwareStatus ss : device.getSoftwareStatus() ) {
 				if( ss.getSoftwareVersion().getSoftware().equals(software)) {
 					if( !ss.getSoftwareVersion().equals(softwareVersion) ) {
@@ -1513,7 +1513,7 @@ public class SoftwareController extends Controller {
 			software.setManually(true);
 			software.setDescription(description);
 			try {
-				em.getTransaction().begin();
+				this.beginTransaction();
 				em.persist(software);
 				em.getTransaction().commit();
 			} catch (Exception e) {
@@ -1533,7 +1533,7 @@ public class SoftwareController extends Controller {
 			softwareVersion = new SoftwareVersion(software,version,"U");
 			logger.debug("Create new software version:" + softwareName + " ## " + version);
 			try {
-				em.getTransaction().begin();
+				this.beginTransaction();
 				em.persist(softwareVersion);
 				software.addSoftwareVersion(softwareVersion);
 				em.merge(software);
@@ -1571,7 +1571,7 @@ public class SoftwareController extends Controller {
 			logger.debug("Create new software status:" + softwareName + " ## " + version + " ## " + status);
 			softwareStatus = new SoftwareStatus(device,softwareVersion,status);
 			try {
-				em.getTransaction().begin();
+				this.beginTransaction();
 				em.persist(softwareStatus);
 				device.getSoftwareStatus().add(softwareStatus);
 				softwareVersion.getSoftwareStatuses().add(softwareStatus);
@@ -1585,7 +1585,7 @@ public class SoftwareController extends Controller {
 		} else {
 			softwareStatus.setStatus(status);
 			try {
-				em.getTransaction().begin();
+				this.beginTransaction();
 				em.merge(softwareStatus);
 				em.getTransaction().commit();
 			} catch (Exception e) {
@@ -1602,7 +1602,7 @@ public class SoftwareController extends Controller {
 				logger.error(e.getMessage());
 			}
 			for( SoftwareStatus st : softwareStatusToRemove ) {
-				em.getTransaction().begin();
+				this.beginTransaction();
 				softwareStatus = em.merge(st);
 				em.remove(softwareStatus);
 				em.getTransaction().commit();
@@ -1626,7 +1626,7 @@ public class SoftwareController extends Controller {
 
 	public OssResponse cleunUpSoftwareStatusOnDevice(Device device, Software software) {
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for(SoftwareStatus st : device.getSoftwareStatus() ) {
 				if( st.getSoftwareVersion().getSoftware().equals(software) ) {
 					em.merge(st);
@@ -1654,7 +1654,7 @@ public class SoftwareController extends Controller {
 		for(SoftwareStatus st : device.getSoftwareStatus() ) {
 			if( st.getSoftwareVersion().getVersion().equals(version) && st.getSoftwareVersion().getSoftware().getName().equals(softwareName) ) {
 				try {
-					em.getTransaction().begin();
+					this.beginTransaction();
 					em.merge(st);
 					em.remove(st);
 					em.getTransaction().commit();
@@ -1759,7 +1759,7 @@ public class SoftwareController extends Controller {
 
 	public OssResponse addRequirements(Software software, Software requirement) {
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			software.getSoftwareRequirements().add(requirement);
 			software.getRequiredBy().add(software);
 			em.merge(software);

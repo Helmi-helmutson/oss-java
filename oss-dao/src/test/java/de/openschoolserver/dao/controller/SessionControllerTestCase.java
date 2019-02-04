@@ -2,8 +2,6 @@ package de.openschoolserver.dao.controller;
 
 import de.openschoolserver.dao.Session;
 
-import de.openschoolserver.dao.User;
-
 /* prerequisites:
  * 
  * 

@@ -24,9 +24,10 @@ public class OSSTokenAuthenticator implements Authenticator<String, Session> {
     public Optional<Session> authenticate(String token) throws AuthenticationException {
 
         logger.debug("Token: " + token);
-        EntityManager em = new CommonEntityManagerFactory().getEntityManager(null);
+        EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
         final SessionController sessionController = new SessionController(em);
         final Session session = sessionController.validateToken(token);
+        em.close();
        
         if (session != null) {
             logger.debug("authentication successful!");

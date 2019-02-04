@@ -7,7 +7,7 @@ import de.openschoolserver.api.resources.SessionsResource;
 
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.SessionController;
-import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Acl;
@@ -15,6 +15,7 @@ import de.openschoolserver.dao.Acl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.UriInfo;
@@ -24,6 +25,18 @@ import java.util.ArrayList;
 public class SessionsResourceImpl implements SessionsResource {
 
 	Logger logger = LoggerFactory.getLogger(SessionsResourceImpl.class);
+
+	private EntityManager em;
+
+	public SessionsResourceImpl() {
+		super();
+		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+	}
+
+	protected void finalize()
+	{
+	   em.close();
+	}
 
 	@Override
 	public Session createSession(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
@@ -42,7 +55,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 		Session session =  new Session();
 		session.setIP(req.getRemoteAddr());
-		SessionController sessionController = new SessionController(session);
+		SessionController sessionController = new SessionController(session,em);
 		session = sessionController.createSessionWithUser(username, password, device);
 		if( session != null ) {
 			logger.debug(session.toString());
@@ -59,7 +72,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public void deleteSession(Session session, String token) {
-		final SessionController sessionController = new SessionController(session);
+		final SessionController sessionController = new SessionController(session,em);
 		if( session == null || ! session.getToken().equals(token) ) {
 			logger.info("deletion of session denied " + token);
 			throw new WebApplicationException(401);
@@ -83,7 +96,7 @@ public class SessionsResourceImpl implements SessionsResource {
 		Printer defaultPrinter  = null;
 		List<Printer> availablePrinters = null;
 		List<String> data = new ArrayList<String>();
-		final SessionController sessionController = new SessionController(session);
+		final SessionController sessionController = new SessionController(session,em);
 		switch(key) {
 		case "defaultPrinter":
 			if( session.getDevice() != null )
@@ -110,7 +123,7 @@ public class SessionsResourceImpl implements SessionsResource {
 			if( session.getDevice() != null)
 				return session.getDevice().getName();
 			break;
-		case "domainName": 
+		case "domainName":
 			return sessionController.getConfigValue("DOMAIN");
 		}
 		return "";
@@ -141,6 +154,6 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public String logonScript(Session session, String OS) {
-		return new SessionController(session).logonScript(OS);
+		return new SessionController(session,em).logonScript(OS);
 	}
 }

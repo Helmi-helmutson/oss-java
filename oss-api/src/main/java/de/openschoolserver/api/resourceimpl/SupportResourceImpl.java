@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityManager;
+
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SupportRequest;
 import de.openschoolserver.dao.controller.SystemController;
+import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 public class SupportResourceImpl implements SupportResource {
@@ -27,16 +30,23 @@ public class SupportResourceImpl implements SupportResource {
 	private String supportEmail;
 	private String supportEmailFrom;
 	private boolean isLinux = true;
+	private EntityManager em;
 
 	public SupportResourceImpl() {
+		super();
 		String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 		isLinux = !((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0));
+		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+	}
 
+	protected void finalize()
+	{
+	   em.close();
 	}
 
 	private void loadConf(Session session) {
 		// Session session = new SessionController().getLocalhostSession();
-		SystemController sc = new SystemController(session);
+		SystemController sc = new SystemController(session,em);
 		supportUrl = sc.getConfigValue("SUPPORT_URL");
 		if (supportUrl != null) {
 			supportUrl = supportUrl.trim();
@@ -138,9 +148,9 @@ public class SupportResourceImpl implements SupportResource {
 				program[i++] = "-r " + supportEmailFrom;
 			}
 			program[i++] = "-c " + supportRequest.getEmail();// cc address
-			
+
 			program[i++] = supportEmail;
-			
+
 			int result = OSSShellTools.exec(program, reply, error, request.toString());
 			if (result == 0) {
 				parameters.add(supportRequest.getSubject());
@@ -150,7 +160,7 @@ public class SupportResourceImpl implements SupportResource {
 				logger.error("Error sending support mail: " + error.toString());
 				parameters.add(supportRequest.getSubject());
 				parameters.add(error.toString());
-				return new OssResponse(session,"ERROR","Sopport request '%s' could not be sent. Reason '%s'",null, parameters); 
+				return new OssResponse(session,"ERROR","Sopport request '%s' could not be sent. Reason '%s'",null, parameters);
 			}
 		}
 	}

@@ -139,7 +139,7 @@ public class EducationController extends Controller {
 		owner.getCategories().add(smartRoom);
 
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(room);
 			em.persist(smartRoom);
 			em.merge(owner);
@@ -149,7 +149,7 @@ public class EducationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			/*
 			 * Add groups to the smart room
 			 */
@@ -197,7 +197,7 @@ public class EducationController extends Controller {
 
 	public OssResponse modifySmartRoom(long roomId, Category smartRoom) {
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			Room room = smartRoom.getRooms().get(0);
 			room.setName(smartRoom.getName());
 			room.setDescription(smartRoom.getDescription());
@@ -214,7 +214,7 @@ public class EducationController extends Controller {
 
 	public OssResponse deleteSmartRoom(Long roomId) {
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			Room room         = em.find(Room.class, roomId);
 			for( Category category : room.getCategories() ) {
 				if( category.getCategoryType().equals("smartRoom") && category.getName().equals(room.getName()) ) {
@@ -655,7 +655,7 @@ public class EducationController extends Controller {
 
 		RoomSmartControl roomSmartControl = new RoomSmartControl(roomId,this.session.getUserId(),minutes);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(roomSmartControl);
 			em.getTransaction().commit();
 		} catch (Exception e) {

@@ -53,7 +53,7 @@ public class InformationController extends Controller {
 		announcement.setCategories( new ArrayList<Category>() );
 		Category category;
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(announcement);
 			user.getMyAnnouncements().add(announcement);
 			em.merge(user);
@@ -98,7 +98,7 @@ public class InformationController extends Controller {
 		contact.setOwner(user);
 		Category category;
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(contact);
 			user.getMyContacts().add(contact);
 			em.merge(user);
@@ -143,7 +143,7 @@ public class InformationController extends Controller {
 		faq.setOwner(user);
 		Category category;
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(faq);
 			user.getMyFAQs().add(faq);
 			em.merge(user);
@@ -237,7 +237,7 @@ public class InformationController extends Controller {
 			User user = this.session.getUser();
 			announcement.getHaveSeenUsers().add(user);
 			user.getReadAnnouncements().add(announcement);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(user);
 			em.merge(announcement);
 			em.getTransaction().commit();
@@ -350,7 +350,7 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this Announcement");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			Announcement oldAnnouncement = em.find(Announcement.class, announcement.getId());
 			for( User user : oldAnnouncement.getHaveSeenUsers() ) {
 				user.getReadAnnouncements().remove(oldAnnouncement);
@@ -388,7 +388,7 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this contact");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			Contact oldContact = em.find(Contact.class, contact.getId());
 			oldContact.setName(contact.getName());
 			oldContact.setEmail(contact.getEmail());
@@ -420,7 +420,7 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to modify this FAQ ");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			FAQ oldFaq = em.find(FAQ.class, faq.getId());
 			oldFaq.setIssue(faq.getIssue());
 			oldFaq.setTitle(faq.getTitle());
@@ -453,7 +453,7 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this Announcement");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(announcement);
 			for( Category category : announcement.getCategories() ) {
 				category.getAnnouncements().remove(announcement);
@@ -487,7 +487,7 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this contact");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(contact);
 			for( Category category : contact.getCategories() ) {
 				category.getContacts().remove(contact);
@@ -521,7 +521,7 @@ public class InformationController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "You have no rights to delete this FAQ");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(faq);
 			for( Category category : faq.getCategories() ) {
 				category.getFaqs().remove(faq);

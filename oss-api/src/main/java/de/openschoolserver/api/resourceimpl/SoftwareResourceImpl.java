@@ -8,6 +8,9 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.persistence.EntityManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -25,6 +28,7 @@ import de.openschoolserver.dao.SoftwareLicense;
 import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.SoftwareVersion;
 import de.openschoolserver.dao.controller.SoftwareController;
+import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.controller.CategoryController;
 import de.openschoolserver.dao.controller.CloneToolController;
 import de.openschoolserver.dao.controller.DeviceController;
@@ -32,90 +36,100 @@ import de.openschoolserver.dao.controller.RoomController;
 
 public class SoftwareResourceImpl implements SoftwareResource {
 	Logger logger           = LoggerFactory.getLogger(SoftwareResource.class);
+
+	private EntityManager em;
+
 	public SoftwareResourceImpl() {
+		super();
+		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+	}
+
+	protected void finalize()
+	{
+	   em.close();
 	}
 
 	@Override
 	public List<Software> getAll(Session session) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.getAll();
 	}
 
 	@Override
 	public List<Software> getAllInstallable(Session session) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.getAllInstallable();
 	}
 
 	@Override
 	public Software getById(Session session, long softwareId) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.getById(softwareId);
 	}
 
 	@Override
 	public List<Software> search(Session session, String search) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.search(search);
 	}
 
 	@Override
 	public OssResponse add(Session session, Software software) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.add(software,true);
 	}
 
 	@Override
 	public OssResponse modify(Session session, Software software) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.modify(software);
 	}
 
 	@Override
 	public OssResponse delete(Session session, long softwareId) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.delete(softwareId);
 	}
 
 	@Override
 	public OssResponse apply(Session session) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.applySoftwareStateToHosts();
 	}
 
 
 	@Override
 	public OssResponse createInstallation(Session session, Category category) {
-		return new SoftwareController(session).createInstallationCategory(category);
+		return new SoftwareController(session,em).createInstallationCategory(category);
 	}
 
 	@Override
 	public OssResponse addSoftwareToInstalation(Session session, long installationId, long softwareId) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.addSoftwareToCategory(softwareId,installationId);
 	}
 
 	@Override
 	public OssResponse addDeviceToInstalation(Session session, long installationId, long deviceId) {
-		CategoryController categoryController = new CategoryController(session);
+		CategoryController categoryController = new CategoryController(session,em);
 		return categoryController.addMember(installationId, "Device", deviceId);
 	}
 
 	@Override
 	public OssResponse addRoomToInstalation(Session session, long installationId, long roomId) {
-		CategoryController categoryController = new CategoryController(session);
+		CategoryController categoryController = new CategoryController(session,em);
 		return categoryController.addMember(installationId, "Room", roomId);
 	}
 
 	@Override
 	public OssResponse addHWConfToInstalation(Session session, long installationId, long hwconfId) {
-		CategoryController categoryController = new CategoryController(session);
+		CategoryController categoryController = new CategoryController(session,em);
 		return categoryController.addMember(installationId, "HWConf", hwconfId);
 	}
 
 	@Override
 	public OssResponse deleteInstalation(Session session, long installationId) {
-		CategoryController categoryController = new CategoryController(session);
+		CategoryController categoryController = new CategoryController(session,em);
 		OssResponse ossResponse = categoryController.delete(installationId);
 		if( ossResponse.getCode().equals("OK") ) {
 			ossResponse = this.apply(session);
@@ -125,31 +139,31 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public OssResponse deleteSoftwareFromInstalation(Session session, long installationId, long softwareId) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.deleteSoftwareFromCategory(softwareId,installationId);
 	}
 
 	@Override
 	public OssResponse deleteDeviceFromInstalation(Session session, long installationId, long deviceId) {
-		CategoryController categoryController = new CategoryController(session);
+		CategoryController categoryController = new CategoryController(session,em);
 		return categoryController.deleteMember(installationId, "Device", deviceId);
 	}
 
 	@Override
 	public OssResponse deleteRoomFromInstalation(Session session, long installationId, long roomId) {
-		CategoryController categoryController = new CategoryController(session);
+		CategoryController categoryController = new CategoryController(session,em);
 		return categoryController.deleteMember(installationId, "Room", roomId);
 	}
 
 	@Override
 	public OssResponse deleteHWConfFromInstalation(Session session, long installationId, long hwconfId) {
-		CategoryController categoryController = new CategoryController(session);
+		CategoryController categoryController = new CategoryController(session,em);
 		return categoryController.deleteMember(installationId, "HWConf", hwconfId);
 	}
 
 	@Override
 	public List<OssBaseObject> getSoftwares(Session session, long installationId) {
-		Category category = new CategoryController(session).getById(installationId);
+		Category category = new CategoryController(session,em).getById(installationId);
 		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
 		for( Software object : category.getSoftwares() ) {
 			objects.add(new OssBaseObject(object.getId(),object.getName()));
@@ -159,7 +173,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public List<OssBaseObject> getDevices(Session session, long installationId) {
-		Category category = new CategoryController(session).getById(installationId);
+		Category category = new CategoryController(session,em).getById(installationId);
 		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
 		for( Device object : category.getDevices() ) {
 			objects.add(new OssBaseObject(object.getId(),object.getName()));
@@ -169,7 +183,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public List<OssBaseObject> getRooms(Session session, long installationId) {
-		Category category = new CategoryController(session).getById(installationId);
+		Category category = new CategoryController(session,em).getById(installationId);
 		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
 		for( Room object : category.getRooms() ) {
 			objects.add(new OssBaseObject(object.getId(),object.getName()));
@@ -179,7 +193,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public List<OssBaseObject> getHWConfs(Session session, long installationId) {
-		Category category = new CategoryController(session).getById(installationId);
+		Category category = new CategoryController(session,em).getById(installationId);
 		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
 		for( HWConf object : category.getHWConfs() ) {
 			objects.add(new OssBaseObject(object.getId(),object.getName()));
@@ -189,37 +203,37 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public List<Map<String, String>> getAvailable(Session session) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.getAvailableSoftware();
 	}
 
 	@Override
 	public OssResponse download(Session session, List<String> softwares) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.downloadSoftwares(softwares);
 	}
 	@Override
 	public OssResponse downloadOne(Session session, String softwareName) {
 		List<String> softwares = new ArrayList<String>();
 		softwares.add(softwareName);
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.downloadSoftwares(softwares);
 	}
 
 	@Override
 	public List<Map<String, String>> listDownloadedSoftware(Session session) {
-		return new SoftwareController(session).listDownloadedSoftware();
+		return new SoftwareController(session,em).listDownloadedSoftware();
 	}
 
 	@Override
 	public OssResponse setSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
 			String version) {
-		return new SoftwareController(session).setSoftwareStatusOnDeviceByName(deviceName, softwareName, softwareName, version, "I");
+		return new SoftwareController(session,em).setSoftwareStatusOnDeviceByName(deviceName, softwareName, softwareName, version, "I");
 	}
 
 	@Override
 	public OssResponse setSoftwareInstalledOnDevice(Session session, String deviceName, Map<String, String> software) {
-		return new SoftwareController(session).setSoftwareStatusOnDeviceByName(
+		return new SoftwareController(session,em).setSoftwareStatusOnDeviceByName(
 				deviceName,
 				software.get("name"),
 				software.get("description"),
@@ -229,18 +243,18 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public String getSoftwareLicencesOnDevice(Session session, String deviceName) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		return softwareController.getSoftwareLicencesOnDevice(deviceName);
 	}
 
 	@Override
 	public List<Category> getInstallations(Session session) {
-		return new CategoryController(session).getByType("installation");
+		return new CategoryController(session,em).getByType("installation");
 	}
 
 	@Override
 	public List<Software> getSoftwares(Session session, List<Long> softwareIds) {
-		return new SoftwareController(session).getSoftwareStatusById(softwareIds);
+		return new SoftwareController(session,em).getSoftwareStatusById(softwareIds);
 	}
 
 	@Override
@@ -257,7 +271,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		softwareLicense.setValue(value);
 		softwareLicense.setCount(count);
 		softwareLicense.setLicenseType(licenseType);
-		return new SoftwareController(session).addLicenseToSoftware(
+		return new SoftwareController(session,em).addLicenseToSoftware(
 				softwareLicense,
 				softwareId,
 				fileInputStream,
@@ -274,7 +288,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader
 		) {
-		SoftwareController  softwareController = new SoftwareController(session);
+		SoftwareController  softwareController = new SoftwareController(session,em);
 		SoftwareLicense softwareLicense = softwareController.getSoftwareLicenseById(licenseId);
 		softwareLicense.setCount(count);
 		softwareLicense.setValue(value);
@@ -285,7 +299,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public OssResponse deleteLicense(Session session, long licenseId) {
-		return new SoftwareController(session).deleteLicence(licenseId);
+		return new SoftwareController(session,em).deleteLicence(licenseId);
 	}
 
 	@Override
@@ -293,17 +307,17 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		if( softwareId == null) {
 			return this.getAllSoftwareStatusOnDevice(session, deviceId);
 		}
-		return new SoftwareController(session).getSoftwareStatusOnDeviceById(deviceId, softwareId);
+		return new SoftwareController(session,em).getSoftwareStatusOnDeviceById(deviceId, softwareId);
 	}
 
 	@Override
 	public List<SoftwareStatus> getAllSoftwareStatusOnDevice(Session session, Long deviceId) {
-		return new SoftwareController(session).getAllSoftwareStatusOnDeviceById(deviceId);
+		return new SoftwareController(session,em).getAllSoftwareStatusOnDeviceById(deviceId);
 	}
 
 	@Override
 	public List<SoftwareStatus> getSoftwareStatus(Session session, Long softwareId) {
-		SoftwareController softwareController = new SoftwareController(session);
+		SoftwareController softwareController = new SoftwareController(session,em);
 		List<SoftwareStatus> softwareStatus = new ArrayList<SoftwareStatus>();
 		Software software = softwareController.getById(softwareId);
 		for( SoftwareVersion sv : software.getSoftwareVersions() ) {
@@ -321,7 +335,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<SoftwareLicense> getSoftwareLicenses(Session session, long softwareId) {
 		List<SoftwareLicense> licenses = new ArrayList<SoftwareLicense>();
-		for( SoftwareLicense license : new SoftwareController(session).getById(softwareId).getSoftwareLicenses() ) {
+		for( SoftwareLicense license : new SoftwareController(session,em).getById(softwareId).getSoftwareLicenses() ) {
 			license.setUsed(license.getDevices().size());
 			licenses.add(license);
 		}
@@ -330,17 +344,17 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public OssResponse addRequirements(Session session, List<String> requirement) {
-		return new SoftwareController(session).addRequirements(requirement);
+		return new SoftwareController(session,em).addRequirements(requirement);
 	}
 
 	@Override
 	public OssResponse addRequirements(Session session, long softwareId, long requirementId) {
-		return new SoftwareController(session).addRequirements(softwareId,requirementId);
+		return new SoftwareController(session,em).addRequirements(softwareId,requirementId);
 	}
 
 	@Override
 	public OssResponse deleteRequirements(Session session, long softwareId, long requirementId) {
-		return new SoftwareController(session).deleteRequirements(softwareId,requirementId);
+		return new SoftwareController(session,em).deleteRequirements(softwareId,requirementId);
 	}
 
 	@Override
@@ -355,8 +369,8 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<SoftwareStatus> getRoomsStatus(Session session, Long roomId) {
 		List<SoftwareStatus> ss = new ArrayList<SoftwareStatus>();
-		Room room = new RoomController(session).getById(roomId);
-		SoftwareController sc = new SoftwareController(session);
+		Room room = new RoomController(session,em).getById(roomId);
+		SoftwareController sc = new SoftwareController(session,em);
 		for( Device device : room.getDevices() ) {
 			ss.addAll(sc.getAllSoftwareStatusOnDevice(device));
 		}
@@ -366,8 +380,8 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<SoftwareStatus> getHWConsStatus(Session session, Long hwconfId) {
 		List<SoftwareStatus> ss = new ArrayList<SoftwareStatus>();
-		SoftwareController sc = new SoftwareController(session);
-		HWConf hwconf = new CloneToolController(session).getById(hwconfId);
+		SoftwareController sc = new SoftwareController(session,em);
+		HWConf hwconf = new CloneToolController(session,em).getById(hwconfId);
 		for( Device device : hwconf.getDevices() ) {
 			ss.addAll(sc.getAllSoftwareStatusOnDevice(device));
 		}
@@ -376,7 +390,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public OssResponse applyState(Session session) {
-		DeviceController deviceController = new DeviceController(session);
+		DeviceController deviceController = new DeviceController(session,em);
 		for( Device device : deviceController.getAll() ) {
 			deviceController.manageDevice(device, "applyState", null);
 		}
@@ -385,29 +399,29 @@ public class SoftwareResourceImpl implements SoftwareResource {
 
 	@Override
 	public Category getInstallation(Session session, long installationId) {
-		return new CategoryController(session).getById(installationId);
+		return new CategoryController(session,em).getById(installationId);
 	}
 
 	@Override
 	public List<Map<String, String>> listUpdatesForSoftwarePackages(Session session) {
-		return new SoftwareController(session).listUpdatesForSoftwarePackages();
+		return new SoftwareController(session,em).listUpdatesForSoftwarePackages();
 	}
 
 	@Override
 	public OssResponse updatesSoftwares(Session session, List<String> softwares) {
-		return new SoftwareController(session).updateSoftwares(softwares);
+		return new SoftwareController(session,em).updateSoftwares(softwares);
 	}
 
 	@Override
 	public OssResponse deleteDownloadedSoftwares(Session session, List<String> softwares) {
-		return new SoftwareController(session).deleteDownloadedSoftwares(softwares);
+		return new SoftwareController(session,em).deleteDownloadedSoftwares(softwares);
 	}
 
 	@Override
 	public List<OssBaseObject> getAvailableSoftwares(Session session, long installationId) {
-		SoftwareController sc = new SoftwareController(session);
+		SoftwareController sc = new SoftwareController(session,em);
 		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
-		Category installationSet = new CategoryController(session).getById(installationId);
+		Category installationSet = new CategoryController(session,em).getById(installationId);
 		for( Software software : sc.getAllInstallable() ) {
 			if( !installationSet.getSoftwares().contains(software) ) {
 				objects.add(new OssBaseObject(software.getId(),software.getName()));
@@ -419,8 +433,8 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<OssBaseObject> getAvailableDevices(Session session, long installationId) {
 		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
-		DeviceController dc = new DeviceController(session);
-		for( Long deviceId : new CategoryController(session).getAvailableMembers(installationId, "Device") ) {
+		DeviceController dc = new DeviceController(session,em);
+		for( Long deviceId : new CategoryController(session,em).getAvailableMembers(installationId, "Device") ) {
 			Device device = dc.getById(deviceId);
 			if( device != null  &&  device.getHwconf() != null && device.getHwconf().getDeviceType().equals("FatClient") ) {
 				objects.add(new OssBaseObject(device.getId(),device.getName()));
@@ -432,8 +446,8 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<OssBaseObject> getAvailableRooms(Session session, long installationId) {
 		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
-		RoomController rc = new RoomController(session);
-		for( Long roomId : new CategoryController(session).getAvailableMembers(installationId, "Room") ) {
+		RoomController rc = new RoomController(session,em);
+		for( Long roomId : new CategoryController(session,em).getAvailableMembers(installationId, "Room") ) {
 			Room room = rc.getById(roomId);
 			if( room != null  &&  room.getHwconf() != null && room.getHwconf().getDeviceType().equals("FatClient") ) {
 				objects.add(new OssBaseObject(room.getId(),room.getName()));
@@ -445,8 +459,8 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<OssBaseObject> getAvailableHWConfs(Session session, long installationId) {
 		List<OssBaseObject> objects = new ArrayList<OssBaseObject>();
-		CloneToolController cc = new CloneToolController(session);
-		for( Long hwconfId : new CategoryController(session).getAvailableMembers(installationId, "HWConf") ) {
+		CloneToolController cc = new CloneToolController(session,em);
+		for( Long hwconfId : new CategoryController(session,em).getAvailableMembers(installationId, "HWConf") ) {
 			HWConf hwconf = cc.getById(hwconfId);
 			if( hwconf != null && hwconf.getDeviceType().equals("FatClient") ) {
 				objects.add(new OssBaseObject(hwconf.getId(),hwconf.getName()));

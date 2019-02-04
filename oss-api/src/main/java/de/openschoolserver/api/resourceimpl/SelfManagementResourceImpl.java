@@ -10,14 +10,23 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.UserController;
+import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 public class SelfManagementResourceImpl implements SelfManagementResource {
 
 	Logger logger = LoggerFactory.getLogger(SelfManagementResource.class);
 
+	private EntityManager em;
+
 	public SelfManagementResourceImpl() {
-		// TODO Auto-generated constructor stub
+		super();
+		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+	}
+
+	protected void finalize()
+	{
+	   em.close();
 	}
 
 	@Override
@@ -27,7 +36,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 
 	@Override
 	public OssResponse modifyMySelf(Session session, User user) {
-		UserController userController = new UserController(session);
+		UserController userController = new UserController(session,em);
 		User oldUser = session.getUser();
 		OssResponse  ossResponse = null;
 		logger.debug("modifyMySelf" + user);
@@ -45,7 +54,6 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			oldUser.setBirthDay(user.getBirthDay());
 			oldUser.setFsQuota(user.getFsQuota());
 			oldUser.setMsQuota(user.getMsQuota());
-			EntityManager em = userController.getEntityManager(); 
 			try {
 				em.getTransaction().begin();
 				em.merge(oldUser);

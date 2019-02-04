@@ -120,7 +120,7 @@ public class GroupController extends Controller {
 		}
 		group.setOwner(this.session.getUser());
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			if( group.getGroupType().equals("primary")) {
 				Enumerate enumerate = new Enumerate("role",group.getName());
 				em.persist(enumerate);
@@ -168,7 +168,7 @@ public class GroupController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(oldGroup);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -198,7 +198,7 @@ public class GroupController extends Controller {
 		//Start the plugin
 		this.startPlugin("delete_group", group);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			if( !em.contains(group)) {
 				group = em.merge(group);
 			}
@@ -340,7 +340,7 @@ public class GroupController extends Controller {
 			}
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for( User user : usersToAdd) {
 				group.getUsers().add(user);
 				user.getGroups().add(group);
@@ -379,7 +379,7 @@ public class GroupController extends Controller {
 		}
 		user.getGroups().add(group);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(user);
 			em.merge(group);
 			em.getTransaction().commit();
@@ -435,7 +435,7 @@ public class GroupController extends Controller {
 		group.getUsers().remove(user);
 		user.getGroups().remove(group);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(user);
 			em.merge(group);
 			em.getTransaction().commit();
@@ -465,7 +465,7 @@ public class GroupController extends Controller {
 		group.setOwner(user);
 		user.getOwnedGroups().add(group);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(user);
 			em.merge(group);
 			em.getTransaction().commit();

@@ -160,7 +160,7 @@ public class PrinterController extends Controller {
 			program[1] = "-x";
 			program[2] = printer.getName();
 			OSSShellTools.exec(program, reply, stderr, null);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			printerDevice.getPrinterQueue().remove(printer);
 			em.remove(printer);
 			em.merge(printerDevice);
@@ -246,7 +246,7 @@ public class PrinterController extends Controller {
 		//Create the printer object
 		try {
 			Device device = em.find(Device.class, deviceId);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			
 			printer.setDevice(device);
 			printer.setName(name.toLowerCase());

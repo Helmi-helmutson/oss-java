@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
 import javax.ws.rs.WebApplicationException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -25,40 +26,49 @@ import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.PrintersOfManufacturer;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.*;
+import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
 public class PrinterResourceImpl implements PrinterResource {
-	
+
 	Logger logger = LoggerFactory.getLogger(PrinterResourceImpl.class);
 
 	private Path PRINTERS  = Paths.get("/usr/share/oss/templates/printers.txt");
 
+	private EntityManager em;
+
 	public PrinterResourceImpl() {
-		// TODO Auto-generated constructor stub
+		super();
+		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+	}
+
+	protected void finalize()
+	{
+	   em.close();
 	}
 
 	@Override
 	public List<Printer> getPrinters(Session session) {
-		return new PrinterController(session).getPrinters();
+		return new PrinterController(session,em).getPrinters();
 	}
 
 	@Override
 	public OssResponse deletePrinter(Session session, Long printerId) {
-		return new PrinterController(session).deletePrinter(printerId);
+		return new PrinterController(session,em).deletePrinter(printerId);
 	}
 
 	@Override
 	public OssResponse deletePrinter(Session session, String printerName) {
-		Printer printer = new PrinterController(session).getByName(printerName);
+		Printer printer = new PrinterController(session,em).getByName(printerName);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		return new PrinterController(session).deletePrinter(printer.getId());
+		return new PrinterController(session,em).deletePrinter(printer.getId());
 	}
 
 	@Override
 	public OssResponse resetPrinter(Session session, Long printerId) {
-		Printer printer = new PrinterController(session).getById(printerId);
+		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
@@ -81,25 +91,25 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse enablePrinter(Session session, Long printerId) {
-		Printer printer = new PrinterController(session).getById(printerId);
+		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		return new PrinterController(session).enablePrinter(printer.getName());
+		return new PrinterController(session,em).enablePrinter(printer.getName());
 	}
 
 	@Override
 	public OssResponse enablePrinter(Session session, String printerName) {
-		return new PrinterController(session).enablePrinter(printerName);
+		return new PrinterController(session,em).enablePrinter(printerName);
 	}
 
 	@Override
 	public OssResponse disablePrinter(Session session, Long printerId) {
-		Printer printer = new PrinterController(session).getById(printerId);
+		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
-		return new PrinterController(session).enablePrinter(printer.getName());
+		return new PrinterController(session,em).enablePrinter(printer.getName());
 	}
 
 	@Override
@@ -115,10 +125,10 @@ public class PrinterResourceImpl implements PrinterResource {
 		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(session,"OK","Printer was disabled succesfully.");
 	}
-	
+
 	@Override
 	public OssResponse activateWindowsDriver(Session session, Long printerId) {
-		Printer printer = new PrinterController(session).getById(printerId);
+		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
@@ -127,7 +137,7 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse activateWindowsDriver(Session session, String printerName) {
-		return new PrinterController(session).activateWindowsDriver(printerName);
+		return new PrinterController(session,em).activateWindowsDriver(printerName);
 	}
 
 	@Override
@@ -139,12 +149,12 @@ public class PrinterResourceImpl implements PrinterResource {
 			boolean windowsDriver,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new PrinterController(session).addPrinter(name,mac,roomId,model,windowsDriver,fileInputStream,contentDispositionHeader);
+		return new PrinterController(session,em).addPrinter(name,mac,roomId,model,windowsDriver,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
 	public Map<String,String[]> getAvailableDrivers(Session session) {
-		Map<String,String[]> drivers = new HashMap<String,String[]>(); 
+		Map<String,String[]> drivers = new HashMap<String,String[]>();
 		try {
 			for( String line : Files.readAllLines(PRINTERS) ) {
 				String[] fields = line.split("###");
@@ -182,7 +192,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			Long printerId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 
-		Printer printer = new PrinterController(session).getById(printerId);
+		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
 		}
@@ -220,16 +230,16 @@ public class PrinterResourceImpl implements PrinterResource {
 	@Override
 	public OssResponse addPrinterQueue(Session session, String name, Long deviceId, String model, boolean windowsDriver,
 			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
-		return new PrinterController(session).addPrinterQueue(session,name,deviceId,model,windowsDriver,fileInputStream,contentDispositionHeader);
+		return new PrinterController(session,em).addPrinterQueue(session,name,deviceId,model,windowsDriver,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
 	public List<Device> getPrinterDevices(Session session) {
-		return new CloneToolController(session).getByName("Printer").getDevices();
+		return new CloneToolController(session,em).getByName("Printer").getDevices();
 	}
 
 	@Override
 	public Printer getPrinterById(Session session, Long printerId) {
-		return new PrinterController(session).getById(printerId);
+		return new PrinterController(session,em).getById(printerId);
 	}
 }

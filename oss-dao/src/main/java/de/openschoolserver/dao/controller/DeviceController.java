@@ -130,7 +130,7 @@ public class DeviceController extends Controller {
 		try {
 			HWConf hwconf = device.getHwconf();
 			Room   room   = device.getRoom();
-			em.getTransaction().begin();
+			this.beginTransaction();
 			if( this.isProtected(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","This device must not be deleted.");
 			}
@@ -311,7 +311,7 @@ public class DeviceController extends Controller {
 		try {
 			for(Device dev: devices){
 				dev.setOwner(session.getUser());
-				em.getTransaction().begin();
+				this.beginTransaction();
 				em.persist(dev);
 				em.getTransaction().commit();
 			}
@@ -599,7 +599,7 @@ public class DeviceController extends Controller {
 			if( printer == null ) {
 				return new OssResponse(this.getSession(),"ERROR", "Printer cannot be found.");
 			}
-			em.getTransaction().begin();
+			this.beginTransaction();
 			device.setDefaultPrinter(printer);
 			printer.getDefaultForDevices().add(device);
 			em.merge(device);
@@ -621,7 +621,7 @@ public class DeviceController extends Controller {
 		Printer printer = device.getDefaultPrinter();
 		if( printer != null  ) {
 			try {
-				em.getTransaction().begin();
+				this.beginTransaction();
 				device.setDefaultPrinter(null);
 				printer.getDefaultForDevices().remove(device);
 				em.merge(device);
@@ -645,7 +645,7 @@ public class DeviceController extends Controller {
 			if( device.getAvailablePrinters().contains(printer) ) {
 				return new OssResponse(this.getSession(),"OK","The printer is already assigned to device.");
 			}
-			em.getTransaction().begin();
+			this.beginTransaction();
 			device.getAvailablePrinters().add(printer);
 			printer.getDefaultForDevices().add(device);
 			em.merge(device);
@@ -665,7 +665,7 @@ public class DeviceController extends Controller {
 			if( device == null || printer == null) {
 				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
 			}
-			em.getTransaction().begin();
+			this.beginTransaction();
 			device.getAvailablePrinters().remove(printer);
 			printer.getDefaultForDevices().remove(device);
 			em.merge(device);
@@ -714,7 +714,7 @@ public class DeviceController extends Controller {
 		logger.debug("addLoggedInUser: " + device.toString());
 		logger.debug("addLoggedInUser: " + user.toString());
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(device);
 			em.merge(user);
 			em.getTransaction().commit();
@@ -752,7 +752,7 @@ public class DeviceController extends Controller {
 		device.getLoggedIn().remove(user);
 		user.getLoggedOn().remove(device);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(device);
 			em.merge(user);
 			em.getTransaction().commit();
@@ -850,7 +850,7 @@ public class DeviceController extends Controller {
 			oldDevice.setInventary(device.getInventary());
 			oldDevice.setSerial(device.getSerial());
 			logger.debug("OLD-Device-After-Merge" + oldDevice);
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(oldDevice);
 			logger.debug("OLDHwconf " + oldHwconf + " new hw " + hwconf);
 			if( hwconf != oldHwconf) {
@@ -1023,7 +1023,7 @@ public class DeviceController extends Controller {
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.logOff";
 		case "cleanuploggedin":
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for( User user : device.getLoggedIn() ) {
 				user.getLoggedOn().remove(device);
 				em.merge(user);
@@ -1068,7 +1068,7 @@ public class DeviceController extends Controller {
 
 	public OssResponse cleanUpLoggedIn(Device device) {
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for( User user : device.getLoggedIn() ) {
 				user.getLoggedOn().remove(device);
 				em.merge(user);
@@ -1150,7 +1150,7 @@ public class DeviceController extends Controller {
 		logger.debug("addLoggedInUser: " + user.toString());
 		cleanUpLoggedIn(device);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			device.setLoggedIn(new ArrayList<User>());
 			device.getLoggedIn().add(user);
 			user.getLoggedOn().add(device);

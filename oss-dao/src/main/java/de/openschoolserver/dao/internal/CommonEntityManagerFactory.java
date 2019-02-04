@@ -112,13 +112,4 @@ public class CommonEntityManagerFactory {
         }
         return commonEmf.get(key);
     }
-
-    public EntityManager getEntityManager(Session session) {
-		if( session != null) {
-			return CommonEntityManagerFactory.instance(session.getSchoolId()).getEntityManagerFactory().createEntityManager();
-		}
-		else {
-			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		}
-	}
 }

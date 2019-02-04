@@ -9,6 +9,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Random;
 
+import javax.persistence.EntityManager;
 import javax.ws.rs.WebApplicationException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -21,10 +22,22 @@ import de.claxss.importlib.ImporterFactory;
 import de.claxss.importlib.ImporterObject;
 import de.openschoolserver.api.resources.ImporterResource;
 import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.internal.ImportHandler;
 
 public class ImporterResourceImpl implements ImporterResource {
 	private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ImporterResourceImpl.class);
+
+	EntityManager em;
+
+	public void ImporterResource() {
+		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+	}
+
+	protected void finalize()
+	{
+	   em.close();
+	}
 
 	@Override
 	public List<ImporterDescription> getAvailableImporters(Session session, String objecttype) {
@@ -45,7 +58,7 @@ public class ImporterResourceImpl implements ImporterResource {
 
 				Importer importer = f.getImporterInstance(importOrder.getImporterId());
 				if (importer.startImport(o)) {
-					ImportHandler h = new ImportHandler(session, importer, o);
+					ImportHandler h = new ImportHandler(session, importer, o, em);
 					h.handleObjects();
 					importOrder.setImportResult("started"); // subsequent calls
 															// will return this

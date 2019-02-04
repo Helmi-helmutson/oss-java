@@ -58,7 +58,7 @@ public class CloneToolController extends Controller {
 			}
 			return hwconf;
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getById: "+ e.getMessage());
 			return null;
 		} finally {
 		}
@@ -69,7 +69,7 @@ public class CloneToolController extends Controller {
 			Query query = em.createNamedQuery("HWConf.getByName").setParameter("name",name);
 			return (HWConf) query.getSingleResult();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getByName: " +e.getMessage());
 			return null;
 		} finally {
 		}
@@ -80,7 +80,7 @@ public class CloneToolController extends Controller {
 			Query query = em.createNamedQuery("HWConf.getByType").setParameter("deviceType",deviceType);
 			return (List<HWConf>) query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getByType: "+ e.getMessage());
 			return null;
 		} finally {
 		}
@@ -104,9 +104,8 @@ public class CloneToolController extends Controller {
 			query.setParameter("hwconfId", hwconfId).setParameter("name",partition);
 			return (Partition) query.getSingleResult();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getPartition" + e.getMessage());
 			return null;
-		} finally {
 		}
 	}
 
@@ -114,7 +113,7 @@ public class CloneToolController extends Controller {
 		try {
 			return em.find(Partition.class, partitionId);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getPartitionById" + e.getMessage());
 			return null;
 		} finally {
 		}
@@ -152,7 +151,7 @@ public class CloneToolController extends Controller {
 			if( hwconf.getDeviceType() == null ||  hwconf.getDeviceType().isEmpty() ) {
 				hwconf.setDeviceType("FatClient");
 			}
-			em.getTransaction().begin();
+			this.beginTransaction();
 			if( hwconf.getPartitions() != null ) {
 				for( Partition partition : hwconf.getPartitions() ) {
 					partition.setId(null);
@@ -164,7 +163,7 @@ public class CloneToolController extends Controller {
 			em.getTransaction().commit();
 			logger.debug("Created HWConf:" + hwconf );
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("addHWConf: "+ e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
@@ -179,7 +178,7 @@ public class CloneToolController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			HWConf oldHwconf = em.find(HWConf.class, hwconfId);
 			if( hwconf.getPartitions() != null && hwconf.getPartitions().size() > 0 ) {
 				for( Partition partition : oldHwconf.getPartitions()) {
@@ -201,7 +200,7 @@ public class CloneToolController extends Controller {
 			em.merge(oldHwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("modifyHWConf" + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
@@ -216,12 +215,12 @@ public class CloneToolController extends Controller {
 		hwconf.addPartition(partition);
 		partition.setHwconf(hwconf);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(partition);
 			em.merge(hwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("addPartitionToHWConf: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
@@ -237,11 +236,11 @@ public class CloneToolController extends Controller {
 		hwconf.addPartition(partition);
 		// First we check if the parameter are unique.
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(hwconf);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("addPartitionToHWConf: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
@@ -282,11 +281,11 @@ public class CloneToolController extends Controller {
 			partition.setOs(value);
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(partition);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("setConfigurationValue: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
@@ -297,7 +296,7 @@ public class CloneToolController extends Controller {
 
 	public OssResponse delete(Long hwconfId){
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			HWConf hwconf = em.find(HWConf.class, hwconfId);
 	        if( this.isProtected(hwconf)) {
 	            return new OssResponse(this.getSession(),"ERROR","This hardware configuration must not be deleted.");
@@ -321,7 +320,7 @@ public class CloneToolController extends Controller {
 			em.getTransaction().commit();
 			em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("delete: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
@@ -336,13 +335,13 @@ public class CloneToolController extends Controller {
         }
 		hwconf.removePartition(partition);
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.remove(partition);
 			em.merge(hwconf);
 			em.getTransaction().commit();
 			em.getEntityManagerFactory().getCache().evict(hwconf.getClass());
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("deletePartition: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
@@ -375,11 +374,11 @@ public class CloneToolController extends Controller {
 			break;
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(partition);
 			em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("deleteConfigurationValue: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
@@ -392,7 +391,7 @@ public class CloneToolController extends Controller {
 			Query query = em.createNamedQuery("HWConf.findAll");
 			return (List<HWConf>) query.getResultList();
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("getAllHWConf: " + e.getMessage());
 			return null;
 		} finally {
 		}
@@ -555,7 +554,7 @@ public class CloneToolController extends Controller {
 			if( device == null ) {
 				return "ERROR Can not find the device.";
 			}
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for ( SoftwareStatus st : device.getSoftwareStatus() ) {
 				em.remove(st);
 			}
@@ -583,7 +582,7 @@ public class CloneToolController extends Controller {
 			this.systemctl("try-restart", "salt-master");
 			this.systemctl("try-restart", "oss_salt_event_watcher");
 		} catch ( IOException e ) {
-			logger.error(e.getMessage());
+			logger.error("resetMinion: " + e.getMessage());
 			return "ERROR "+e.getMessage();
 		}
 		return "OK";
@@ -607,7 +606,7 @@ public class CloneToolController extends Controller {
 			program[7] = "&";
 			OSSShellTools.exec(program, reply, error, null);
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("startMulticast: " + e.getMessage());
 			return null;
 		} finally {
 		}
@@ -623,7 +622,7 @@ public class CloneToolController extends Controller {
 			if( oldPartition == null ) {
 				return new OssResponse(this.getSession(),"ERROR","Cannot find partition.");
 			}
-			em.getTransaction().begin();
+			this.beginTransaction();
 			oldPartition.setDescription(partition.getDescription());
 			oldPartition.setOs(partition.getOs());
 			oldPartition.setFormat(partition.getFormat());

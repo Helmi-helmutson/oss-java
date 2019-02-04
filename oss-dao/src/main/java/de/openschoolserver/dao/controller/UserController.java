@@ -224,7 +224,7 @@ public class UserController extends Controller {
 			}
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.persist(user);
 			em.merge(user);
 			em.getTransaction().commit();
@@ -293,7 +293,7 @@ public class UserController extends Controller {
 			return new OssResponse(this.getSession(), "ERROR", errorMessage.toString());
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			em.merge(oldUser);
 			em.getTransaction().commit();
 		} catch (Exception e) {
@@ -337,15 +337,14 @@ public class UserController extends Controller {
 		this.startPlugin("delete_user", user);
 		//TODO make it configurable
 		User admin = getById(1L);
+		this.beginTransaction();
 		if( user.getRole().equals(roleStudent) || user.getRole().equals(roleWorkstation) ){
 			this.deleteCreatedObjects(user);
 		} else {
 			this.inheritCreatedObjects(user,admin);
 		}
-		user = em.find(User.class, user.getId());
 		List<Device> devices = user.getOwnedDevices();
 		boolean restartDHCP = !devices.isEmpty();
-		em.getTransaction().begin();
 		if (!em.contains(user)) {
 			user = em.merge(user);
 		}
@@ -361,7 +360,6 @@ public class UserController extends Controller {
 		}
 		em.remove(user);
 		em.getTransaction().commit();
-		em.getEntityManagerFactory().getCache().evictAll();
 		if (restartDHCP) {
 			DHCPConfig dhcpConfig = new DHCPConfig(session,em);
 			dhcpConfig.Create();
@@ -406,7 +404,7 @@ public class UserController extends Controller {
 			}
 		}
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for (Group group : groupsToAdd) {
 				group.getUsers().add(user);
 				user.getGroups().add(group);
@@ -435,7 +433,7 @@ public class UserController extends Controller {
 	public OssResponse syncFsQuotas(List<List<String>> quotas) {
 		User user;
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for (List<String> quota : quotas) {
 				if (quota.isEmpty())
 					continue;
@@ -457,7 +455,7 @@ public class UserController extends Controller {
 	public OssResponse syncMsQuotas(List<List<String>> quotas) {
 		User user;
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			for (List<String> quota : quotas) {
 				if (quota.isEmpty())
 					continue;
@@ -844,7 +842,7 @@ public class UserController extends Controller {
 
 		group = groupController.getById(ossResponse.getObjectId());
 		try {
-			em.getTransaction().begin();
+			this.beginTransaction();
 			category.setGroups(new ArrayList<Group>());
 			category.getGroups().add(group);
 			group.setCategories(new ArrayList<Category>());
@@ -892,7 +890,6 @@ public class UserController extends Controller {
 
 	public void inheritCreatedObjects(User creator, User newCreator) {
 		try {
-			em.getTransaction().begin();
 			//Acls
 			for( Acl o : creator.getCreatedAcls() ) {
 				o.setCreator(newCreator);
@@ -961,12 +958,10 @@ public class UserController extends Controller {
 			creator.setCreatedUsers(null);
 			//Sessions will be deleted
 			for( Session o : creator.getSessions() ) {
-				Session s = em.find(Session.class,o.getId());
-				em.remove(s);
+				em.remove(o);
 			}
 			em.merge(creator);
 			em.merge(newCreator);
-			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("inheritCreatedObjects:" + e.getMessage());
 		}
@@ -974,7 +969,6 @@ public class UserController extends Controller {
 
 	public void deleteCreatedObjects(User creator) {
 		try {
-			em.getTransaction().begin();
 			//Acls
 			for( Acl o : creator.getCreatedAcls() ) {
 				em.remove(o);
@@ -1027,12 +1021,10 @@ public class UserController extends Controller {
 			creator.setCreatedUsers(null);
 			//Sessions will be deleted
 			for( Session o : creator.getSessions() ) {
-				Session s = em.find(Session.class,o.getId());
-				em.remove(s);
+				em.remove(o);
 			}
 			creator.setSessions(null);
 			em.merge(creator);
-			em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("delete owned objects:" + e.getMessage());
 		}
