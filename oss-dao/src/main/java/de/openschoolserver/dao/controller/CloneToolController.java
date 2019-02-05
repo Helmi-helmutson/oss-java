@@ -593,17 +593,13 @@ public class CloneToolController extends Controller {
 		try {
 			partition = em.find(Partition.class, partitionId);
 			Long hwconfId = partition.getHwconf().getId();
-			String[] program   = new String[8];
+			String[] program   = new String[4];
 			StringBuffer reply = new StringBuffer();
 			StringBuffer error = new StringBuffer();
-			program[0] = "/usr/sbin/udp-sender";
-			program[1] = "--nokbd";
-			program[2] = "--interface";
-			program[3] = networkDevice;
-			program[4] = "--file";
-			program[5] = images + hwconfId + "/" + partition.getName() + ".img";
-			program[6] = "--autostart";
-			program[7] = "&";
+			program[0] = "/sbin/startproc";
+			program[1] = "/usr/share/oss/tools/start_multicast_imaging.sh";
+			program[2] = networkDevice;
+			program[3] = images + hwconfId + "/" + partition.getName() + ".img";
 			OSSShellTools.exec(program, reply, error, null);
 		} catch (Exception e) {
 			logger.error("startMulticast: " + e.getMessage());
