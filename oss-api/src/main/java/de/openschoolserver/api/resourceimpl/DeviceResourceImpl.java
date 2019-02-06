@@ -26,40 +26,34 @@ import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 
 public class DeviceResourceImpl implements DeviceResource {
 
-	private EntityManager em;
-
 	public DeviceResourceImpl() {
-		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-	}
-
-	protected void finalize()
-	{
-	   em.close();
 	}
 
 	@Override
 	public Device getById(Session session, long deviceId) {
-	    final DeviceController deviceController = new DeviceController(session,em);
-	    final Device device = deviceController.getById(deviceId);
-	    if (device == null) {
-	            throw new WebApplicationException(404);
-	    }
-	    return device;
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		final DeviceController deviceController = new DeviceController(session,em);
+		final Device device = deviceController.getById(deviceId);
+		if (device == null) {
+		        throw new WebApplicationException(404);
+		}
+		return device;
 	}
 
 	@Override
 	public List<Device> getAll(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		final List<Device> devices = deviceController.getAll();
 		if (devices == null) {
 	            throw new WebApplicationException(404);
-	    }
+		}
 		return devices;
 	}
 
 	@Override
 	public String getAllNames(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		StringBuilder devices = new StringBuilder();
 		for( Device device : deviceController.getAll() ) {
@@ -70,6 +64,7 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public Device getByIP(Session session, String IP) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		final Device device = deviceController.getByIP(IP);
 		if (device == null) {
@@ -80,6 +75,7 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public Device getByMAC(Session session, String MAC) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		final Device device = deviceController.getByMAC(MAC);
 		if (device == null) {
@@ -90,6 +86,7 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public Device getByName(Session session, String Name) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		final Device device = deviceController.getByName(Name);
 		if (device == null) {
@@ -100,23 +97,27 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public Printer getDefaultPrinter(Session session, long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.getDefaultPrinter(deviceId);
 	}
 
 	@Override
 	public List<Printer> getAvailablePrinters(Session session, long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.getAvailablePrinters(deviceId);
 	}
 
 	@Override
 	public List<String> getLoggedInUsers(Session session, String IP) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).getLoggedInUsers(IP);
 	}
 
 	@Override
 	public String getFirstLoggedInUser(String IP) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Session session  = new SessionController(em).getLocalhostSession();
 		DeviceController deviceController = new DeviceController(session,em);
 		Device device = deviceController.getByIP(IP);
@@ -130,78 +131,92 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public List<String> getLoggedInUsers(Session session, long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.getLoggedInUsers(deviceId);
 	}
 
 	@Override
 	public OssResponse setDefaultPrinter(Session session, long deviceId, long defaultPrinterId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.setDefaultPrinter(deviceId,defaultPrinterId);
 	}
 
 	@Override
 	public OssResponse deleteDefaultPrinter(Session session, long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).deleteDefaultPrinter(deviceId);
 	}
 
 	@Override
 	public OssResponse addAvailablePrinters(Session session, long deviceId, long printerId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).addAvailablePrinter(deviceId, printerId);
 	}
 
 	@Override
 	public OssResponse deleteAvailablePrinters(Session session, long deviceId, long printerId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).deleteAvailablePrinter(deviceId, printerId);
 	}
 	@Override
 	public OssResponse setLoggedInUsers(Session session, String IP, String userName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.setLoggedInUsers(IP, userName);
 	}
 
 	@Override
 	public OssResponse deleteLoggedInUser(Session session, String IP, String userName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.removeLoggedInUser(IP, userName);
 	}
 
 	@Override
 	public void refreshConfig(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		new DHCPConfig(session,em).Create();
 	}
 
 	@Override
 	public List<Device> search(Session session, String search) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.search(search);
 	}
 
 	@Override
 	public OssResponse modify(Session session, Device device) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).modify(device);
 	}
 
 	@Override
 	public OssResponse delete(Session session, long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.delete(deviceId,true);
 	}
 
 	@Override
 	public List<Device> getDevices(Session session, List<Long> deviceIds) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		return deviceController.getDevices(deviceIds);
 	}
 
 	@Override
 	public List<Device> getByHWConf(Session session, Long id) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).getByHWConf(id);
 	}
 
 	@Override
 	public OssResponse importDevices(Session session, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).importDevices(fileInputStream, contentDispositionHeader);
 	}
 
@@ -225,31 +240,37 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public List<String> getAvailableDeviceActions(Session session, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).getAvailableDeviceActions(deviceId);
 	}
 
 	@Override
 	public OssResponse manageDevice(Session session, Long deviceId, String action) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).manageDevice(deviceId,action,null);
 	}
 
 	@Override
 	public OssResponse manageDevice(Session session, String deviceName, String action) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).manageDevice(deviceName,action,null);
 	}
 
 	@Override
 	public OssResponse manageDevice(Session session, Long deviceId, String action, Map<String, String> actionContent) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).manageDevice(deviceId,action,actionContent);
 	}
 
 	@Override
 	public OssResponse cleanUpLoggedIn(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).cleanUpLoggedIn();
 	}
 
 	@Override
 	public String getDefaultPrinter(Session session, String IP) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		DeviceController deviceController = new DeviceController(session,em);
 		Device device =  deviceController.getByIP(IP);
 		if( device == null ) {
@@ -264,6 +285,7 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public String getAvailablePrinters(Session session, String IP) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		DeviceController deviceController = new DeviceController(session,em);
 		Device device = deviceController.getByIP(IP);
 		if( device == null ) {
@@ -278,11 +300,13 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public String getAllUsedDevices(Session session, Long saltClientOnly) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).getAllUsedDevices(saltClientOnly);
 	}
 
 	@Override
 	public List<OSSMConfig> getDHCP(Session session, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<OSSMConfig> dhcpParameters = new ArrayList<OSSMConfig>();
 		DeviceController deviceController = new DeviceController(session,em);
 		Device device = deviceController.getById(deviceId);
@@ -300,6 +324,7 @@ public class DeviceResourceImpl implements DeviceResource {
 		if( !dhcpParameter.getKeyword().equals("dhcpStatements") && !dhcpParameter.getKeyword().equals("dhcpOptions") ) {
 			return new OssResponse(session,"ERROR","Bad DHCP parameter.");
 		}
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		DeviceController deviceController = new DeviceController(session,em);
 		Device device = deviceController.getById(deviceId);
 		OssResponse ossResponse = deviceController.addMConfig(device, dhcpParameter.getKeyword(), dhcpParameter.getValue());
@@ -318,6 +343,7 @@ public class DeviceResourceImpl implements DeviceResource {
 
 	@Override
 	public OssResponse deleteDHCP(Session session, Long deviceId, Long parameterId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		DeviceController deviceController = new DeviceController(session,em);
 		Device device = deviceController.getById(deviceId);
 		return deviceController.deleteMConfig(device,parameterId);

@@ -39,20 +39,12 @@ public class UserResourceImpl implements UserResource {
 
 	Logger logger = LoggerFactory.getLogger(UserResourceImpl.class);
 
-	private EntityManager em;
-
 	public UserResourceImpl() {
-		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-	}
-
-	protected void finalize()
-	{
-	   em.close();
 	}
 
 	@Override
 	public User getById(Session session, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final User user = userController.getById(userId);
 		 if (user == null) {
@@ -63,6 +55,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<User> getByRole(Session session, String role) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<User> users = userController.getByRole(role);
 		if (users == null) {
@@ -73,6 +66,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<User> getAll(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<User> users = userController.getAll();
 		if (users == null) {
@@ -83,12 +77,14 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse insert(Session session, User user) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		return userController.add(user);
 	}
 
 	@Override
 	public OssResponse add(Session session, User user) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse ossResponse =  new UserController(session,em).add(user);
 		if( ossResponse.getCode().equals("OK")) {
 			sync(session);
@@ -98,6 +94,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<OssResponse> add(Session session, List<User> users) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<OssResponse> ossResponses =  new UserController(session,em).add(users);
 		sync(session);
 		return ossResponses;
@@ -105,18 +102,21 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse delete(Session session, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		return userController.delete(userId);
 	}
 
 	@Override
 	public OssResponse modify(Session session, User user) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		return userController.modify(user);
 	}
 
 	@Override
 	public List<User> search(Session session, String search) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<User> users = userController.search(search);
 		if (users == null) {
@@ -127,6 +127,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<Group> getAvailableGroups(Session session, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<Group> groups = userController.getAvailableGroups(userId);
 		if (groups == null) {
@@ -137,6 +138,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<Group> groups(Session session, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<Group> groups =  userController.getGroups(userId);
 		if (groups == null) {
@@ -147,17 +149,20 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse setMembers(Session session, long userId, List<Long> groupIds) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).setGroups(userId,groupIds);
 	}
 
 	@Override
 	public OssResponse removeMember(Session session, long groupId, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final GroupController groupController = new GroupController(session,em);
 		return groupController.removeMember(groupId,userId);
 	}
 
 	@Override
 	public OssResponse addToGroups(Session session, long userId, List<Long> groups) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		StringBuilder error = new StringBuilder();
 		final GroupController groupController = new GroupController(session,em);
 		for( Long groupId : groups ) {
@@ -174,24 +179,28 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse addMember(Session session, long groupId, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final GroupController groupController = new GroupController(session,em);
 		return groupController.addMember(groupId,userId);
 	}
 
 	@Override
 	public OssResponse syncFsQuotas(Session session, List<List<String>> Quotas) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		return userController.syncFsQuotas(Quotas);
 	}
 
 	@Override
 	public List<User> getUsers(Session session, List<Long> userIds) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		return userController.getUsers(userIds);
 	}
 
 	@Override
 	public String getUserAttribute(Session session, String uid, String attribute) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		User user = userController.getByUid(uid);
 		if( user == null) {
@@ -251,58 +260,69 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<Category> getGuestUsers(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).getGuestUsers();
 	}
 
 	@Override
 	public Category getGuestUsersCategory(Session session, Long guestUsersId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).getGuestUsersCategory(guestUsersId);
 	}
 
 	@Override
 	public OssResponse deleteGuestUsers(Session session, Long guestUsersId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).deleteGuestUsers(guestUsersId);
 	}
 
 	@Override
 	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).addGuestUsers(name, description, roomId, count, validUntil);
 	}
 
 	@Override
 	public String getGroups(Session session, String userName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).getGroupsOfUser(userName,"workgroup");
 	}
 
 	@Override
 	public String getClasses(Session session, String userName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).getGroupsOfUser(userName,"class");
 	}
 
 	@Override
 	public String addToGroup(Session session, String userName, String groupName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new GroupController(session,em).addMember(groupName, userName).getCode();
 	}
 
 
 	@Override
 	public String addGroupToUser(Session session, String userName, String groupName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new GroupController(session,em).setOwner(groupName, userName).getCode();
 	}
 
 	@Override
 	public String removeFromGroup(Session session, String userName, String groupName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new GroupController(session,em).removeMember(groupName, userName).getCode();
 	}
 
 	@Override
 	public String delete(Session session, String userName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).delete(userName).getCode();
 	}
 
 	@Override
 	public String createUid(Session session, String givenName, String surName, Date birthDay) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).createUid(givenName,surName,birthDay);
 	}
 
@@ -363,7 +383,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<UserImport> getImports(Session session) {
-		Controller controller    = new Controller(session,em);
+		Controller controller    = new Controller(session,null);
 		StringBuilder importDir  = controller.getImportDir("");
 		List<UserImport> imports = new ArrayList<UserImport>();
 		File importDirObject = new File(importDir.toString());
@@ -380,7 +400,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public UserImport getImport(Session session, String startTime) {
-		Controller controller    = new Controller(session,em);
+		Controller controller    = new Controller(session,null);
 		String content;
 		UserImport userImport;
 		String importLog  = controller.getImportDir(startTime).append("/import.log").toString();
@@ -407,7 +427,7 @@ public class UserResourceImpl implements UserResource {
 	public OssResponse restartImport(Session session, String startTime) {
 		UserImport userImport = getImport(session, startTime);
 		if( userImport != null ) {
-			Controller controller    = new Controller(session,em);
+			Controller controller    = new Controller(session,null);
 			StringBuilder importFile = controller.getImportDir(startTime);
 			importFile.append("/userlist.txt");
 			List<String> parameters = new ArrayList<String>();
@@ -452,7 +472,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse deleteImport(Session session, String startTime) {
-		Controller controller    = new Controller(session,em);
+		Controller controller    = new Controller(session,null);
 		StringBuilder importDir  = controller.getImportDir(startTime);
 		if( startTime == null || startTime.isEmpty() ) {
 			return new OssResponse(session,"ERROR", "Invalid import name.");
@@ -483,11 +503,13 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse syncMsQuotas(Session session, List<List<String>> Quotas) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).syncMsQuotas(Quotas);
 	}
 
 	@Override
 	public String getUidsByRole(Session session, String role) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		List<String> users = new ArrayList<String>();
 		for( User user : userController.getByRole(role) ) {
@@ -498,6 +520,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse allTeachersInAllClasses(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final GroupController groupController = new GroupController(session,em);
 		for( User user : userController.getByRole("teachers") ) {
@@ -510,6 +533,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse allClasses(Session session, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		User user = new UserController(session,em).getById(userId);
 		final GroupController groupController = new GroupController(session,em);
 		for( Group group : groupController.getByType("class")) {
@@ -520,6 +544,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public String addToAllClasses(Session session, String userName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		User user = new UserController(session,em).getByUid(userName);
 		final GroupController groupController = new GroupController(session,em);
 		for( Group group : groupController.getByType("class")) {

@@ -28,6 +28,7 @@ public class SchedulerResourceImpl implements SchedulerResource {
 
 	@Override
 	public OssResponse deleteExpieredGuestUser(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		UserController uc = new UserController(session,em);
 		Query query = em.createNamedQuery("Category.expiredByType").setParameter("type", "guestUser");
 		Integer counter = 0;

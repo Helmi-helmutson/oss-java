@@ -406,6 +406,7 @@ public class RoomController extends Controller {
 		}
 		DHCPConfig dhcpconfig = new DHCPConfig(session,em);
 		dhcpconfig.Create();
+		new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
 		this.startPlugin("delete_room", room);
 		return new OssResponse(this.getSession(),"OK", "Room was removed successfully.");
 	}

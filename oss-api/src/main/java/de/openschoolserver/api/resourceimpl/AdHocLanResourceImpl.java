@@ -23,21 +23,17 @@ import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	Logger logger = LoggerFactory.getLogger(AdHocLanResource.class);
-	private EntityManager em;
 
-	protected void finalize()
-	{
-	   em.close();
-	}
 
 	public AdHocLanResourceImpl() {
 		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	@Override
 	public List<User> getUsersOfRoom(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Room room  = new RoomController(session,em).getById(roomId);
+		em.close();
 		for( Category category : room.getCategories() ) {
 			if( category.getCategoryType().equals("AdHocAccess")) {
 				return category.getUsers();
@@ -48,7 +44,9 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public List<Group> getGroupsOfRoom(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Room room  = new RoomController(session,em).getById(roomId);
+		em.close();
 		for( Category category : room.getCategories() ) {
 			if( category.getCategoryType().equals("AdHocAccess")) {
 				return category.getGroups();
@@ -59,18 +57,23 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public List<User> getUsers(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		AdHocLanController adHocLan = new AdHocLanController(session,em);
+		em.close();
 		return adHocLan.getUsers();
 	}
 
 	@Override
 	public List<Group> getGroups(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		AdHocLanController adHocLan = new AdHocLanController(session,em);
+		em.close();
 		return adHocLan.getGroups();
 	}
 
 	@Override
 	public List<Room> getRooms(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		RoomController roomController = new RoomController(session,em);
 		if( roomController.isSuperuser() ) {
 			return roomController.getByType("AdHocAccess");
@@ -81,26 +84,31 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public OssResponse add(Session session, Room room) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new AdHocLanController(session,em).add(room);
 	}
 
 	@Override
 	public OssResponse putObjectIntoRoom(Session session, Long roomId, String objectType, Long objectId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new AdHocLanController(session,em).putObjectIntoRoom(roomId,objectType,objectId);
 	}
 
 	@Override
 	public OssResponse deleteObjectInRoom(Session session, Long roomId, String objectType, Long objectId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new AdHocLanController(session,em).deleteObjectInRoom(roomId,objectType,objectId);
 	}
 
 	@Override
 	public List<Device> getDevices(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return session.getUser().getOwnedDevices();
 	}
 
 	@Override
 	public OssResponse deleteDevice(Session session, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		DeviceController deviceController = new DeviceController(session,em);
 		if( deviceController.isSuperuser() ) {
 			return deviceController.delete(deviceId, true);
@@ -116,11 +124,13 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public OssResponse addDevice(Session session, long roomId, String macAddress, String name) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new RoomController(session,em).addDevice(roomId, macAddress, name);
 	}
 
 	@Override
 	public OssResponse modifyDevice(Session session, Long deviceId, Device device) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		DeviceController deviceController = new DeviceController(session,em);
 		try {
 			Device oldDevice = em.find(Device.class, deviceId);
@@ -148,6 +158,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public OssResponse turnOn(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		Room room = roomController.getById(roomId);
 		Category category = new Category();
@@ -166,6 +177,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public List<User> getAvailableUser(Session session, long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<User> users = new ArrayList<User>();
 		Category category = new AdHocLanController(session,em).getAdHocCategoryOfRoom(roomId);
 		for( User user : new UserController(session,em).getAll() ) {
@@ -178,6 +190,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public List<Group> getAvailableGroups(Session session, long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<Group> groups = new ArrayList<Group>();
 		Category category = new AdHocLanController(session,em).getAdHocCategoryOfRoom(roomId);
 		for( Group group : new GroupController(session,em).getAll() ) {
@@ -190,6 +203,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public Room getRoomById(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		Room room = roomController.getById(roomId);
 		if( room == null ) {
@@ -203,6 +217,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public OssResponse modify(Session session, Long roomId, Room room) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController rc =  new RoomController(session,em);
 		Room oldRoom = rc.getById(roomId);
 		if( !oldRoom.getRoomType().equals("AdHocAccess")) {
@@ -214,11 +229,13 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public boolean getStudentsOnly(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new AdHocLanController(session,em).getAdHocCategoryOfRoom(roomId).getStudentsOnly();
 	}
 
 	@Override
 	public OssResponse setStudentsOnly(Session session, Long roomId, boolean studentsOnly) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Category category = new AdHocLanController(session,em).getAdHocCategoryOfRoom(roomId);
 		category.setStudentsOnly(studentsOnly);
 		return new CategoryController(session,em).modify(category);
@@ -226,6 +243,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public List<Device> getDevicesOfRoom(Session session, Long adHocRoomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Category category = new AdHocLanController(session,em).getAdHocCategoryOfRoom(adHocRoomId);
 		List<Device> devices = new ArrayList<Device>();
 		for( Room room : category.getRooms() ) {
@@ -240,6 +258,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public OssResponse delete(Session session, Long adHocRoomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new AdHocLanController(session,em).delete(adHocRoomId);
 	}
 

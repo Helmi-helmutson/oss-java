@@ -75,6 +75,7 @@ public class GroupResourceImpl implements GroupResource {
 
 	@Override
 	public OssResponse delete(Session session, long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new GroupController(session,em).delete(groupId);
 	}
 

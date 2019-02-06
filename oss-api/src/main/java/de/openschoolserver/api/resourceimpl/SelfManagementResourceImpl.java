@@ -36,6 +36,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 
 	@Override
 	public OssResponse modifyMySelf(Session session, User user) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		UserController userController = new UserController(session,em);
 		User oldUser = session.getUser();
 		OssResponse  ossResponse = null;

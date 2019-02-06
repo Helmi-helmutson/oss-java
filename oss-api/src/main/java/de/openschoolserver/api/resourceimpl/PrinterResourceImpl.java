@@ -35,30 +35,24 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	private Path PRINTERS  = Paths.get("/usr/share/oss/templates/printers.txt");
 
-	private EntityManager em;
-
 	public PrinterResourceImpl() {
-		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-	}
-
-	protected void finalize()
-	{
-	   em.close();
 	}
 
 	@Override
 	public List<Printer> getPrinters(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new PrinterController(session,em).getPrinters();
 	}
 
 	@Override
 	public OssResponse deletePrinter(Session session, Long printerId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new PrinterController(session,em).deletePrinter(printerId);
 	}
 
 	@Override
 	public OssResponse deletePrinter(Session session, String printerName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Printer printer = new PrinterController(session,em).getByName(printerName);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
@@ -68,6 +62,7 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse resetPrinter(Session session, Long printerId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
@@ -91,6 +86,7 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse enablePrinter(Session session, Long printerId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
@@ -100,11 +96,13 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse enablePrinter(Session session, String printerName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new PrinterController(session,em).enablePrinter(printerName);
 	}
 
 	@Override
 	public OssResponse disablePrinter(Session session, Long printerId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
@@ -128,6 +126,7 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse activateWindowsDriver(Session session, Long printerId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
@@ -137,6 +136,7 @@ public class PrinterResourceImpl implements PrinterResource {
 
 	@Override
 	public OssResponse activateWindowsDriver(Session session, String printerName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new PrinterController(session,em).activateWindowsDriver(printerName);
 	}
 
@@ -149,6 +149,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			boolean windowsDriver,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new PrinterController(session,em).addPrinter(name,mac,roomId,model,windowsDriver,fileInputStream,contentDispositionHeader);
 	}
 
@@ -192,6 +193,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			Long printerId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Printer printer = new PrinterController(session,em).getById(printerId);
 		if( printer == null ) {
 			throw new WebApplicationException(404);
@@ -230,16 +232,19 @@ public class PrinterResourceImpl implements PrinterResource {
 	@Override
 	public OssResponse addPrinterQueue(Session session, String name, Long deviceId, String model, boolean windowsDriver,
 			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new PrinterController(session,em).addPrinterQueue(session,name,deviceId,model,windowsDriver,fileInputStream,contentDispositionHeader);
 	}
 
 	@Override
 	public List<Device> getPrinterDevices(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new CloneToolController(session,em).getByName("Printer").getDevices();
 	}
 
 	@Override
 	public Printer getPrinterById(Session session, Long printerId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new PrinterController(session,em).getById(printerId);
 	}
 }

@@ -35,51 +35,49 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	Logger logger = LoggerFactory.getLogger(EducationResourceImpl.class);
 
-	private EntityManager em;
-
-	protected void finalize()
-	{
-	   em.close();
-	}
-
 	public EducationResourceImpl() {
-		super();
-		em  = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	@Override
 	public OssResponse createSmartRoom(Session session, Category smartRoom) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).createSmartRoom(smartRoom);
 	}
 
 	@Override
 	public OssResponse modifySmartRoom(Session session, Long roomId, Category smartRoom) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).modifySmartRoom(roomId, smartRoom);
 	}
 
 	@Override
 	public OssResponse deleteSmartRoom(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).deleteSmartRoom(roomId);
 	}
 
 	@Override
 	public List<Room> getMySmartRooms(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).getMySmartRooms();
 
 	}
 
 	@Override
 	public List<Room> getMyRooms(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).getMyRooms();
 	}
 
 	@Override
 	public List<List<Long>> getRoom(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).getRoom(roomId);
 	}
 
 	@Override
 	public List<String> getAvailableRoomActions(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).getAvailableRoomActions(roomId);
 	}
 
@@ -90,6 +88,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		}  catch (Exception e) {
 			logger.error("EducationResourceImpl.manageRoom error:" + e.getMessage());
 		}
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).manageRoom(roomId,action, null);
 	}
 
@@ -100,86 +99,102 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		}  catch (Exception e) {
 			logger.error("EducationResourceImpl.manageRoom error:" + e.getMessage());
 		}
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).manageRoom(roomId,action, actionContent);
 	}
 
 	@Override
 	public OssResponse createGroup(Session session, Group group) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).createGroup(group);
 	}
 
 	@Override
 	public OssResponse modifyGroup(Session session, Long groupId, Group group) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).modifyGroup(groupId, group);
 	}
 
 	@Override
 	public OssResponse deleteGroup(Session session, Long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).deleteGroup(groupId);
 	}
 
 	@Override
 	public OssResponse logOut(Session session, Long userId, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).removeLoggedInUser(deviceId, userId);
 	}
 
 	@Override
 	public OssResponse logIn(Session session, Long userId, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).addLoggedInUser(deviceId, userId);
 	}
 
 	@Override
 	public List<String> getAvailableUserActions(Session session, Long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).getAvailableUserActions(userId);
 	}
 
 	@Override
 	public List<String> getAvailableDeviceActions(Session session, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).getAvailableDeviceActions(deviceId);
 	}
 
 	@Override
 	public OssResponse manageDevice(Session session, Long deviceId, String action) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).manageDevice(deviceId,action,null);
 	}
 
 	@Override
 	public OssResponse manageDevice(Session session, Long deviceId, String action, Map<String, String> actionContent) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).manageDevice(deviceId,action,actionContent);
 	}
 
 	@Override
 	public OssResponse addUser(Session session, Long roomId, Long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		return new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
 	}
 
 	@Override
 	public OssResponse addDevice(Session session, Long roomId, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		return new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
 	}
 
 	@Override
 	public OssResponse deleteUser(Session session, Long roomId, Long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		return new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
 	}
 
 	@Override
 	public OssResponse deleteDevice(Session session, Long roomId, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		return new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
 	}
 
 	@Override
 	public OssResponse addGroup(Session session, Long roomId, Long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		return new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
 	}
 
 	@Override
 	public OssResponse deleteGroup(Session session, Long roomId, Long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		return new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
 	}
@@ -187,18 +202,21 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<OssResponse> uploadFileToRoom(Session session, Long roomId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).uploadFileTo("room",roomId,null,fileInputStream,contentDispositionHeader,false);
 	}
 
 	@Override
 	public OssResponse uploadFileToUser(Session session, Long userId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).uploadFileTo("user",userId,null,fileInputStream,contentDispositionHeader,false).get(0);
 	}
 
 	@Override
 	public OssResponse uploadFileToDevice(Session session, Long deviceId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).uploadFileTo("device",deviceId,null,fileInputStream,contentDispositionHeader,false).get(0);
 	}
 
@@ -208,6 +226,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			boolean studentsOnly,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly);
 	}
 
@@ -217,6 +236,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			boolean studentsOnly,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<OssResponse> responses = new ArrayList<OssResponse>();
 		EducationController ec = new EducationController(session,em);
 		for(String sgroupId : groupIds.split(",")) {
@@ -236,6 +256,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			userIds.add(Long.valueOf(id));
 		}
 		logger.debug("uploadFileToUsers: " + sUserIds + " " + userIds);
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).uploadFileTo("users",0l,userIds,fileInputStream,contentDispositionHeader,false);
 	}
 
@@ -243,6 +264,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public List<OssResponse> collectFileFromUsers(Session session, String projectName, boolean sortInDirs,
 			boolean cleanUpExport, String userIds) {
 		List<OssResponse> responses = new ArrayList<OssResponse>();
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		UserController userController = new UserController(session,em);
 		for( String id : userIds.split(",")) {
 			User user = userController.getById(Long.valueOf(id));
@@ -255,68 +277,81 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse getRoomControl(Session session, Long roomId, Long minutes) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new EducationController(session,em).getRoomControl(roomId,minutes);
 	}
 
 	@Override
 	public List<String> getAvailableGroupActions(Session session, Long groupId) {
 		// TODO Auto-generated method stub
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return null;
 	}
 
 	@Override
 	public List<PositiveList> getPositiveLists(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).getAllPositiveLists();
 	}
 
 	@Override
 	public List<PositiveList> getMyPositiveLists(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return session.getUser().getOwnedPositiveLists();
 	}
 
 	@Override
 	public OssResponse addPositiveList(Session session, PositiveList positiveList) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).editPositiveList(positiveList);
 	}
 
 	@Override
 	public PositiveList getPositiveListById(Session session, Long positiveListId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).getPositiveList(positiveListId);
 	}
 
 	@Override
 	public OssResponse deletePositiveListById(Session session, Long positiveListId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).deletePositiveList(positiveListId);
 	}
 
 	@Override
 	public OssResponse activatePositiveListsInRoom(Session session, Long roomId, List<Long> positiveListIds) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).setAclsInRoom(roomId, positiveListIds);
 	}
 
 	@Override
 	public OssResponse deActivatePositiveListsInRoom(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).deleteAclsInRoom(roomId);
 	}
 
 	@Override
 	public List<PositiveList> getPositiveListsInRoom(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).getPositiveListsInRoom(roomId);
 	}
 
 	@Override
 	public Printer getDefaultPrinter(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new RoomController(session,em).getById(roomId).getDefaultPrinter();
 	}
 
 	@Override
 	public List<Printer> getAvailablePrinters(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new RoomController(session,em).getById(roomId).getAvailablePrinters();
 	}
 
 	@Override
 	public List<User> getUserMember(Session session, Long roomId) {
 		List<User> users = new ArrayList<User>();
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Category category = new EducationController(session,em).getCategoryToRoom(roomId);
 		if( category != null ) {
 			for ( User member : category.getUsers() ) {
@@ -329,6 +364,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Group> getGroupMember(Session session, Long roomId) {
 		List<Group> groups = new ArrayList<Group>();
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Category category = new EducationController(session,em).getCategoryToRoom(roomId);
 		if( category != null ) {
 			for ( Group member : category.getGroups() ) {
@@ -341,6 +377,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Device> getDeviceMember(Session session, Long roomId) {
 		List<Device> devices = new ArrayList<Device>();
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Category category  = new EducationController(session,em).getCategoryToRoom(roomId);
 		if( category != null ) {
 			for ( Device member : category.getDevices() ) {
@@ -355,12 +392,14 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse collectFileFromDevice(Session session, Long deviceId, String projectName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Device device = new DeviceController(session,em).getById(deviceId);
 		return new UserController(session,em).collectFile(device.getLoggedIn(), projectName);
 	}
 
 	@Override
 	public List<OssResponse> collectFileFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs, boolean cleanUpExport) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		UserController userController     = new UserController(session,em);
 		DeviceController deviceController = new DeviceController(session,em);
 		List<OssResponse> responses       = new ArrayList<OssResponse>();
@@ -385,6 +424,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			boolean cleanUpExport,
 			boolean studentsOnly
 			) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		UserController userController = new UserController(session,em);
 		Group          group          = new GroupController(session,em).getById(groupId);
 		List<OssResponse> responses   = new ArrayList<OssResponse>();
@@ -420,6 +460,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<OssResponse> applyAction(Session session, OssActionMap ossActionMap) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<OssResponse> responses = new ArrayList<OssResponse>();
 		UserController userController = new UserController(session,em);
 		logger.debug(ossActionMap.toString());
@@ -466,37 +507,44 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<Category> getGuestUsers(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).getGuestUsers();
 	}
 
 	@Override
 	public Category getGuestUsersCategory(Session session, Long guestUsersId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).getGuestUsersCategory(guestUsersId);
 	}
 
 	@Override
 	public OssResponse deleteGuestUsers(Session session, Long guestUsersId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).deleteGuestUsers(guestUsersId);
 	}
 
 	@Override
 	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).addGuestUsers(name, description, roomId, count, validUntil);
 	}
 
 	@Override
 	public List<Room> getGuestRooms(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new RoomController(session,em).getAllWithTeacherControl();
 	}
 
 	@Override
 	public List<User> getUsersById(Session session, List<Long> userIds) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).getUsers(userIds);
 	}
 
 	@Override
 	public Group getGroup(Session session, Long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new GroupController(session,em).getById(groupId);
 	}
 
@@ -514,6 +562,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Group> getMyAvailableClasses(Session session) {
 		List<Group> groups = new ArrayList<Group>();
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		for( Group group : new GroupController(session,em).getByType("class") ) {
 			if( !session.getUser().getGroups().contains(group)) {
 				groups.add(group);
@@ -524,12 +573,14 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<User> getAvailableMembers(Session session, long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new GroupController(session,em).getAvailableMember(groupId);
 	}
 
 	@Override
 	public List<User> getMembers(Session session, long groupId) {
 		List<User> users = new ArrayList<User>();
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Group group = new GroupController(session,em).getById(groupId);
 		Boolean myGroup = group.getOwner().equals(session.getUser());
 		for( User user :  new GroupController(session,em).getMembers(groupId) ) {
@@ -542,41 +593,49 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse deleteMember(Session session, long groupId, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new GroupController(session,em).removeMember(groupId, userId);
 	}
 
 	@Override
 	public OssResponse addMember(Session session, long groupId, long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new GroupController(session,em).addMember(groupId, userId);
 	}
 
 	@Override
 	public AccessInRoom getAccessStatus(Session session, long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new RoomController(session,em).getAccessStatus(roomId);
 	}
 
 	@Override
 	public OssResponse setAccessStatus(Session session, long roomId, AccessInRoom access) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new RoomController(session,em).setAccessStatus(roomId, access);
 	}
 
 	@Override
 	public List<Device> getDevicesById(Session session, List<Long> deviceIds) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).getDevices(deviceIds);
 	}
 
 	@Override
 	public User getUserById(Session session, Long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new UserController(session,em).getById(userId);
 	}
 
 	@Override
 	public Device getDeviceById(Session session, Long deviceId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new DeviceController(session,em).getById(deviceId);
 	}
 
 	@Override
 	public List<User> getAvailableUserMember(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<User> members = this.getUserMember(session, roomId);
 		List<User> availableMembers = new ArrayList<User>();
 		for( User user : new UserController(session,em).getAll() ) {
@@ -589,6 +648,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<Group> getAvailableGroupMember(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<Group> members = this.getGroupMember(session, roomId);
 		List<Group> availableMembers = new ArrayList<Group>();
 		for( Group group : new GroupController(session,em).getAll() ) {
@@ -601,6 +661,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<Device> getAvailableDeviceMember(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<Device> members = this.getDeviceMember(session, roomId);
 		List<Device> availableMembers = new ArrayList<Device>();
 		for( Device device : new DeviceController(session,em).getAll() ) {
@@ -613,6 +674,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse modifyDevice(Session session, Long deviceId, Device device) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		DeviceController deviceConrtoller = new DeviceController(session,em);
 		Device oldDevice = deviceConrtoller.getById(deviceId);
 		oldDevice.setRow(device.getRow());
@@ -632,6 +694,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse modifyDeviceOfRoom(Session session, Long roomId, Long deviceId, Device device) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Room room = new RoomController(session,em).getById(roomId);
 		if( (room.getCategories() != null) && (room.getCategories().size() > 0 ) && room.getCategories().get(0).getCategoryType().equals("smartRoom") ) {
 			DeviceController deviceConrtoller = new DeviceController(session,em);
@@ -644,11 +707,13 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public SmartRoom getRoomDetails(Session session, Long roomId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SmartRoom(session,em,roomId);
 	}
 
 	@Override
 	public OssResponse manageGroup(Session session, Long groupId, String action) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		GroupController gc = new GroupController(session,em);
 		Group group = gc.getById(groupId);
 		switch(action.toLowerCase()) {

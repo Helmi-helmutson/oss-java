@@ -28,15 +28,7 @@ import de.openschoolserver.dao.internal.ImportHandler;
 public class ImporterResourceImpl implements ImporterResource {
 	private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ImporterResourceImpl.class);
 
-	EntityManager em;
-
 	public void ImporterResource() {
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-	}
-
-	protected void finalize()
-	{
-		em.close();
 	}
 
 	@Override
@@ -49,7 +41,7 @@ public class ImporterResourceImpl implements ImporterResource {
 
 	@Override
 	public ImportOrder processImport(Session session, ImportOrder importOrder) {
-
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		if (session.getTemporaryUploadData() != null && session.getTemporaryUploadData() instanceof ImportOrder) {
 			// TODO handle cached file
 			ImportOrder o = (ImportOrder) session.getTemporaryUploadData();

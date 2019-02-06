@@ -41,19 +41,12 @@ public class SystemResourceImpl implements SystemResource {
 
 	Logger logger = LoggerFactory.getLogger(SystemResourceImpl.class);
 
-	private EntityManager em;
-
 	public SystemResourceImpl() {
-		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
-	protected void finalize()
-	{
-	   em.close();
-	}
 	@Override
 	public Object getStatus(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.getStatus();
 	}
@@ -83,36 +76,42 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public List<String> getEnumerates(Session session, String type) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.getEnumerates(type);
 	}
 
 	@Override
 	public OssResponse addEnumerate(Session session, String type, String value) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.addEnumerate(type, value);
 	}
 
 	@Override
 	public OssResponse deleteEnumerate(Session session, String type, String value) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.deleteEnumerate(type, value);
 	}
 
 	@Override
 	public List<Map<String, String>> getConfig(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.getConfig();
 	}
 
 	@Override
 	public String getConfig(Session session, String key) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.getConfigValue(key);
 	}
 
 	@Override
 	public OssResponse setConfig(Session session, String key, String value) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		if( systemController.setConfigValue(key, value) ) {
 			return new OssResponse(session,"OK","Global configuration value was set succesfully.");
@@ -123,6 +122,7 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public OssResponse setConfig(Session session, Map<String, String> config) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		try {
 			if( systemController.setConfigValue(config.get("key"), config.get("value")) ) {
@@ -137,97 +137,115 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public Map<String, String> getFirewallIncomingRules(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.getFirewallIncomingRules();
 	}
 
 	@Override
 	public OssResponse setFirewallIncomingRules(Session session, Map<String, String> incommingRules) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.setFirewallIncomingRules(incommingRules);
 	}
 
 	@Override
 	public List<Map<String, String>> getFirewallOutgoingRules(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.getFirewallOutgoingRules();
 	}
 
 	@Override
 	public OssResponse setFirewallOutgoingRules(Session session, List<Map<String, String>> outgoingRules) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.setFirewallOutgoingRules(outgoingRules);
 	}
 
 	@Override
 	public List<Map<String, String>> getFirewallRemoteAccessRules(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.getFirewallRemoteAccessRules();
 	}
 
 	@Override
 	public OssResponse setFirewallRemoteAccessRules(Session session, List<Map<String, String>> remoteAccessRules) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController systemController = new SystemController(session,em);
 		return systemController.setFirewallRemoteAccessRules(remoteAccessRules);
 		}
 
 	@Override
 	public String translate(Session session, Translation translation) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).translate(translation.getLang(), translation.getString());
 	}
 
 	@Override
 	public OssResponse addTranslation(Session session, Translation translation) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).addTranslation(translation);
 	}
 
 	@Override
 	public List<Translation> getMissedTranslations(Session session, String lang) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).getMissedTranslations(lang);
 	}
 
 	@Override
 	public OssResponse register(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).registerSystem();
 	}
 
 	@Override
 	public List<Map<String, String>> searchPackages(Session session, String filter) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).searchPackages(filter);
 	}
 
 	@Override
 	public OssResponse installPackages(Session session, List<String> packages) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).installPackages(packages);
 	}
 
 	@Override
 	public OssResponse updatePackages(Session session, List<String> packages) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).updatePackages(packages);
 	}
 
 	@Override
 	public OssResponse updateSyste(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).updateSystem();
 	}
 
 	@Override
 	public  List<ProxyRule> getProxyDefault(Session session, String role) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).readDefaults(role);
 	}
 
 	@Override
 	public OssResponse setProxyDefault(Session session, String role, List<ProxyRule> acl) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).setDefaults(role, acl);
 	}
 
 	@Override
 	public Map<String, List<ProxyRule>> getProxyDefaults(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).readDefaults();
 	}
 
 	@Override
 	public OssResponse setProxyDefaults(Session session, String role, Map<String, List<ProxyRule>> acls) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new ProxyController(session,em).setDefaults(acls);
 	}
 
@@ -255,7 +273,7 @@ public class SystemResourceImpl implements SystemResource {
 			program[3] = "-C";
 			program[4] = "custom/" +list + "/domains";
 			OSSShellTools.exec(program, reply, error, null);
-			new Controller(session,em).systemctl("try-restart", "squid");
+			new Controller(session,null).systemctl("try-restart", "squid");
 			return new OssResponse(session,"OK","Custom list was written successfully");
 		} catch( IOException e ) {
 			e.printStackTrace();
@@ -265,26 +283,31 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public OssResponse createJob(Session session, Job job) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new JobController(session,em).createJob(job);
 	}
 
 	@Override
 	public List<Job> searchJob(Session session, Job job ) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new JobController(session,em).searchJobs(job.getDescription(), job.getStartTime(), job.getEndTime());
 	}
 
 	@Override
 	public Job getJob(Session session, Long jobId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new JobController(session,em).getById(jobId);
 	}
 
 	@Override
 	public OssResponse setJobExitValue(Session session, Long jobId, Integer exitValue) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new JobController(session,em).setExitCode(jobId, exitValue);
 	}
 
 	@Override
 	public OssResponse restartJob(Session session, Long jobId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new JobController(session,em).restartJob(jobId);
 	}
 
@@ -294,97 +317,116 @@ public class SystemResourceImpl implements SystemResource {
 	 */
 	@Override
 	public List<Acl> getAcls(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).getAvailableAcls();
 	}
 
 	@Override
 	public List<Acl> getAclsOfGroup(Session session, Long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).getAclsOfGroup(groupId);
 	}
 
 	@Override
 	public OssResponse setAclOfGroup(Session session, Long groupId, Acl acl) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).setAclToGroup(groupId,acl);
 	}
 
 	@Override
 	public List<Acl> getAvailableAclsForGroup(Session session, Long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).getAvailableAclsForGroup(groupId);
 	}
 
 	@Override
 	public List<Acl> getAclsOfUser(Session session, Long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).getAclsOfUser(userId);
 	}
 
 	@Override
 	public OssResponse setAclOfUser(Session session, Long userId, Acl acl) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).setAclToUser(userId,acl);
 	}
 
 	@Override
 	public List<Acl> getAvailableAclsForUser(Session session, Long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).getAvailableAclsForUser(userId);
 	}
 
 	@Override
 	public String getName(UriInfo ui, HttpServletRequest req) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Session session  = new SessionController(em).getLocalhostSession();
 		return new SystemController(session,em).getConfigValue("NAME");
 	}
 
 	@Override
 	public String getType(UriInfo ui, HttpServletRequest req) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Session session  = new SessionController(em).getLocalhostSession();
 		return new SystemController(session,em).getConfigValue("TYPE");
 	}
 
 	@Override
 	public List<Job> getRunningJobs(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new JobController(session,em).getRunningJobs();
 	}
 
 	@Override
 	public List<Job> getFailedJobs(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new JobController(session,em).getFailedJobs();
 	}
 
 	@Override
 	public List<Job> getSucceededJobs(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new JobController(session,em).getSucceededJobs();
 	}
 
 	@Override
 	public String[] getDnsDomains(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).getDnsDomains();
 	}
 
 	@Override
 	public OssResponse addDnsDomain(Session session, String domainName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).addDnsDomain(domainName);
 	}
 
 	@Override
 	public OssResponse deleteDnsDomain(Session session, String domainName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).deleteDnsDomain(domainName);
 	}
 	@Override
 	public List<DnsRecord> getRecords(Session session, String domainName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).getRecords(domainName);
 	}
 
 	@Override
 	public OssResponse addDnsRecord(Session session, DnsRecord dnsRecord) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).addDnsRecord(dnsRecord);
 	}
 
 	@Override
 	public OssResponse deleteDnsRecord(Session session, DnsRecord dnsRecord) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).deleteDnsRecord(dnsRecord);
 	}
 
 	@Override
 	public OssResponse findObject(Session session, String objectType, LinkedHashMap<String,Object> object) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SystemController(session,em).findObject(objectType, object);
 	}
 

@@ -26,20 +26,12 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	Logger logger = LoggerFactory.getLogger(SessionsResourceImpl.class);
 
-	private EntityManager em;
-
 	public SessionsResourceImpl() {
-		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-	}
-
-	protected void finalize()
-	{
-	   em.close();
 	}
 
 	@Override
 	public Session createSession(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 
 		if(username == null || password == null ) {
 			throw new WebApplicationException(400);
@@ -72,6 +64,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public void deleteSession(Session session, String token) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final SessionController sessionController = new SessionController(session,em);
 		if( session == null || ! session.getToken().equals(token) ) {
 			logger.info("deletion of session denied " + token);
@@ -83,6 +76,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public String createToken(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Session session = createSession(ui, username, password, device, req);
 		if( session == null) {
 			return "";
@@ -93,6 +87,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public String getSessionValue(Session session,String key){
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Printer defaultPrinter  = null;
 		List<Printer> availablePrinters = null;
 		List<String> data = new ArrayList<String>();
@@ -154,6 +149,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public String logonScript(Session session, String OS) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		return new SessionController(session,em).logonScript(OS);
 	}
 }

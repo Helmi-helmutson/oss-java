@@ -31,21 +31,13 @@ public class SupportResourceImpl implements SupportResource {
 	private String supportEmailFrom;
 	private boolean isLinux = true;
 	private EntityManager em;
-
 	public SupportResourceImpl() {
-		super();
 		String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 		isLinux = !((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0));
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-	}
-
-	protected void finalize()
-	{
-	   em.close();
 	}
 
 	private void loadConf(Session session) {
-		// Session session = new SessionController().getLocalhostSession();
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SystemController sc = new SystemController(session,em);
 		supportUrl = sc.getConfigValue("SUPPORT_URL");
 		if (supportUrl != null) {
