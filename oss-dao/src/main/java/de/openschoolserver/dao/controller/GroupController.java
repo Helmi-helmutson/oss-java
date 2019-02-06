@@ -42,7 +42,7 @@ public class GroupController extends Controller {
 
 	public Group getById(long groupId) {
 		try {
-			return em.find(Group.class, groupId);
+			return this.em.find(Group.class, groupId);
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			return null;
@@ -52,7 +52,7 @@ public class GroupController extends Controller {
 
 	public List<Group> getByType(String groupType) {
 		try {
-			Query query = em.createNamedQuery("Group.getByType");
+			Query query = this.em.createNamedQuery("Group.getByType");
 			query.setParameter("groupType", groupType);
 			return query.getResultList();
 		} catch (Exception e) {
@@ -64,7 +64,7 @@ public class GroupController extends Controller {
 
 	public Group getByName(String name) {
 		try {
-			Query query = em.createNamedQuery("Group.getByName");
+			Query query = this.em.createNamedQuery("Group.getByName");
 			query.setParameter("name", name);
 			List<Group> result = query.getResultList();
 			if (result!=null && result.size()>0) {
@@ -81,7 +81,7 @@ public class GroupController extends Controller {
 
 	public List<Group> search(String search) {
 		try {
-			Query query = em.createNamedQuery("Group.search");
+			Query query = this.em.createNamedQuery("Group.search");
 			query.setParameter("search", search + "%");
 			return query.getResultList();
 		} catch (Exception e) {
@@ -93,7 +93,7 @@ public class GroupController extends Controller {
 
 	public List<Group> getAll() {
 		try {
-			Query query = em.createNamedQuery("Group.findAll");
+			Query query = this.em.createNamedQuery("Group.findAll");
 			return query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -123,17 +123,17 @@ public class GroupController extends Controller {
 			this.beginTransaction();
 			if( group.getGroupType().equals("primary")) {
 				Enumerate enumerate = new Enumerate("role",group.getName());
-				em.persist(enumerate);
+				this.em.persist(enumerate);
 			}
-			em.persist(group);
+			this.em.persist(group);
 			if( group.getGroupType().equals("workgroup") || group.getGroupType().equals("guest")) {
 				this.session.getUser().getOwnedGroups().add(group);
-				User user = em.find(User.class, this.session.getUser().getId());
+				User user = this.em.find(User.class, this.session.getUser().getId());
 				group.setOwnerId(user.getId());
 				user.getOwnedGroups().add(group);
-				em.merge(user);
+				this.em.merge(user);
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 			logger.debug("Created Group:" + group);
 		} catch (Exception e) {
 			logger.error("Error crating a group" + e.getMessage(),e);
@@ -169,8 +169,8 @@ public class GroupController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			em.merge(oldGroup);
-			em.getTransaction().commit();
+			this.em.merge(oldGroup);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -182,7 +182,7 @@ public class GroupController extends Controller {
 
 	public OssResponse delete(Group group){
 		// Remove group from GroupMember of table
-		group =  em.find(Group.class, group.getId());
+		group =  this.em.find(Group.class, group.getId());
 		if( this.isProtected(group)) {
 			return new OssResponse(this.getSession(),"ERROR","This group must not be deleted.");
 		}
@@ -200,29 +200,29 @@ public class GroupController extends Controller {
 		try {
 			this.beginTransaction();
 			if( !em.contains(group)) {
-				group = em.merge(group);
+				group = this.em.merge(group);
 			}
 			for ( Category category : group.getCategories() ) {
 				if( category.getCategoryType().equals("smartRoom") && category.getName().equals(group.getName()) ) {
 					for( Room room : category.getRooms() ) {
 						if( room.getRoomType().equals("smartRoom") && room.getName().equals(group.getName())) {
-							em.remove(room);
+							this.em.remove(room);
 						}
 					}
 					User owner = category.getOwner();
 					if( owner != null ) {
 						owner.getCategories().remove(category);
-						em.merge(owner);
+						this.em.merge(owner);
 					}
-					em.remove(category);
+					this.em.remove(category);
 				}
 			}
 			for( User user : group.getUsers() ) {
 				user.getGroups().remove(group);
-				em.merge(user);
+				this.em.merge(user);
 			}
-			em.remove(group);
-			em.getTransaction().commit();
+			this.em.remove(group);
+			this.em.getTransaction().commit();
 			//em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -303,7 +303,7 @@ public class GroupController extends Controller {
 
 	public List<User> getAvailableMember(long groupId){
 		Group group = this.getById(groupId);
-		Query query = em.createNamedQuery("User.findAll");
+		Query query = this.em.createNamedQuery("User.findAll");
 		List<User> allUsers = query.getResultList();
 		allUsers.removeAll(group.getUsers());
 		return allUsers;
@@ -344,15 +344,15 @@ public class GroupController extends Controller {
 			for( User user : usersToAdd) {
 				group.getUsers().add(user);
 				user.getGroups().add(group);
-				em.merge(user);
+				this.em.merge(user);
 			}
 			for( User user : usersToRemove ) {
 				group.getUsers().remove(user);
 				user.getGroups().remove(group);
-				em.merge(user);
+				this.em.merge(user);
 			}
-			em.merge(group);
-			em.getTransaction().commit();
+			this.em.merge(group);
+			this.em.getTransaction().commit();
 		}catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
@@ -380,9 +380,9 @@ public class GroupController extends Controller {
 		user.getGroups().add(group);
 		try {
 			this.beginTransaction();
-			em.merge(user);
-			em.merge(group);
-			em.getTransaction().commit();
+			this.em.merge(user);
+			this.em.merge(group);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
@@ -392,8 +392,8 @@ public class GroupController extends Controller {
 	}
 
 	public OssResponse addMember(long groupId, long userId) {
-		Group group = em.find(Group.class, groupId);
-		User  user  = em.find(User.class, userId);
+		Group group = this.em.find(Group.class, groupId);
+		User  user  = this.em.find(User.class, userId);
 		if( group == null ) {
 			return new OssResponse(this.getSession(),"ERROR","Group %s was not found.",null,String.valueOf(groupId));
 		}
@@ -405,30 +405,30 @@ public class GroupController extends Controller {
 
 	public OssResponse addMember(String groupName, String uid) {
 		Group group = this.getByName(groupName);
-		User  user  = new UserController(session,em).getByUid(uid);
+		User  user  = new UserController(this.session,this.em).getByUid(uid);
 		if( group == null ) {
 			return new OssResponse(this.getSession(),"ERROR","Group %s was not found.",null,groupName);
 		}
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR","User %s was not found.",null,uid);
 		}
-		group = em.find(Group.class, group.getId());
-		user  = em.find(User.class,  user.getId());
+		group = this.em.find(Group.class, group.getId());
+		user  = this.em.find(User.class,  user.getId());
 		return this.addMember(group, user);
 	}
 
 	public OssResponse removeMember(String groupName, String uid) {
 		Long groupId = this.getByName(groupName).getId();
-		Long userId  = new UserController(session,em).getByUid(uid).getId();
+		Long userId  = new UserController(this.session,this.em).getByUid(uid).getId();
 		return this.removeMember(groupId, userId);
 	}
 
 	public OssResponse removeMember(long groupId, long userId) {
-		Group group = em.find(Group.class, groupId);
+		Group group = this.em.find(Group.class, groupId);
 		if( !this.mayModify(group) ) {
        return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
         }
-		User  user  = em.find(User.class, userId);
+		User  user  = this.em.find(User.class, userId);
 		if( user.getRole().equals(group.getName()) ) {
 			return new OssResponse(this.getSession(),"ERROR","User must not be removed from it's primary group.");
 		}
@@ -436,9 +436,9 @@ public class GroupController extends Controller {
 		user.getGroups().remove(group);
 		try {
 			this.beginTransaction();
-			em.merge(user);
-			em.merge(group);
-			em.getTransaction().commit();
+			this.em.merge(user);
+			this.em.merge(group);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
@@ -460,15 +460,15 @@ public class GroupController extends Controller {
 
 	public OssResponse setOwner(String groupName, String userName) {
 		Long groupId = this.getByName(groupName).getId();
-		User user    = new UserController(session,em).getByUid(userName);
-		Group group = em.find(Group.class, groupId);
+		User user    = new UserController(this.session,this.em).getByUid(userName);
+		Group group = this.em.find(Group.class, groupId);
 		group.setOwner(user);
 		user.getOwnedGroups().add(group);
 		try {
 			this.beginTransaction();
-			em.merge(user);
-			em.merge(group);
-			em.getTransaction().commit();
+			this.em.merge(user);
+			this.em.merge(group);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
@@ -519,7 +519,7 @@ public class GroupController extends Controller {
 		category.setPublicAccess(publicAccess);
 		category.setGroupIds(new ArrayList<Long>());
 		category.getGroupIds().add(group.getId());
-		return new CategoryController(session,em).add(category);
+		return new CategoryController(this.session,this.em).add(category);
 	}
 
 	public OssResponse createSmartRoomForGroup(Long groupId, boolean studentsOnly, boolean publicAccess) {
@@ -541,6 +541,6 @@ public class GroupController extends Controller {
 		category.setPublicAccess(publicAccess);
 		category.setGroupIds(new ArrayList<Long>());
 		category.getGroupIds().add(group.getId());
-		return new EducationController(session,em).createSmartRoom(category);
+		return new EducationController(this.session,this.em).createSmartRoom(category);
 	}
 }

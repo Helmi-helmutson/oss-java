@@ -41,7 +41,7 @@ public class JobController extends Controller {
 
 	public Job getById(Long jobId) {
 		try {
-			Job job = em.find(Job.class, jobId);
+			Job job = this.em.find(Job.class, jobId);
 			Path JOB_COMMAND = Paths.get(basePath + String.valueOf(jobId));
 			Path JOB_RESULT  = Paths.get(basePath + String.valueOf(jobId) + ".log");
 			List<String> tmp = Files.readAllLines(JOB_COMMAND);
@@ -84,8 +84,8 @@ public class JobController extends Controller {
 		 */
 		try {
 			this.beginTransaction();
-			em.persist(job);
-			em.getTransaction().commit();
+			this.em.persist(job);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("createJob" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -131,12 +131,12 @@ public class JobController extends Controller {
 
 	public OssResponse setExitCode(Long jobId, Integer exitCode) {
 		try {
-			Job job = em.find(Job.class, jobId);
+			Job job = this.em.find(Job.class, jobId);
 			job.setExitCode(exitCode);
 			job.setEndTime(new Timestamp(System.currentTimeMillis()));
 			this.beginTransaction();
-			em.merge(job);
-			em.getTransaction().commit();
+			this.em.merge(job);
+			this.em.getTransaction().commit();
 		}  catch (Exception e) {
 			logger.error("createJob" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -147,11 +147,11 @@ public class JobController extends Controller {
 
 	public OssResponse restartJob(Long jobId) {
 		try {
-			Job job = em.find(Job.class, jobId);
+			Job job = this.em.find(Job.class, jobId);
 			job.setStartTime(new Timestamp(System.currentTimeMillis()));
 			this.beginTransaction();
-			em.merge(job);
-			em.getTransaction().commit();
+			this.em.merge(job);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("createJob" + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -172,9 +172,9 @@ public class JobController extends Controller {
 	public List<Job> searchJobs(String description, Timestamp after, Timestamp befor) {
 		Query query = null;
 		if( after.equals(befor) ) {
-			query = em.createNamedQuery("Job.getByDescription").setParameter("description", description);
+			query = this.em.createNamedQuery("Job.getByDescription").setParameter("description", description);
 		} else {
-			query = em.createNamedQuery("Job.getByDescriptionAndTime")
+			query = this.em.createNamedQuery("Job.getByDescriptionAndTime")
 					.setParameter("description", description)
 					.setParameter("after", after)
 					.setParameter("befor", befor);
@@ -185,21 +185,21 @@ public class JobController extends Controller {
 
 	@SuppressWarnings("unchecked")
 	public List<Job> getRunningJobs() {
-		Query query = em.createNamedQuery("Job.getRunning");
+		Query query = this.em.createNamedQuery("Job.getRunning");
 		List<Job> jobs =  query.getResultList();
 		return jobs;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Job> getFailedJobs() {
-		Query query = em.createNamedQuery("Job.getFailed");
+		Query query = this.em.createNamedQuery("Job.getFailed");
 		List<Job> jobs =  query.getResultList();
 		return jobs;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Job> getSucceededJobs() {
-		Query query = em.createNamedQuery("Job.getSucceeded");
+		Query query = this.em.createNamedQuery("Job.getSucceeded");
 		List<Job> jobs =  query.getResultList();
 		return jobs;
 	}

@@ -138,7 +138,7 @@ public class ProxyController extends Controller {
 	}
 
 	public Map<String, List<ProxyRule>> readDefaults() {
-		List<String> roles = new SystemController(session,em).getEnumerates("role");
+		List<String> roles = new SystemController(this.session,this.em).getEnumerates("role");
 		roles.add("default");
 		Map<String, List<ProxyRule>> acls = new HashMap<String, List<ProxyRule>>();
 		for (String role : roles ) {
@@ -148,7 +148,7 @@ public class ProxyController extends Controller {
 	}
 
 	public OssResponse setDefaults(Map<String, List<ProxyRule>> acls) {
-		List<String> roles = new SystemController(session,em).getEnumerates("role");
+		List<String> roles = new SystemController(this.session,this.em).getEnumerates("role");
 		roles.add("default");
 		StringBuilder output = new StringBuilder();
 		for (String role : roles ) {
@@ -205,7 +205,7 @@ public class ProxyController extends Controller {
 
 	public PositiveList getPositiveListById( Long positiveListId ) {
 		try {
-			return em.find(PositiveList.class, positiveListId);
+			return this.em.find(PositiveList.class, positiveListId);
 		} catch (Exception e) {
 			logger.debug("PositiveList:" + positiveListId + " " + e.getMessage(),e);
 			return null;
@@ -215,7 +215,7 @@ public class ProxyController extends Controller {
 
 	public PositiveList getPositiveListByName( String name ) {
 		try {
-			Query query = em.createNamedQuery("PositiveList.byName").setParameter("name", name);
+			Query query = this.em.createNamedQuery("PositiveList.byName").setParameter("name", name);
 			return (PositiveList) query.getResultList().get(0);
 		} catch (Exception e) {
 			return null;
@@ -239,15 +239,15 @@ public class ProxyController extends Controller {
 				int count = user.getOwnedPositiveLists().size();
 				positiveList.setName(user.getUid() + String.valueOf(count));
 				positiveList.setOwner(user);
-				em.persist(positiveList);
+				this.em.persist(positiveList);
 				user.getOwnedPositiveLists().add(positiveList);
-				em.merge(user);
+				this.em.merge(user);
 			} else {
 				oldPositiveList.setDescription(positiveList.getDescription());
 				oldPositiveList.setSubject(positiveList.getSubject());
-				em.merge(oldPositiveList);
+				this.em.merge(oldPositiveList);
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 			String[] program   = new String[3];
 			program[0] = "/usr/share/oss/tools/squidGuard.pl";
 			program[1] = "writePositiveList";
@@ -268,8 +268,8 @@ public class ProxyController extends Controller {
 		try {
 			Files.deleteIfExists(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains"));
 			this.beginTransaction();
-			em.remove(positiveList);
-			em.getTransaction().commit();
+			this.em.remove(positiveList);
+			this.em.getTransaction().commit();
 		}  catch (Exception e) {
 			logger.error("delete " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -305,7 +305,7 @@ public class ProxyController extends Controller {
 	 */
 	public List<PositiveList> getAllPositiveLists() {
 		try {
-			Query query = em.createNamedQuery("PositiveList.findAll");
+			Query query = this.em.createNamedQuery("PositiveList.findAll");
 			return query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
@@ -324,7 +324,7 @@ public class ProxyController extends Controller {
 
 	public List<PositiveList> getPositiveListsInRoom(Long roomId) {
 		List<PositiveList> positiveLists = new ArrayList<PositiveList>();
-		Room room  = new RoomController(session,em).getById(roomId);
+		Room room  = new RoomController(this.session,this.em).getById(roomId);
 		String[] program   = new String[3];
 		program[0] = "/usr/share/oss/tools/squidGuard.pl";
 		program[1] = "readRoom";
@@ -350,10 +350,10 @@ public class ProxyController extends Controller {
 	 */
 	public OssResponse setAclsInRoom(Long roomId, List<Long> positiveListIds) {
 
-		DeviceController deviceController = new DeviceController(session,em);;
-		Room room         = new RoomController(session,em).getById(roomId);
+		DeviceController deviceController = new DeviceController(this.session,this.em);;
+		Room room         = new RoomController(this.session,this.em).getById(roomId);
 		StringBuilder ips = new StringBuilder();
-		for(List<Long> loggedOn : new EducationController(session,em).getRoom(roomId)) {
+		for(List<Long> loggedOn : new EducationController(this.session,this.em).getRoom(roomId)) {
 			Device device = deviceController.getById(loggedOn.get(1));
 			if( device.getIp() != null && !device.getIp().isEmpty() ) {
 				ips.append(device.getIp()).append(this.getNl());
@@ -392,7 +392,7 @@ public class ProxyController extends Controller {
 		program[1] = "write";
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
-		Room room  = new RoomController(session,em).getById(roomId);
+		Room room  = new RoomController(this.session,this.em).getById(roomId);
 		String acls = room.getName() + ":remove-this-list:true\n";
 		OSSShellTools.exec(program, reply, error, acls);
 		return new OssResponse(this.session,"OK","Positive lists was succesfully deactivated in your room.");

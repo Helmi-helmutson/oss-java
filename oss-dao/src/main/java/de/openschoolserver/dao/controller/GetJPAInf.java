@@ -24,7 +24,7 @@ public class GetJPAInf extends Controller implements Runnable {
 	}
 
 	public void run(){
-		final DeviceController deviceController = new DeviceController(session,em);;
+		final DeviceController deviceController = new DeviceController(this.session,this.em);;
 		String ip;
 	//	BufferedReader in = null;
 		Scanner in = null;

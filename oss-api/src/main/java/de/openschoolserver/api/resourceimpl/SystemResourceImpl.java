@@ -45,16 +45,16 @@ public class SystemResourceImpl implements SystemResource {
 
 	public SystemResourceImpl() {
 		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		this.em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected void finalize()
 	{
-	   em.close();
+	   this.em.close();
 	}
 	@Override
 	public Object getStatus(Session session) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.getStatus();
 	}
 
@@ -83,37 +83,37 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public List<String> getEnumerates(Session session, String type) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.getEnumerates(type);
 	}
 
 	@Override
 	public OssResponse addEnumerate(Session session, String type, String value) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.addEnumerate(type, value);
 	}
 
 	@Override
 	public OssResponse deleteEnumerate(Session session, String type, String value) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.deleteEnumerate(type, value);
 	}
 
 	@Override
 	public List<Map<String, String>> getConfig(Session session) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.getConfig();
 	}
 
 	@Override
 	public String getConfig(Session session, String key) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.getConfigValue(key);
 	}
 
 	@Override
 	public OssResponse setConfig(Session session, String key, String value) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		if( systemController.setConfigValue(key, value) ) {
 			return new OssResponse(session,"OK","Global configuration value was set succesfully.");
 		} else {
@@ -123,7 +123,7 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public OssResponse setConfig(Session session, Map<String, String> config) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		try {
 			if( systemController.setConfigValue(config.get("key"), config.get("value")) ) {
 				return new OssResponse(session,"OK","Global configuration value was set succesfully.");
@@ -137,98 +137,98 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public Map<String, String> getFirewallIncomingRules(Session session) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.getFirewallIncomingRules();
 	}
 
 	@Override
 	public OssResponse setFirewallIncomingRules(Session session, Map<String, String> incommingRules) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.setFirewallIncomingRules(incommingRules);
 	}
 
 	@Override
 	public List<Map<String, String>> getFirewallOutgoingRules(Session session) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.getFirewallOutgoingRules();
 	}
 
 	@Override
 	public OssResponse setFirewallOutgoingRules(Session session, List<Map<String, String>> outgoingRules) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.setFirewallOutgoingRules(outgoingRules);
 	}
 
 	@Override
 	public List<Map<String, String>> getFirewallRemoteAccessRules(Session session) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.getFirewallRemoteAccessRules();
 	}
 
 	@Override
 	public OssResponse setFirewallRemoteAccessRules(Session session, List<Map<String, String>> remoteAccessRules) {
-		SystemController systemController = new SystemController(session,em);
+		SystemController systemController = new SystemController(session,this.em);
 		return systemController.setFirewallRemoteAccessRules(remoteAccessRules);
 		}
 
 	@Override
 	public String translate(Session session, Translation translation) {
-		return new SystemController(session,em).translate(translation.getLang(), translation.getString());
+		return new SystemController(session,this.em).translate(translation.getLang(), translation.getString());
 	}
 
 	@Override
 	public OssResponse addTranslation(Session session, Translation translation) {
-		return new SystemController(session,em).addTranslation(translation);
+		return new SystemController(session,this.em).addTranslation(translation);
 	}
 
 	@Override
 	public List<Translation> getMissedTranslations(Session session, String lang) {
-		return new SystemController(session,em).getMissedTranslations(lang);
+		return new SystemController(session,this.em).getMissedTranslations(lang);
 	}
 
 	@Override
 	public OssResponse register(Session session) {
-		return new SystemController(session,em).registerSystem();
+		return new SystemController(session,this.em).registerSystem();
 	}
 
 	@Override
 	public List<Map<String, String>> searchPackages(Session session, String filter) {
-		return new SystemController(session,em).searchPackages(filter);
+		return new SystemController(session,this.em).searchPackages(filter);
 	}
 
 	@Override
 	public OssResponse installPackages(Session session, List<String> packages) {
-		return new SystemController(session,em).installPackages(packages);
+		return new SystemController(session,this.em).installPackages(packages);
 	}
 
 	@Override
 	public OssResponse updatePackages(Session session, List<String> packages) {
-		return new SystemController(session,em).updatePackages(packages);
+		return new SystemController(session,this.em).updatePackages(packages);
 	}
 
 	@Override
 	public OssResponse updateSyste(Session session) {
-		return new SystemController(session,em).updateSystem();
+		return new SystemController(session,this.em).updateSystem();
 	}
 
 	@Override
 	public  List<ProxyRule> getProxyDefault(Session session, String role) {
-		return new ProxyController(session,em).readDefaults(role);
+		return new ProxyController(session,this.em).readDefaults(role);
 	}
 
 	@Override
 	public OssResponse setProxyDefault(Session session, String role, List<ProxyRule> acl) {
-		return new ProxyController(session,em).setDefaults(role, acl);
+		return new ProxyController(session,this.em).setDefaults(role, acl);
 	}
 
 	@Override
 	public Map<String, List<ProxyRule>> getProxyDefaults(Session session) {
-		return new ProxyController(session,em).readDefaults();
+		return new ProxyController(session,this.em).readDefaults();
 	}
 
 	@Override
 	public OssResponse setProxyDefaults(Session session, String role, Map<String, List<ProxyRule>> acls) {
-		return new ProxyController(session,em).setDefaults(acls);
+		return new ProxyController(session,this.em).setDefaults(acls);
 	}
 
 	@Override
@@ -255,7 +255,7 @@ public class SystemResourceImpl implements SystemResource {
 			program[3] = "-C";
 			program[4] = "custom/" +list + "/domains";
 			OSSShellTools.exec(program, reply, error, null);
-			new Controller(session,em).systemctl("try-restart", "squid");
+			new Controller(session,this.em).systemctl("try-restart", "squid");
 			return new OssResponse(session,"OK","Custom list was written successfully");
 		} catch( IOException e ) {
 			e.printStackTrace();
@@ -265,27 +265,27 @@ public class SystemResourceImpl implements SystemResource {
 
 	@Override
 	public OssResponse createJob(Session session, Job job) {
-		return new JobController(session,em).createJob(job);
+		return new JobController(session,this.em).createJob(job);
 	}
 
 	@Override
 	public List<Job> searchJob(Session session, Job job ) {
-		return new JobController(session,em).searchJobs(job.getDescription(), job.getStartTime(), job.getEndTime());
+		return new JobController(session,this.em).searchJobs(job.getDescription(), job.getStartTime(), job.getEndTime());
 	}
 
 	@Override
 	public Job getJob(Session session, Long jobId) {
-		return new JobController(session,em).getById(jobId);
+		return new JobController(session,this.em).getById(jobId);
 	}
 
 	@Override
 	public OssResponse setJobExitValue(Session session, Long jobId, Integer exitValue) {
-		return new JobController(session,em).setExitCode(jobId, exitValue);
+		return new JobController(session,this.em).setExitCode(jobId, exitValue);
 	}
 
 	@Override
 	public OssResponse restartJob(Session session, Long jobId) {
-		return new JobController(session,em).restartJob(jobId);
+		return new JobController(session,this.em).restartJob(jobId);
 	}
 
 	/*
@@ -294,98 +294,98 @@ public class SystemResourceImpl implements SystemResource {
 	 */
 	@Override
 	public List<Acl> getAcls(Session session) {
-		return new SystemController(session,em).getAvailableAcls();
+		return new SystemController(session,this.em).getAvailableAcls();
 	}
 
 	@Override
 	public List<Acl> getAclsOfGroup(Session session, Long groupId) {
-		return new SystemController(session,em).getAclsOfGroup(groupId);
+		return new SystemController(session,this.em).getAclsOfGroup(groupId);
 	}
 
 	@Override
 	public OssResponse setAclOfGroup(Session session, Long groupId, Acl acl) {
-		return new SystemController(session,em).setAclToGroup(groupId,acl);
+		return new SystemController(session,this.em).setAclToGroup(groupId,acl);
 	}
 
 	@Override
 	public List<Acl> getAvailableAclsForGroup(Session session, Long groupId) {
-		return new SystemController(session,em).getAvailableAclsForGroup(groupId);
+		return new SystemController(session,this.em).getAvailableAclsForGroup(groupId);
 	}
 
 	@Override
 	public List<Acl> getAclsOfUser(Session session, Long userId) {
-		return new SystemController(session,em).getAclsOfUser(userId);
+		return new SystemController(session,this.em).getAclsOfUser(userId);
 	}
 
 	@Override
 	public OssResponse setAclOfUser(Session session, Long userId, Acl acl) {
-		return new SystemController(session,em).setAclToUser(userId,acl);
+		return new SystemController(session,this.em).setAclToUser(userId,acl);
 	}
 
 	@Override
 	public List<Acl> getAvailableAclsForUser(Session session, Long userId) {
-		return new SystemController(session,em).getAvailableAclsForUser(userId);
+		return new SystemController(session,this.em).getAvailableAclsForUser(userId);
 	}
 
 	@Override
 	public String getName(UriInfo ui, HttpServletRequest req) {
 		Session session  = new SessionController(em).getLocalhostSession();
-		return new SystemController(session,em).getConfigValue("NAME");
+		return new SystemController(session,this.em).getConfigValue("NAME");
 	}
 
 	@Override
 	public String getType(UriInfo ui, HttpServletRequest req) {
 		Session session  = new SessionController(em).getLocalhostSession();
-		return new SystemController(session,em).getConfigValue("TYPE");
+		return new SystemController(session,this.em).getConfigValue("TYPE");
 	}
 
 	@Override
 	public List<Job> getRunningJobs(Session session) {
-		return new JobController(session,em).getRunningJobs();
+		return new JobController(session,this.em).getRunningJobs();
 	}
 
 	@Override
 	public List<Job> getFailedJobs(Session session) {
-		return new JobController(session,em).getFailedJobs();
+		return new JobController(session,this.em).getFailedJobs();
 	}
 
 	@Override
 	public List<Job> getSucceededJobs(Session session) {
-		return new JobController(session,em).getSucceededJobs();
+		return new JobController(session,this.em).getSucceededJobs();
 	}
 
 	@Override
 	public String[] getDnsDomains(Session session) {
-		return new SystemController(session,em).getDnsDomains();
+		return new SystemController(session,this.em).getDnsDomains();
 	}
 
 	@Override
 	public OssResponse addDnsDomain(Session session, String domainName) {
-		return new SystemController(session,em).addDnsDomain(domainName);
+		return new SystemController(session,this.em).addDnsDomain(domainName);
 	}
 
 	@Override
 	public OssResponse deleteDnsDomain(Session session, String domainName) {
-		return new SystemController(session,em).deleteDnsDomain(domainName);
+		return new SystemController(session,this.em).deleteDnsDomain(domainName);
 	}
 	@Override
 	public List<DnsRecord> getRecords(Session session, String domainName) {
-		return new SystemController(session,em).getRecords(domainName);
+		return new SystemController(session,this.em).getRecords(domainName);
 	}
 
 	@Override
 	public OssResponse addDnsRecord(Session session, DnsRecord dnsRecord) {
-		return new SystemController(session,em).addDnsRecord(dnsRecord);
+		return new SystemController(session,this.em).addDnsRecord(dnsRecord);
 	}
 
 	@Override
 	public OssResponse deleteDnsRecord(Session session, DnsRecord dnsRecord) {
-		return new SystemController(session,em).deleteDnsRecord(dnsRecord);
+		return new SystemController(session,this.em).deleteDnsRecord(dnsRecord);
 	}
 
 	@Override
 	public OssResponse findObject(Session session, String objectType, LinkedHashMap<String,Object> object) {
-		return new SystemController(session,em).findObject(objectType, object);
+		return new SystemController(session,this.em).findObject(objectType, object);
 	}
 
 	@Override

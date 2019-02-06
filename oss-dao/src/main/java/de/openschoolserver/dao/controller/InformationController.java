@@ -54,21 +54,21 @@ public class InformationController extends Controller {
 		Category category;
 		try {
 			this.beginTransaction();
-			em.persist(announcement);
+			this.em.persist(announcement);
 			user.getMyAnnouncements().add(announcement);
-			em.merge(user);
+			this.em.merge(user);
 			for( Long categoryId : announcement.getCategoryIds() ) {
 				try {
-					category = em.find(Category.class, categoryId);
+					category = this.em.find(Category.class, categoryId);
 					category.getAnnouncements().add(announcement);
 					announcement.getCategories().add(category);
-					em.merge(category);
-					em.merge(announcement);
+					this.em.merge(category);
+					this.em.merge(announcement);
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 			logger.debug("Created Announcement:" + announcement);
 			return new OssResponse(this.getSession(),"OK", "Announcement was created succesfully.",announcement.getId());
 		} catch (Exception e) {
@@ -99,21 +99,21 @@ public class InformationController extends Controller {
 		Category category;
 		try {
 			this.beginTransaction();
-			em.persist(contact);
+			this.em.persist(contact);
 			user.getMyContacts().add(contact);
-			em.merge(user);
+			this.em.merge(user);
 			for( Long categoryId : contact.getCategoryIds() ) {
 				try {
-					category = em.find(Category.class, categoryId);
+					category = this.em.find(Category.class, categoryId);
 					category.getContacts().add(contact);
 					contact.getCategories().add(category);
-					em.merge(category);
-					em.merge(contact);
+					this.em.merge(category);
+					this.em.merge(contact);
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 			logger.debug("Created Contact:" + contact);
 			return new OssResponse(this.getSession(),"OK", "Contact was created succesfully.",contact.getId());
 		} catch (Exception e) {
@@ -144,21 +144,21 @@ public class InformationController extends Controller {
 		Category category;
 		try {
 			this.beginTransaction();
-			em.persist(faq);
+			this.em.persist(faq);
 			user.getMyFAQs().add(faq);
-			em.merge(user);
+			this.em.merge(user);
 			for( Long categoryId : faq.getCategoryIds() ) {
 				try {
-					category = em.find(Category.class, categoryId);
+					category = this.em.find(Category.class, categoryId);
 					category.getFaqs().add(faq);
 					faq.getCategories().add(category);
-					em.merge(category);
-					em.merge(faq);
+					this.em.merge(category);
+					this.em.merge(faq);
 				} catch (Exception e) {
 					logger.error(e.getMessage());
 				}
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 			logger.debug("Created FAQ:" + faq);
 			return new OssResponse(this.getSession(),"OK", "FAQ was created succesfully.",faq.getId());
 		} catch (Exception e) {
@@ -177,7 +177,7 @@ public class InformationController extends Controller {
 		List<Announcement> announcements = new ArrayList<Announcement>();
 		User user;
 		try {
-			user = em.find(User.class, this.session.getUser().getId());
+			user = this.em.find(User.class, this.session.getUser().getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -207,7 +207,7 @@ public class InformationController extends Controller {
 		List<Announcement> announcements = new ArrayList<Announcement>();
 		User user;
 		try {
-			user = em.find(User.class, this.session.getUser().getId());
+			user = this.em.find(User.class, this.session.getUser().getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -233,14 +233,14 @@ public class InformationController extends Controller {
 
 	public OssResponse setAnnouncementHaveSeen(Long announcementId) {
 		try {
-			Announcement announcement = em.find(Announcement.class, announcementId);
+			Announcement announcement = this.em.find(Announcement.class, announcementId);
 			User user = this.session.getUser();
 			announcement.getHaveSeenUsers().add(user);
 			user.getReadAnnouncements().add(announcement);
 			this.beginTransaction();
-			em.merge(user);
-			em.merge(announcement);
-			em.getTransaction().commit();
+			this.em.merge(user);
+			this.em.merge(announcement);
+			this.em.getTransaction().commit();
 		}catch (Exception e) {
 			logger.error("setAnnouncementHaveSeen:" + this.getSession().getUserId() + " " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR","Annoncement could not be set as seen.");
@@ -257,7 +257,7 @@ public class InformationController extends Controller {
 		List<FAQ> faqs = new ArrayList<FAQ>();
 		User user;
 		try {
-			user = em.find(User.class, this.session.getUser().getId());
+			user = this.em.find(User.class, this.session.getUser().getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -286,7 +286,7 @@ public class InformationController extends Controller {
 		List<Contact> contacts = new ArrayList<Contact>();
 		User user;
 		try {
-			user = em.find(User.class, this.session.getUser().getId());
+			user = this.em.find(User.class, this.session.getUser().getId());
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -307,7 +307,7 @@ public class InformationController extends Controller {
 
 	public Announcement getAnnouncementById(Long AnnouncementId) {
 		try {
-			return em.find(Announcement.class, AnnouncementId);
+			return this.em.find(Announcement.class, AnnouncementId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -317,7 +317,7 @@ public class InformationController extends Controller {
 
 	public Contact getContactById(Long ContactId) {
 		try {
-			return em.find(Contact.class, ContactId);
+			return this.em.find(Contact.class, ContactId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -327,7 +327,7 @@ public class InformationController extends Controller {
 
 	public FAQ getFAQById(Long FAQId) {
 		try {
-			return em.find(FAQ.class, FAQId);
+			return this.em.find(FAQ.class, FAQId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -351,10 +351,10 @@ public class InformationController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			Announcement oldAnnouncement = em.find(Announcement.class, announcement.getId());
+			Announcement oldAnnouncement = this.em.find(Announcement.class, announcement.getId());
 			for( User user : oldAnnouncement.getHaveSeenUsers() ) {
 				user.getReadAnnouncements().remove(oldAnnouncement);
-				em.merge(user);
+				this.em.merge(user);
 				//TODO check if there are relay changes.
 			}
 			oldAnnouncement.setIssue(announcement.getIssue());
@@ -363,8 +363,8 @@ public class InformationController extends Controller {
 			oldAnnouncement.setValidFrom(announcement.getValidFrom());
 			oldAnnouncement.setValidUntil(announcement.getValidUntil());
 			oldAnnouncement.setHaveSeenUsers(new ArrayList<User>());
-			em.merge(announcement);
-			em.getTransaction().commit();
+			this.em.merge(announcement);
+			this.em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "Announcement was modified succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -389,14 +389,14 @@ public class InformationController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			Contact oldContact = em.find(Contact.class, contact.getId());
+			Contact oldContact = this.em.find(Contact.class, contact.getId());
 			oldContact.setName(contact.getName());
 			oldContact.setEmail(contact.getEmail());
 			oldContact.setPhone(contact.getPhone());
 			oldContact.setTitle(contact.getTitle());
 			oldContact.setIssue(contact.getIssue());
-			em.merge(oldContact);
-			em.getTransaction().commit();
+			this.em.merge(oldContact);
+			this.em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "Contact was modified succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -421,12 +421,12 @@ public class InformationController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			FAQ oldFaq = em.find(FAQ.class, faq.getId());
+			FAQ oldFaq = this.em.find(FAQ.class, faq.getId());
 			oldFaq.setIssue(faq.getIssue());
 			oldFaq.setTitle(faq.getTitle());
 			oldFaq.setText(faq.getText());
-			em.merge(oldFaq);
-			em.getTransaction().commit();
+			this.em.merge(oldFaq);
+			this.em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "FAQ was modified succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -443,7 +443,7 @@ public class InformationController extends Controller {
 	public OssResponse deleteAnnouncement(Long announcementId) {
 		Announcement announcement;
 		try {
-			announcement = em.find(Announcement.class, announcementId);
+			announcement = this.em.find(Announcement.class, announcementId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -454,13 +454,13 @@ public class InformationController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			em.merge(announcement);
+			this.em.merge(announcement);
 			for( Category category : announcement.getCategories() ) {
 				category.getAnnouncements().remove(announcement);
-				em.merge(category);
+				this.em.merge(category);
 			}
-			em.remove(announcement);
-			em.getTransaction().commit();
+			this.em.remove(announcement);
+			this.em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "Announcement was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -477,7 +477,7 @@ public class InformationController extends Controller {
 	public OssResponse deleteContact(Long contactId) {
 		Contact contact;
 		try {
-			contact = em.find(Contact.class, contactId);
+			contact = this.em.find(Contact.class, contactId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -488,13 +488,13 @@ public class InformationController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			em.merge(contact);
+			this.em.merge(contact);
 			for( Category category : contact.getCategories() ) {
 				category.getContacts().remove(contact);
-				em.merge(category);
+				this.em.merge(category);
 			}
-			em.remove(contact);
-			em.getTransaction().commit();
+			this.em.remove(contact);
+			this.em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "Contact was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -511,7 +511,7 @@ public class InformationController extends Controller {
 	public OssResponse deleteFAQ(Long faqId) {
 		FAQ faq;
 		try {
-			faq = em.find(FAQ.class, faqId);
+			faq = this.em.find(FAQ.class, faqId);
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
 			return null;
@@ -522,13 +522,13 @@ public class InformationController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			em.merge(faq);
+			this.em.merge(faq);
 			for( Category category : faq.getCategories() ) {
 				category.getFaqs().remove(faq);
-				em.merge(category);
+				this.em.merge(category);
 			}
-			em.remove(faq);
-			em.getTransaction().commit();
+			this.em.remove(faq);
+			this.em.getTransaction().commit();
 			return new OssResponse(this.getSession(),"OK", "FAQ was deleted succesfully.");
 		} catch (Exception e) {
 			logger.error("add " + e.getMessage(),e);
@@ -544,7 +544,7 @@ public class InformationController extends Controller {
 	 * @return The list of the found categories.
 	 */
 	public List<Category> getInfoCategories() {
-		CategoryController categoryController = new CategoryController(session,em);
+		CategoryController categoryController = new CategoryController(this.session,this.em);
 		boolean isSuperuser = this.isSuperuser();
 		List<Category> categories = new ArrayList<Category>();
 		for(Category category : this.session.getUser().getOwnedCategories() ) {

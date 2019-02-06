@@ -51,7 +51,7 @@ public class DeviceController extends Controller {
 	 */
 	public Device getById(long deviceId) {
 		try {
-			return em.find(Device.class, deviceId);
+			return this.em.find(Device.class, deviceId);
 		} catch (Exception e) {
 			return null;
 		} finally {
@@ -63,7 +63,7 @@ public class DeviceController extends Controller {
 	 */
 	public List<Device> getAll() {
 		try {
-			Query query = em.createNamedQuery("Device.findAll");
+			Query query = this.em.createNamedQuery("Device.findAll");
 			return query.getResultList();
 		} catch (Exception e) {
 			logger.error("getAll " + e.getMessage(),e);
@@ -77,7 +77,7 @@ public class DeviceController extends Controller {
 	 */
 	public List<Long> getAllId() {
 		try {
-			Query query = em.createNamedQuery("Device.findAllId");
+			Query query = this.em.createNamedQuery("Device.findAllId");
 			return query.getResultList();
 		} catch (Exception e) {
 			logger.error("getAllId " + e.getMessage(),e);
@@ -93,17 +93,17 @@ public class DeviceController extends Controller {
 		boolean needReloadSalt = false;
 		try {
 			for( Long deviceId : deviceIds) {
-				Device device = em.find(Device.class, deviceId);
+				Device device = this.em.find(Device.class, deviceId);
 				if(device.getHwconf() != null &&  device.getHwconf().getDeviceType().equals("FatClient")) {
 					needReloadSalt = true;
 				}
 				//TODO Evaluate the response
 				this.delete(deviceId, false);
 			}
-			em.getEntityManagerFactory().getCache().evictAll();
+			this.em.getEntityManagerFactory().getCache().evictAll();
 			new DHCPConfig(session,em).Create();
 			if( needReloadSalt ) {
-				new SoftwareController(session,em).applySoftwareStateToHosts();
+				new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
 			}
 			return new OssResponse(this.getSession(),"OK", "Devices were deleted succesfully.");
 		} catch (Exception e) {
@@ -120,9 +120,8 @@ public class DeviceController extends Controller {
 	 * @return
 	 */
 	public OssResponse delete(Long deviceId, boolean atomic) {
-		UserController userController = new UserController(session,em);
 		boolean needReloadSalt = false;
-		Device device = em.find(Device.class, deviceId);
+		Device device = this.em.find(Device.class, deviceId);
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "Can not find device with id %s.",null,String.valueOf(deviceId));
 		}
@@ -140,14 +139,10 @@ public class DeviceController extends Controller {
 			if(hwconf != null )
 			{
 				hwconf.getDevices().remove(device);
-				em.merge(hwconf);
+				this.em.merge(hwconf);
 				if( hwconf.getDeviceType().equals("FatClient")) {
 					needReloadSalt = true;
 				}
-			}
-			user = userController.getByUid(device.getName());
-			if( user != null ) {
-				userController.delete(user);
 			}
 			this.startPlugin("delete_device", device);
 			if( device.getOwner() != null ) {
@@ -157,38 +152,38 @@ public class DeviceController extends Controller {
 				if( session.getUser().equals(owner)) {
 					session.getUser().getOwnedDevices().remove(device);
 				}
-				em.merge(owner);
+				this.em.merge(owner);
 			}
 			//Clean up room
 			room.getDevices().remove(device);
-			em.merge(room);
+			this.em.merge(room);
 			//Clean up softwareStatus
 			for( SoftwareStatus st : device.getSoftwareStatus() ) {
-				em.remove(st);
+				this.em.remove(st);
 			}
 			//Clean up softwareLicences
 			for( SoftwareLicense sl : device.getSoftwareLicenses()  ) {
 				sl.getDevices().remove(device);
-				em.merge(sl);
+				this.em.merge(sl);
 			}
 			//Clean up printers
 			for( Printer pr : device.getAvailablePrinters() ) {
 				pr.getAvailableForDevices().remove(device);
-				em.merge(pr);
+				this.em.merge(pr);
 			}
 			if( device.getDefaultPrinter() != null ) {
 				Printer pr = device.getDefaultPrinter();
 				pr.getDefaultForDevices().remove(device);
-				em.merge(pr);
+				this.em.merge(pr);
 			}
 			//Clean up categories
 			for( Category cat : device.getCategories() ) {
 				cat.getDevices().remove(device);
-				em.merge(cat);
+				this.em.merge(cat);
 			}
 			//Clean up sessions
 			for( Session session : device.getSessions() ) {
-				em.remove(session);
+				this.em.remove(session);
 			}
 			//Remove salt sls file if exists
 			File saltFile = new File("/srv/salt/oss_device_" + device.getName() + ".sls");
@@ -200,14 +195,19 @@ public class DeviceController extends Controller {
 					logger.error("Deleting salt file:" + e.getMessage());
 				}
 			}
-			em.remove(device);
-			em.getTransaction().commit();
+			this.em.remove(device);
+			this.em.getTransaction().commit();
 			if( atomic ) {
-				em.getEntityManagerFactory().getCache().evictAll();
+				this.em.getEntityManagerFactory().getCache().evictAll();
 				new DHCPConfig(session,em).Create();
 				if( needReloadSalt ) {
-					new SoftwareController(session,em).applySoftwareStateToHosts();
+					new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
 				}
+			}
+			UserController userController = new UserController(this.session,this.em);
+			user = userController.getByUid(device.getName());
+			if( user != null ) {
+				userController.delete(user);
 			}
 			return new OssResponse(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
@@ -312,8 +312,8 @@ public class DeviceController extends Controller {
 			for(Device dev: devices){
 				dev.setOwner(session.getUser());
 				this.beginTransaction();
-				em.persist(dev);
-				em.getTransaction().commit();
+				this.em.persist(dev);
+				this.em.getTransaction().commit();
 			}
 			return new OssResponse(this.getSession(),"OK", "Devices were created succesfully.");
 		} catch (Exception e) {
@@ -328,7 +328,7 @@ public class DeviceController extends Controller {
 	 */
 	public Device getByIP(String IP) {
 		try {
-			Query query = em.createNamedQuery("Device.getByIP");
+			Query query = this.em.createNamedQuery("Device.getByIP");
 			query.setParameter("IP", IP);
 			if( query.getResultList().isEmpty() ) {
 				return null;
@@ -346,7 +346,7 @@ public class DeviceController extends Controller {
 	 */
 	public Device getByMAC(String MAC) {
 		try {
-			Query query = em.createNamedQuery("Device.getByMAC");
+			Query query = this.em.createNamedQuery("Device.getByMAC");
 			query.setParameter("MAC", MAC);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
@@ -361,7 +361,7 @@ public class DeviceController extends Controller {
 	 */
 	public Device getByName(String name) {
 		try {
-			Query query = em.createNamedQuery("Device.getByName");
+			Query query = this.em.createNamedQuery("Device.getByName");
 			query.setParameter("name", name);
 			return (Device) query.getSingleResult();
 		} catch (Exception e) {
@@ -376,7 +376,7 @@ public class DeviceController extends Controller {
 	 */
 	public List<Device> search(String search) {
 		try {
-			Query query = em.createNamedQuery("Device.search");
+			Query query = this.em.createNamedQuery("Device.search");
 			query.setParameter("search", "%" + search + "%");
 			return (List<Device>) query.getResultList();
 		} catch (Exception e) {
@@ -481,9 +481,9 @@ public class DeviceController extends Controller {
 			logger.error("File error:" + e.getMessage(), e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
-		RoomController        roomController      = new RoomController(session,em);
-		CloneToolController   cloneToolController = new CloneToolController(session,em);
-		UserController        userController      = new UserController(session,em);
+		RoomController        roomController      = new RoomController(this.session,this.em);
+		CloneToolController   cloneToolController = new CloneToolController(this.session,this.em);
+		UserController        userController      = new UserController(this.session,this.em);
 		Map<Long,List<Device>> devicesToImport    = new HashMap<>();
 		Map<Integer,String> header                = new HashMap<>();
 		StringBuilder error                       = new StringBuilder();
@@ -591,8 +591,8 @@ public class DeviceController extends Controller {
 	public OssResponse setDefaultPrinter(long deviceId, long printerId) {
 		try {
 			logger.debug("deviceId:" +deviceId + " printerId:" +  printerId);
-			Printer printer = em.find(Printer.class, printerId);
-			Device device   = em.find(Device.class, deviceId);
+			Printer printer = this.em.find(Printer.class, printerId);
+			Device device   = this.em.find(Device.class, deviceId);
 			if( device == null ) {
 				return new OssResponse(this.getSession(),"ERROR", "Device cannot be found.");
 			}
@@ -602,9 +602,9 @@ public class DeviceController extends Controller {
 			this.beginTransaction();
 			device.setDefaultPrinter(printer);
 			printer.getDefaultForDevices().add(device);
-			em.merge(device);
-			em.merge(printer);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.merge(printer);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -614,7 +614,7 @@ public class DeviceController extends Controller {
 
 
 	public OssResponse deleteDefaultPrinter(long deviceId) {
-		Device  device  = em.find(Device.class, deviceId);
+		Device  device  = this.em.find(Device.class, deviceId);
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "Device cannot be found.");
 		}
@@ -624,9 +624,9 @@ public class DeviceController extends Controller {
 				this.beginTransaction();
 				device.setDefaultPrinter(null);
 				printer.getDefaultForDevices().remove(device);
-				em.merge(device);
-				em.merge(printer);
-				em.getTransaction().commit();
+				this.em.merge(device);
+				this.em.merge(printer);
+				this.em.getTransaction().commit();
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			} finally {
@@ -637,8 +637,8 @@ public class DeviceController extends Controller {
 
 	public OssResponse addAvailablePrinter(long deviceId, long printerId) {
 		try {
-			Printer printer = em.find(Printer.class, printerId);
-			Device device   = em.find(Device.class, deviceId);
+			Printer printer = this.em.find(Printer.class, printerId);
+			Device device   = this.em.find(Device.class, deviceId);
 			if( device == null || printer == null) {
 				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
 			}
@@ -648,9 +648,9 @@ public class DeviceController extends Controller {
 			this.beginTransaction();
 			device.getAvailablePrinters().add(printer);
 			printer.getDefaultForDevices().add(device);
-			em.merge(device);
-			em.merge(printer);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.merge(printer);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -660,17 +660,17 @@ public class DeviceController extends Controller {
 
 	public OssResponse deleteAvailablePrinter(long deviceId, long printerId) {
 		try {
-			Printer printer = em.find(Printer.class, printerId);
-			Device device   = em.find(Device.class, deviceId);
+			Printer printer = this.em.find(Printer.class, printerId);
+			Device device   = this.em.find(Device.class, deviceId);
 			if( device == null || printer == null) {
 				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
 			}
 			this.beginTransaction();
 			device.getAvailablePrinters().remove(printer);
 			printer.getDefaultForDevices().remove(device);
-			em.merge(device);
-			em.merge(printer);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.merge(printer);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -683,7 +683,7 @@ public class DeviceController extends Controller {
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP: %s",null,IP);
 		}
-		User user = new UserController(session,em).getByUid(userName);
+		User user = new UserController(this.session,this.em).getByUid(userName);
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
 		}
@@ -694,7 +694,7 @@ public class DeviceController extends Controller {
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with ID: %s",null,String.valueOf(deviceId));
 		}
-		User user = new UserController(session,em).getById(userId);
+		User user = new UserController(this.session,this.em).getById(userId);
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,String.valueOf(userId));
 		}
@@ -715,9 +715,9 @@ public class DeviceController extends Controller {
 		logger.debug("addLoggedInUser: " + user.toString());
 		try {
 			this.beginTransaction();
-			em.merge(device);
-			em.merge(user);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.merge(user);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -728,7 +728,7 @@ public class DeviceController extends Controller {
 
 	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
-		User user = new UserController(session,em).getByUid(userName);
+		User user = new UserController(this.session,this.em).getByUid(userName);
 		if( device == null  || user == null ) {
 			return new OssResponse(this.getSession(),"ERROR","Can not find user or device");
 		}
@@ -736,7 +736,7 @@ public class DeviceController extends Controller {
 	}
 	public OssResponse removeLoggedInUser(Long deviceId, Long userId) {
 		Device device = this.getById(deviceId);
-		User   user   = new UserController(session,em).getById(userId);
+		User   user   = new UserController(this.session,this.em).getById(userId);
 		if( device == null  || user == null ) {
 			return new OssResponse(this.getSession(),"ERROR","Can not find user or device");
 		}
@@ -753,9 +753,9 @@ public class DeviceController extends Controller {
 		user.getLoggedOn().remove(device);
 		try {
 			this.beginTransaction();
-			em.merge(device);
-			em.merge(user);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.merge(user);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -771,9 +771,9 @@ public class DeviceController extends Controller {
 		HWConf hwconf;
 		Room   room;
 		try {
-			oldDevice= em.find(Device.class, device.getId());
-			hwconf   = em.find(HWConf.class, device.getHwconfId());
-			room     = em.find(Room.class, oldDevice.getRoom().getId());
+			oldDevice= this.em.find(Device.class, device.getId());
+			hwconf   = this.em.find(HWConf.class, device.getHwconfId());
+			room     = this.em.find(Room.class, oldDevice.getRoom().getId());
 		} catch (Exception e) {
 			logger.debug("DeviceId:" + device.getId() + " " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR","Device or HWConf can not be found.");
@@ -823,7 +823,7 @@ public class DeviceController extends Controller {
 			}
 			if( oldDevice.getWlanMac().isEmpty() ) {
 				//There was no WLAN-Mac before we need a new IP-Address
-				RoomController rc = new RoomController(session,em);
+				RoomController rc = new RoomController(this.session,this.em);
 				List<String> wlanIps = rc.getAvailableIPAddresses(oldDevice.getRoom().getId());
 				if( wlanIps.isEmpty() ) {
 					error.add("The are no more IP addesses in room" );
@@ -851,7 +851,7 @@ public class DeviceController extends Controller {
 			oldDevice.setSerial(device.getSerial());
 			logger.debug("OLD-Device-After-Merge" + oldDevice);
 			this.beginTransaction();
-			em.merge(oldDevice);
+			this.em.merge(oldDevice);
 			logger.debug("OLDHwconf " + oldHwconf + " new hw " + hwconf);
 			if( hwconf != oldHwconf) {
 				if( hwconf.getDevices() != null ) {
@@ -864,15 +864,15 @@ public class DeviceController extends Controller {
 				oldDevice.setHwconf(hwconf);
 				oldDevice.setHwconfId(hwconf.getId());
 				logger.debug(" new hw " + hwconf);
-				em.merge(hwconf);
+				this.em.merge(hwconf);
 				if(oldHwconf != null  ) {
 					oldHwconf.getDevices().remove(oldDevice);
 					logger.debug("OLDHwconf " + oldHwconf );
-					em.merge(oldHwconf);
+					this.em.merge(oldHwconf);
 				}
 			}
-			em.merge(room);
-			em.getTransaction().commit();
+			this.em.merge(room);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", "ERROR-3"+  e.getMessage());
 		} finally {
@@ -893,7 +893,7 @@ public class DeviceController extends Controller {
 	}
 
 	public List<Device> getByHWConf(Long id) {
-		HWConf hwconf = new CloneToolController(session,em).getById(id);
+		HWConf hwconf = new CloneToolController(this.session,this.em).getById(id);
 		return hwconf.getDevices();
 	}
 
@@ -1026,14 +1026,14 @@ public class DeviceController extends Controller {
 			this.beginTransaction();
 			for( User user : device.getLoggedIn() ) {
 				user.getLoggedOn().remove(device);
-				em.merge(user);
+				this.em.merge(user);
 			}
 			device.setLoggedIn(new ArrayList<User>());
-			em.merge(device);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.getTransaction().commit();
 			break;
 		case "download":
-			UserController uc = new UserController(session,em);;
+			UserController uc = new UserController(this.session,this.em);;
 			boolean cleanUpExport = true;
 			boolean sortInDirs    = true;
 			String  projectName   = this.nowString();
@@ -1071,11 +1071,11 @@ public class DeviceController extends Controller {
 			this.beginTransaction();
 			for( User user : device.getLoggedIn() ) {
 				user.getLoggedOn().remove(device);
-				em.merge(user);
+				this.em.merge(user);
 			}
 			device.setLoggedIn(new ArrayList<User>());
-			em.merge(device);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.debug("cleanUpLoggedIn: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1122,7 +1122,7 @@ public class DeviceController extends Controller {
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with IP: %s",null,IP);
 		}
-		User user = new UserController(session,em).getByUid(userName);
+		User user = new UserController(this.session,this.em).getByUid(userName);
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
 		}
@@ -1134,7 +1134,7 @@ public class DeviceController extends Controller {
 		if( device == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with ID: %s",null,String.valueOf(deviceId));
 		}
-		User user = new UserController(session,em).getById(userId);
+		User user = new UserController(this.session,this.em).getById(userId);
 		if( user == null ) {
 			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,String.valueOf(userId));
 		}
@@ -1154,9 +1154,9 @@ public class DeviceController extends Controller {
 			device.setLoggedIn(new ArrayList<User>());
 			device.getLoggedIn().add(user);
 			user.getLoggedOn().add(device);
-			em.merge(device);
-			em.merge(user);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.merge(user);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {

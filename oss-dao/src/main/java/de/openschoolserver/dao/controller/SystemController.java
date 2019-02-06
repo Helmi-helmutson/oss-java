@@ -45,7 +45,7 @@ public class SystemController extends Controller {
 	 * @see				AddTranslation
 	 */
 	public String translate(String lang, String key) {
-		Query query = em.createNamedQuery("Translation.find").setParameter("lang", lang.toUpperCase()).setParameter("string", key);
+		Query query = this.em.createNamedQuery("Translation.find").setParameter("lang", lang.toUpperCase()).setParameter("string", key);
 		try {
 			Translation trans = (Translation) query.getSingleResult();
 			if( trans.getValue().isEmpty() ) {
@@ -73,15 +73,15 @@ public class SystemController extends Controller {
 	 */
 	public OssResponse addTranslation(Translation translation) {
 		translation.setLang(translation.getLang().toUpperCase());
-		Query query = em.createNamedQuery("Translation.find")
+		Query query = this.em.createNamedQuery("Translation.find")
 				.setParameter("lang", translation.getLang())
 				.setParameter("string", translation.getString());
 		String	responseText = "Translation was created";
 		if( query.getResultList().isEmpty()) {
 			try {
 				this.beginTransaction();
-				em.persist(translation);
-				em.getTransaction().commit();
+				this.em.persist(translation);
+				this.em.getTransaction().commit();
 				responseText = "Translation was updated";
 			}  catch (Exception b) {
 				logger.error(b.getMessage());
@@ -90,8 +90,8 @@ public class SystemController extends Controller {
 		} else {
 			try {
 				this.beginTransaction();
-				em.merge(translation);
-				em.getTransaction().commit();
+				this.em.merge(translation);
+				this.em.getTransaction().commit();
 			}  catch (Exception e) {
 				logger.error(e.getMessage());
 				return new OssResponse(this.session,"ERROR", e.getMessage());
@@ -110,7 +110,7 @@ public class SystemController extends Controller {
 	 * @see				AddTranslation
 	 */
 	public List<Translation> getMissedTranslations(String lang){
-		Query query = em.createNamedQuery("Translation.untranslated").setParameter("lang", lang.toUpperCase());
+		Query query = this.em.createNamedQuery("Translation.untranslated").setParameter("lang", lang.toUpperCase());
 		return query.getResultList();
 	}
 
@@ -149,7 +149,7 @@ public class SystemController extends Controller {
 		//Groups;
 		statusMapList = new ArrayList<Map<String,String>>();
 		for( String groupType : this.getEnumerates("groupType")) {
-			query = em.createNamedQuery("Group.getByType").setParameter("groupType",groupType);
+			query = this.em.createNamedQuery("Group.getByType").setParameter("groupType",groupType);
 			count = query.getResultList().size();
 			statusMap = new HashMap<>();
 			statusMap.put("name", groupType);
@@ -161,7 +161,7 @@ public class SystemController extends Controller {
 		//Users
 		statusMapList = new ArrayList<Map<String,String>>();
 		for( String role : this.getEnumerates("role")) {
-			query = em.createNamedQuery("User.getByRole").setParameter("role",role);
+			query = this.em.createNamedQuery("User.getByRole").setParameter("role",role);
 			count = query.getResultList().size();
 			Integer loggedOn = 0;
 			for( User u : (List<User>) query.getResultList() ) {
@@ -179,14 +179,14 @@ public class SystemController extends Controller {
 		//Rooms
 		statusMapList = new ArrayList<Map<String,String>>();
 		for( String roomType : this.getEnumerates("roomType")) {
-			query = em.createNamedQuery("Room.getByType").setParameter("type",roomType);
+			query = this.em.createNamedQuery("Room.getByType").setParameter("type",roomType);
 			count = query.getResultList().size();
 			statusMap = new HashMap<>();
 			statusMap.put("name", roomType);
 			statusMap.put("count",count.toString());
 			statusMapList.add(statusMap);
 		}
-		query = em.createNamedQuery("Room.getByType").setParameter("type","adHocAccess");
+		query = this.em.createNamedQuery("Room.getByType").setParameter("type","adHocAccess");
 		count = query.getResultList().size();
 		statusMap = new HashMap<>();
 		statusMap.put("name", "adHocAccess");
@@ -194,9 +194,9 @@ public class SystemController extends Controller {
 		statusMapList.add(statusMap);
 		systemStatus.put("rooms", statusMapList);
 
-		Integer deviceCount = new DeviceController(session,em).getAll().size();
+		Integer deviceCount = new DeviceController(this.session,this.em).getAll().size();
 		statusMapList = new ArrayList<Map<String,String>>();
-		CloneToolController ctc = new CloneToolController(session,em);
+		CloneToolController ctc = new CloneToolController(this.session,this.em);
 		for( HWConf hwconf : ctc.getAllHWConf() ) {
 			count = hwconf.getDevices().size();
 			deviceCount -= count;
@@ -211,7 +211,7 @@ public class SystemController extends Controller {
 		statusMapList.add(statusMap);
 		systemStatus.put("devices", statusMapList);
 		//Software
-		SoftwareController softwareController = new SoftwareController(session,em);
+		SoftwareController softwareController = new SoftwareController(this.session,this.em);
 		systemStatus.put("softwares",softwareController.statistic());
 
 		return systemStatus;
@@ -226,15 +226,15 @@ public class SystemController extends Controller {
 	 * @see					deleteEnumerate
 	 */
 	public OssResponse addEnumerate(String type, String value) {
-		Query	query = em.createNamedQuery("Enumerate.get").setParameter("name", value).setParameter("value", value);
+		Query	query = this.em.createNamedQuery("Enumerate.get").setParameter("name", value).setParameter("value", value);
 		if( ! query.getResultList().isEmpty() ) {
 				return new OssResponse(this.getSession(),"ERROR","Entry alread does exists");
 		}
 		Enumerate en = new Enumerate(type,value);
 		try {
 			this.beginTransaction();
-			em.persist(en);
-			em.getTransaction().commit();
+			this.em.persist(en);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -252,12 +252,12 @@ public class SystemController extends Controller {
 	 * @see					addEnumerate
 	 */
 	public OssResponse deleteEnumerate(String type, String value) {
-		Query query = em.createNamedQuery("Enumerate.getByType").setParameter("type", type).setParameter("value", value);
+		Query query = this.em.createNamedQuery("Enumerate.getByType").setParameter("type", type).setParameter("value", value);
 		try {
 			Enumerate en = (Enumerate) query.getSingleResult();
 			this.beginTransaction();
-			em.remove(en);
-			em.getTransaction().commit();
+			this.em.remove(en);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -332,8 +332,8 @@ public class SystemController extends Controller {
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
 		List<Map<String, String>> firewallList = new ArrayList<>();
 		Map<String,String> statusMap;
-		RoomController roomController = new RoomController(session,em);
-		DeviceController deviceController = new DeviceController(session,em);
+		RoomController roomController = new RoomController(this.session,this.em);
+		DeviceController deviceController = new DeviceController(this.session,this.em);
 
 		for( String outRule : fwConfig.getConfigValue("MASQ_NETS").split(" ") ) {
 			if (outRule.length() > 0) {
@@ -383,8 +383,8 @@ public class SystemController extends Controller {
 			logger.debug("{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }");
 		}
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
-		RoomController roomController = new RoomController(session,em);
-		DeviceController deviceController = new DeviceController(session,em);
+		RoomController roomController = new RoomController(this.session,this.em);
+		DeviceController deviceController = new DeviceController(this.session,this.em);
 		Device device;
 		Room   room;
 		for( Map<String,String> map : firewallList ) {
@@ -422,7 +422,7 @@ public class SystemController extends Controller {
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
 		List<Map<String, String>> firewallList = new ArrayList<>();
 		Map<String,String> statusMap;
-		DeviceController deviceController = new DeviceController(session,em);
+		DeviceController deviceController = new DeviceController(this.session,this.em);
 
 		for( String outRule : fwConfig.getConfigValue("FORWARD_MASQ").split(" ") ) {
 		   if (outRule!=null && outRule.length()>0) {
@@ -450,7 +450,7 @@ public class SystemController extends Controller {
 	public OssResponse setFirewallRemoteAccessRules(List<Map<String, String>> firewallList) {
 		List<String> fwForwardMasq = new ArrayList<String>();
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
-		DeviceController deviceController = new DeviceController(session,em);
+		DeviceController deviceController = new DeviceController(this.session,this.em);
 		for( Map<String,String> map : firewallList ) {
 			Device device = deviceController.getById(Long.parseLong(map.get("id")));
 			fwForwardMasq.add("0/0," + device.getIp() + ",tcp," + map.get("ext") + "," + map.get("port") );
@@ -646,7 +646,7 @@ public class SystemController extends Controller {
 	 */
 	public Acl getAclById(Long aclId) {
 		try {
-			return em.find(Acl.class, aclId);
+			return this.em.find(Acl.class, aclId);
 		} catch (Exception e) {
 			return null;
 		} finally {
@@ -662,7 +662,7 @@ public class SystemController extends Controller {
 	}
 
 	public List<Acl> getAclsOfGroup(Long groupId) {
-		return new GroupController(session,em).getById(groupId).getAcls();
+		return new GroupController(this.session,this.em).getById(groupId).getAcls();
 	}
 
 	public List<Acl> getAvailableAclsForGroup(Long groupId) {
@@ -685,11 +685,11 @@ public class SystemController extends Controller {
 
 
 	public OssResponse setAclToGroup(Long groupId, Acl acl) {
-		Group group = new GroupController(session,em).getById(groupId);
+		Group group = new GroupController(this.session,this.em).getById(groupId);
 		Acl oldAcl;
 		logger.debug("Group acl to set: " + acl);
 		try {
-			oldAcl = em.find(Acl.class, acl.getId());
+			oldAcl = this.em.find(Acl.class, acl.getId());
 		} catch(Exception e) {
 			oldAcl = null;
 		}
@@ -698,20 +698,20 @@ public class SystemController extends Controller {
 			if( oldAcl != null ) {
 				if( acl.getAllowed() ) {
 					oldAcl.setAllowed(true);
-					em.merge(oldAcl);
+					this.em.merge(oldAcl);
 				} else {
 					group.getAcls().remove(oldAcl);
-					em.merge(group);
-					em.remove(oldAcl);
+					this.em.merge(group);
+					this.em.remove(oldAcl);
 				}
 			} else {
 				acl.setGroup(group);
 				acl.setCreator(this.session.getUser());
-				em.persist(acl);
+				this.em.persist(acl);
 				group.addAcl(acl);
-				em.merge(group);
+				this.em.merge(group);
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 		} catch(Exception e) {
 			logger.debug("ERROR in setAclToGroup:" + e.getMessage());
 			return new OssResponse(session,"ERROR",e.getMessage());
@@ -721,7 +721,7 @@ public class SystemController extends Controller {
 	}
 
 	public List<Acl> getAclsOfUser(Long userId) {
-		User         user     = new UserController(session,em).getById(userId);
+		User         user     = new UserController(this.session,this.em).getById(userId);
 		List<Acl>    acls     = user.getAcls();
 		List<String> aclNames = new ArrayList<String>();
 		for( Acl acl : user.getAcls() ){
@@ -770,11 +770,11 @@ public class SystemController extends Controller {
 	}
 
 	public OssResponse setAclToUser(Long userId, Acl acl) {
-		User user   = new UserController(session,em).getById(userId);
+		User user   = new UserController(this.session,this.em).getById(userId);
 		Acl oldAcl  = null;
 		logger.debug("User acl to set: " + acl);
 		try {
-			oldAcl = em.find(Acl.class, acl.getId());
+			oldAcl = this.em.find(Acl.class, acl.getId());
 		} catch(Exception e) {
 			oldAcl = null;
 		}
@@ -784,22 +784,22 @@ public class SystemController extends Controller {
 				logger.debug("User old to modify: " + oldAcl);
 				if( !this.hasUsersGroupAcl(user,acl)) {
 					user.getAcls().remove(oldAcl);
-					em.remove(oldAcl);
-					em.merge(user);
+					this.em.remove(oldAcl);
+					this.em.merge(user);
 				} else {
 					oldAcl.setAllowed(acl.getAllowed());
-					em.merge(oldAcl);
+					this.em.merge(oldAcl);
 				}
 			} else  {
 				logger.debug("This is a new acl.");
 				acl.setGroup(null);
 				acl.setUser(user);
 				acl.setCreator(this.session.getUser());
-				em.persist(acl);
+				this.em.persist(acl);
 				user.addAcl(acl);
-				em.merge(user);
+				this.em.merge(user);
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 		} catch(Exception e) {
 			logger.debug("ERROR in setAclToUser:" + e.getMessage());
 			return new OssResponse(session,"ERROR",e.getMessage());
@@ -849,7 +849,7 @@ public class SystemController extends Controller {
 		String patternTypeString = "(.+?): (.+?) \\(flags";
 		Pattern patternName = Pattern.compile(patternNameString);
 		Pattern patternType = Pattern.compile(patternTypeString);
-		DeviceController dc = new DeviceController(session,em);
+		DeviceController dc = new DeviceController(this.session,this.em);
 		for( String line : reply.toString().split(this.getNl()) ) {
 			Matcher matcher = patternName.matcher(line);
 			while(matcher.find()) {
@@ -954,7 +954,7 @@ public class SystemController extends Controller {
 			break;
 		case "category":
 			name = (String) object.get("name");
-			Category category = new CategoryController(session,em).getByName(name);
+			Category category = new CategoryController(this.session,this.em).getByName(name);
 			if( category != null ) {
 				objectId = category.getId();
 			}
@@ -975,7 +975,7 @@ public class SystemController extends Controller {
 			break;
 		case "software":
 			name = (String) object.get("name");
-			Software software = new SoftwareController(session,em).getByName(name);
+			Software software = new SoftwareController(this.session,this.em).getByName(name);
 			if( software != null ) {
 				objectId = software.getId();
 			}

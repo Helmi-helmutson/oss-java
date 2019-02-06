@@ -43,53 +43,53 @@ public class UserResourceImpl implements UserResource {
 
 	public UserResourceImpl() {
 		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		this.em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected void finalize()
 	{
-	   em.close();
+	   this.em.close();
 	}
 
 	@Override
 	public User getById(Session session, long userId) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		final User user = userController.getById(userId);
 		 if (user == null) {
 	            throw new WebApplicationException(404);
-	    }
+		}
 		return user;
 	}
 
 	@Override
 	public List<User> getByRole(Session session, String role) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		final List<User> users = userController.getByRole(role);
 		if (users == null) {
-            throw new WebApplicationException(404);
+			throw new WebApplicationException(404);
 		}
 		return users;
 	}
 
 	@Override
 	public List<User> getAll(Session session) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		final List<User> users = userController.getAll();
 		if (users == null) {
-            throw new WebApplicationException(404);
+			throw new WebApplicationException(404);
 		}
 		return users;
 	}
 
 	@Override
 	public OssResponse insert(Session session, User user) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		return userController.add(user);
 	}
 
 	@Override
 	public OssResponse add(Session session, User user) {
-		OssResponse ossResponse =  new UserController(session,em).add(user);
+		OssResponse ossResponse =  new UserController(session,this.em).add(user);
 		if( ossResponse.getCode().equals("OK")) {
 			sync(session);
 		}
@@ -98,26 +98,26 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<OssResponse> add(Session session, List<User> users) {
-		List<OssResponse> ossResponses =  new UserController(session,em).add(users);
+		List<OssResponse> ossResponses =  new UserController(session,this.em).add(users);
 		sync(session);
 		return ossResponses;
 	}
 
 	@Override
 	public OssResponse delete(Session session, long userId) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		return userController.delete(userId);
 	}
 
 	@Override
 	public OssResponse modify(Session session, User user) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		return userController.modify(user);
 	}
 
 	@Override
 	public List<User> search(Session session, String search) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		final List<User> users = userController.search(search);
 		if (users == null) {
             throw new WebApplicationException(404);
@@ -127,7 +127,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<Group> getAvailableGroups(Session session, long userId) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		final List<Group> groups = userController.getAvailableGroups(userId);
 		if (groups == null) {
             throw new WebApplicationException(404);
@@ -137,7 +137,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<Group> groups(Session session, long userId) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		final List<Group> groups =  userController.getGroups(userId);
 		if (groups == null) {
             throw new WebApplicationException(404);
@@ -147,19 +147,19 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse setMembers(Session session, long userId, List<Long> groupIds) {
-		return new UserController(session,em).setGroups(userId,groupIds);
+		return new UserController(session,this.em).setGroups(userId,groupIds);
 	}
 
 	@Override
 	public OssResponse removeMember(Session session, long groupId, long userId) {
-		final GroupController groupController = new GroupController(session,em);
+		final GroupController groupController = new GroupController(session,this.em);
 		return groupController.removeMember(groupId,userId);
 	}
 
 	@Override
 	public OssResponse addToGroups(Session session, long userId, List<Long> groups) {
 		StringBuilder error = new StringBuilder();
-		final GroupController groupController = new GroupController(session,em);
+		final GroupController groupController = new GroupController(session,this.em);
 		for( Long groupId : groups ) {
 			OssResponse ossResponse = groupController.addMember(groupId,userId);
 			if( !ossResponse.getCode().equals("OK")  ) {
@@ -174,25 +174,25 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse addMember(Session session, long groupId, long userId) {
-		final GroupController groupController = new GroupController(session,em);
+		final GroupController groupController = new GroupController(session,this.em);
 		return groupController.addMember(groupId,userId);
 	}
 
 	@Override
 	public OssResponse syncFsQuotas(Session session, List<List<String>> Quotas) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		return userController.syncFsQuotas(Quotas);
 	}
 
 	@Override
 	public List<User> getUsers(Session session, List<Long> userIds) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		return userController.getUsers(userIds);
 	}
 
 	@Override
 	public String getUserAttribute(Session session, String uid, String attribute) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		User user = userController.getByUid(uid);
 		if( user == null) {
 			return "";
@@ -251,59 +251,59 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<Category> getGuestUsers(Session session) {
-		return new UserController(session,em).getGuestUsers();
+		return new UserController(session,this.em).getGuestUsers();
 	}
 
 	@Override
 	public Category getGuestUsersCategory(Session session, Long guestUsersId) {
-		return new UserController(session,em).getGuestUsersCategory(guestUsersId);
+		return new UserController(session,this.em).getGuestUsersCategory(guestUsersId);
 	}
 
 	@Override
 	public OssResponse deleteGuestUsers(Session session, Long guestUsersId) {
-		return new UserController(session,em).deleteGuestUsers(guestUsersId);
+		return new UserController(session,this.em).deleteGuestUsers(guestUsersId);
 	}
 
 	@Override
 	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
-		return new UserController(session,em).addGuestUsers(name, description, roomId, count, validUntil);
+		return new UserController(session,this.em).addGuestUsers(name, description, roomId, count, validUntil);
 	}
 
 	@Override
 	public String getGroups(Session session, String userName) {
-		return new UserController(session,em).getGroupsOfUser(userName,"workgroup");
+		return new UserController(session,this.em).getGroupsOfUser(userName,"workgroup");
 	}
 
 	@Override
 	public String getClasses(Session session, String userName) {
-		return new UserController(session,em).getGroupsOfUser(userName,"class");
+		return new UserController(session,this.em).getGroupsOfUser(userName,"class");
 	}
 
 	@Override
 	public String addToGroup(Session session, String userName, String groupName) {
-		return new GroupController(session,em).addMember(groupName, userName).getCode();
+		return new GroupController(session,this.em).addMember(groupName, userName).getCode();
 	}
 
 
 	@Override
 	public String addGroupToUser(Session session, String userName, String groupName) {
-		return new GroupController(session,em).setOwner(groupName, userName).getCode();
+		return new GroupController(session,this.em).setOwner(groupName, userName).getCode();
 	}
 
 	@Override
 	public String removeFromGroup(Session session, String userName, String groupName) {
-		return new GroupController(session,em).removeMember(groupName, userName).getCode();
+		return new GroupController(session,this.em).removeMember(groupName, userName).getCode();
 	}
 
 	@Override
 	public String delete(Session session, String userName) {
-		return new UserController(session,em).delete(userName).getCode();
+		return new UserController(session,this.em).delete(userName).getCode();
 	}
 
 	@Override
 	public String createUid(Session session, String givenName, String surName, Date birthDay) {
-		return new UserController(session,em).createUid(givenName,surName,birthDay);
+		return new UserController(session,this.em).createUid(givenName,surName,birthDay);
 	}
 
 	@Override
@@ -363,7 +363,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public List<UserImport> getImports(Session session) {
-		Controller controller    = new Controller(session,em);
+		Controller controller    = new Controller(session,this.em);
 		StringBuilder importDir  = controller.getImportDir("");
 		List<UserImport> imports = new ArrayList<UserImport>();
 		File importDirObject = new File(importDir.toString());
@@ -380,7 +380,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public UserImport getImport(Session session, String startTime) {
-		Controller controller    = new Controller(session,em);
+		Controller controller    = new Controller(session,this.em);
 		String content;
 		UserImport userImport;
 		String importLog  = controller.getImportDir(startTime).append("/import.log").toString();
@@ -407,7 +407,7 @@ public class UserResourceImpl implements UserResource {
 	public OssResponse restartImport(Session session, String startTime) {
 		UserImport userImport = getImport(session, startTime);
 		if( userImport != null ) {
-			Controller controller    = new Controller(session,em);
+			Controller controller    = new Controller(session,this.em);
 			StringBuilder importFile = controller.getImportDir(startTime);
 			importFile.append("/userlist.txt");
 			List<String> parameters = new ArrayList<String>();
@@ -452,7 +452,7 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse deleteImport(Session session, String startTime) {
-		Controller controller    = new Controller(session,em);
+		Controller controller    = new Controller(session,this.em);
 		StringBuilder importDir  = controller.getImportDir(startTime);
 		if( startTime == null || startTime.isEmpty() ) {
 			return new OssResponse(session,"ERROR", "Invalid import name.");
@@ -483,12 +483,12 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse syncMsQuotas(Session session, List<List<String>> Quotas) {
-		return new UserController(session,em).syncMsQuotas(Quotas);
+		return new UserController(session,this.em).syncMsQuotas(Quotas);
 	}
 
 	@Override
 	public String getUidsByRole(Session session, String role) {
-		final UserController userController = new UserController(session,em);
+		final UserController userController = new UserController(session,this.em);
 		List<String> users = new ArrayList<String>();
 		for( User user : userController.getByRole(role) ) {
 			users.add(user.getUid());
@@ -498,8 +498,8 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse allTeachersInAllClasses(Session session) {
-		final UserController userController = new UserController(session,em);
-		final GroupController groupController = new GroupController(session,em);
+		final UserController userController = new UserController(session,this.em);
+		final GroupController groupController = new GroupController(session,this.em);
 		for( User user : userController.getByRole("teachers") ) {
 			for( Group group : groupController.getByType("class")) {
 				groupController.addMember(group, user);
@@ -510,8 +510,8 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public OssResponse allClasses(Session session, long userId) {
-		User user = new UserController(session,em).getById(userId);
-		final GroupController groupController = new GroupController(session,em);
+		User user = new UserController(session,this.em).getById(userId);
+		final GroupController groupController = new GroupController(session,this.em);
 		for( Group group : groupController.getByType("class")) {
 			groupController.addMember(group, user);
 		}
@@ -520,8 +520,8 @@ public class UserResourceImpl implements UserResource {
 
 	@Override
 	public String addToAllClasses(Session session, String userName) {
-		User user = new UserController(session,em).getByUid(userName);
-		final GroupController groupController = new GroupController(session,em);
+		User user = new UserController(session,this.em).getByUid(userName);
+		final GroupController groupController = new GroupController(session,this.em);
 		for( Group group : groupController.getByType("class")) {
 			groupController.addMember(group, user);
 		}

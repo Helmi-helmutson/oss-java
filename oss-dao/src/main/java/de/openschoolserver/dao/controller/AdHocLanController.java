@@ -32,13 +32,13 @@ public class AdHocLanController extends Controller {
 	}
 
 	public Category getAdHocCategoryOfRoom(Long roomId) {
-		Room room = new RoomController(session,em).getById(roomId);
+		Room room = new RoomController(this.session,this.em).getById(roomId);
 		return (( room == null ) ? null :getAdHocCategoryOfRoom(room) );
 	}
 
 	public List<Group> getGroups() {
 		ArrayList<Group> groups = new ArrayList<Group>();
-		for( Room room : new RoomController(session,em).getByType("AdHocAccess") ) {
+		for( Room room : new RoomController(this.session,this.em).getByType("AdHocAccess") ) {
 			for( Category category : room.getCategories() ) {
 				if( category.getCategoryType().equals("AdHocAccess")) {
 					groups.addAll(category.getGroups());
@@ -50,7 +50,7 @@ public class AdHocLanController extends Controller {
 
 	public List<User> getUsers() {
 		ArrayList<User> users = new ArrayList<User>();
-		for( Room room : new RoomController(session,em).getByType("AdHocAccess") ) {
+		for( Room room : new RoomController(this.session,this.em).getByType("AdHocAccess") ) {
 			for( Category category : room.getCategories() ) {
 				if( category.getCategoryType().equals("AdHocAccess")) {
 					users.addAll(category.getUsers());
@@ -65,11 +65,11 @@ public class AdHocLanController extends Controller {
 		logger.debug("Add AdHocLan: " + room);
 		//Search the BYOD HwConf
 		if( room.getHwconf() == null ) {
-			HWConf hwconf = new CloneToolController(session,em).getByName("BYOD");
+			HWConf hwconf = new CloneToolController(this.session,this.em).getByName("BYOD");
 			room.setHwconfId(hwconf.getId());
 		}
 		room.setRoomType("AdHocAccess");
-		RoomController roomConrtoller = new RoomController(session,em);;
+		RoomController roomConrtoller = new RoomController(this.session,this.em);;
 		OssResponse ossResponseRoom =  roomConrtoller.add(room);
 		logger.debug("Add AdHocLan after creating: " + room);
 		if( ossResponseRoom.getCode().equals("ERROR")) {
@@ -83,7 +83,7 @@ public class AdHocLanController extends Controller {
 		category.setOwner(this.session.getUser());
 		category.setPublicAccess(false);
 		logger.debug("Add AdHocLan category: " + category);
-		CategoryController categoryController = new CategoryController(session,em);;
+		CategoryController categoryController = new CategoryController(this.session,this.em);;
 		OssResponse ossResponseCategory = categoryController.add(category);
 		if( ossResponseCategory.getCode().equals("ERROR")) {
 			roomConrtoller.delete(ossResponseRoom.getObjectId());
@@ -109,7 +109,7 @@ public class AdHocLanController extends Controller {
 		if( categoryId == null ) {
 			return new OssResponse(session,"ERROR","AdHocAccess not found");
 		}
-		return new CategoryController(session,em).addMember(categoryId, objectType, objectId);
+		return new CategoryController(this.session,this.em).addMember(categoryId, objectType, objectId);
 	}
 
 
@@ -118,30 +118,30 @@ public class AdHocLanController extends Controller {
 		if( categoryId == null ) {
 			return new OssResponse(session,"ERROR","AdHocAccess not found");
 		}
-		return new CategoryController(session,em).deleteMember(categoryId, objectType, objectId);
+		return new CategoryController(this.session,this.em).deleteMember(categoryId, objectType, objectId);
 	}
 
 
 	public OssResponse delete(Long adHocRoomId) {
 		try {
-			Category category = em.find(Category.class, adHocRoomId);
+			Category category = this.em.find(Category.class, adHocRoomId);
 			logger.debug("Delete adHocRoom:" + category);
-			RoomController roomController = new RoomController(session,em);
+			RoomController roomController = new RoomController(this.session,this.em);
 			for( Room room : category.getRooms() ) {
 				roomController.delete(room.getId());
 			}
 			this.beginTransaction();
 			for( Object o : category.getFaqs())  {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			for( Object o : category.getAnnouncements())  {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			for( Object o : category.getContacts())  {
-				em.remove(o);
+				this.em.remove(o);
 			}
-			em.remove(category);
-			em.getTransaction().commit();
+			this.em.remove(category);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("deleteMember:" +e.getMessage());
 			return new OssResponse(this.getSession(),"erease category ERROR",e.getMessage());

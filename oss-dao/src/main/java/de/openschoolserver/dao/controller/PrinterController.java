@@ -56,7 +56,7 @@ public class PrinterController extends Controller {
 	 */
 	public Printer getById(long printerId) {
 		try {
-			Printer printer = em.find(Printer.class, printerId);
+			Printer printer = this.em.find(Printer.class, printerId);
 			if( printer != null ) {
 				if( printer.getDevice() != null ) {
 					printer.setDeviceName(printer.getDevice().getName());
@@ -77,7 +77,7 @@ public class PrinterController extends Controller {
 	 */
 	public Printer getByName(String name) {
 		try {
-			Query query = em.createNamedQuery("Printer.getByName");
+			Query query = this.em.createNamedQuery("Printer.getByName");
 			query.setParameter("name", name);
 			Printer printer = (Printer) query.getSingleResult();
 			printer.setRoomId(printer.getDevice().getRoom().getId());
@@ -148,7 +148,7 @@ public class PrinterController extends Controller {
 
 		OssResponse ossResponse = new OssResponse(session,"OK","Printer was deleted succesfully.");
 		try {
-			Printer printer = em.find(Printer.class, printerId);
+			Printer printer = this.em.find(Printer.class, printerId);
 			if( printer == null ) {
 				return new OssResponse(this.getSession(),"ERROR", "Can not find printer with id %s.",null,String.valueOf(printerId));
 			}
@@ -162,11 +162,11 @@ public class PrinterController extends Controller {
 			OSSShellTools.exec(program, reply, stderr, null);
 			this.beginTransaction();
 			printerDevice.getPrinterQueue().remove(printer);
-			em.remove(printer);
-			em.merge(printerDevice);
-			em.getTransaction().commit();
+			this.em.remove(printer);
+			this.em.merge(printerDevice);
+			this.em.getTransaction().commit();
 			if( printerDevice.getPrinterQueue().isEmpty() ) {
-				ossResponse = new DeviceController(session,em).delete(printerDevice, true);
+				ossResponse = new DeviceController(this.session,this.em).delete(printerDevice, true);
 			}
 		} catch (Exception e) {
 			logger.debug("deletePrinter :" + e.getMessage());
@@ -181,7 +181,7 @@ public class PrinterController extends Controller {
 		if( session.getPassword() == null || session.getPassword().isEmpty() ) {
 			return new OssResponse(session,"ERROR", "The session password of the administrator is expiered. Please login into the web interface again.");
 		}
-		String printserver   = new RoomController(session,em).getConfigValue("PRINTSERVER");
+		String printserver   = new RoomController(this.session,this.em).getConfigValue("PRINTSERVER");
 		String[] program     = new String[7];
 		StringBuffer reply   = new StringBuffer();
 		StringBuffer stderr  = new StringBuffer();
@@ -220,8 +220,8 @@ public class PrinterController extends Controller {
 			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
 		logger.debug("addPrinter: " + name + "#" + mac + "#" + roomId + "#" + model +"#" + ( windowsDriver ? "yes" : "no" ) );
 		//First we create a device object
-		RoomController roomController = new RoomController(session,em);;
-		HWConf hwconf = new CloneToolController(session,em).getByName("Printer");
+		RoomController roomController = new RoomController(this.session,this.em);;
+		HWConf hwconf = new CloneToolController(this.session,this.em).getByName("Printer");
 		Device device = new Device();
 		device.setMac(mac);
 		device.setName(name.toLowerCase());
@@ -240,21 +240,21 @@ public class PrinterController extends Controller {
 	public OssResponse addPrinterQueue(Session session, String name, Long deviceId, String model, boolean windowsDriver,
 				InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
 		
-		RoomController roomController = new RoomController(session,em);;
+		RoomController roomController = new RoomController(this.session,this.em);;
 		String deviceHostName;
 		Printer printer = new Printer();
 		//Create the printer object
 		try {
-			Device device = em.find(Device.class, deviceId);
+			Device device = this.em.find(Device.class, deviceId);
 			this.beginTransaction();
 			
 			printer.setDevice(device);
 			printer.setName(name.toLowerCase());
-			em.persist(printer);
+			this.em.persist(printer);
 			logger.debug("Created Printer: " + printer);
 			device.getPrinterQueue().add(printer);
-			em.merge(device);
-			em.getTransaction().commit();
+			this.em.merge(device);
+			this.em.getTransaction().commit();
 			deviceHostName = device.getName();
 		} catch (Exception e){
 			logger.debug("addPrinterQueue :" + e.getMessage());

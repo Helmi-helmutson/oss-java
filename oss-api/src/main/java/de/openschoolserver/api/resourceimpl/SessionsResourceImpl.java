@@ -30,12 +30,12 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	public SessionsResourceImpl() {
 		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		this.em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected void finalize()
 	{
-	   em.close();
+	   this.em.close();
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 		Session session =  new Session();
 		session.setIP(req.getRemoteAddr());
-		SessionController sessionController = new SessionController(session,em);
+		SessionController sessionController = new SessionController(session,this.em);
 		session = sessionController.createSessionWithUser(username, password, device);
 		if( session != null ) {
 			logger.debug(session.toString());
@@ -72,7 +72,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public void deleteSession(Session session, String token) {
-		final SessionController sessionController = new SessionController(session,em);
+		final SessionController sessionController = new SessionController(session,this.em);
 		if( session == null || ! session.getToken().equals(token) ) {
 			logger.info("deletion of session denied " + token);
 			throw new WebApplicationException(401);
@@ -96,7 +96,7 @@ public class SessionsResourceImpl implements SessionsResource {
 		Printer defaultPrinter  = null;
 		List<Printer> availablePrinters = null;
 		List<String> data = new ArrayList<String>();
-		final SessionController sessionController = new SessionController(session,em);
+		final SessionController sessionController = new SessionController(session,this.em);
 		switch(key) {
 		case "defaultPrinter":
 			if( session.getDevice() != null )
@@ -154,6 +154,6 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public String logonScript(Session session, String OS) {
-		return new SessionController(session,em).logonScript(OS);
+		return new SessionController(session,this.em).logonScript(OS);
 	}
 }

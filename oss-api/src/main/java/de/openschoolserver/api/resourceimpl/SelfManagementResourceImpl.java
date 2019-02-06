@@ -21,12 +21,12 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 
 	public SelfManagementResourceImpl() {
 		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		this.em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected void finalize()
 	{
-	   em.close();
+	   this.em.close();
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 
 	@Override
 	public OssResponse modifyMySelf(Session session, User user) {
-		UserController userController = new UserController(session,em);
+		UserController userController = new UserController(session,this.em);
 		User oldUser = session.getUser();
 		OssResponse  ossResponse = null;
 		logger.debug("modifyMySelf" + user);
@@ -55,14 +55,12 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			oldUser.setFsQuota(user.getFsQuota());
 			oldUser.setMsQuota(user.getMsQuota());
 			try {
-				em.getTransaction().begin();
-				em.merge(oldUser);
-				em.getTransaction().commit();
+				this.em.getTransaction().begin();
+				this.em.merge(oldUser);
+				this.em.getTransaction().commit();
 				userController.startPlugin("modify_user", oldUser);
 			} catch (Exception e) {
 				return null;
-			} finally {
-				em.close();
 			}
 			ossResponse = new OssResponse(session,"OK","User parameters were set successfully.");
 		} else {

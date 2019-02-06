@@ -71,14 +71,15 @@ public class Controller extends Config {
 	}
 	
 	public void beginTransaction() {
-		while(em.getTransaction().isActive()) {
+		while(this.em.getTransaction().isActive()) {
 			try {
+				logger.debug("beginTransaction: is active");
 				TimeUnit.MILLISECONDS.sleep(500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
-		em.getTransaction().begin();
+		this.em.getTransaction().begin();
 	}
 
 	public String createRandomPassword()
@@ -126,28 +127,28 @@ public class Controller extends Config {
 		if( this.getConfigValue("WORKGROUP").equals(name)) {
 			return false;
 		}
-		Query query = em.createNamedQuery("User.getByUid");
+		Query query = this.em.createNamedQuery("User.getByUid");
 		query.setParameter("uid", name);
 		List<User> user = (List<User>) query.getResultList();
 		if( ! user.isEmpty() ){
 			logger.debug("Found user " + user);
 			return false;
 		}
-		query = em.createNamedQuery("Group.getByName");
+		query = this.em.createNamedQuery("Group.getByName");
 		query.setParameter("name", name);
 		List<Group> group = (List<Group>) query.getResultList();
 		if( ! group.isEmpty() ){
 			logger.debug("Found group " + group );
 			return false;
 		}
-		query = em.createNamedQuery("Device.getByName");
+		query = this.em.createNamedQuery("Device.getByName");
 		query.setParameter("name", name);
 		List<Device> device = (List<Device>) query.getResultList();
 		if( ! device.isEmpty() ){
 			logger.debug("Found device " + device );
 			return false;
 		}
-		query = em.createNamedQuery("Room.getByName");
+		query = this.em.createNamedQuery("Room.getByName");
 		query.setParameter("name", name);
 		List<Room> room = (List<Room>) query.getResultList();
 		if( ! room.isEmpty() ){
@@ -189,7 +190,7 @@ public class Controller extends Config {
 	}
 
 	public String isMacUnique(String name){
-		Query query = em.createNamedQuery("Device.getByMAC");
+		Query query = this.em.createNamedQuery("Device.getByMAC");
 		query.setParameter("MAC", name);
 		List<Device> devices = (List<Device>) query.getResultList();
 		if( ! devices.isEmpty() ){
@@ -199,7 +200,7 @@ public class Controller extends Config {
 	}
 
 	public String isIPUnique(String name){
-		Query query = em.createNamedQuery("Device.getByIP");
+		Query query = this.em.createNamedQuery("Device.getByIP");
 		query.setParameter("IP", name);
 		List<Device> devices = (List<Device>) query.getResultList();
 		if( ! devices.isEmpty() ){
@@ -209,7 +210,7 @@ public class Controller extends Config {
 	}
 
 	public boolean isUserAliasUnique(String name){
-		Query query = em.createNamedQuery("Alias.getByName");
+		Query query = this.em.createNamedQuery("Alias.getByName");
 		query.setParameter("alias", name);
 		boolean result = query.getResultList().isEmpty();
 		return result;
@@ -598,7 +599,7 @@ public class Controller extends Config {
 
 	public OSSMConfig getMConfigObject(Object object, String key, String value) {
 		Long id = null;
-		Query query = em.createNamedQuery("OSSMConfig.check");
+		Query query = this.em.createNamedQuery("OSSMConfig.check");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
 			 query.setParameter("type","Group");
@@ -633,7 +634,7 @@ public class Controller extends Config {
 
 	public OSSConfig getConfigObject(Object object, String key) {
 		Long id = null;
-		Query query = em.createNamedQuery("OSSConfig.get");
+		Query query = this.em.createNamedQuery("OSSConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
 			 query.setParameter("type","Group");
@@ -667,7 +668,7 @@ public class Controller extends Config {
 	 *         False if the enumerate is not allowed and in case of error.
 	 */
 	public boolean checkEnumerate(String type, String value) {
-		Query query      = em.createNamedQuery("Enumerate.get");
+		Query query      = this.em.createNamedQuery("Enumerate.get");
 		try {
 			query.setParameter("type",type).setParameter("value",value);
 			return  !query.getResultList().isEmpty() ;
@@ -687,7 +688,7 @@ public class Controller extends Config {
 	 */
 	public List<String> getEnumerates(String type ) {
 		try {
-			Query query = em.createNamedQuery("Enumerate.getByType").setParameter("type", type);
+			Query query = this.em.createNamedQuery("Enumerate.getByType").setParameter("type", type);
 			List<String> results = new ArrayList<String>();
 			for( Enumerate e :  (List<Enumerate>) query.getResultList() ) {
 				results.add(e.getValue());
@@ -709,7 +710,7 @@ public class Controller extends Config {
 
 	public OSSConfig getConfig(String type, String key) {
 		OSSConfig     ossConfig = null;
-		Query query      = em.createNamedQuery("OSSConfig.getAllByKey");
+		Query query      = this.em.createNamedQuery("OSSConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
 		if( ! query.getResultList().isEmpty() ) {
 			ossConfig = (OSSConfig)  query.getResultList().get(0);
@@ -718,14 +719,14 @@ public class Controller extends Config {
 	}
 
 	public List<OSSMConfig> getMConfigs(String key) {
-		Query query = em.createNamedQuery("OSSMConfig.getAllForKey");
+		Query query = this.em.createNamedQuery("OSSMConfig.getAllForKey");
 		query.setParameter("keyword",key);
 		List<OSSMConfig> ossMConfigs = (List<OSSMConfig>) query.getResultList();
 		return ossMConfigs;
 	}
 
 	public List<OSSMConfig> getMConfigs(String type, String key) {
-		Query query = em.createNamedQuery("OSSMConfig.getAllByKey");
+		Query query = this.em.createNamedQuery("OSSMConfig.getAllByKey");
 		query.setParameter("type",type).setParameter("keyword",key);
 		List<OSSMConfig> ossMConfigs = (List<OSSMConfig>) query.getResultList();
 		return ossMConfigs;
@@ -733,7 +734,7 @@ public class Controller extends Config {
 
 	public List<String> getMConfigs(Object object, String key) {
 		Long id = null;
-		Query query = em.createNamedQuery("OSSMConfig.get");
+		Query query = this.em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
 			 query.setParameter("type","Group");
@@ -762,7 +763,7 @@ public class Controller extends Config {
 
 	public List<OSSMConfig> getMConfigObjects(Object object, String key) {
 		Long id = null;
-		Query query = em.createNamedQuery("OSSMConfig.get");
+		Query query = this.em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
 			 query.setParameter("type","Group");
@@ -797,7 +798,7 @@ public class Controller extends Config {
 
 	public String getConfig(Object object, String key) {
 		Long id = null;
-		Query query = em.createNamedQuery("OSSConfig.get");
+		Query query = this.em.createNamedQuery("OSSConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
 			 query.setParameter("type","Group");
@@ -852,8 +853,8 @@ public class Controller extends Config {
 		mconfig.setCreator(this.session.getUser());
 		try {
 			this.beginTransaction();
-			em.persist(mconfig);
-			em.getTransaction().commit();
+			this.em.persist(mconfig);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("addMConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -890,8 +891,8 @@ public class Controller extends Config {
 		config.setCreator(this.session.getUser());
 		try {
 			this.beginTransaction();
-			em.persist(config);
-			em.getTransaction().commit();
+			this.em.persist(config);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("addConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -906,11 +907,11 @@ public class Controller extends Config {
 		}
 		OSSConfig config = this.getConfigObject(object, key);
 		try {
-			config = em.find(OSSConfig.class, config.getId());
+			config = this.em.find(OSSConfig.class, config.getId());
 			config.setValue(value);
 			this.beginTransaction();
-			em.merge(config);
-			em.getTransaction().commit();
+			this.em.merge(config);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("setConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -921,11 +922,11 @@ public class Controller extends Config {
 
 	public OssResponse deleteConfig(Object object, Long configId) {
 		try {
-			OSSConfig config = em.find(OSSConfig.class, configId);
+			OSSConfig config = this.em.find(OSSConfig.class, configId);
 			this.beginTransaction();
-			em.merge(config);
-			em.remove(config);
-			em.getTransaction().commit();
+			this.em.merge(config);
+			this.em.remove(config);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("deleteConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -936,11 +937,11 @@ public class Controller extends Config {
 
 	public OssResponse deleteMConfig(Object object, Long configId) {
 		try {
-			OSSMConfig config = em.find(OSSMConfig.class, configId);
+			OSSMConfig config = this.em.find(OSSMConfig.class, configId);
 			this.beginTransaction();
-			em.merge(config);
-			em.remove(config);
-			em.getTransaction().commit();
+			this.em.merge(config);
+			this.em.remove(config);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("deleteConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -956,10 +957,10 @@ public class Controller extends Config {
 		}
 		try {
 			this.beginTransaction();
-			config = em.find(OSSConfig.class, config.getId());
-			em.merge(config);
-			em.remove(config);
-			em.getTransaction().commit();
+			config = this.em.find(OSSConfig.class, config.getId());
+			this.em.merge(config);
+			this.em.remove(config);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("deleteConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -975,10 +976,10 @@ public class Controller extends Config {
 		}
 		try {
 			this.beginTransaction();
-			config = em.find(OSSMConfig.class, config.getId());
-			em.merge(config);
-			em.remove(config);
-			em.getTransaction().commit();
+			config = this.em.find(OSSMConfig.class, config.getId());
+			this.em.merge(config);
+			this.em.remove(config);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("deleteMConfig: " + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());

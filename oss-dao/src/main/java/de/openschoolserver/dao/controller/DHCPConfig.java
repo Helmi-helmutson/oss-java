@@ -106,7 +106,7 @@ public class DHCPConfig extends Controller {
 	}
 
 	private void Write(Path path) {
-		Query query = em.createNamedQuery("Room.findAllToRegister");
+		Query query = this.em.createNamedQuery("Room.findAllToRegister");
 		saltGroupFile.add("nodegroups:");
 		for( Room room : (List<Room>) query.getResultList() ) {
 			logger.debug("Write DHCP Room" + room.getName());
@@ -128,7 +128,7 @@ public class DHCPConfig extends Controller {
 		try {
 			Files.write(path, dhcpConfigFile );
 			//Build groups by hwconf
-			query = em.createNamedQuery("HWConf.findAll");
+			query = this.em.createNamedQuery("HWConf.findAll");
 			for( HWConf hwconf : (List<HWConf>) query.getResultList() ) {
 				List<String> line = new ArrayList<String>();
 				for( Device device : hwconf.getDevices() ) {

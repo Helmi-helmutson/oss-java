@@ -33,7 +33,7 @@ public class UserController extends Controller {
 
 	public User getById(long userId) {
 		try {
-			User user = em.find(User.class, userId);
+			User user = this.em.find(User.class, userId);
 			if( user != null ) {
 				for( Alias alias : user.getAliases() ) {
 					user.getMailAliases().add(alias.getAlias());
@@ -49,7 +49,7 @@ public class UserController extends Controller {
 
 	public List<User> getByRole(String role) {
 		try {
-			Query query = em.createNamedQuery("User.getByRole");
+			Query query = this.em.createNamedQuery("User.getByRole");
 			query.setParameter("role", role);
 			return query.getResultList();
 		} catch (Exception e) {
@@ -61,7 +61,7 @@ public class UserController extends Controller {
 
 	public User getByUid(String uid) {
 		try {
-			Query query = em.createNamedQuery("User.getByUid");
+			Query query = this.em.createNamedQuery("User.getByUid");
 			query.setParameter("uid", uid);
 			List<User> result = query.getResultList();
 			if (result != null && result.size() > 0) {
@@ -79,7 +79,7 @@ public class UserController extends Controller {
 
 	public List<User> search(String search) {
 		try {
-			Query query = em.createNamedQuery("User.search");
+			Query query = this.em.createNamedQuery("User.search");
 			query.setParameter("search", search + "%");
 			return query.getResultList();
 		} catch (Exception e) {
@@ -91,7 +91,7 @@ public class UserController extends Controller {
 
 	public List<User> findByName(String givenName, String surName) {
 		try {
-			Query query = em.createNamedQuery("User.findByName");
+			Query query = this.em.createNamedQuery("User.findByName");
 			query.setParameter("givenName", givenName);
 			query.setParameter("surName", surName);
 			return query.getResultList();
@@ -104,7 +104,7 @@ public class UserController extends Controller {
 
 	public List<User> findByNameAndRole(String givenName, String surName, String role) {
 		try {
-			Query query = em.createNamedQuery("User.findByNameAndRole");
+			Query query = this.em.createNamedQuery("User.findByNameAndRole");
 			query.setParameter("givenName", givenName);
 			query.setParameter("surName", surName);
 			query.setParameter("role", role);
@@ -120,7 +120,7 @@ public class UserController extends Controller {
 		List<User> users = new ArrayList<User>();
 		boolean userManage = this.isAllowed("user.manage");
 		try {
-			Query query = em.createNamedQuery("User.findAll");
+			Query query = this.em.createNamedQuery("User.findAll");
 			for (User user : (List<User>) query.getResultList()) {
 				if (userManage || user.getRole().equals(roleStudent)
 					|| ( user.getRole().equals(roleGuest) && user.getCreator().equals(session.getUser()) ) ) {
@@ -225,9 +225,9 @@ public class UserController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			em.persist(user);
-			em.merge(user);
-			em.getTransaction().commit();
+			this.em.persist(user);
+			this.em.merge(user);
+			this.em.getTransaction().commit();
 			logger.debug("Created user" + user);
 		} catch (Exception e) {
 			logger.error("add: " + e.getMessage());
@@ -235,8 +235,8 @@ public class UserController extends Controller {
 		} finally {
 		}
 		this.startPlugin("add_user", user);
-		GroupController groupController = new GroupController(session,em);
-		Group group = new GroupController(session,em).getByName(user.getRole());
+		GroupController groupController = new GroupController(this.session,this.em);
+		Group group = new GroupController(this.session,this.em).getByName(user.getRole());
 		if (group != null) {
 			groupController.addMember(group, user);
 		}
@@ -294,8 +294,8 @@ public class UserController extends Controller {
 		}
 		try {
 			this.beginTransaction();
-			em.merge(oldUser);
-			em.getTransaction().commit();
+			this.em.merge(oldUser);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
@@ -346,20 +346,20 @@ public class UserController extends Controller {
 		List<Device> devices = user.getOwnedDevices();
 		boolean restartDHCP = !devices.isEmpty();
 		if (!em.contains(user)) {
-			user = em.merge(user);
+			user = this.em.merge(user);
 		}
 		for( Group group : user.getGroups() ) {
 			group.getUsers().remove(user);
-			em.merge(group);
+			this.em.merge(group);
 		}
 		if( restartDHCP ) {
-			DeviceController dc = new DeviceController(session,em);;
+			DeviceController dc = new DeviceController(this.session,this.em);;
 			for( Device device : devices ) {
 				dc.delete(device.getId(),false);
 			}
 		}
-		em.remove(user);
-		em.getTransaction().commit();
+		this.em.remove(user);
+		this.em.getTransaction().commit();
 		if (restartDHCP) {
 			DHCPConfig dhcpConfig = new DHCPConfig(session,em);
 			dhcpConfig.Create();
@@ -370,7 +370,7 @@ public class UserController extends Controller {
 	public List<Group> getAvailableGroups(long userId) {
 
 		User user = this.getById(userId);
-		Query query = em.createNamedQuery("Group.findAll");
+		Query query = this.em.createNamedQuery("Group.findAll");
 		List<Group> allGroups = query.getResultList();
 		allGroups.removeAll(user.getGroups());
 		return allGroups;
@@ -408,15 +408,15 @@ public class UserController extends Controller {
 			for (Group group : groupsToAdd) {
 				group.getUsers().add(user);
 				user.getGroups().add(group);
-				em.merge(group);
+				this.em.merge(group);
 			}
 			for (Group group : groupsToRemove) {
 				group.getUsers().remove(user);
 				user.getGroups().remove(group);
-				em.merge(group);
+				this.em.merge(group);
 			}
-			em.merge(user);
-			em.getTransaction().commit();
+			this.em.merge(user);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
@@ -441,10 +441,10 @@ public class UserController extends Controller {
 				if (user != null) {
 					user.setFsQuotaUsed(Integer.valueOf(quota.get(1)));
 					user.setFsQuota(Integer.valueOf(quota.get(2)));
-					em.merge(user);
+					this.em.merge(user);
 				}
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
@@ -463,10 +463,10 @@ public class UserController extends Controller {
 				if (user != null) {
 					user.setMsQuotaUsed(Integer.valueOf(quota.get(1)));
 					user.setMsQuota(Integer.valueOf(quota.get(2)));
-					em.merge(user);
+					this.em.merge(user);
 				}
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
@@ -632,7 +632,7 @@ public class UserController extends Controller {
 			if( user != null ) {
 				program[1] = user.getUid();
 				user.setFsQuota(quota);
-				em.merge(user);
+				this.em.merge(user);
 				OSSShellTools.exec(program, reply, error, null);
 				responses.add(new OssResponse(this.getSession(), "OK", "The file system quota for '%s' was set.",null,user.getUid()));
 			}
@@ -653,7 +653,7 @@ public class UserController extends Controller {
 			if( user != null ) {
 				program[1] = user.getUid();
 				user.setMsQuota(quota);
-				em.merge(user);
+				this.em.merge(user);
 				OSSShellTools.exec(program, reply, error, null);
 				responses.add(new OssResponse(this.getSession(), "OK", "The mail system quota for '%s' was set.",null,user.getUid()));
 			}
@@ -769,7 +769,7 @@ public class UserController extends Controller {
 	 * @return The list of the guest users categories
 	 */
 	public List<Category> getGuestUsers() {
-		final CategoryController categoryController = new CategoryController(session,em);
+		final CategoryController categoryController = new CategoryController(this.session,this.em);
 		if (categoryController.isSuperuser()) {
 			return categoryController.getByType("guestUsers");
 		}
@@ -788,7 +788,7 @@ public class UserController extends Controller {
 	 * @return The list of the guest users.
 	 */
 	public Category getGuestUsersCategory(Long guestUsersId) {
-		return new CategoryController(session,em).getById(guestUsersId);
+		return new CategoryController(this.session,this.em).getById(guestUsersId);
 	}
 
 	/**
@@ -797,8 +797,8 @@ public class UserController extends Controller {
 	 * @return The result as an OssResponse
 	 */
 	public OssResponse deleteGuestUsers(Long guestUsersId) {
-		final CategoryController categoryController = new CategoryController(session,em);
-		final GroupController groupController = new GroupController(session,em);
+		final CategoryController categoryController = new CategoryController(this.session,this.em);
+		final GroupController groupController = new GroupController(this.session,this.em);
 		Category category = categoryController.getById(guestUsersId);
 		for (User user : category.getUsers()) {
 			if (user.getRole().equals("guest")) {
@@ -816,8 +816,8 @@ public class UserController extends Controller {
 	}
 
 	public OssResponse addGuestUsers(String name, String description, Long roomId, Long count, Date validUntil) {
-		final CategoryController categoryController = new CategoryController(session,em);
-		final GroupController groupController = new GroupController(session,em);
+		final CategoryController categoryController = new CategoryController(this.session,this.em);
+		final GroupController groupController = new GroupController(this.session,this.em);
 		Category category = new Category();
 		category.setCategoryType("guestUsers");
 		category.setName(name);
@@ -847,9 +847,9 @@ public class UserController extends Controller {
 			category.getGroups().add(group);
 			group.setCategories(new ArrayList<Category>());
 			group.getCategories().add(category);
-			em.merge(category);
-			em.merge(group);
-			em.getTransaction().commit();
+			this.em.merge(category);
+			this.em.merge(group);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -893,75 +893,75 @@ public class UserController extends Controller {
 			//Acls
 			for( Acl o : creator.getCreatedAcls() ) {
 				o.setCreator(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setCreatedAcls(null);
 			//AccessInRoom
 			for( AccessInRoom o : creator.getCreatedAccessInRoom() ) {
 				o.setCreator(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setCreatedAccessInRoom(null);
 			//Announcement
 			for( Announcement o : creator.getMyAnnouncements() ) {
 				o.setOwner(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setMyAnnouncements(null);
 			//Categories
 			for( Category o : creator.getOwnedCategories() ) {
 				o.setOwner(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setOwnedCategories(null);
 			//Contacts
 			for( Contact o : creator.getMyContacts() ) {
 				o.setOwner(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setMyContacts(null);
 			//Groups
 			for( Group o : creator.getOwnedGroups() ) {
 				o.setOwner(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setOwnedGroups(null);
 			//HWConfs
 			for( HWConf o : creator.getCreatedHWConfs() ) {
 				o.setCreator(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setCreatedHWConfs(null);
 			//PositiveList
 			for( PositiveList o : creator.getOwnedPositiveLists() ) {
 				o.setOwner(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setOwnedPositiveLists(null);
 			//Partitions
 			for( Partition o : creator.getCreatedPartitions()) {
 				o.setCreator(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setCreatedPartitions(null);
 			//Rooms
 			for( Room o : creator.getCreatedRooms() ) {
 				o.setCreator(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setCreatedRooms(null);
 			//User
 			for( User o : creator.getCreatedUsers() ) {
 				o.setCreator(newCreator);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			creator.setCreatedUsers(null);
 			//Sessions will be deleted
 			for( Session o : creator.getSessions() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
-			em.merge(creator);
-			em.merge(newCreator);
+			this.em.merge(creator);
+			this.em.merge(newCreator);
 		} catch (Exception e) {
 			logger.error("inheritCreatedObjects:" + e.getMessage());
 		}
@@ -971,60 +971,60 @@ public class UserController extends Controller {
 		try {
 			//Acls
 			for( Acl o : creator.getCreatedAcls() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setCreatedAcls(null);
 			//AccessInRoom
 			for( AccessInRoom o : creator.getCreatedAccessInRoom() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setCreatedAccessInRoom(null);
 			//Announcement
 			for( Announcement o : creator.getMyAnnouncements() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setMyAnnouncements(null);
 			//Categories
 			for( Category o : creator.getOwnedCategories() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setOwnedCategories(null);
 			//Contacts
 			for( Contact o : creator.getMyContacts() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setMyContacts(null);
 			//Groups
 			for( Group o : creator.getOwnedGroups() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setOwnedGroups(null);
 			//HWConfs
 			for( HWConf o : creator.getCreatedHWConfs() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setCreatedHWConfs(null);
 			//PositiveList
 			for( PositiveList o : creator.getOwnedPositiveLists() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setOwnedPositiveLists(null);
 			//Rooms
 			for( Room o : creator.getCreatedRooms() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setCreatedRooms(null);
 			//User
 			for( User o : creator.getCreatedUsers() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setCreatedUsers(null);
 			//Sessions will be deleted
 			for( Session o : creator.getSessions() ) {
-				em.remove(o);
+				this.em.remove(o);
 			}
 			creator.setSessions(null);
-			em.merge(creator);
+			this.em.merge(creator);
 		} catch (Exception e) {
 			logger.error("delete owned objects:" + e.getMessage());
 		}

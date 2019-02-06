@@ -84,7 +84,7 @@ public class RoomController extends Controller {
 	public boolean isNameUnique(String name)
 	{
 		try {
-			Query query = em.createNamedQuery("Room.getByName");
+			Query query = this.em.createNamedQuery("Room.getByName");
 			query.setParameter("name", name);
 			List<Room> rooms = (List<Room>) query.getResultList();
 			return rooms.isEmpty();
@@ -98,7 +98,7 @@ public class RoomController extends Controller {
 	public boolean isDescriptionUnique(String description)
 	{
 		try {
-			Query query = em.createNamedQuery("Room.getByDescription");
+			Query query = this.em.createNamedQuery("Room.getByDescription");
 			query.setParameter("description", description);
 			List<Room> rooms = query.getResultList();
 			return rooms.isEmpty();
@@ -112,7 +112,7 @@ public class RoomController extends Controller {
 	public Room getById(long roomId) {
 
 		try {
-			return em.find(Room.class, roomId);
+			return this.em.find(Room.class, roomId);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -122,7 +122,7 @@ public class RoomController extends Controller {
 
 	public List<Room> getAllToUse() {
 		try {
-			Query query = em.createNamedQuery("Room.findAllToUse");
+			Query query = this.em.createNamedQuery("Room.findAllToUse");
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -133,7 +133,7 @@ public class RoomController extends Controller {
 
 	public List<Room> getAll() {
 		try {
-			Query query = em.createNamedQuery("Room.findAll");
+			Query query = this.em.createNamedQuery("Room.findAll");
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -144,7 +144,7 @@ public class RoomController extends Controller {
 
 	public List<Room> getAllWithControl() {
 		try {
-			Query query = em.createNamedQuery("Room.findAllWithControl");
+			Query query = this.em.createNamedQuery("Room.findAllWithControl");
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -155,7 +155,7 @@ public class RoomController extends Controller {
 
 	public List<Room> getAllWithTeacherControl() {
 		try {
-			Query query = em.createNamedQuery("Room.findAllWithTeacherControl");
+			Query query = this.em.createNamedQuery("Room.findAllWithTeacherControl");
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -183,7 +183,7 @@ public class RoomController extends Controller {
 			}
 		}
 		try {
-			Query query = em.createNamedQuery("Room.findAllWithFirewallControl");
+			Query query = this.em.createNamedQuery("Room.findAllWithFirewallControl");
 			for( Room room : (List<Room>) query.getResultList() ) {
 				rooms.add(room);
 			}
@@ -196,7 +196,7 @@ public class RoomController extends Controller {
 
 	public List<Room> getByType(String roomType) {
 		try {
-			Query query = em.createNamedQuery("Room.getByType").setParameter("type", roomType);
+			Query query = this.em.createNamedQuery("Room.getByType").setParameter("type", roomType);
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -208,7 +208,7 @@ public class RoomController extends Controller {
 
 	public Room getByIP(String ip) {
 		try {
-			Query query = em.createNamedQuery("Room.getByIp").setParameter("ip", ip);
+			Query query = this.em.createNamedQuery("Room.getByIp").setParameter("ip", ip);
 			return (Room) query.getResultList().get(0);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -219,7 +219,7 @@ public class RoomController extends Controller {
 
 	public Room getByName(String name) {
 		try {
-			Query query = em.createNamedQuery("Room.getByName").setParameter("name", name);
+			Query query = this.em.createNamedQuery("Room.getByName").setParameter("name", name);
 			return (Room) query.getResultList().get(0);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -238,7 +238,7 @@ public class RoomController extends Controller {
 		try {
 			if( this.isSuperuser() ) {
 				logger.debug("Is superuser" + this.session.getUser().getUid());
-				Query query = em.createNamedQuery("Room.findAllToRegister");
+				Query query = this.em.createNamedQuery("Room.findAllToRegister");
 				return query.getResultList();
 			} else {
 				List<Room> rooms = new ArrayList<Room>();
@@ -275,7 +275,7 @@ public class RoomController extends Controller {
 	 */
 	public List<Room> search(String search) {
 		try {
-			Query query = em.createNamedQuery("Device.search");
+			Query query = this.em.createNamedQuery("Device.search");
 			query.setParameter("search", search + "%");
 			return (List<Room>) query.getResultList();
 		} catch (Exception e) {
@@ -290,7 +290,7 @@ public class RoomController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "Smart Rooms can only be created by Education Controller.");
 		}
         HWConf hwconf = new HWConf();
-        CloneToolController cloneToolController = new CloneToolController(session,em);
+        CloneToolController cloneToolController = new CloneToolController(this.session,this.em);
         HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
 		logger.debug("First HWConf:" +  firstFatClient.toString());
 
@@ -349,9 +349,9 @@ public class RoomController extends Controller {
 		try {
 			logger.debug("Create Room:" + room);
 			this.beginTransaction();
-			em.persist(room);
-			em.merge(hwconf);
-			em.getTransaction().commit();
+			this.em.persist(room);
+			this.em.merge(hwconf);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("Error by creating Room:" + e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -369,7 +369,7 @@ public class RoomController extends Controller {
 		if( !this.mayModify(room) ) {
 			return new OssResponse(this.getSession(),"ERROR","You must not delete this room.");
 		}
-		DeviceController devController = new DeviceController(session,em);
+		DeviceController devController = new DeviceController(this.session,this.em);
 		if( this.isProtected(room) ) {
 			return new OssResponse(this.getSession(),"ERROR","This room must not be deleted.");
 		}
@@ -386,20 +386,20 @@ public class RoomController extends Controller {
 		List<Category> categoriesToModify = new ArrayList<Category>();
 		for( Category category : room.getCategories() ) {
 			if( category.getCategoryType().equals("samrtRoom") ) {
-				new CategoryController(session,em).delete(category);
+				new CategoryController(this.session,this.em).delete(category);
 			} else {
 				categoriesToModify.add(category);
 			}
 		}
 		try {
 			this.beginTransaction();
-			room = em.find(Room.class, roomId);
+			room = this.em.find(Room.class, roomId);
 			for(Category category : categoriesToModify) {
 				category.getRooms().remove(room);
-				em.merge(category);
+				this.em.merge(category);
 			}
-			em.remove(room);
-			em.getTransaction().commit();
+			this.em.remove(room);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -502,7 +502,7 @@ public class RoomController extends Controller {
 		if(roomNetMask < subNetwork.getNetmaskNumeric() ) {
 			throw new NumberFormatException("The network netmask must be less then the room netmask:" + roomNetMask + ">" + subNetwork.getNetmaskNumeric() );
 		}
-		Query query = em.createNamedQuery("Room.findAll");
+		Query query = this.em.createNamedQuery("Room.findAll");
 		List<Room> rooms = (List<Room>) query.getResultList();
 		String nextNet = subNetwork.getBase();
 
@@ -579,7 +579,7 @@ public class RoomController extends Controller {
 		StringBuffer error = new StringBuffer();
 
 		if(access.getAccessType().equals("ACT") ) {
-			DeviceController dc = new DeviceController(session,em);
+			DeviceController dc = new DeviceController(this.session,this.em);
 			for(Device device : room.getDevices() ) {
 				dc.manageDevice(device, access.getAction(), null);
 			}
@@ -640,7 +640,7 @@ public class RoomController extends Controller {
 
 
 	public OssResponse setDefaultAccess() {
-		Query query = em.createNamedQuery("AccessInRoom.findByType");
+		Query query = this.em.createNamedQuery("AccessInRoom.findByType");
 		query.setParameter("accessType", "DEF");
 		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
 			this.setAccessStatus(access.getRoom(), access);
@@ -654,7 +654,7 @@ public class RoomController extends Controller {
 		Calendar rightNow = Calendar.getInstance();
 		String   actTime  = String.format("%02d:%02d", rightNow.get(Calendar.HOUR_OF_DAY),rightNow.get(Calendar.MINUTE));
 		int day = rightNow.get(Calendar.DAY_OF_WEEK);
-		Query query = em.createNamedQuery("AccessInRoom.findActualAccesses");
+		Query query = this.em.createNamedQuery("AccessInRoom.findActualAccesses");
 		query.setParameter("time", actTime);
 		logger.debug("setScheduledAccess: " + actTime + " Day: " + day);
 		for( AccessInRoom access : (List<AccessInRoom>) query.getResultList() ){
@@ -795,8 +795,8 @@ public class RoomController extends Controller {
 	public OssResponse addDevices(long roomId,List<Device> devices){
 		Room room = this.getById(roomId);
 		HWConf hwconf = new HWConf();
-		DeviceController deviceController = new DeviceController(session,em);
-		CloneToolController cloneToolController = new CloneToolController(session,em);
+		DeviceController deviceController = new DeviceController(this.session,this.em);
+		CloneToolController cloneToolController = new CloneToolController(this.session,this.em);
 		HWConf firstFatClient = cloneToolController.getByType("FatClient").get(0);
 		List<String> ipAddress;
 		List<Device> newDevices = new ArrayList<Device>();
@@ -809,7 +809,7 @@ public class RoomController extends Controller {
 				ipAddress = this.getAvailableIPAddresses(roomId, 2);
 				if( device.getIp().isEmpty() ){
 					if( ipAddress.isEmpty() ) {
-						em.getTransaction().rollback();
+						this.em.getTransaction().rollback();
 						parameters.add(device.getMac());
 						return new OssResponse(this.getSession(),"ERROR",
 								"There are no more free ip addresses in this room for the MAC: %s.",room.getId(),parameters);
@@ -821,7 +821,7 @@ public class RoomController extends Controller {
 				}
 				if( !device.getWlanMac().isEmpty() ){
 					if( ipAddress.size() < 2 ) {
-						em.getTransaction().rollback();
+						this.em.getTransaction().rollback();
 						parameters.add(device.getWlanMac());
 						return new OssResponse(this.getSession(),"ERROR",
 								"There are no more free ip addresses in this room for the MAC: %s.",room.getId(),parameters);
@@ -850,21 +850,21 @@ public class RoomController extends Controller {
 				}
 				device.setHwconf(hwconf);
 				device.setRoomId(room.getId());
-				em.persist(device);
+				this.em.persist(device);
 				hwconf.getDevices().add(device);
 				room.addDevice(device);
-				em.merge(hwconf);
-				em.merge(room);
+				this.em.merge(hwconf);
+				this.em.merge(room);
 				newDevices.add(device);
 				logger.debug(device.toString());
-				em.getTransaction().commit();
+				this.em.getTransaction().commit();
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", "Error by creating the device: " + e.getMessage());
 		} finally {
 		}
-		UserController userController = new UserController(session,em);
+		UserController userController = new UserController(this.session,this.em);
 		boolean needWriteSalt = false;
 		for(Device device : newDevices) {
 			this.startPlugin("add_device", device);
@@ -888,7 +888,7 @@ public class RoomController extends Controller {
 		}
 		new DHCPConfig(session,em).Create();
 		if( needWriteSalt ) {
-			new SoftwareController(session,em).applySoftwareStateToHosts();
+			new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
 		}
 		return new OssResponse(this.getSession(),"OK", "Devices were created succesfully." );
 	}
@@ -897,12 +897,12 @@ public class RoomController extends Controller {
 	 * Deletes devices in the room
 	 */
 	public OssResponse deleteDevices(long roomId,List<Long> deviceIDs){
-		Room room = em.find(Room.class, roomId);
-		DeviceController deviceController = new DeviceController(session,em);
+		Room room = this.em.find(Room.class, roomId);
+		DeviceController deviceController = new DeviceController(this.session,this.em);
 		boolean needWriteSalt = false;
 		try {
 			for(Long deviceId : deviceIDs) {
-				Device device = em.find(Device.class, deviceId);
+				Device device = this.em.find(Device.class, deviceId);
 				if( room.getDevices().contains(device) ) {
 					if( device.getHwconf().getDeviceType().equals("FatClient")) {
 						needWriteSalt = true;
@@ -910,7 +910,7 @@ public class RoomController extends Controller {
 					deviceController.delete(device, false);
 				}
 			}
-			em.getEntityManagerFactory().getCache().evictAll();
+			this.em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -918,7 +918,7 @@ public class RoomController extends Controller {
 		}
 		new DHCPConfig(session,em).Create();
 		if( needWriteSalt ) {
-			new SoftwareController(session,em).applySoftwareStateToHosts();
+			new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
 		}
 		return new OssResponse(this.getSession(),"OK ", "Devices were deleted succesfully.");
 	}
@@ -934,7 +934,7 @@ public class RoomController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
 		}
 		Device device = new Device();
-		Room   room   = em.find(Room.class, roomId);
+		Room   room   = this.em.find(Room.class, roomId);
 		User   owner  = this.getSession().getUser();
 		HWConf hwconf = room.getHwconf();
 		logger.debug("DEVICE " + macAddress + " " + name);
@@ -949,7 +949,7 @@ public class RoomController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR","You must not register more devices in this room.");
 			}
 			if( hwconf == null ) {
-					Query query = em.createNamedQuery("HWConf.getByName");
+					Query query = this.em.createNamedQuery("HWConf.getByName");
 					query.setParameter("name", "BYOD");
 					hwconf = (HWConf) query.getResultList().get(0);
 			}
@@ -970,7 +970,7 @@ public class RoomController extends Controller {
 			logger.debug("Sysadmin register:" + device.getMac() +"#" +device.getIp() +"#" +device.getName());
 		}
 		//Check if the Device settings are OK
-		DeviceController deviceController = new DeviceController(session,em);
+		DeviceController deviceController = new DeviceController(this.session,this.em);
 		logger.debug("DEVICE " + device);
 		OssResponse ossResponse = deviceController.check(device, room);
 		if( ossResponse.getCode().equals("ERROR") ) {
@@ -979,7 +979,7 @@ public class RoomController extends Controller {
 		device.setRoom(room);
 		try {
 			this.beginTransaction();
-			em.persist(device);
+			this.em.persist(device);
 			if( hwconf != null ) {
 				if( hwconf.getDevices() != null ) {
 					hwconf.getDevices().add(device);
@@ -988,16 +988,16 @@ public class RoomController extends Controller {
 					devices.add(device);
 					hwconf.setDevices(devices);
 				}
-				em.merge(hwconf);
+				this.em.merge(hwconf);
 			}
 			room.getDevices().add(device);
-			em.merge(room);
+			this.em.merge(room);
 			if( ! owner.getRole().contains("sysadmins") ) {
 			//TODO
 				owner.getOwnedDevices().add(device);
-				em.merge(owner);
+				this.em.merge(owner);
 			}
-			em.getTransaction().commit();
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR","Error by registering: " +  e.getMessage());
@@ -1011,7 +1011,7 @@ public class RoomController extends Controller {
 
 	public HWConf getHWConf(long roomId) {
 		try {
-			return em.find(Room.class, roomId).getHwconf();
+			return this.em.find(Room.class, roomId).getHwconf();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -1022,10 +1022,10 @@ public class RoomController extends Controller {
 	public OssResponse setHWConf(long roomId, long hwConfId) {
 		try {
 			this.beginTransaction();
-			Room room = em.find(Room.class, roomId);
+			Room room = this.em.find(Room.class, roomId);
 			room.setHwconf(em.find(HWConf.class, hwConfId));
-			em.merge(room);
-			em.getTransaction().commit();
+			this.em.merge(room);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1036,7 +1036,7 @@ public class RoomController extends Controller {
 
 	public OssResponse modify(Room room){
 		Room oldRoom = this.getById(room.getId());
-		HWConf hwconf = new CloneToolController(session,em).getById(room.getHwconfId());
+		HWConf hwconf = new CloneToolController(this.session,this.em).getById(room.getHwconfId());
 		oldRoom.setDescription(room.getDescription());
 		oldRoom.setHwconf(hwconf);
 		oldRoom.setHwconfId(room.getHwconfId());
@@ -1048,12 +1048,12 @@ public class RoomController extends Controller {
 			this.beginTransaction();
 			if(oldRoom.getRoomControl().equals("no")) {
 				for( AccessInRoom o : oldRoom.getAccessInRooms() ) {
-					em.remove(o);
+					this.em.remove(o);
 				}
 				oldRoom.setAccessInRoom(null);
 			}
-			em.merge(oldRoom);
-			em.getTransaction().commit();
+			this.em.merge(oldRoom);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -1083,9 +1083,9 @@ public class RoomController extends Controller {
 		printer.getDefaultInRooms().add(room);
 		try {
 			this.beginTransaction();
-			em.merge(room);
-			em.merge(printer);
-			em.getTransaction().commit();
+			this.em.merge(room);
+			this.em.merge(printer);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -1095,13 +1095,13 @@ public class RoomController extends Controller {
 
 	public OssResponse setDefaultPrinter(Long roomId, Long deviceId) {
 		Room room = this.getById(roomId);
-		Printer printer = new PrinterController(session,em).getById(deviceId);
+		Printer printer = new PrinterController(this.session,this.em).getById(deviceId);
 		return this.setDefaultPrinter(room, printer);
 	}
 
 	public OssResponse setDefaultPrinter(String roomName, String printerName) {
 		Room room = this.getByName(roomName);
-		Printer printer = new PrinterController(session,em).getByName(printerName);
+		Printer printer = new PrinterController(this.session,this.em).getByName(printerName);
 		return this.setDefaultPrinter(room, printer);
 	}
 
@@ -1113,9 +1113,9 @@ public class RoomController extends Controller {
 			printer.getDefaultInRooms().remove(room);
 			try {
 				this.beginTransaction();
-				em.merge(room);
-				em.merge(printer);
-				em.getTransaction().commit();
+				this.em.merge(room);
+				this.em.merge(printer);
+				this.em.getTransaction().commit();
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			} finally {
@@ -1126,7 +1126,7 @@ public class RoomController extends Controller {
 
 	public OssResponse setAvailablePrinters(long roomId, List<Long> printerIds) {
 		Room room = this.getById(roomId);
-		PrinterController printerController = new PrinterController(session,em);;
+		PrinterController printerController = new PrinterController(this.session,this.em);;
 		room.setAvailablePrinters(new ArrayList<Printer>());
 		try {
 			this.beginTransaction();
@@ -1135,11 +1135,11 @@ public class RoomController extends Controller {
 				if( ! room.getAvailablePrinters().contains(printer) ) {
 					printer.getAvailableInRooms().add(room);
 					room.getAvailablePrinters().add(printer);
-					em.merge(printer);
+					this.em.merge(printer);
 				}
 			}
-			em.merge(room);
-			em.getTransaction().commit();
+			this.em.merge(room);
+			this.em.getTransaction().commit();
 
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1150,17 +1150,17 @@ public class RoomController extends Controller {
 
 	public OssResponse addAvailablePrinter(long roomId, long printerId) {
 		try {
-			Printer printer = em.find(Printer.class, printerId);
-			Room room = em.find(Room.class, roomId);
+			Printer printer = this.em.find(Printer.class, printerId);
+			Room room = this.em.find(Room.class, roomId);
 			if( room.getAvailablePrinters().contains(printer) ) {
 				return new OssResponse(this.getSession(),"OK","The printer is already assigned to room.");
 			}
 			room.getAvailablePrinters().add(printer);
 			printer.getAvailableInRooms().add(room);
 			this.beginTransaction();
-			em.merge(room);
-			em.merge(printer);
-			em.getTransaction().commit();
+			this.em.merge(room);
+			this.em.merge(printer);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -1170,17 +1170,17 @@ public class RoomController extends Controller {
 
 	public OssResponse deleteAvailablePrinter(long roomId, long printerId) {
 		try {
-			Printer printer = em.find(Printer.class, printerId);
-			Room room = em.find(Room.class, roomId);
+			Printer printer = this.em.find(Printer.class, printerId);
+			Room room = this.em.find(Room.class, roomId);
 			if( room == null || printer == null) {
 				return new OssResponse(this.getSession(),"ERROR", "Room or printer cannot be found.");
 			}
 			this.beginTransaction();
 			room.getAvailablePrinters().remove(printer);
 			printer.getAvailableInRooms().remove(room);
-			em.merge(room);
-			em.merge(printer);
-			em.getTransaction().commit();
+			this.em.merge(room);
+			this.em.merge(printer);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
@@ -1191,7 +1191,7 @@ public class RoomController extends Controller {
 	public OssResponse manageRoom(long roomId, String action, Map<String, String> actionContent) {
 		OssResponse ossResponse = null;
 		List<String> errors = new ArrayList<String>();
-		DeviceController dc = new DeviceController(session,em);
+		DeviceController dc = new DeviceController(this.session,this.em);
 		for( Device device : this.getById(roomId).getDevices() ) {
 			//Do not control the own workstation
 			if( this.session.getDevice().getId().equals(device.getId())) {
@@ -1228,8 +1228,8 @@ public class RoomController extends Controller {
 		if( changed ) {
 			try {
 				this.beginTransaction();
-				em.merge(room);
-				em.getTransaction().commit();
+				this.em.merge(room);
+				this.em.getTransaction().commit();
 			} catch (Exception e) {
 				return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 			}
@@ -1250,8 +1250,8 @@ public class RoomController extends Controller {
 				device.setPlace(coordinates.get(1));
 				try {
 					this.beginTransaction();
-					em.merge(device);
-					em.getTransaction().commit();
+					this.em.merge(device);
+					this.em.getTransaction().commit();
 				} catch (Exception e) {
 					return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 				}
@@ -1304,8 +1304,8 @@ public class RoomController extends Controller {
 				air.setRoom(room);
 				room.addAccessInRoom(air);
 			}
-			em.merge(room);
-			em.getTransaction().commit();
+			this.em.merge(room);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1316,7 +1316,7 @@ public class RoomController extends Controller {
 
 	public OssResponse addAccessList(long roomId, AccessInRoom accessList) {
 		try {
-			Room room = em.find(Room.class, roomId);
+			Room room = this.em.find(Room.class, roomId);
 			if( room.getRoomControl() != null && room.getRoomControl().equals("no") ) {
 				return new OssResponse(this.getSession(),"ERROR", "You must not set access control in a room with no room control.");
 			}
@@ -1325,10 +1325,10 @@ public class RoomController extends Controller {
 			accessList.setRoom(room);
 			accessList.setRoomId(roomId);
 			accessList.setCreator(this.session.getUser());
-			em.persist(accessList);
+			this.em.persist(accessList);
 			room.getAccessInRooms().add(accessList);
-			em.merge(room);
-			em.getTransaction().commit();
+			this.em.merge(room);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1339,16 +1339,16 @@ public class RoomController extends Controller {
 
 	public OssResponse deleteAccessList(long accessInRoomId) {
 		try {
-			AccessInRoom accessList = em.find(AccessInRoom.class, accessInRoomId);
+			AccessInRoom accessList = this.em.find(AccessInRoom.class, accessInRoomId);
 			if( !this.mayModify(accessList) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this accessList.");
 			}
 			Room room = accessList.getRoom();
 			this.beginTransaction();
 			room.getAccessInRooms().remove(accessList);
-			em.remove(accessList);
-			em.merge(room);
-			em.getTransaction().commit();
+			this.em.remove(accessList);
+			this.em.merge(room);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -1368,7 +1368,7 @@ public class RoomController extends Controller {
 			logger.error("File error:" + e.getMessage(), e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		}
-		CloneToolController   cloneToolController = new CloneToolController(session,em);
+		CloneToolController   cloneToolController = new CloneToolController(this.session,this.em);
 		Map<String,Integer> header                = new HashMap<>();
 		OssResponse ossResponse;
 		String headerLine = importFile.get(0);

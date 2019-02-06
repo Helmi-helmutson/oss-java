@@ -57,8 +57,8 @@ public class SessionController extends Controller {
 	}
 
 	public Session createSessionWithUser(String username, String password, String deviceType) {
-		UserController userController = new UserController(session,em);
-		DeviceController deviceController = new DeviceController(session,em);
+		UserController userController = new UserController(this.session,this.em);
+		DeviceController deviceController = new DeviceController(this.session,this.em);
 		Room room = null;
 		String[]   program = new String[5];
 		StringBuffer reply = new StringBuffer();
@@ -154,7 +154,7 @@ public class SessionController extends Controller {
 			}
 		}
 		if( !this.isSuperuser() ) {
-			RoomController  roomController = new RoomController(session,em);;
+			RoomController  roomController = new RoomController(this.session,this.em);;
 			if( ! roomController.getAllToRegister().isEmpty() ) {
 				modules.add("adhoclan.mydevices");
 			}
@@ -172,9 +172,9 @@ public class SessionController extends Controller {
 			try {
 				this.beginTransaction();
 				if (obj.getId() > 0) {
-					em.merge(obj);
+					this.em.merge(obj);
 				} else {
-					em.persist(obj);
+					this.em.persist(obj);
 				}
 				Device device = obj.getDevice();
 				if( device != null ) {
@@ -182,13 +182,13 @@ public class SessionController extends Controller {
 					if( ! user.getLoggedOn().contains(device) ) {
 						user.getLoggedOn().add(device);
 						device.getLoggedIn().add(user);
-						em.merge(device);
-						em.merge(user);
+						this.em.merge(device);
+						this.em.merge(user);
 					}
 				}
-				em.flush();
-				em.refresh(obj);
-				em.getTransaction().commit();
+				this.em.flush();
+				this.em.refresh(obj);
+				this.em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {
@@ -201,8 +201,8 @@ public class SessionController extends Controller {
 		if (em != null) {
 			try {
 				this.beginTransaction();
-				data = em.find(Session.class, id);
-				em.getTransaction().commit();
+				data = this.em.find(Session.class, id);
+				this.em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {
@@ -217,19 +217,19 @@ public class SessionController extends Controller {
 		if (em != null) {
 			try {
 				this.beginTransaction();
-				Session foundSession = em.find(Session.class, session.getId());
+				Session foundSession = this.em.find(Session.class, session.getId());
 				if (foundSession != null) {
 					Device device = foundSession.getDevice();
 					if( device != null ) {
 						User user = foundSession.getUser();
 						user.getLoggedOn().remove(device);
 						device.getLoggedIn().remove(user);
-						em.merge(device);
-						em.merge(user);
+						this.em.merge(device);
+						this.em.merge(user);
 					}
-					em.remove(foundSession);
+					this.em.remove(foundSession);
 				}
-				em.getTransaction().commit();
+				this.em.getTransaction().commit();
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 			} finally {
@@ -243,7 +243,7 @@ public class SessionController extends Controller {
 		Session data = null;
 		if (em != null) {
 			try {
-				Query q = em.createNamedQuery("Session.getByToken").setParameter("token", token).setMaxResults(1);
+				Query q = this.em.createNamedQuery("Session.getByToken").setParameter("token", token).setMaxResults(1);
 				List<Session> sessions = q.getResultList();
 				if ((sessions != null) && (sessions.size() > 0)) {
 					data = sessions.get(0);
@@ -292,8 +292,8 @@ public class SessionController extends Controller {
 		try {
 			this.beginTransaction();
 			session.setCreateDate(now());
-			em.merge(session);
-			em.getTransaction().commit();
+			this.em.merge(session);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {

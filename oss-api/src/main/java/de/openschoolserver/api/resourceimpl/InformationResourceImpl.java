@@ -22,95 +22,95 @@ public class InformationResourceImpl implements InformationResource {
 
 	public InformationResourceImpl() {
 		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		this.em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected void finalize()
 	{
-	   em.close();
+	   this.em.close();
 	}
 
 	@Override
 	public OssResponse addAnnouncement(Session session, Announcement announcement) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.addAnnouncement(announcement);
 	}
 
 	@Override
 	public OssResponse addContact(Session session, Contact contact) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.addContact(contact);
 	}
 
 	@Override
 	public OssResponse addFAQ(Session session, FAQ faq) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.addFAQ(faq);
 	}
 
 	@Override
 	public List<Announcement> getAnnouncements(Session session) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.getAnnouncements();
 	}
 
 	@Override
 	public List<Announcement> getNewAnnouncements(Session session) {
-		return new InformationController(session,em).getNewAnnouncements();
+		return new InformationController(session,this.em).getNewAnnouncements();
 	}
 
 	@Override
 	public OssResponse setAnnouncementHaveSeen(Session session, Long announcementId) {
-		return new InformationController(session,em).setAnnouncementHaveSeen(announcementId);
+		return new InformationController(session,this.em).setAnnouncementHaveSeen(announcementId);
 	}
 
 	@Override
 	public List<Contact> getContacts(Session session) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.getContacts();
 	}
 
 	@Override
 	public List<FAQ> getFAQs(Session session) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.getFAQs();
 	}
 
 	@Override
 	public OssResponse deleteAnnouncement(Session session, Long announcementId) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.deleteAnnouncement(announcementId);
 	}
 
 	@Override
 	public OssResponse deleteContact(Session session, Long contactId) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.deleteContact(contactId);
 	}
 
 	@Override
 	public OssResponse deleteFAQ(Session session, Long faqId) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		return infoController.deleteFAQ(faqId);
 	}
 
 	@Override
 	public OssResponse modifyAnnouncement(Session session, Long announcementId, Announcement announcement) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		announcement.setId(announcementId);
 		return infoController.modifyAnnouncement(announcement);
 	}
 
 	@Override
 	public OssResponse modifyContact(Session session, Long contactId, Contact contact) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		contact.setId(contactId);
 		return infoController.modifyContact(contact);
 	}
 
 	@Override
 	public OssResponse modifyFAQ(Session session, Long faqId, FAQ faq) {
-		InformationController infoController = new InformationController(session,em);
+		InformationController infoController = new InformationController(session,this.em);
 		faq.setId(faqId);
 		return infoController.modifyFAQ(faq);
 	}
@@ -142,21 +142,21 @@ public class InformationResourceImpl implements InformationResource {
 
 	@Override
 	public List<Category> getInformationCategories(Session session) {
-		return new InformationController(session,em).getInfoCategories();
+		return new InformationController(session,this.em).getInfoCategories();
 	}
 
 	@Override
 	public Announcement getAnnouncement(Session session, Long announcementId) {
-		return new InformationController(session,em).getAnnouncementById(announcementId);
+		return new InformationController(session,this.em).getAnnouncementById(announcementId);
 	}
 
 	@Override
 	public Contact getContact(Session session, Long contactId) {
-		return new InformationController(session,em).getContactById(contactId);
+		return new InformationController(session,this.em).getContactById(contactId);
 	}
 
 	@Override
 	public FAQ getFAQ(Session session, Long faqId) {
-		return new InformationController(session,em).getFAQById(faqId);
+		return new InformationController(session,this.em).getFAQById(faqId);
 	}
 }

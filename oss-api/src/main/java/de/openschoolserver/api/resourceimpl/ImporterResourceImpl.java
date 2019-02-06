@@ -31,12 +31,12 @@ public class ImporterResourceImpl implements ImporterResource {
 	EntityManager em;
 
 	public void ImporterResource() {
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		this.em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected void finalize()
 	{
-	   em.close();
+		this.em.close();
 	}
 
 	@Override

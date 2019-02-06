@@ -24,7 +24,7 @@ public class CategoryController extends Controller {
 
 	public List<Category> getAll() {
 		try {
-			Query query = em.createNamedQuery("Category.findAll"); 
+			Query query = this.em.createNamedQuery("Category.findAll"); 
 			return query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
@@ -35,7 +35,7 @@ public class CategoryController extends Controller {
 
 	public Category getById(long categoryId) {
 		try {
-			return em.find(Category.class, categoryId);
+			return this.em.find(Category.class, categoryId);
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -45,7 +45,7 @@ public class CategoryController extends Controller {
 
 	public List<Category> search(String search) {
 		try {
-			Query query = em.createNamedQuery("Category.search");
+			Query query = this.em.createNamedQuery("Category.search");
 			query.setParameter("search", search + "%");
 			return query.getResultList();
 		} catch (Exception e) {
@@ -58,7 +58,7 @@ public class CategoryController extends Controller {
 	public List<Category> getByType(String search) {
 		List<Category> categories = new ArrayList<Category>();
 		try {
-			Query query = em.createNamedQuery("Category.getByType").setParameter("type", search);
+			Query query = this.em.createNamedQuery("Category.getByType").setParameter("type", search);
 			for( Category c :  (List<Category>) query.getResultList() ) {
 				c.setIds();
 				categories.add(c);
@@ -72,7 +72,7 @@ public class CategoryController extends Controller {
 
 	public Category getByName(String name) {
 		try {
-			Query query = em.createNamedQuery("Category.getByName").setParameter("name", name);
+			Query query = this.em.createNamedQuery("Category.getByName").setParameter("name", name);
 			return (Category) query.getSingleResult();
 		} catch (Exception e) {
 			logger.debug(e.getMessage());
@@ -93,20 +93,20 @@ public class CategoryController extends Controller {
 		}
 		try {
 			// First we check if the parameter are unique.
-			Query query = em.createNamedQuery("Category.getByName").setParameter("name",category.getName());
+			Query query = this.em.createNamedQuery("Category.getByName").setParameter("name",category.getName());
 			if( !query.getResultList().isEmpty() ){
 				return new OssResponse(this.getSession(),"ERROR","Category name is not unique.");
 			}
 			if( !category.getDescription().isEmpty() ) {
-				query = em.createNamedQuery("Category.getByDescription").setParameter("description",category.getDescription());
+				query = this.em.createNamedQuery("Category.getByDescription").setParameter("description",category.getDescription());
 				if( !query.getResultList().isEmpty() ){
 					return new OssResponse(this.getSession(),"ERROR","Category description is not unique.");
 				}
 			}
 			category.setOwner(this.session.getUser());
 			this.beginTransaction();
-			em.persist(category);
-			em.getTransaction().commit();
+			this.em.persist(category);
+			this.em.getTransaction().commit();
 			logger.debug("Created Category:" + category );
 		} catch (Exception e) {
 			logger.error("Exeption: " + e.getMessage());
@@ -133,8 +133,8 @@ public class CategoryController extends Controller {
 		oldCategory.setPublicAccess(category.isPublicAccess());
 		try {
 			this.beginTransaction();
-			em.merge(oldCategory);
-			em.getTransaction().commit();
+			this.em.merge(oldCategory);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -153,60 +153,60 @@ public class CategoryController extends Controller {
 		// Remove group from GroupMember of table
 		try {
 			this.beginTransaction();
-			if( !em.contains(category)) {
-				category = em.merge(category);
+			if( !this.em.contains(category)) {
+				category = this.em.merge(category);
 			}
 			for(Device o : category.getDevices() ) {
 				o.getCategories().remove(category);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			for(Group o : category.getGroups() ) {
 				o.getCategories().remove(category);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			for(HWConf o : category.getHWConfs() ) {
 				o.getCategories().remove(category);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			for(Room o : category.getRooms() ) {
 				o.getCategories().remove(category);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			for(Software o : category.getSoftwares() ) {
 				o.getCategories().remove(category);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			for(User o : category.getUsers() ) {
 				o.getCategories().remove(category);
-				em.merge(o);
+				this.em.merge(o);
 			}
 			for(FAQ o : category.getFaqs() ) {
 				if( o.getCategories().size() == 1 ) {
-					em.remove(o);
+					this.em.remove(o);
 				} else {
 					o.getCategories().remove(category);
-					em.merge(o);
+					this.em.merge(o);
 				}
 			}
 			for(Contact o : category.getContacts() ) {
 				if( o.getCategories().size() == 1 ) {
-					em.remove(o);
+					this.em.remove(o);
 				} else {
 					o.getCategories().remove(category);
-					em.merge(o);
+					this.em.merge(o);
 				}
 			}
 			for(Announcement o : category.getAnnouncements() ) {
 				if( o.getCategories().size() == 1 ) {
-					em.remove(o);
+					this.em.remove(o);
 				} else {
 					o.getCategories().remove(category);
-					em.merge(o);
+					this.em.merge(o);
 				}
 			}
-			em.remove(category);
-			em.getTransaction().commit();
-			em.getEntityManagerFactory().getCache().evictAll();
+			this.em.remove(category);
+			this.em.getTransaction().commit();
+			this.em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
@@ -222,7 +222,7 @@ public class CategoryController extends Controller {
 		if( c == null ) {
 			return objectIds;
 		}
-		Query query = em.createNamedQuery(objectName + ".findAllId");
+		Query query = this.em.createNamedQuery(objectName + ".findAllId");
 		for(Long l : (List<Long>) query.getResultList() ) {
 			objectIds.add(l);
 		}
@@ -333,103 +333,103 @@ public class CategoryController extends Controller {
 	public OssResponse addMember(Long categoryId, String objectName,Long objectId ) {
 		boolean changes = false;
 		try {
-			Category category = em.find(Category.class, categoryId);
+			Category category = this.em.find(Category.class, categoryId);
 			this.beginTransaction();
 			switch(objectName.toLowerCase()){
 			case("device"):
-				Device device = em.find(Device.class, objectId);
+				Device device = this.em.find(Device.class, objectId);
 				if(!category.getDevices().contains(device)) {
 					category.getDevices().add(device);
 					category.getDeviceIds().add(device.getId());
 					device.getCategories().add(category);
-					em.merge(device);
+					this.em.merge(device);
 					changes = true;
 				}
 			break;
 			case("group"):
-				Group group = em.find(Group.class, objectId);
+				Group group = this.em.find(Group.class, objectId);
 				if(!category.getGroups().contains(group)) {
 					category.getGroups().add(group);
 					category.getGroupIds().add(group.getId());
 					group.getCategories().add(category);
-					em.merge(group);
+					this.em.merge(group);
 					changes = true;
 				}
 			break;
 			case("hwconf"):
-				HWConf hwconf = em.find(HWConf.class, objectId);
+				HWConf hwconf = this.em.find(HWConf.class, objectId);
 				if(!category.getHWConfs().contains(hwconf)) {
 					category.getHWConfs().add(hwconf);
 					category.getHWConfIds().add(hwconf.getId());
 					hwconf.getCategories().add(category);
-					em.merge(hwconf);
+					this.em.merge(hwconf);
 					changes = true;
 				}
 			break;
 			case("room"):
-				Room room = em.find(Room.class, objectId);
+				Room room = this.em.find(Room.class, objectId);
 				if(!category.getRooms().contains(room)) {
 					category.getRooms().add(room);
 					category.getRoomIds().add(room.getId());
 					room.getCategories().add(category);
-					em.merge(room);
+					this.em.merge(room);
 					changes = true;
 				}
 			break;
 			case("software"):
-				Software software = em.find(Software.class, objectId);
+				Software software = this.em.find(Software.class, objectId);
 				if(!category.getSoftwares().contains(software)) {
 					category.getSoftwares().add(software);
 					category.getSoftwareIds().add(software.getId());
 					software.getCategories().add(category);
-					em.merge(software);
+					this.em.merge(software);
 					changes = true;
 				}
 			break;
 			case("user"):
-				User user = em.find(User.class, objectId);
+				User user = this.em.find(User.class, objectId);
 				if(!category.getUsers().contains(user)) {
 					category.getUsers().add(user);
 					category.getUserIds().add(user.getId());
 					user.getCategories().add(category);
-					em.merge(user);
+					this.em.merge(user);
 					changes = true;
 				}
 			break;
 			case("faq"):
-				FAQ faq = em.find(FAQ.class, objectId);
+				FAQ faq = this.em.find(FAQ.class, objectId);
 				if(!category.getFaqs().contains(faq)) {
 					category.getFaqs().add(faq);
 					category.getFAQIds().add(faq.getId());
 					faq.getCategories().add(category);
-					em.merge(faq);
+					this.em.merge(faq);
 					changes = true;
 				}
 			break;
 			case("announcement"):
-				Announcement info = em.find(Announcement.class, objectId);
+				Announcement info = this.em.find(Announcement.class, objectId);
 				if(!category.getAnnouncements().contains(info)) {
 					category.getAnnouncements().add(info);
 					category.getAnnouncementIds().add(info.getId());
 					info.getCategories().add(category);
-					em.merge(info);
+					this.em.merge(info);
 					changes = true;
 				}
 			break;
 			case("contact"):
-				Contact contact = em.find(Contact.class, objectId);
+				Contact contact = this.em.find(Contact.class, objectId);
 				if(!category.getContacts().contains(contact)) {
 					category.getContacts().add(contact);
 					category.getContactIds().add(contact.getId());
 					contact.getCategories().add(category);
-					em.merge(contact);
+					this.em.merge(contact);
 					changes = true;
 				}
 			break;
 			}
 			if( changes ) {
-				em.merge(category);
-				em.getTransaction().commit();
+				this.em.merge(category);
+				this.em.getTransaction().commit();
 			}
 		} catch (Exception e) {
 			logger.error("addMember: " + e.getMessage());
@@ -441,88 +441,88 @@ public class CategoryController extends Controller {
 
 	public OssResponse deleteMember(Long categoryId, String objectName, Long objectId ) {
 		try {
-			Category category = em.find(Category.class, categoryId);
+			Category category = this.em.find(Category.class, categoryId);
 			logger.debug("CategoryId:" + categoryId + " Category " + category);
 			this.beginTransaction();
 			switch(objectName.toLowerCase()){
 			case("device"):
-				Device device = em.find(Device.class, objectId);
+				Device device = this.em.find(Device.class, objectId);
 				if(category.getDevices().contains(device)) {
 					category.getDevices().remove(device);
 					device.getCategories().remove(category);
-					em.merge(device);
+					this.em.merge(device);
 				}
 			break;
 			case("group"):
-				Group group = em.find(Group.class, objectId);
+				Group group = this.em.find(Group.class, objectId);
 				if(category.getGroups().contains(group)) {
 					category.getGroups().remove(group);
 					group.getCategories().remove(category);
-					em.merge(group);
+					this.em.merge(group);
 				}
 			break;
 			case("hwconf"):
-				HWConf hwconf = em.find(HWConf.class, objectId);
+				HWConf hwconf = this.em.find(HWConf.class, objectId);
 				if(category.getHWConfs().contains(hwconf)) {
 					category.getHWConfs().remove(hwconf);
 					hwconf.getCategories().remove(category);
-					em.merge(hwconf);
+					this.em.merge(hwconf);
 				}
 			break;
 			case("room"):
-				Room room = em.find(Room.class, objectId);
+				Room room = this.em.find(Room.class, objectId);
 				if(category.getRooms().contains(room)) {
 					category.getRooms().remove(room);
 					room.getCategories().remove(category);
-					em.merge(room);
+					this.em.merge(room);
 				}
 			break;
 			case("software"):
-				Software software = em.find(Software.class, objectId);
+				Software software = this.em.find(Software.class, objectId);
 			    logger.debug("Software:" + software);
 				if( category.getSoftwares().contains(software) ) {
 					category.getSoftwares().remove(software);
 					category.getRemovedSoftwares().add(software);
 					software.getCategories().remove(category);
 					software.getRemovedFromCategories().add(category);
-					em.merge(software);
+					this.em.merge(software);
 				}
 			break;
 			case("user"):
-				User user = em.find(User.class, objectId);
+				User user = this.em.find(User.class, objectId);
 				if( category.getUsers().contains(user)) {
 					category.getUsers().remove(user);
 					user.getCategories().remove(category);
-					em.merge(user);
+					this.em.merge(user);
 				}
 			break;
 			case("faq"):
-				FAQ faq = em.find(FAQ.class, objectId);
+				FAQ faq = this.em.find(FAQ.class, objectId);
 				if(category.getFaqs().contains(faq) ) {
 					category.getFaqs().remove(faq);
 					faq.getCategories().remove(category);
-					em.merge(faq);
+					this.em.merge(faq);
 				}
 			break;
 			case("announcement"):
-				Announcement info = em.find(Announcement.class, objectId);
+				Announcement info = this.em.find(Announcement.class, objectId);
 				if( category.getAnnouncements().contains(info)) {
 					category.getAnnouncements().remove(info);
 					info.getCategories().remove(category);
-					em.merge(info);
+					this.em.merge(info);
 				}
 			break;
 			case("contact"):
-				Contact contact = em.find(Contact.class, objectId);
+				Contact contact = this.em.find(Contact.class, objectId);
 				if( category.getContacts().contains(contact)) {
 					category.getContacts().remove(contact);
 					contact.getCategories().remove(category);
-					em.merge(contact);
+					this.em.merge(contact);
 				}
 			break;
 			}
-			em.merge(category);
-			em.getTransaction().commit();
+			this.em.merge(category);
+			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			logger.error("deleteMember:" +e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
