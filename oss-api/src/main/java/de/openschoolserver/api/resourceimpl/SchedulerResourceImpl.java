@@ -18,17 +18,17 @@ public class SchedulerResourceImpl implements SchedulerResource {
 
 	public SchedulerResourceImpl() {
 		super();
-		this.em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected void finalize()
 	{
-	   this.em.close();
+	   em.close();
 	}
 
 	@Override
 	public OssResponse deleteExpieredGuestUser(Session session) {
-		UserController uc = new UserController(session,this.em);
+		UserController uc = new UserController(session,em);
 		Query query = em.createNamedQuery("Category.expiredByType").setParameter("type", "guestUser");
 		Integer counter = 0;
 		for(Category category : (List<Category>) query.getResultList() ) {

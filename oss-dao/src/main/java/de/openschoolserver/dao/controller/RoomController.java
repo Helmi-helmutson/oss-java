@@ -373,14 +373,13 @@ public class RoomController extends Controller {
 		if( this.isProtected(room) ) {
 			return new OssResponse(this.getSession(),"ERROR","This room must not be deleted.");
 		}
-		List<Long> deviceIds = new ArrayList<Long>();
-		for( Device device : room.getDevices()) {
-			deviceIds.add(device.getId());
+		List<Device> toDelete = new ArrayList<Device>();
+		for( Device device : room.getDevices() ) {
+			toDelete.add(device);
 		}
-		OssResponse ossResponse = devController.delete(deviceIds);
-		//If an error happened during deleting the devices the room must not be removed.
-		if( ossResponse.getCode().equals("ERROR") ) {
-			return ossResponse;
+		for( Device device : toDelete ) {
+			logger.debug("Deleteing " + device.getName());
+			devController.delete(device, false);
 		}
 		//The categories connected to a room must handled too
 		List<Category> categoriesToModify = new ArrayList<Category>();

@@ -100,7 +100,6 @@ public class DeviceController extends Controller {
 				//TODO Evaluate the response
 				this.delete(deviceId, false);
 			}
-			this.em.getEntityManagerFactory().getCache().evictAll();
 			new DHCPConfig(session,em).Create();
 			if( needReloadSalt ) {
 				new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
@@ -119,23 +118,22 @@ public class DeviceController extends Controller {
 	 * @param atomic If it is true means no other devices will be deleted. DHCP and salt should be reloaded.
 	 * @return
 	 */
-	public OssResponse delete(Long deviceId, boolean atomic) {
+	public OssResponse delete(Device device, boolean atomic) {
 		boolean needReloadSalt = false;
-		Device device = this.em.find(Device.class, deviceId);
 		if( device == null ) {
-			return new OssResponse(this.getSession(),"ERROR", "Can not find device with id %s.",null,String.valueOf(deviceId));
+			return new OssResponse(this.getSession(),"ERROR", "Can not delete null device.");
 		}
 		User user = null;
 		try {
 			HWConf hwconf = device.getHwconf();
 			Room   room   = device.getRoom();
-			this.beginTransaction();
 			if( this.isProtected(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","This device must not be deleted.");
 			}
 			if( !this.mayModify(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
 			}
+			this.em.getTransaction().begin();
 			if(hwconf != null )
 			{
 				hwconf.getDevices().remove(device);
@@ -196,9 +194,9 @@ public class DeviceController extends Controller {
 				}
 			}
 			this.em.remove(device);
+			this.em.flush();
 			this.em.getTransaction().commit();
 			if( atomic ) {
-				this.em.getEntityManagerFactory().getCache().evictAll();
 				new DHCPConfig(session,em).Create();
 				if( needReloadSalt ) {
 					new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
@@ -223,8 +221,13 @@ public class DeviceController extends Controller {
 	 * @param atomic If it is true means no other devices will be deleted. DHCP and salt should be reloaded.
 	 * @return
 	 */
-	public OssResponse delete(Device device, boolean atomic) {
-		return this.delete(device.getId(), atomic);
+	public OssResponse delete(Long deviceId, boolean atomic) {
+
+		Device device = this.em.find(Device.class, deviceId);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "Can not find device with id %s.",null,String.valueOf(deviceId));
+		}
+		return this.delete(device, atomic);
 	}
 
 	protected OssResponse check(Device device,Room room) {
@@ -1067,6 +1070,9 @@ public class DeviceController extends Controller {
 	}
 
 	public OssResponse cleanUpLoggedIn(Device device) {
+		if( device.getLoggedIn() == null || device.getLoggedIn().isEmpty() ) {
+			return new OssResponse(this.getSession(),"OK", "No logged in user to remove.");
+		}
 		try {
 			this.beginTransaction();
 			for( User user : device.getLoggedIn() ) {
@@ -1148,7 +1154,7 @@ public class DeviceController extends Controller {
 		parameters.add(user.getUid());;
 		logger.debug("addLoggedInUser: " + device.toString());
 		logger.debug("addLoggedInUser: " + user.toString());
-		cleanUpLoggedIn(device);
+		this.cleanUpLoggedIn(device);
 		try {
 			this.beginTransaction();
 			device.setLoggedIn(new ArrayList<User>());

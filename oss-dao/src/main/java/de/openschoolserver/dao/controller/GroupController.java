@@ -131,7 +131,6 @@ public class GroupController extends Controller {
 				User user = this.em.find(User.class, this.session.getUser().getId());
 				group.setOwnerId(user.getId());
 				user.getOwnedGroups().add(group);
-				this.em.merge(user);
 			}
 			this.em.getTransaction().commit();
 			logger.debug("Created Group:" + group);

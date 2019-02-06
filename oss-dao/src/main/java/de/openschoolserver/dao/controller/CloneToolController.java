@@ -393,7 +393,6 @@ public class CloneToolController extends Controller {
 		} catch (Exception e) {
 			logger.error("getAllHWConf: " + e.getMessage());
 			return null;
-		} finally {
 		}
 	}
 

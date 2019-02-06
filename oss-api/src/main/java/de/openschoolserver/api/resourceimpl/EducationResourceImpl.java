@@ -39,48 +39,48 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	protected void finalize()
 	{
-	   this.em.close();
+	   em.close();
 	}
 
 	public EducationResourceImpl() {
 		super();
-		this.em  = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		em  = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	@Override
 	public OssResponse createSmartRoom(Session session, Category smartRoom) {
-		return new EducationController(session,this.em).createSmartRoom(smartRoom);
+		return new EducationController(session,em).createSmartRoom(smartRoom);
 	}
 
 	@Override
 	public OssResponse modifySmartRoom(Session session, Long roomId, Category smartRoom) {
-		return new EducationController(session,this.em).modifySmartRoom(roomId, smartRoom);
+		return new EducationController(session,em).modifySmartRoom(roomId, smartRoom);
 	}
 
 	@Override
 	public OssResponse deleteSmartRoom(Session session, Long roomId) {
-		return new EducationController(session,this.em).deleteSmartRoom(roomId);
+		return new EducationController(session,em).deleteSmartRoom(roomId);
 	}
 
 	@Override
 	public List<Room> getMySmartRooms(Session session) {
-		return new EducationController(session,this.em).getMySmartRooms();
+		return new EducationController(session,em).getMySmartRooms();
 
 	}
 
 	@Override
 	public List<Room> getMyRooms(Session session) {
-		return new EducationController(session,this.em).getMyRooms();
+		return new EducationController(session,em).getMyRooms();
 	}
 
 	@Override
 	public List<List<Long>> getRoom(Session session, Long roomId) {
-		return new EducationController(session,this.em).getRoom(roomId);
+		return new EducationController(session,em).getRoom(roomId);
 	}
 
 	@Override
 	public List<String> getAvailableRoomActions(Session session, Long roomId) {
-		return new EducationController(session,this.em).getAvailableRoomActions(roomId);
+		return new EducationController(session,em).getAvailableRoomActions(roomId);
 	}
 
 	@Override
@@ -90,7 +90,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		}  catch (Exception e) {
 			logger.error("EducationResourceImpl.manageRoom error:" + e.getMessage());
 		}
-		return new EducationController(session,this.em).manageRoom(roomId,action, null);
+		return new EducationController(session,em).manageRoom(roomId,action, null);
 	}
 
 	@Override
@@ -100,106 +100,106 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		}  catch (Exception e) {
 			logger.error("EducationResourceImpl.manageRoom error:" + e.getMessage());
 		}
-		return new EducationController(session,this.em).manageRoom(roomId,action, actionContent);
+		return new EducationController(session,em).manageRoom(roomId,action, actionContent);
 	}
 
 	@Override
 	public OssResponse createGroup(Session session, Group group) {
-		return new EducationController(session,this.em).createGroup(group);
+		return new EducationController(session,em).createGroup(group);
 	}
 
 	@Override
 	public OssResponse modifyGroup(Session session, Long groupId, Group group) {
-		return new EducationController(session,this.em).modifyGroup(groupId, group);
+		return new EducationController(session,em).modifyGroup(groupId, group);
 	}
 
 	@Override
 	public OssResponse deleteGroup(Session session, Long groupId) {
-		return new EducationController(session,this.em).deleteGroup(groupId);
+		return new EducationController(session,em).deleteGroup(groupId);
 	}
 
 	@Override
 	public OssResponse logOut(Session session, Long userId, Long deviceId) {
-		return new DeviceController(session,this.em).removeLoggedInUser(deviceId, userId);
+		return new DeviceController(session,em).removeLoggedInUser(deviceId, userId);
 	}
 
 	@Override
 	public OssResponse logIn(Session session, Long userId, Long deviceId) {
-		return new DeviceController(session,this.em).addLoggedInUser(deviceId, userId);
+		return new DeviceController(session,em).addLoggedInUser(deviceId, userId);
 	}
 
 	@Override
 	public List<String> getAvailableUserActions(Session session, Long userId) {
-		return new EducationController(session,this.em).getAvailableUserActions(userId);
+		return new EducationController(session,em).getAvailableUserActions(userId);
 	}
 
 	@Override
 	public List<String> getAvailableDeviceActions(Session session, Long deviceId) {
-		return new EducationController(session,this.em).getAvailableDeviceActions(deviceId);
+		return new EducationController(session,em).getAvailableDeviceActions(deviceId);
 	}
 
 	@Override
 	public OssResponse manageDevice(Session session, Long deviceId, String action) {
-		return new DeviceController(session,this.em).manageDevice(deviceId,action,null);
+		return new DeviceController(session,em).manageDevice(deviceId,action,null);
 	}
 
 	@Override
 	public OssResponse manageDevice(Session session, Long deviceId, String action, Map<String, String> actionContent) {
-		return new DeviceController(session,this.em).manageDevice(deviceId,action,actionContent);
+		return new DeviceController(session,em).manageDevice(deviceId,action,actionContent);
 	}
 
 	@Override
 	public OssResponse addUser(Session session, Long roomId, Long userId) {
-		EducationController educationController = new EducationController(session,this.em);
-		return new CategoryController(session,this.em).addMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
+		EducationController educationController = new EducationController(session,em);
+		return new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
 	}
 
 	@Override
 	public OssResponse addDevice(Session session, Long roomId, Long deviceId) {
-		EducationController educationController = new EducationController(session,this.em);
-		return new CategoryController(session,this.em).addMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
+		EducationController educationController = new EducationController(session,em);
+		return new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
 	}
 
 	@Override
 	public OssResponse deleteUser(Session session, Long roomId, Long userId) {
-		EducationController educationController = new EducationController(session,this.em);
-		return new CategoryController(session,this.em).deleteMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
+		EducationController educationController = new EducationController(session,em);
+		return new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
 	}
 
 	@Override
 	public OssResponse deleteDevice(Session session, Long roomId, Long deviceId) {
-		EducationController educationController = new EducationController(session,this.em);
-		return new CategoryController(session,this.em).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
+		EducationController educationController = new EducationController(session,em);
+		return new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
 	}
 
 	@Override
 	public OssResponse addGroup(Session session, Long roomId, Long groupId) {
-		EducationController educationController = new EducationController(session,this.em);
-		return new CategoryController(session,this.em).addMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
+		EducationController educationController = new EducationController(session,em);
+		return new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
 	}
 
 	@Override
 	public OssResponse deleteGroup(Session session, Long roomId, Long groupId) {
-		EducationController educationController = new EducationController(session,this.em);
-		return new CategoryController(session,this.em).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
+		EducationController educationController = new EducationController(session,em);
+		return new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
 	}
 
 	@Override
 	public List<OssResponse> uploadFileToRoom(Session session, Long roomId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session,this.em).uploadFileTo("room",roomId,null,fileInputStream,contentDispositionHeader,false);
+		return new EducationController(session,em).uploadFileTo("room",roomId,null,fileInputStream,contentDispositionHeader,false);
 	}
 
 	@Override
 	public OssResponse uploadFileToUser(Session session, Long userId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session,this.em).uploadFileTo("user",userId,null,fileInputStream,contentDispositionHeader,false).get(0);
+		return new EducationController(session,em).uploadFileTo("user",userId,null,fileInputStream,contentDispositionHeader,false).get(0);
 	}
 
 	@Override
 	public OssResponse uploadFileToDevice(Session session, Long deviceId, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session,this.em).uploadFileTo("device",deviceId,null,fileInputStream,contentDispositionHeader,false).get(0);
+		return new EducationController(session,em).uploadFileTo("device",deviceId,null,fileInputStream,contentDispositionHeader,false).get(0);
 	}
 
 	@Override
@@ -208,7 +208,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			boolean studentsOnly,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
-		return new EducationController(session,this.em).uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly);
+		return new EducationController(session,em).uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly);
 	}
 
 	@Override
@@ -218,7 +218,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		List<OssResponse> responses = new ArrayList<OssResponse>();
-		EducationController ec = new EducationController(session,this.em);
+		EducationController ec = new EducationController(session,em);
 		for(String sgroupId : groupIds.split(",")) {
 			Long groupId = Long.valueOf(sgroupId);
 			if( groupId != null ) {
@@ -236,14 +236,14 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			userIds.add(Long.valueOf(id));
 		}
 		logger.debug("uploadFileToUsers: " + sUserIds + " " + userIds);
-		return new EducationController(session,this.em).uploadFileTo("users",0l,userIds,fileInputStream,contentDispositionHeader,false);
+		return new EducationController(session,em).uploadFileTo("users",0l,userIds,fileInputStream,contentDispositionHeader,false);
 	}
 
 	@Override
 	public List<OssResponse> collectFileFromUsers(Session session, String projectName, boolean sortInDirs,
 			boolean cleanUpExport, String userIds) {
 		List<OssResponse> responses = new ArrayList<OssResponse>();
-		UserController userController = new UserController(session,this.em);
+		UserController userController = new UserController(session,em);
 		for( String id : userIds.split(",")) {
 			User user = userController.getById(Long.valueOf(id));
 			if( user != null ) {
@@ -255,7 +255,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse getRoomControl(Session session, Long roomId, Long minutes) {
-		return new EducationController(session,this.em).getRoomControl(roomId,minutes);
+		return new EducationController(session,em).getRoomControl(roomId,minutes);
 	}
 
 	@Override
@@ -266,7 +266,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<PositiveList> getPositiveLists(Session session) {
-		return new ProxyController(session,this.em).getAllPositiveLists();
+		return new ProxyController(session,em).getAllPositiveLists();
 	}
 
 	@Override
@@ -276,48 +276,48 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse addPositiveList(Session session, PositiveList positiveList) {
-		return new ProxyController(session,this.em).editPositiveList(positiveList);
+		return new ProxyController(session,em).editPositiveList(positiveList);
 	}
 
 	@Override
 	public PositiveList getPositiveListById(Session session, Long positiveListId) {
-		return new ProxyController(session,this.em).getPositiveList(positiveListId);
+		return new ProxyController(session,em).getPositiveList(positiveListId);
 	}
 
 	@Override
 	public OssResponse deletePositiveListById(Session session, Long positiveListId) {
-		return new ProxyController(session,this.em).deletePositiveList(positiveListId);
+		return new ProxyController(session,em).deletePositiveList(positiveListId);
 	}
 
 	@Override
 	public OssResponse activatePositiveListsInRoom(Session session, Long roomId, List<Long> positiveListIds) {
-		return new ProxyController(session,this.em).setAclsInRoom(roomId, positiveListIds);
+		return new ProxyController(session,em).setAclsInRoom(roomId, positiveListIds);
 	}
 
 	@Override
 	public OssResponse deActivatePositiveListsInRoom(Session session, Long roomId) {
-		return new ProxyController(session,this.em).deleteAclsInRoom(roomId);
+		return new ProxyController(session,em).deleteAclsInRoom(roomId);
 	}
 
 	@Override
 	public List<PositiveList> getPositiveListsInRoom(Session session, Long roomId) {
-		return new ProxyController(session,this.em).getPositiveListsInRoom(roomId);
+		return new ProxyController(session,em).getPositiveListsInRoom(roomId);
 	}
 
 	@Override
 	public Printer getDefaultPrinter(Session session, Long roomId) {
-		return new RoomController(session,this.em).getById(roomId).getDefaultPrinter();
+		return new RoomController(session,em).getById(roomId).getDefaultPrinter();
 	}
 
 	@Override
 	public List<Printer> getAvailablePrinters(Session session, Long roomId) {
-		return new RoomController(session,this.em).getById(roomId).getAvailablePrinters();
+		return new RoomController(session,em).getById(roomId).getAvailablePrinters();
 	}
 
 	@Override
 	public List<User> getUserMember(Session session, Long roomId) {
 		List<User> users = new ArrayList<User>();
-		Category category = new EducationController(session,this.em).getCategoryToRoom(roomId);
+		Category category = new EducationController(session,em).getCategoryToRoom(roomId);
 		if( category != null ) {
 			for ( User member : category.getUsers() ) {
 				users.add(member);
@@ -329,7 +329,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Group> getGroupMember(Session session, Long roomId) {
 		List<Group> groups = new ArrayList<Group>();
-		Category category = new EducationController(session,this.em).getCategoryToRoom(roomId);
+		Category category = new EducationController(session,em).getCategoryToRoom(roomId);
 		if( category != null ) {
 			for ( Group member : category.getGroups() ) {
 				groups.add(member);
@@ -341,13 +341,13 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Device> getDeviceMember(Session session, Long roomId) {
 		List<Device> devices = new ArrayList<Device>();
-		Category category  = new EducationController(session,this.em).getCategoryToRoom(roomId);
+		Category category  = new EducationController(session,em).getCategoryToRoom(roomId);
 		if( category != null ) {
 			for ( Device member : category.getDevices() ) {
 				devices.add(member);
 			}
 		} else {
-			RoomController roomController = new RoomController(session,this.em);
+			RoomController roomController = new RoomController(session,em);
 			return roomController.getDevices(roomId);
 		}
 		return devices;
@@ -355,16 +355,16 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse collectFileFromDevice(Session session, Long deviceId, String projectName) {
-		Device device = new DeviceController(session,this.em).getById(deviceId);
-		return new UserController(session,this.em).collectFile(device.getLoggedIn(), projectName);
+		Device device = new DeviceController(session,em).getById(deviceId);
+		return new UserController(session,em).collectFile(device.getLoggedIn(), projectName);
 	}
 
 	@Override
 	public List<OssResponse> collectFileFromRoom(Session session, Long roomId, String projectName, boolean sortInDirs, boolean cleanUpExport) {
-		UserController userController     = new UserController(session,this.em);
-		DeviceController deviceController = new DeviceController(session,this.em);
+		UserController userController     = new UserController(session,em);
+		DeviceController deviceController = new DeviceController(session,em);
 		List<OssResponse> responses       = new ArrayList<OssResponse>();
-		for( List<Long> logged : new EducationController(session,this.em).getRoom(roomId) ) {
+		for( List<Long> logged : new EducationController(session,em).getRoom(roomId) ) {
 			User   user   = userController.getById(logged.get(0));
 			Device device =  deviceController.getById(logged.get(1));
 			if( user == null ) {
@@ -385,8 +385,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			boolean cleanUpExport,
 			boolean studentsOnly
 			) {
-		UserController userController = new UserController(session,this.em);
-		Group          group          = new GroupController(session,this.em).getById(groupId);
+		UserController userController = new UserController(session,em);
+		Group          group          = new GroupController(session,em).getById(groupId);
 		List<OssResponse> responses   = new ArrayList<OssResponse>();
 		for( User user : group.getUsers() ) {
 			if( !studentsOnly ||  user.getRole().equals(roleStudent) || user.getRole().equals(roleGuest)) {
@@ -421,7 +421,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<OssResponse> applyAction(Session session, OssActionMap ossActionMap) {
 		List<OssResponse> responses = new ArrayList<OssResponse>();
-		UserController userController = new UserController(session,this.em);
+		UserController userController = new UserController(session,em);
 		logger.debug(ossActionMap.toString());
 		switch(ossActionMap.getName()) {
 		case "setPassword":
@@ -452,7 +452,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		case "removeProfiles":
 			return  userController.removeProfile(ossActionMap.getUserIds());
 		case "deleteUser":
-			SessionController sessionController = new SessionController(session,this.em);
+			SessionController sessionController = new SessionController(session,em);
 			if( sessionController.authorize(session,"user.delete") || sessionController.authorize(session,"student.delete") ) {
 				return  userController.deleteStudents(ossActionMap.getUserIds());
 			} else {
@@ -466,38 +466,38 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<Category> getGuestUsers(Session session) {
-		return new UserController(session,this.em).getGuestUsers();
+		return new UserController(session,em).getGuestUsers();
 	}
 
 	@Override
 	public Category getGuestUsersCategory(Session session, Long guestUsersId) {
-		return new UserController(session,this.em).getGuestUsersCategory(guestUsersId);
+		return new UserController(session,em).getGuestUsersCategory(guestUsersId);
 	}
 
 	@Override
 	public OssResponse deleteGuestUsers(Session session, Long guestUsersId) {
-		return new UserController(session,this.em).deleteGuestUsers(guestUsersId);
+		return new UserController(session,em).deleteGuestUsers(guestUsersId);
 	}
 
 	@Override
 	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
-		return new UserController(session,this.em).addGuestUsers(name, description, roomId, count, validUntil);
+		return new UserController(session,em).addGuestUsers(name, description, roomId, count, validUntil);
 	}
 
 	@Override
 	public List<Room> getGuestRooms(Session session) {
-		return new RoomController(session,this.em).getAllWithTeacherControl();
+		return new RoomController(session,em).getAllWithTeacherControl();
 	}
 
 	@Override
 	public List<User> getUsersById(Session session, List<Long> userIds) {
-		return new UserController(session,this.em).getUsers(userIds);
+		return new UserController(session,em).getUsers(userIds);
 	}
 
 	@Override
 	public Group getGroup(Session session, Long groupId) {
-		return new GroupController(session,this.em).getById(groupId);
+		return new GroupController(session,em).getById(groupId);
 	}
 
 	@Override
@@ -514,7 +514,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<Group> getMyAvailableClasses(Session session) {
 		List<Group> groups = new ArrayList<Group>();
-		for( Group group : new GroupController(session,this.em).getByType("class") ) {
+		for( Group group : new GroupController(session,em).getByType("class") ) {
 			if( !session.getUser().getGroups().contains(group)) {
 				groups.add(group);
 			}
@@ -524,15 +524,15 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public List<User> getAvailableMembers(Session session, long groupId) {
-		return new GroupController(session,this.em).getAvailableMember(groupId);
+		return new GroupController(session,em).getAvailableMember(groupId);
 	}
 
 	@Override
 	public List<User> getMembers(Session session, long groupId) {
 		List<User> users = new ArrayList<User>();
-		Group group = new GroupController(session,this.em).getById(groupId);
+		Group group = new GroupController(session,em).getById(groupId);
 		Boolean myGroup = group.getOwner().equals(session.getUser());
-		for( User user :  new GroupController(session,this.em).getMembers(groupId) ) {
+		for( User user :  new GroupController(session,em).getMembers(groupId) ) {
 			if( myGroup || user.getRole().equals(roleStudent) || user.getRole().equals(roleGuest) ) {
 				users.add(user);
 			}
@@ -542,44 +542,44 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse deleteMember(Session session, long groupId, long userId) {
-		return new GroupController(session,this.em).removeMember(groupId, userId);
+		return new GroupController(session,em).removeMember(groupId, userId);
 	}
 
 	@Override
 	public OssResponse addMember(Session session, long groupId, long userId) {
-		return new GroupController(session,this.em).addMember(groupId, userId);
+		return new GroupController(session,em).addMember(groupId, userId);
 	}
 
 	@Override
 	public AccessInRoom getAccessStatus(Session session, long roomId) {
-		return new RoomController(session,this.em).getAccessStatus(roomId);
+		return new RoomController(session,em).getAccessStatus(roomId);
 	}
 
 	@Override
 	public OssResponse setAccessStatus(Session session, long roomId, AccessInRoom access) {
-		return new RoomController(session,this.em).setAccessStatus(roomId, access);
+		return new RoomController(session,em).setAccessStatus(roomId, access);
 	}
 
 	@Override
 	public List<Device> getDevicesById(Session session, List<Long> deviceIds) {
-		return new DeviceController(session,this.em).getDevices(deviceIds);
+		return new DeviceController(session,em).getDevices(deviceIds);
 	}
 
 	@Override
 	public User getUserById(Session session, Long userId) {
-		return new UserController(session,this.em).getById(userId);
+		return new UserController(session,em).getById(userId);
 	}
 
 	@Override
 	public Device getDeviceById(Session session, Long deviceId) {
-		return new DeviceController(session,this.em).getById(deviceId);
+		return new DeviceController(session,em).getById(deviceId);
 	}
 
 	@Override
 	public List<User> getAvailableUserMember(Session session, Long roomId) {
 		List<User> members = this.getUserMember(session, roomId);
 		List<User> availableMembers = new ArrayList<User>();
-		for( User user : new UserController(session,this.em).getAll() ) {
+		for( User user : new UserController(session,em).getAll() ) {
 			if(!members.contains(user)) {
 				availableMembers.add(user);
 			}
@@ -591,7 +591,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public List<Group> getAvailableGroupMember(Session session, Long roomId) {
 		List<Group> members = this.getGroupMember(session, roomId);
 		List<Group> availableMembers = new ArrayList<Group>();
-		for( Group group : new GroupController(session,this.em).getAll() ) {
+		for( Group group : new GroupController(session,em).getAll() ) {
 			if( !members.contains(group)) {
 				availableMembers.add(group);
 			}
@@ -603,7 +603,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public List<Device> getAvailableDeviceMember(Session session, Long roomId) {
 		List<Device> members = this.getDeviceMember(session, roomId);
 		List<Device> availableMembers = new ArrayList<Device>();
-		for( Device device : new DeviceController(session,this.em).getAll() ) {
+		for( Device device : new DeviceController(session,em).getAll() ) {
 			if( !members.contains(device)) {
 				availableMembers.add(device);
 			}
@@ -613,7 +613,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse modifyDevice(Session session, Long deviceId, Device device) {
-		DeviceController deviceConrtoller = new DeviceController(session,this.em);
+		DeviceController deviceConrtoller = new DeviceController(session,em);
 		Device oldDevice = deviceConrtoller.getById(deviceId);
 		oldDevice.setRow(device.getRow());
 		oldDevice.setPlace(device.getPlace());
@@ -621,9 +621,9 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			return new OssResponse(session,"ERROR","Place is already occupied.");
 		}
 		try {
-			this.em.getTransaction().begin();
-			this.em.merge(oldDevice);
-			this.em.getTransaction().commit();
+			em.getTransaction().begin();
+			em.merge(oldDevice);
+			em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(session,"ERROR", e.getMessage());
 		}
@@ -632,9 +632,9 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public OssResponse modifyDeviceOfRoom(Session session, Long roomId, Long deviceId, Device device) {
-		Room room = new RoomController(session,this.em).getById(roomId);
+		Room room = new RoomController(session,em).getById(roomId);
 		if( (room.getCategories() != null) && (room.getCategories().size() > 0 ) && room.getCategories().get(0).getCategoryType().equals("smartRoom") ) {
-			DeviceController deviceConrtoller = new DeviceController(session,this.em);
+			DeviceController deviceConrtoller = new DeviceController(session,em);
 			Device oldDevice = deviceConrtoller.getById(deviceId);
 			return deviceConrtoller.setConfig(oldDevice, "smartRoom-" + roomId + "-coordinates", String.format("%d,%d", device.getRow(),device.getPlace()));
 		} else {
@@ -644,12 +644,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 
 	@Override
 	public SmartRoom getRoomDetails(Session session, Long roomId) {
-		return new SmartRoom(session,this.em,roomId);
+		return new SmartRoom(session,em,roomId);
 	}
 
 	@Override
 	public OssResponse manageGroup(Session session, Long groupId, String action) {
-		GroupController gc = new GroupController(session,this.em);
+		GroupController gc = new GroupController(session,em);
 		Group group = gc.getById(groupId);
 		switch(action.toLowerCase()) {
 		case "turnsmartroom":

@@ -73,8 +73,9 @@ public class Controller extends Config {
 	public void beginTransaction() {
 		while(this.em.getTransaction().isActive()) {
 			try {
-				logger.debug("beginTransaction: is active");
+				logger.debug("beginTransaction: is active" + this.em.getTransaction());
 				TimeUnit.MILLISECONDS.sleep(500);
+				this.em.getTransaction().commit();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

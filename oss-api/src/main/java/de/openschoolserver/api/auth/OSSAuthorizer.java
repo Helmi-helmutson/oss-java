@@ -24,7 +24,9 @@ public class OSSAuthorizer implements Authorizer<Session> {
 		logger.debug("authorize() Person: " + session.getUser().getUid() + ", required role category: " + requiredRole);
 		final SessionController sessionController = new SessionController(em);
 		boolean result = sessionController.authorize(session, requiredRole);
+		logger.debug("result " + result);
 		em.close();
+		logger.debug("em closed.");
 		return result;
 	}
 }

@@ -36,17 +36,17 @@ public class SupportResourceImpl implements SupportResource {
 		super();
 		String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 		isLinux = !((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0));
-		this.em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 	}
 
 	protected void finalize()
 	{
-	   this.em.close();
+	   em.close();
 	}
 
 	private void loadConf(Session session) {
 		// Session session = new SessionController().getLocalhostSession();
-		SystemController sc = new SystemController(session,this.em);
+		SystemController sc = new SystemController(session,em);
 		supportUrl = sc.getConfigValue("SUPPORT_URL");
 		if (supportUrl != null) {
 			supportUrl = supportUrl.trim();

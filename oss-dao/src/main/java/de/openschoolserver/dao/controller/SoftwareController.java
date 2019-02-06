@@ -305,7 +305,9 @@ public class SoftwareController extends Controller {
 		Query query = this.em.createNamedQuery("Software.findAll");
 		List<Software> softwares = new ArrayList<Software>();
 		for( Software software : (List<Software>)query.getResultList() ) {
-			if( ! software.getManually() ) {
+			logger.debug("Manually:" + software.getManually() );
+			if( software.getManually() != true ) {
+				software.setSourceAvailable(false);
 				logger.debug("getAllInstallable: " + software);
 				File f = new File(SALT_SOURCE_DIR + software.getName() );
 				if( f.exists() ) {
@@ -318,7 +320,6 @@ public class SoftwareController extends Controller {
 					}
 					if( count > 0 ) {
 						software.setSourceAvailable(true);
-						softwares.add(software);
 					}
 					logger.debug("count:" + count );
 				} else {
@@ -326,9 +327,9 @@ public class SoftwareController extends Controller {
 					f = new File(SALT_PACKAGE_DIR + software.getName() + ".sls" );
 					if( f.exists() ) {
 						software.setSourceAvailable(true);
-						softwares.add(software);
 					}
 				}
+				softwares.add(software);
 			}
 		}
 		return softwares;
@@ -1201,8 +1202,7 @@ public class SoftwareController extends Controller {
 			}
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
-			logger.error("Error in setInstallUpdateOnDevice" + e.getMessage());
-		} finally {
+			logger.error("Error in setInstallUpdateOnDevice: " + device.getName() + " ERROR " + e.getMessage());
 		}
 	}
 
