@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 
-public class EducationController extends Controller {
+public class EducationController extends UserController {
 
 	Logger logger = LoggerFactory.getLogger(EducationController.class);
 
@@ -164,9 +164,8 @@ public class EducationController extends Controller {
 			/*
 			 * Add users to the smart room
 			 */
-			UserController  userController  = new UserController(this.session,this.em);
 			for( Long id : smartRoom.getUserIds()) {
-				User user = userController.getById(Long.valueOf(id));
+				User user = this.getById(Long.valueOf(id));
 				if(smartRoom.getStudentsOnly() && ! user.getRole().equals(roleStudent)){
 					continue;
 				}
@@ -354,9 +353,8 @@ public class EducationController extends Controller {
 		}
 		switch(what) {
 		case "users":
-			UserController uc = new UserController(this.session,this.em);
 			for( Long id : objectIds) {
-				User user = uc.getById(id);
+				User user = this.getById(id);
 				if( user != null ) {
 					responses.add(this.saveFileToUserImport(user, file, fileName));
 				} else {
@@ -365,7 +363,7 @@ public class EducationController extends Controller {
 			}
 			break;
 		case "user":
-			User user = new UserController(this.session,this.em).getById(objectId);
+			User user = this.getById(objectId);
 			if( user != null ) {
 				responses.add(this.saveFileToUserImport(user, file, fileName));
 			} else {
@@ -396,15 +394,14 @@ public class EducationController extends Controller {
 			}
 			break;
 		case "room":
-			UserController   userController   = new UserController(this.session,this.em);
 			DeviceController deviceController = new DeviceController(this.session,this.em);
 			for( List<Long> loggedOn : this.getRoom(objectId) ) {
-				User myUser = userController.getById(loggedOn.get(0));
+				User myUser = this.getById(loggedOn.get(0));
 				if( myUser == null ) {
 					//no user logged in we try the workstation user
 					Device dev = deviceController.getById(loggedOn.get(1));
 					if( dev != null ){
-						myUser=userController.getByUid(dev.getName());
+						myUser=this.getByUid(dev.getName());
 					}
 				}
 				if( myUser != null ) {
@@ -427,13 +424,23 @@ public class EducationController extends Controller {
 		parameters.add(fileName);
 		parameters.add(user.getUid());
 		try {
-			StringBuilder newFileName = new StringBuilder(this.getConfigValue("HOME_BASE"));
-			newFileName.append("/").append(user.getRole()).append("/").append(user.getUid()).append("/") .append("Import").append("/");
+			StringBuilder newFileName = new StringBuilder(this.getHomeDir(user));
+			//TODO make it configurable
+			if( user.getRole().equals(roleWorkstation) ) {
+				StringBuffer reply = new StringBuffer();
+				StringBuffer error = new StringBuffer();
+				String[] program   = new String[3];
+				program[0] = "/usr/bin/rm";
+				program[1] = "-rf";
+				program[2] = newFileName.toString();
+				OSSShellTools.exec(program, reply, error, null);
+			}
+			newFileName.append("Import").append("/");
 			// Create the directory first.
 			File importDir = new File( newFileName.toString() );
 			Files.createDirectories(importDir.toPath(), privatDirAttribute );
 
-			// Copy temp file to the rigth place
+			// Copy temp file to the right place
 			newFileName.append(fileName);
 			File newFile = new File( newFileName.toString() );
 			Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -507,7 +514,7 @@ public class EducationController extends Controller {
 	}
 
 	public List<String> getAvailableUserActions(long userId) {
-		User user = new UserController(this.session,this.em).getById(userId);
+		User user = this.getById(userId);
 		List<String> actions = new ArrayList<String>();
 		for( String action : this.getProperty("de.openschoolserver.dao.EducationController.UserActions").split(",") ) {
 			if(! this.checkMConfig(user, "disabledActions", action )) {
