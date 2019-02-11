@@ -227,6 +227,10 @@ public class Controller extends Config {
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.User":
 			User user = (User)object;
+			String myGroups = "";
+			for(Group g : user.getGroups()) {
+				myGroups.concat(g.getName() + " ");
+			}
 			switch(pluginName) {
 			case "add_user":
 			case "modify_user":
@@ -242,14 +246,13 @@ public class Controller extends Config {
 				if( user.isMustChange() ) {
 					data.append("mpassword: yes");
 				}
-				String myGroups = "";
-				for(Group g : user.getGroups()) {
-					myGroups.concat(g.getName() + " ");
-				}
 				data.append(String.format("groups: %s%n", myGroups));
 				break;
 			case "delete_user":
 				data.append(String.format("uid: %s%n", user.getUid()));
+				data.append(String.format("uuid: %s%n", user.getUuid()));
+				data.append(String.format("role: %s%n", user.getRole()));
+				data.append(String.format("groups: %s%n", myGroups));
 				break;
 			}
 			break;
