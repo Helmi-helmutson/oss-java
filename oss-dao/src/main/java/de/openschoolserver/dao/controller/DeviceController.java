@@ -152,11 +152,9 @@ public class DeviceController extends Controller {
 				}
 				this.em.merge(owner);
 			}
-			//Clean up room
-			room.getDevices().remove(device);
-			this.em.merge(room);
 			//Clean up softwareStatus
 			for( SoftwareStatus st : device.getSoftwareStatus() ) {
+				logger.debug("Deleteing software status from device:" + device.getName() +" " + st.getId());
 				this.em.remove(st);
 			}
 			//Clean up softwareLicences
@@ -194,6 +192,9 @@ public class DeviceController extends Controller {
 				}
 			}
 			this.em.remove(device);
+			//Clean up room
+			room.getDevices().remove(device);
+			this.em.merge(room);
 			this.em.flush();
 			this.em.getTransaction().commit();
 			if( atomic ) {
