@@ -47,6 +47,7 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final User user = userController.getById(userId);
+		em.close();
 		 if (user == null) {
 	            throw new WebApplicationException(404);
 		}
@@ -58,6 +59,7 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<User> users = userController.getByRole(role);
+		em.close();
 		if (users == null) {
 			throw new WebApplicationException(404);
 		}
@@ -69,6 +71,7 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<User> users = userController.getAll();
+		em.close();
 		if (users == null) {
 			throw new WebApplicationException(404);
 		}
@@ -78,14 +81,16 @@ public class UserResourceImpl implements UserResource {
 	@Override
 	public OssResponse insert(Session session, User user) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		final UserController userController = new UserController(session,em);
-		return userController.add(user);
+		OssResponse ossResponse =  new UserController(session,em).add(user);
+		em.close();
+		return ossResponse;
 	}
 
 	@Override
 	public OssResponse add(Session session, User user) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse ossResponse =  new UserController(session,em).add(user);
+		em.close();
 		if( ossResponse.getCode().equals("OK")) {
 			sync(session);
 		}
@@ -97,21 +102,25 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<OssResponse> ossResponses =  new UserController(session,em).add(users);
 		sync(session);
+		em.close();
 		return ossResponses;
 	}
 
 	@Override
 	public OssResponse delete(Session session, long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		final UserController userController = new UserController(session,em);
-		return userController.delete(userId);
+		OssResponse ossResponse = new UserController(session,em).delete(userId);
+		em.close();
+		return ossResponse;
 	}
 
 	@Override
 	public OssResponse modify(Session session, User user) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
-		return userController.modify(user);
+		OssResponse ossResponse = userController.modify(user);
+		em.close();
+		return ossResponse;
 	}
 
 	@Override
@@ -119,6 +128,7 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<User> users = userController.search(search);
+		em.close();
 		if (users == null) {
             throw new WebApplicationException(404);
 		}
@@ -130,6 +140,7 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<Group> groups = userController.getAvailableGroups(userId);
+		em.close();
 		if (groups == null) {
             throw new WebApplicationException(404);
 		}
@@ -141,6 +152,7 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<Group> groups =  userController.getGroups(userId);
+		em.close();
 		if (groups == null) {
             throw new WebApplicationException(404);
 		}
@@ -150,14 +162,18 @@ public class UserResourceImpl implements UserResource {
 	@Override
 	public OssResponse setMembers(Session session, long userId, List<Long> groupIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).setGroups(userId,groupIds);
+		OssResponse ossResponse =  new UserController(session,em).setGroups(userId,groupIds);
+		em.close();
+		return ossResponse;
 	}
 
 	@Override
 	public OssResponse removeMember(Session session, long groupId, long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final GroupController groupController = new GroupController(session,em);
-		return groupController.removeMember(groupId,userId);
+		OssResponse ossResponse = groupController.removeMember(groupId,userId);
+		em.close();
+		return ossResponse;
 	}
 
 	@Override
@@ -171,6 +187,7 @@ public class UserResourceImpl implements UserResource {
 				error.append(ossResponse.getValue()).append("<br>");
 			}
 		}
+		em.close();
 		if( error.length() > 0 ) {
 			return new OssResponse(session,"ERROR",error.toString());
 		}
@@ -181,46 +198,61 @@ public class UserResourceImpl implements UserResource {
 	public OssResponse addMember(Session session, long groupId, long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final GroupController groupController = new GroupController(session,em);
-		return groupController.addMember(groupId,userId);
+		OssResponse ossResponse = groupController.addMember(groupId,userId);
+		em.close();
+		return ossResponse;
 	}
 
 	@Override
 	public OssResponse syncFsQuotas(Session session, List<List<String>> Quotas) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
-		return userController.syncFsQuotas(Quotas);
+		OssResponse ossResponse = userController.syncFsQuotas(Quotas);
+		em.close();
+		return ossResponse;
 	}
 
 	@Override
 	public List<User> getUsers(Session session, List<Long> userIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
-		return userController.getUsers(userIds);
+		List<User> users = userController.getUsers(userIds);
+		em.close();
+		return users;
 	}
 
 	@Override
 	public String getUserAttribute(Session session, String uid, String attribute) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
+		String resp;
 		User user = userController.getByUid(uid);
 		if( user == null) {
 			return "";
 		}
 		switch(attribute.toLowerCase()) {
 		case "role":
-			return user.getRole();
+			resp = user.getRole();
+			break;
 		case "uuid":
-			return user.getUuid();
+			resp = user.getUuid();
+			break;
 		case "givenname":
-			return user.getGivenName();
+			resp = user.getGivenName();
+			break;
 		case "surname":
-			return user.getSurName();
+			resp = user.getSurName();
+			break;
+		case "home":
+			resp = userController.getHomeDir(user);
+			break;
 		case "groups":
 			List<String> groups = new ArrayList<String>();
 			for( Group group : user.getGroups() ) {
 				groups.add(group.getName());
 			}
-			return String.join(userController.getNl(), groups);
+			resp = String.join(userController.getNl(), groups);
+			break;
 		default:
 			//This is a config or mconfig. We have to merge it from the groups from actual room and from the user
 			List<String> configs = new ArrayList<String>();
@@ -254,76 +286,100 @@ public class UserResourceImpl implements UserResource {
 					configs.add(config);
 				}
 			}
-			return String.join(userController.getNl(), configs);
+			resp = String.join(userController.getNl(), configs);
 		}
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Category> getGuestUsers(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).getGuestUsers();
+		List<Category> resp = new UserController(session,em).getGuestUsers();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public Category getGuestUsersCategory(Session session, Long guestUsersId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).getGuestUsersCategory(guestUsersId);
+		Category resp = new UserController(session,em).getGuestUsersCategory(guestUsersId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteGuestUsers(Session session, Long guestUsersId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).deleteGuestUsers(guestUsersId);
+		OssResponse resp = new UserController(session,em).deleteGuestUsers(guestUsersId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).addGuestUsers(name, description, roomId, count, validUntil);
+		OssResponse resp = new UserController(session,em).addGuestUsers(name, description, roomId, count, validUntil);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public String getGroups(Session session, String userName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).getGroupsOfUser(userName,"workgroup");
+		String resp = new UserController(session,em).getGroupsOfUser(userName,"workgroup");
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public String getClasses(Session session, String userName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).getGroupsOfUser(userName,"class");
+		String resp = new UserController(session,em).getGroupsOfUser(userName,"class");
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public String addToGroup(Session session, String userName, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).addMember(groupName, userName).getCode();
+		String resp = new GroupController(session,em).addMember(groupName, userName).getCode();
+		em.close();
+		return resp;
 	}
 
 
 	@Override
 	public String addGroupToUser(Session session, String userName, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).setOwner(groupName, userName).getCode();
+		String resp = new GroupController(session,em).setOwner(groupName, userName).getCode();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public String removeFromGroup(Session session, String userName, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).removeMember(groupName, userName).getCode();
+		String resp = new GroupController(session,em).removeMember(groupName, userName).getCode();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public String delete(Session session, String userName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).delete(userName).getCode();
+		String resp = new UserController(session,em).delete(userName).getCode();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public String createUid(Session session, String givenName, String surName, Date birthDay) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).createUid(givenName,surName,birthDay);
+		String resp = new UserController(session,em).createUid(givenName,surName,birthDay);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -504,7 +560,9 @@ public class UserResourceImpl implements UserResource {
 	@Override
 	public OssResponse syncMsQuotas(Session session, List<List<String>> Quotas) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new UserController(session,em).syncMsQuotas(Quotas);
+		OssResponse resp = new UserController(session,em).syncMsQuotas(Quotas);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -515,7 +573,9 @@ public class UserResourceImpl implements UserResource {
 		for( User user : userController.getByRole(role) ) {
 			users.add(user.getUid());
 		}
-		return String.join(userController.getNl(),users);
+		String resp = String.join(userController.getNl(),users);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -528,6 +588,7 @@ public class UserResourceImpl implements UserResource {
 				groupController.addMember(group, user);
 			}
 		}
+		em.close();
 		return new OssResponse(session,"OK", "All teachers was put into all classes.");
 	}
 
@@ -539,6 +600,7 @@ public class UserResourceImpl implements UserResource {
 		for( Group group : groupController.getByType("class")) {
 			groupController.addMember(group, user);
 		}
+		em.close();
 		return new OssResponse(session,"OK", "User was put into all classes.");
 	}
 
@@ -550,6 +612,7 @@ public class UserResourceImpl implements UserResource {
 		for( Group group : groupController.getByType("class")) {
 			groupController.addMember(group, user);
 		}
+		em.close();
 		return "OK";
 	}
 
