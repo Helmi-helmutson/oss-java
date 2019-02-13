@@ -828,4 +828,44 @@ public interface SystemResource {
 		@ApiParam(hidden = true) @Auth Session session,
 		@FormDataParam("path")   String  path
 	);
+
+	@GET
+	@Path("addon")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets the list of available addon.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")
+	})
+	@RolesAllowed("system.addons")
+	List<String> getAddOns(
+			@ApiParam(hidden = true) @Auth Session session
+	);
+
+	@PUT
+	@Path("addon/{name}/{action}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Executes an action for an addon.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")
+	})
+	@RolesAllowed("system.addons")
+	OssResponse applyActionForAddon(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("name")	String name,
+			@PathParam("action")	String action
+	);
+
+	@GET
+	@Path("addon/{name}/{key}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets some data from an addon.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")
+	})
+	@RolesAllowed("system.addons")
+	String[] getDataFromAddon(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("name")	String name,
+			@PathParam("key")	String key
+	);
 }
