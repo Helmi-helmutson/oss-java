@@ -954,7 +954,7 @@ public class RoomController extends Controller {
 					hwconf = (HWConf) query.getResultList().get(0);
 			}
 			device.setMac(macAddress);
-			device.setName(name + "-" + owner.getUid().replaceAll("_", "-").replaceAll("\\.", ""));
+			device.setName(name.toLowerCase().trim() + "-" + owner.getUid().replaceAll("_", "-").replaceAll("\\.", ""));
 			device.setIp(ipAddress.get(0).split(" ")[0]);
 			device.setHwconf(hwconf);
 			device.setOwner(owner);
@@ -964,7 +964,7 @@ public class RoomController extends Controller {
 			if( name.equals("nextFreeName") ) {
 				device.setName(ipAddress.get(0).split(" ")[1]);
 			} else {
-				device.setName(name);
+				device.setName(name.toLowerCase().trim());
 			}
 			device.setHwconf(room.getHwconf());
 			logger.debug("Sysadmin register:" + device.getMac() +"#" +device.getIp() +"#" +device.getName());

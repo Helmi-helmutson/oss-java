@@ -223,8 +223,8 @@ public class PrinterController extends Controller {
 		RoomController roomController = new RoomController(this.session,this.em);;
 		HWConf hwconf = new CloneToolController(this.session,this.em).getByName("Printer");
 		Device device = new Device();
-		device.setMac(mac);
-		device.setName(name.toLowerCase());
+		device.setMac(mac.trim());
+		device.setName(name.toLowerCase().trim());
 		device.setHwconfId(hwconf.getId());
 		logger.debug(hwconf.getName() + "#" + hwconf.getId() );
 		List<Device> devices = new ArrayList<Device>();
@@ -249,7 +249,7 @@ public class PrinterController extends Controller {
 			this.beginTransaction();
 			
 			printer.setDevice(device);
-			printer.setName(name.toLowerCase());
+			printer.setName(name.toLowerCase().trim());
 			this.em.persist(printer);
 			logger.debug("Created Printer: " + printer);
 			device.getPrinterQueue().add(printer);
