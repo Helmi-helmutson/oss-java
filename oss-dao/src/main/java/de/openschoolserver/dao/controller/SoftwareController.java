@@ -1048,10 +1048,14 @@ public class SoftwareController extends Controller {
 					this.em.persist(sv);
 					SoftwareStatus ss = new SoftwareStatus(d,sv,status);
 					this.em.persist(ss);
+					d.getSoftwareStatus().add(ss);
+					this.em.merge(d);
 				} else {
 					for( SoftwareVersion sv : lsv ) {
 						SoftwareStatus ss = new SoftwareStatus(d,sv,status);
 						this.em.persist(ss);
+						d.getSoftwareStatus().add(ss);
+						this.em.merge(d);
 					}
 				}
 			}
@@ -1196,8 +1200,8 @@ public class SoftwareController extends Controller {
 			}
 			if( !update && !installed ) {
 				SoftwareStatus softwareStatus = new SoftwareStatus(device,softwareVersion,"IS");
-				device.getSoftwareStatus().add(softwareStatus);
 				this.em.persist(softwareStatus);
+				device.getSoftwareStatus().add(softwareStatus);
 				this.em.merge(device);
 			}
 			this.em.getTransaction().commit();
