@@ -236,10 +236,10 @@ public class EducationController extends UserController {
 	}
 
 
-	/*
+	/**
 	 * Get the list of users which are logged in a room or smart room
 	 * If a user of a smart room is not logged on the device id is 0L;
-	 * @param  roomId The id of the wanted room.
+	 * @param roomId The id of the wanted room.
 	 * @return The id list of the logged on users: [ [ <userId>,<deviceId> ], [ <userId>, <deviceId] ... ]
 	 */
 	public List<List<Long>> getRoom(long roomId) {
@@ -424,7 +424,8 @@ public class EducationController extends UserController {
 		parameters.add(fileName);
 		parameters.add(user.getUid());
 		try {
-			StringBuilder newFileName = new StringBuilder(this.getHomeDir(user));
+			UserPrincipal owner = lookupService.lookupPrincipalByName(user.getUid());
+			String homeDir = this.getHomeDir(user);
 			//TODO make it configurable
 			if( user.getRole().equals(roleWorkstation) ) {
 				StringBuffer reply = new StringBuffer();
@@ -432,29 +433,29 @@ public class EducationController extends UserController {
 				String[] program   = new String[3];
 				program[0] = "/usr/bin/rm";
 				program[1] = "-rf";
-				program[2] = newFileName.toString();
+				program[2] = homeDir;
 				OSSShellTools.exec(program, reply, error, null);
+				File homeDirF = new File( homeDir );
+				Files.createDirectories(homeDirF.toPath(), privatDirAttribute );
+				Files.setOwner(homeDirF.toPath(), owner);
 			}
-			newFileName.append("Import").append("/");
+			String importDir = homeDir + "Import/";
 			// Create the directory first.
-			File importDir = new File( newFileName.toString() );
-			Files.createDirectories(importDir.toPath(), privatDirAttribute );
+			File importDirF = new File( importDir );
+			Files.createDirectories(importDirF.toPath(), privatDirAttribute );
 
 			// Copy temp file to the right place
-			newFileName.append(fileName);
-			File newFile = new File( newFileName.toString() );
+			File newFile = new File( importDir +  fileName );
 			Files.copy(file.toPath(), newFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
 
 			// Set owner
-			UserPrincipal owner = lookupService.lookupPrincipalByName(user.getUid());
-			Files.setOwner(importDir.toPath(), owner);
+			Files.setOwner(importDirF.toPath(), owner);
 			Files.setOwner(newFile.toPath(), owner);
 
 			//Clean up export of target
 			//TODO MAKE IT BOOLEAN
-			StringBuilder export = new StringBuilder(this.getConfigValue("HOME_BASE"));
-			export.append("/").append(user.getRole()).append("/").append(user.getUid()).append("/") .append("Export").append("/");
-			File exportDir = new File( export.toString() );
+			String export  = homeDir + "Export/";
+			File exportDir = new File( export );
 			Files.createDirectories(exportDir.toPath(), privatDirAttribute );
 			Files.setOwner(exportDir.toPath(), owner);
 			if( user.getRole().equals(roleStudent) || user.getRole().equals(roleWorkstation) || user.getRole().equals(roleGuest) ) {
