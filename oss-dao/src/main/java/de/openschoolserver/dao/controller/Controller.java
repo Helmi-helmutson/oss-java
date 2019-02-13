@@ -14,7 +14,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.*;
 import de.openschoolserver.dao.*;
-import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.controller.Config;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import java.io.File;
