@@ -50,9 +50,9 @@ public class UserController extends Controller {
 	public String getHomeDir(User user) {
 		StringBuilder homeDir = new StringBuilder(this.getConfigValue("HOME_BASE"));
 		if( this.getConfigValue("SORT_HOMES").equals("no")) {
-			homeDir.append(user.getUid()).append("/");
+			homeDir.append(user.getUid().toLowerCase()).append("/");
 		} else {
-			homeDir.append("/").append(user.getRole()).append("/").append(user.getUid()).append("/");
+			homeDir.append("/").append(user.getRole()).append("/").append(user.getUid().toLowerCase()).append("/");
 		}
 		return homeDir.toString();
 	}
