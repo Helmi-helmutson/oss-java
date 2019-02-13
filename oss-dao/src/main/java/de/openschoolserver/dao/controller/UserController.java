@@ -47,6 +47,16 @@ public class UserController extends Controller {
 		}
 	}
 
+	public String getHomeDir(User user) {
+		StringBuilder homeDir = new StringBuilder(this.getConfigValue("HOME_BASE"));
+		if( this.getConfigValue("SORT_HOMES").equals("no")) {
+			homeDir.append(user.getUid()).append("/");
+		} else {
+			homeDir.append("/").append(user.getRole()).append("/").append(user.getUid()).append("/");
+		}
+		return homeDir.toString();
+	}
+
 	public List<User> getByRole(String role) {
 		try {
 			Query query = this.em.createNamedQuery("User.getByRole");
