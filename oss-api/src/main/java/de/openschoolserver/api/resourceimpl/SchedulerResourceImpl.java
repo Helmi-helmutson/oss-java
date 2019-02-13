@@ -12,18 +12,11 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 
+@SuppressWarnings( "unchecked" )
 public class SchedulerResourceImpl implements SchedulerResource {
-
-	private EntityManager em;
 
 	public SchedulerResourceImpl() {
 		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-	}
-
-	protected void finalize()
-	{
-	   em.close();
 	}
 
 	@Override
@@ -36,6 +29,7 @@ public class SchedulerResourceImpl implements SchedulerResource {
 			uc.deleteGuestUsers(category.getId());
 			counter++;
 		}
+		em.close();
 		if( counter == 0 ) {
 			return new OssResponse(session,"OK","No guest user accounts to delete.");
 		}
