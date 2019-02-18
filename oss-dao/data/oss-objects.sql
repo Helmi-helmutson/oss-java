@@ -103,7 +103,7 @@ CREATE TABLE IF NOT EXISTS Rooms (
         description  VARCHAR(64) DEFAULT "",
         roomType     VARCHAR(16) NOT NULL,
         roomControl  VARCHAR(16) NOT NULL,
-        rows         INTEGER  DEFAULT 5,
+        `rows`       INTEGER  DEFAULT 5,
         places       INTEGER  DEFAULT 5,
         startIP      VARCHAR(16) DEFAULT NULL,
         netMask      INTEGER  DEFAULT NULL,
