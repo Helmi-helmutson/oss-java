@@ -151,7 +151,7 @@ public class CloneToolController extends Controller {
 			if( hwconf.getDeviceType() == null ||  hwconf.getDeviceType().isEmpty() ) {
 				hwconf.setDeviceType("FatClient");
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			if( hwconf.getPartitions() != null ) {
 				for( Partition partition : hwconf.getPartitions() ) {
 					partition.setId(null);
@@ -178,7 +178,7 @@ public class CloneToolController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			HWConf oldHwconf = this.em.find(HWConf.class, hwconfId);
 			if( hwconf.getPartitions() != null && hwconf.getPartitions().size() > 0 ) {
 				for( Partition partition : oldHwconf.getPartitions()) {
@@ -215,7 +215,7 @@ public class CloneToolController extends Controller {
 		hwconf.addPartition(partition);
 		partition.setHwconf(hwconf);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.persist(partition);
 			this.em.merge(hwconf);
 			this.em.getTransaction().commit();
@@ -236,7 +236,7 @@ public class CloneToolController extends Controller {
 		hwconf.addPartition(partition);
 		// First we check if the parameter are unique.
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(hwconf);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -281,7 +281,7 @@ public class CloneToolController extends Controller {
 			partition.setOs(value);
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(partition);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -296,7 +296,7 @@ public class CloneToolController extends Controller {
 
 	public OssResponse delete(Long hwconfId){
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			HWConf hwconf = this.em.find(HWConf.class, hwconfId);
 	        if( this.isProtected(hwconf)) {
 	            return new OssResponse(this.getSession(),"ERROR","This hardware configuration must not be deleted.");
@@ -335,7 +335,7 @@ public class CloneToolController extends Controller {
         }
 		hwconf.removePartition(partition);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.remove(partition);
 			this.em.merge(hwconf);
 			this.em.getTransaction().commit();
@@ -374,7 +374,7 @@ public class CloneToolController extends Controller {
 			break;
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(partition);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -553,7 +553,7 @@ public class CloneToolController extends Controller {
 			if( device == null ) {
 				return "ERROR Can not find the device.";
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for ( SoftwareStatus st : device.getSoftwareStatus() ) {
 				this.em.remove(st);
 			}
@@ -617,7 +617,7 @@ public class CloneToolController extends Controller {
 			if( oldPartition == null ) {
 				return new OssResponse(this.getSession(),"ERROR","Cannot find partition.");
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			oldPartition.setDescription(partition.getDescription());
 			oldPartition.setOs(partition.getOs());
 			oldPartition.setFormat(partition.getFormat());

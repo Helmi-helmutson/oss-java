@@ -170,7 +170,7 @@ public class SessionController extends Controller {
 	private void save(Session obj) {
 		if (em != null) {
 			try {
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				if (obj.getId() > 0) {
 					this.em.merge(obj);
 				} else {
@@ -200,7 +200,7 @@ public class SessionController extends Controller {
 		Session data = null;
 		if (em != null) {
 			try {
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				data = this.em.find(Session.class, id);
 				this.em.getTransaction().commit();
 			} catch (Exception e) {
@@ -216,7 +216,7 @@ public class SessionController extends Controller {
 	private void remove(Session session) {
 		if (em != null) {
 			try {
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				Session foundSession = this.em.find(Session.class, session.getId());
 				if (foundSession != null) {
 					Device device = foundSession.getDevice();
@@ -290,7 +290,7 @@ public class SessionController extends Controller {
 
 	public void updateSession(Session session) {
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			session.setCreateDate(now());
 			this.em.merge(session);
 			this.em.getTransaction().commit();

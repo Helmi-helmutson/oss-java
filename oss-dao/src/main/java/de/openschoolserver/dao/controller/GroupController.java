@@ -120,7 +120,7 @@ public class GroupController extends Controller {
 		}
 		group.setOwner(this.session.getUser());
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			if( group.getGroupType().equals("primary")) {
 				Enumerate enumerate = new Enumerate("role",group.getName());
 				this.em.persist(enumerate);
@@ -167,7 +167,7 @@ public class GroupController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR", errorMessage.toString());
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(oldGroup);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -197,7 +197,7 @@ public class GroupController extends Controller {
 		//Start the plugin
 		this.startPlugin("delete_group", group);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			if( !em.contains(group)) {
 				group = this.em.merge(group);
 			}
@@ -339,7 +339,7 @@ public class GroupController extends Controller {
 			}
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for( User user : usersToAdd) {
 				group.getUsers().add(user);
 				user.getGroups().add(group);
@@ -378,7 +378,7 @@ public class GroupController extends Controller {
 		}
 		user.getGroups().add(group);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(user);
 			this.em.merge(group);
 			this.em.getTransaction().commit();
@@ -434,7 +434,7 @@ public class GroupController extends Controller {
 		group.getUsers().remove(user);
 		user.getGroups().remove(group);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(user);
 			this.em.merge(group);
 			this.em.getTransaction().commit();
@@ -464,7 +464,7 @@ public class GroupController extends Controller {
 		group.setOwner(user);
 		user.getOwnedGroups().add(group);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(user);
 			this.em.merge(group);
 			this.em.getTransaction().commit();

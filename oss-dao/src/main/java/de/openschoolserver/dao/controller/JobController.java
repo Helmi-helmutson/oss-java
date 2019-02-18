@@ -83,7 +83,7 @@ public class JobController extends Controller {
 		 * Create the Job entity
 		 */
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.persist(job);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -134,7 +134,7 @@ public class JobController extends Controller {
 			Job job = this.em.find(Job.class, jobId);
 			job.setExitCode(exitCode);
 			job.setEndTime(new Timestamp(System.currentTimeMillis()));
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(job);
 			this.em.getTransaction().commit();
 		}  catch (Exception e) {
@@ -149,7 +149,7 @@ public class JobController extends Controller {
 		try {
 			Job job = this.em.find(Job.class, jobId);
 			job.setStartTime(new Timestamp(System.currentTimeMillis()));
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(job);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {

@@ -130,7 +130,7 @@ public class AdHocLanController extends Controller {
 			for( Room room : category.getRooms() ) {
 				roomController.delete(room.getId());
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for( Object o : category.getFaqs())  {
 				this.em.remove(o);
 			}

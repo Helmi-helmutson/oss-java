@@ -348,7 +348,7 @@ public class RoomController extends Controller {
 		}
 		try {
 			logger.debug("Create Room:" + room);
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.persist(room);
 			this.em.merge(hwconf);
 			this.em.getTransaction().commit();
@@ -391,7 +391,7 @@ public class RoomController extends Controller {
 			}
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			room = this.em.find(Room.class, roomId);
 			for(Category category : categoriesToModify) {
 				category.getRooms().remove(room);
@@ -804,7 +804,7 @@ public class RoomController extends Controller {
 		try {
 			for(Device device : devices) {
 				//Remove trailing and ending spaces.
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				device.setName(device.getName().trim());
 				ipAddress = this.getAvailableIPAddresses(roomId, 2);
 				if( device.getIp().isEmpty() ){
@@ -978,7 +978,7 @@ public class RoomController extends Controller {
 		}
 		device.setRoom(room);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.persist(device);
 			if( hwconf != null ) {
 				if( hwconf.getDevices() != null ) {
@@ -1021,7 +1021,7 @@ public class RoomController extends Controller {
 
 	public OssResponse setHWConf(long roomId, long hwConfId) {
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			Room room = this.em.find(Room.class, roomId);
 			room.setHwconf(em.find(HWConf.class, hwConfId));
 			this.em.merge(room);
@@ -1045,7 +1045,7 @@ public class RoomController extends Controller {
 		oldRoom.setRoomControl(room.getRoomControl());
 		oldRoom.setPlaces(room.getPlaces());
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			if(oldRoom.getRoomControl().equals("no")) {
 				for( AccessInRoom o : oldRoom.getAccessInRooms() ) {
 					this.em.remove(o);
@@ -1082,7 +1082,7 @@ public class RoomController extends Controller {
 		room.setDefaultPrinter(printer);
 		printer.getDefaultInRooms().add(room);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(room);
 			this.em.merge(printer);
 			this.em.getTransaction().commit();
@@ -1112,7 +1112,7 @@ public class RoomController extends Controller {
 			room.setDefaultPrinter(null);
 			printer.getDefaultInRooms().remove(room);
 			try {
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				this.em.merge(room);
 				this.em.merge(printer);
 				this.em.getTransaction().commit();
@@ -1129,7 +1129,7 @@ public class RoomController extends Controller {
 		PrinterController printerController = new PrinterController(this.session,this.em);;
 		room.setAvailablePrinters(new ArrayList<Printer>());
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for( Long printerId : printerIds) {
 				Printer printer = printerController.getById(printerId);
 				if( ! room.getAvailablePrinters().contains(printer) ) {
@@ -1157,7 +1157,7 @@ public class RoomController extends Controller {
 			}
 			room.getAvailablePrinters().add(printer);
 			printer.getAvailableInRooms().add(room);
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(room);
 			this.em.merge(printer);
 			this.em.getTransaction().commit();
@@ -1175,7 +1175,7 @@ public class RoomController extends Controller {
 			if( room == null || printer == null) {
 				return new OssResponse(this.getSession(),"ERROR", "Room or printer cannot be found.");
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			room.getAvailablePrinters().remove(printer);
 			printer.getAvailableInRooms().remove(room);
 			this.em.merge(room);
@@ -1227,7 +1227,7 @@ public class RoomController extends Controller {
 		}
 		if( changed ) {
 			try {
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				this.em.merge(room);
 				this.em.getTransaction().commit();
 			} catch (Exception e) {
@@ -1249,7 +1249,7 @@ public class RoomController extends Controller {
 				device.setRow(coordinates.get(0));
 				device.setPlace(coordinates.get(1));
 				try {
-					this.beginTransaction();
+					this.em.getTransaction().begin();
 					this.em.merge(device);
 					this.em.getTransaction().commit();
 				} catch (Exception e) {
@@ -1295,7 +1295,7 @@ public class RoomController extends Controller {
 	public OssResponse setAccessList(long roomId,List<AccessInRoom> AccessList){
 		Room room = this.getById(roomId);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for( AccessInRoom air : room.getAccessInRooms() ) {
 				room.removeAccessInRoome(air);
 			}
@@ -1320,7 +1320,7 @@ public class RoomController extends Controller {
 			if( room.getRoomControl() != null && room.getRoomControl().equals("no") ) {
 				return new OssResponse(this.getSession(),"ERROR", "You must not set access control in a room with no room control.");
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			accessList.correctTime();
 			accessList.setRoom(room);
 			accessList.setRoomId(roomId);
@@ -1344,7 +1344,7 @@ public class RoomController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this accessList.");
 			}
 			Room room = accessList.getRoom();
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			room.getAccessInRooms().remove(accessList);
 			this.em.remove(accessList);
 			this.em.merge(room);

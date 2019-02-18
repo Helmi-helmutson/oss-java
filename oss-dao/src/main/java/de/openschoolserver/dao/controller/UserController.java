@@ -234,7 +234,7 @@ public class UserController extends Controller {
 			}
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.persist(user);
 			this.em.merge(user);
 			this.em.getTransaction().commit();
@@ -303,7 +303,7 @@ public class UserController extends Controller {
 			return new OssResponse(this.getSession(), "ERROR", errorMessage.toString());
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(oldUser);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -346,15 +346,23 @@ public class UserController extends Controller {
 		}
 		this.startPlugin("delete_user", user);
 		//TODO make it configurable
+		//Remove the devices before doing anything else
+		if( !user.getOwnedDevices().isEmpty() ) {
+			DeviceController dc = new DeviceController(this.session,this.em);
+			List<Device> devices = user.getOwnedDevices();
+			for( Device device : devices ) {
+				dc.delete(device,false);
+			}
+			DHCPConfig dhcpConfig = new DHCPConfig(session,this.em);
+			dhcpConfig.Create();
+		}
 		User admin = getById(1L);
-		this.beginTransaction();
+		this.em.getTransaction().begin();
 		if( user.getRole().equals(roleStudent) || user.getRole().equals(roleWorkstation) ){
 			this.deleteCreatedObjects(user);
 		} else {
 			this.inheritCreatedObjects(user,admin);
 		}
-		List<Device> devices = user.getOwnedDevices();
-		boolean restartDHCP = !devices.isEmpty();
 		if (!em.contains(user)) {
 			user = this.em.merge(user);
 		}
@@ -362,18 +370,8 @@ public class UserController extends Controller {
 			group.getUsers().remove(user);
 			this.em.merge(group);
 		}
-		if( restartDHCP ) {
-			DeviceController dc = new DeviceController(this.session,this.em);;
-			for( Device device : devices ) {
-				dc.delete(device.getId(),false);
-			}
-		}
 		this.em.remove(user);
 		this.em.getTransaction().commit();
-		if (restartDHCP) {
-			DHCPConfig dhcpConfig = new DHCPConfig(session,em);
-			dhcpConfig.Create();
-		}
 		return new OssResponse(this.getSession(), "OK", "User was deleted");
 	}
 
@@ -414,7 +412,7 @@ public class UserController extends Controller {
 			}
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for (Group group : groupsToAdd) {
 				group.getUsers().add(user);
 				user.getGroups().add(group);
@@ -443,7 +441,7 @@ public class UserController extends Controller {
 	public OssResponse syncFsQuotas(List<List<String>> quotas) {
 		User user;
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for (List<String> quota : quotas) {
 				if (quota.isEmpty())
 					continue;
@@ -465,7 +463,7 @@ public class UserController extends Controller {
 	public OssResponse syncMsQuotas(List<List<String>> quotas) {
 		User user;
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for (List<String> quota : quotas) {
 				if (quota.isEmpty())
 					continue;
@@ -539,7 +537,7 @@ public class UserController extends Controller {
 				continue;
 			}
 		/* We allow it
-		 * 	if( user.getRole().equals(roleWorkstation) ) {
+		 *if( user.getRole().equals(roleWorkstation) ) {
 		 *		logger.error("resetUserPassword: Must not change workstation users password.");
 		 *		continue;
 		 *	}
@@ -852,7 +850,7 @@ public class UserController extends Controller {
 
 		group = groupController.getById(ossResponse.getObjectId());
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			category.setGroups(new ArrayList<Group>());
 			category.getGroups().add(group);
 			group.setCategories(new ArrayList<Category>());
@@ -970,7 +968,6 @@ public class UserController extends Controller {
 			for( Session o : creator.getSessions() ) {
 				this.em.remove(o);
 			}
-			this.em.merge(creator);
 			this.em.merge(newCreator);
 		} catch (Exception e) {
 			logger.error("inheritCreatedObjects:" + e.getMessage());

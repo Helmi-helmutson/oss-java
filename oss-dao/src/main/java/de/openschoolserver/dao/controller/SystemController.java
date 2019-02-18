@@ -79,7 +79,7 @@ public class SystemController extends Controller {
 		String	responseText = "Translation was created";
 		if( query.getResultList().isEmpty()) {
 			try {
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				this.em.persist(translation);
 				this.em.getTransaction().commit();
 				responseText = "Translation was updated";
@@ -89,7 +89,7 @@ public class SystemController extends Controller {
 			}
 		} else {
 			try {
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				this.em.merge(translation);
 				this.em.getTransaction().commit();
 			}  catch (Exception e) {
@@ -232,7 +232,7 @@ public class SystemController extends Controller {
 		}
 		Enumerate en = new Enumerate(type,value);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.persist(en);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -255,7 +255,7 @@ public class SystemController extends Controller {
 		Query query = this.em.createNamedQuery("Enumerate.getByType").setParameter("type", type).setParameter("value", value);
 		try {
 			Enumerate en = (Enumerate) query.getSingleResult();
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.remove(en);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -694,7 +694,7 @@ public class SystemController extends Controller {
 			oldAcl = null;
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			if( oldAcl != null ) {
 				if( acl.getAllowed() ) {
 					oldAcl.setAllowed(true);
@@ -779,7 +779,7 @@ public class SystemController extends Controller {
 			oldAcl = null;
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			if( oldAcl != null && oldAcl.getUser() != null && oldAcl.getUser().equals(user) ) {
 				logger.debug("User old to modify: " + oldAcl);
 				if( !this.hasUsersGroupAcl(user,acl)) {

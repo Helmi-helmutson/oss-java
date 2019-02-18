@@ -233,7 +233,7 @@ public class ProxyController extends Controller {
 		PositiveList oldPositiveList = this.getPositiveListById(positiveList.getId());
 		try {
 			positiveList.setOwner(session.getUser());
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			if( oldPositiveList == null ) {
 				User user = this.session.getUser();
 				int count = user.getOwnedPositiveLists().size();
@@ -267,7 +267,7 @@ public class ProxyController extends Controller {
 		PositiveList positiveList = this.getPositiveListById(positiveListId);
 		try {
 			Files.deleteIfExists(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains"));
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.remove(positiveList);
 			this.em.getTransaction().commit();
 		}  catch (Exception e) {

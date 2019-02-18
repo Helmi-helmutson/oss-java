@@ -36,7 +36,6 @@ public class PrinterController extends Controller {
 	public String getModel(String name){
 		try {
 			Pattern pattern = Pattern.compile(".NickName: \"(.*)\"");
-			logger.debug("getModel of:" + name);
 			for( String line : Files.readAllLines(Paths.get("/etc/cups/ppd/" + name + ".ppd")) ) {
 				Matcher matcher = pattern.matcher(line);
 				if( matcher.find() ) {
@@ -44,7 +43,8 @@ public class PrinterController extends Controller {
 				}
 			}
 		} catch (IOException e) {
-			logger.debug("getModel of: " + name + " ppd file not found");
+			logger.error(e.getMessage());
+			logger.debug("getModel of: " + name + " ppd file not found: /etc/cups/ppd/" + name + ".ppd" );
 		}
 		return "";
 	}
@@ -160,7 +160,7 @@ public class PrinterController extends Controller {
 			program[1] = "-x";
 			program[2] = printer.getName();
 			OSSShellTools.exec(program, reply, stderr, null);
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			printerDevice.getPrinterQueue().remove(printer);
 			this.em.remove(printer);
 			this.em.merge(printerDevice);
@@ -246,7 +246,7 @@ public class PrinterController extends Controller {
 		//Create the printer object
 		try {
 			Device device = this.em.find(Device.class, deviceId);
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			
 			printer.setDevice(device);
 			printer.setName(name.toLowerCase().trim());

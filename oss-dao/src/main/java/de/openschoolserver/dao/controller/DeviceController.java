@@ -315,7 +315,7 @@ public class DeviceController extends Controller {
 		try {
 			for(Device dev: devices){
 				dev.setOwner(session.getUser());
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				this.em.persist(dev);
 				this.em.getTransaction().commit();
 			}
@@ -603,7 +603,7 @@ public class DeviceController extends Controller {
 			if( printer == null ) {
 				return new OssResponse(this.getSession(),"ERROR", "Printer cannot be found.");
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			device.setDefaultPrinter(printer);
 			printer.getDefaultForDevices().add(device);
 			this.em.merge(device);
@@ -625,7 +625,7 @@ public class DeviceController extends Controller {
 		Printer printer = device.getDefaultPrinter();
 		if( printer != null  ) {
 			try {
-				this.beginTransaction();
+				this.em.getTransaction().begin();
 				device.setDefaultPrinter(null);
 				printer.getDefaultForDevices().remove(device);
 				this.em.merge(device);
@@ -649,7 +649,7 @@ public class DeviceController extends Controller {
 			if( device.getAvailablePrinters().contains(printer) ) {
 				return new OssResponse(this.getSession(),"OK","The printer is already assigned to device.");
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			device.getAvailablePrinters().add(printer);
 			printer.getDefaultForDevices().add(device);
 			this.em.merge(device);
@@ -669,7 +669,7 @@ public class DeviceController extends Controller {
 			if( device == null || printer == null) {
 				return new OssResponse(this.getSession(),"ERROR", "Device or printer cannot be found.");
 			}
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			device.getAvailablePrinters().remove(printer);
 			printer.getDefaultForDevices().remove(device);
 			this.em.merge(device);
@@ -718,7 +718,7 @@ public class DeviceController extends Controller {
 		logger.debug("addLoggedInUser: " + device.toString());
 		logger.debug("addLoggedInUser: " + user.toString());
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(device);
 			this.em.merge(user);
 			this.em.getTransaction().commit();
@@ -756,7 +756,7 @@ public class DeviceController extends Controller {
 		device.getLoggedIn().remove(user);
 		user.getLoggedOn().remove(device);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(device);
 			this.em.merge(user);
 			this.em.getTransaction().commit();
@@ -854,7 +854,7 @@ public class DeviceController extends Controller {
 			oldDevice.setInventary(device.getInventary());
 			oldDevice.setSerial(device.getSerial());
 			logger.debug("OLD-Device-After-Merge" + oldDevice);
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(oldDevice);
 			logger.debug("OLDHwconf " + oldHwconf + " new hw " + hwconf);
 			if( hwconf != oldHwconf) {
@@ -1027,7 +1027,7 @@ public class DeviceController extends Controller {
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.logOff";
 		case "cleanuploggedin":
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for( User user : device.getLoggedIn() ) {
 				user.getLoggedOn().remove(device);
 				this.em.merge(user);
@@ -1075,7 +1075,7 @@ public class DeviceController extends Controller {
 			return new OssResponse(this.getSession(),"OK", "No logged in user to remove.");
 		}
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			for( User user : device.getLoggedIn() ) {
 				user.getLoggedOn().remove(device);
 				this.em.merge(user);
@@ -1157,7 +1157,7 @@ public class DeviceController extends Controller {
 		logger.debug("addLoggedInUser: " + user.toString());
 		this.cleanUpLoggedIn(device);
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			device.setLoggedIn(new ArrayList<User>());
 			device.getLoggedIn().add(user);
 			user.getLoggedOn().add(device);

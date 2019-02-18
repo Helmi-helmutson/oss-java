@@ -104,7 +104,7 @@ public class CategoryController extends Controller {
 				}
 			}
 			category.setOwner(this.session.getUser());
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.persist(category);
 			this.em.getTransaction().commit();
 			logger.debug("Created Category:" + category );
@@ -132,7 +132,7 @@ public class CategoryController extends Controller {
 		oldCategory.setStudentsOnly(category.getStudentsOnly());
 		oldCategory.setPublicAccess(category.isPublicAccess());
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			this.em.merge(oldCategory);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {
@@ -152,7 +152,7 @@ public class CategoryController extends Controller {
 		}
 		// Remove group from GroupMember of table
 		try {
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			if( !this.em.contains(category)) {
 				category = this.em.merge(category);
 			}
@@ -334,7 +334,7 @@ public class CategoryController extends Controller {
 		boolean changes = false;
 		try {
 			Category category = this.em.find(Category.class, categoryId);
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			switch(objectName.toLowerCase()){
 			case("device"):
 				Device device = this.em.find(Device.class, objectId);
@@ -443,7 +443,7 @@ public class CategoryController extends Controller {
 		try {
 			Category category = this.em.find(Category.class, categoryId);
 			logger.debug("CategoryId:" + categoryId + " Category " + category);
-			this.beginTransaction();
+			this.em.getTransaction().begin();
 			switch(objectName.toLowerCase()){
 			case("device"):
 				Device device = this.em.find(Device.class, objectId);
