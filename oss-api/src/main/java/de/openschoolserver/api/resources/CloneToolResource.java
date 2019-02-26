@@ -38,7 +38,7 @@ public interface CloneToolResource {
 	@GET
 	@Path("hwconf")
 	@Produces(TEXT)
-	@ApiOperation(value = "Gets the id of the hardware configuration based on the IP-address of the session.")
+	@ApiOperation(value = "Gets the id of the hardware configuration based on the IP-address of http request.")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -53,13 +53,13 @@ public interface CloneToolResource {
 	@PUT
 	@Path("resetMinion")
 	@Produces(TEXT)
-	@ApiOperation(value = "Removes the pubkey of the minion of the session device.")
+	@ApiOperation(value = "Removes the pubkey of the minion based on the IP-address of http request..")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 404, message = "Device not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
 	String resetMinion(
-	        @ApiParam(hidden = true) @Auth Session session
+			@Context UriInfo ui,
+	        @Context HttpServletRequest req
 	);
 
 	/*
