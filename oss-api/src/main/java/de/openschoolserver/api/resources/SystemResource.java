@@ -640,6 +640,19 @@ public interface SystemResource {
 	    Acl acl
 	);
 
+	@DELETE
+	@Path("acls/groups/{groupId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Removes all ACLs of a group.")
+	@ApiResponses(value = {
+	    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("system.acls")
+	OssResponse deleteAclsOfGroup(
+	    @ApiParam(hidden = true) @Auth Session session,
+	    @PathParam("groupId") Long groupId
+	);
+
 	@GET
 	@Path("acls/users/{userId}/available")
 	@Produces(JSON_UTF8)
@@ -678,6 +691,19 @@ public interface SystemResource {
 	    @ApiParam(hidden = true) @Auth Session session,
 	    @PathParam("userId") Long userId,
 	    Acl acl
+	);
+
+	@DELETE
+	@Path("acls/user/{userId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Removes all ACLs of a user.")
+	@ApiResponses(value = {
+	    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("system.acls")
+	OssResponse deleteAclsOfUser(
+	    @ApiParam(hidden = true) @Auth Session session,
+	    @PathParam("userId") Long userId
 	);
 
 	/**
