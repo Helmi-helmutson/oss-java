@@ -25,75 +25,97 @@ public class InformationResourceImpl implements InformationResource {
 	public OssResponse addAnnouncement(Session session, Announcement announcement) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.addAnnouncement(announcement);
+		OssResponse resp = infoController.addAnnouncement(announcement);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addContact(Session session, Contact contact) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.addContact(contact);
+		OssResponse resp = infoController.addContact(contact);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addFAQ(Session session, FAQ faq) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.addFAQ(faq);
+		OssResponse resp = infoController.addFAQ(faq);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Announcement> getAnnouncements(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.getAnnouncements();
+		List<Announcement> resp = infoController.getAnnouncements();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Announcement> getNewAnnouncements(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new InformationController(session,em).getNewAnnouncements();
+		List<Announcement> resp = new InformationController(session,em).getNewAnnouncements();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setAnnouncementHaveSeen(Session session, Long announcementId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new InformationController(session,em).setAnnouncementHaveSeen(announcementId);
+		OssResponse resp = new InformationController(session,em).setAnnouncementHaveSeen(announcementId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Contact> getContacts(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.getContacts();
+		List<Contact> resp = infoController.getContacts();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<FAQ> getFAQs(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.getFAQs();
+		List<FAQ> resp = infoController.getFAQs();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteAnnouncement(Session session, Long announcementId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.deleteAnnouncement(announcementId);
+		OssResponse resp = infoController.deleteAnnouncement(announcementId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteContact(Session session, Long contactId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.deleteContact(contactId);
+		OssResponse resp = infoController.deleteContact(contactId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteFAQ(Session session, Long faqId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
-		return infoController.deleteFAQ(faqId);
+		OssResponse resp = infoController.deleteFAQ(faqId);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -101,7 +123,9 @@ public class InformationResourceImpl implements InformationResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
 		announcement.setId(announcementId);
-		return infoController.modifyAnnouncement(announcement);
+		OssResponse resp = infoController.modifyAnnouncement(announcement);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -109,7 +133,9 @@ public class InformationResourceImpl implements InformationResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
 		contact.setId(contactId);
-		return infoController.modifyContact(contact);
+		OssResponse resp = infoController.modifyContact(contact);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -117,7 +143,9 @@ public class InformationResourceImpl implements InformationResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		InformationController infoController = new InformationController(session,em);
 		faq.setId(faqId);
-		return infoController.modifyFAQ(faq);
+		OssResponse resp = infoController.modifyFAQ(faq);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -148,24 +176,32 @@ public class InformationResourceImpl implements InformationResource {
 	@Override
 	public List<Category> getInformationCategories(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new InformationController(session,em).getInfoCategories();
+		List<Category> resp = new InformationController(session,em).getInfoCategories();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public Announcement getAnnouncement(Session session, Long announcementId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new InformationController(session,em).getAnnouncementById(announcementId);
+		Announcement resp = new InformationController(session,em).getAnnouncementById(announcementId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public Contact getContact(Session session, Long contactId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new InformationController(session,em).getContactById(contactId);
+		Contact resp = new InformationController(session,em).getContactById(contactId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public FAQ getFAQ(Session session, Long faqId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new InformationController(session,em).getFAQById(faqId);
+		FAQ resp = new InformationController(session,em).getFAQById(faqId);
+		em.close();
+		return resp;
 	}
 }

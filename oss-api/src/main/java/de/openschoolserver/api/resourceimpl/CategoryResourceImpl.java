@@ -21,77 +21,99 @@ public class CategoryResourceImpl implements CategoryResource {
 	public List<Category> getAll(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.getAll();
+		List<Category> resp = categoryController.getAll();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public Category getById(Session session, long categoryId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.getById(categoryId);
+		Category resp = categoryController.getById(categoryId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Long> getMember(Session session, long categoryId, String memberType) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.getMembers(categoryId,memberType);
+		List<Long> resp = categoryController.getMembers(categoryId,memberType);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Long> getAvailableMember(Session session, long categoryId, String memberType) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.getAvailableMembers(categoryId,memberType);
+		List<Long> resp = categoryController.getAvailableMembers(categoryId,memberType);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Category> search(Session session, String search) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.search(search);
+		List<Category> resp = categoryController.search(search);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse add(Session session, Category category) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.add(category);
+		OssResponse resp = categoryController.add(category);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addMember(Session session, long categoryId, String memberType, long memberId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.addMember(categoryId, memberType, memberId);
+		OssResponse resp = categoryController.addMember(categoryId, memberType, memberId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse removeMember(Session session, long categoryId, String memberType, long memberId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.deleteMember(categoryId, memberType, memberId);
+		OssResponse resp = categoryController.deleteMember(categoryId, memberType, memberId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse modify(Session session, Category category) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.modify(category);
+		OssResponse resp = categoryController.modify(category);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse delete(Session session, long categoryId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.delete(categoryId);
+		OssResponse resp = categoryController.delete(categoryId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Category> getCategories(Session session, List<Long> categoryIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.getCategories(categoryIds);
+		List<Category> resp = categoryController.getCategories(categoryIds);
+		em.close();
+		return resp;
 	}
 
 }

@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.openschoolserver.api.resources.UserResource;
+import de.openschoolserver.dao.Alias;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
@@ -354,6 +355,29 @@ public class UserResourceImpl implements UserResource {
 	public String addGroupToUser(Session session, String userName, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		String resp = new GroupController(session,em).setOwner(groupName, userName).getCode();
+		em.close();
+		return resp;
+	}
+
+	@Override
+	public String addUserAlias(Session session, String userName, String alias) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		UserController uc = new UserController(session,em);
+		String resp = "Alias not unique";
+		if( uc.isUserAliasUnique(alias) ) {
+			User user = uc.getByUid(userName);
+			if( user != null ) {
+				Alias newAlias = new Alias(user,alias);
+				em.getTransaction().begin();
+				em.persist(newAlias);
+				user.getAliases().add(newAlias);
+				em.merge(user);
+				em.getTransaction().commit();
+				resp = "Alias was created";
+			} else {
+				resp = "User can not be found";
+			}
+		}
 		em.close();
 		return resp;
 	}

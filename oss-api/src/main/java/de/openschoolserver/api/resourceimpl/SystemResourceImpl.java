@@ -25,11 +25,13 @@ import org.slf4j.LoggerFactory;
 import de.openschoolserver.api.resources.SystemResource;
 import de.openschoolserver.dao.Acl;
 import de.openschoolserver.dao.DnsRecord;
+import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Job;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.ProxyRule;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.Translation;
+import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.SystemController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
@@ -405,6 +407,25 @@ public class SystemResourceImpl implements SystemResource {
 	}
 
 	@Override
+	public OssResponse deleteAclsOfGroup(Session session, Long groupId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		Group group = em.find(Group.class, groupId);
+		OssResponse resp = new OssResponse(session,"OK","Acls was deleted succesfully.");
+		if( group != null ) {
+			em.getTransaction().begin();
+			for(Acl acl : group.getAcls() ) {
+				em.remove(acl);
+			}
+			group.setAcls(new ArrayList<Acl>());
+			em.merge(group);
+			em.getTransaction().commit();
+		} else {
+			resp = new OssResponse(session,"ERROR","Group can not be find.");
+		}
+		return resp;
+	}
+
+	@Override
 	public List<Acl> getAclsOfUser(Session session, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<Acl> resp = new SystemController(session,em).getAclsOfUser(userId);
@@ -425,6 +446,25 @@ public class SystemResourceImpl implements SystemResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<Acl> resp = new SystemController(session,em).getAvailableAclsForUser(userId);
 		em.close();
+		return resp;
+	}
+
+	@Override
+	public OssResponse deleteAclsOfUser(Session session, Long userId) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		User user = em.find(User.class, userId);
+		OssResponse resp = new OssResponse(session,"OK","Acls was deleted succesfully.");
+		if( user != null ) {
+			em.getTransaction().begin();
+			for(Acl acl : user.getAcls() ) {
+				em.remove(acl);
+			}
+			user.setAcls(new ArrayList<Acl>());
+			em.merge(user);
+			em.getTransaction().commit();
+		} else {
+			resp = new OssResponse(session,"ERROR","Group can not be find.");
+		}
 		return resp;
 	}
 
@@ -611,4 +651,5 @@ public class SystemResourceImpl implements SystemResource {
 		}
 		return res;
 	}
+
 }

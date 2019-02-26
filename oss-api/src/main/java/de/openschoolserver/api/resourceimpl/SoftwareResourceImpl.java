@@ -44,91 +44,117 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public List<Software> getAll(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.getAll();
+		List<Software> resp = softwareController.getAll();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Software> getAllInstallable(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.getAllInstallable();
+		List<Software> resp = softwareController.getAllInstallable();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public Software getById(Session session, long softwareId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.getById(softwareId);
+		Software resp = softwareController.getById(softwareId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Software> search(Session session, String search) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.search(search);
+		List<Software> resp = softwareController.search(search);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse add(Session session, Software software) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.add(software,true);
+		OssResponse resp = softwareController.add(software,true);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse modify(Session session, Software software) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.modify(software);
+		OssResponse resp = softwareController.modify(software);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse delete(Session session, long softwareId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.delete(softwareId);
+		OssResponse resp = softwareController.delete(softwareId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse apply(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.applySoftwareStateToHosts();
+		OssResponse resp = resp = softwareController.applySoftwareStateToHosts();
+		em.close();
+		return resp;
 	}
 
 
 	@Override
 	public OssResponse createInstallation(Session session, Category category) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).createInstallationCategory(category);
+		OssResponse resp = new SoftwareController(session,em).createInstallationCategory(category);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addSoftwareToInstalation(Session session, long installationId, long softwareId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.addSoftwareToCategory(softwareId,installationId);
+		OssResponse resp = softwareController.addSoftwareToCategory(softwareId,installationId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addDeviceToInstalation(Session session, long installationId, long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.addMember(installationId, "Device", deviceId);
+		OssResponse resp = categoryController.addMember(installationId, "Device", deviceId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addRoomToInstalation(Session session, long installationId, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.addMember(installationId, "Room", roomId);
+		OssResponse resp = categoryController.addMember(installationId, "Room", roomId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addHWConfToInstalation(Session session, long installationId, long hwconfId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.addMember(installationId, "HWConf", hwconfId);
+		OssResponse resp = categoryController.addMember(installationId, "HWConf", hwconfId);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -139,6 +165,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		if( ossResponse.getCode().equals("OK") ) {
 			ossResponse = this.apply(session);
 		}
+		em.close();
 		return ossResponse;
 	}
 
@@ -146,28 +173,36 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public OssResponse deleteSoftwareFromInstalation(Session session, long installationId, long softwareId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.deleteSoftwareFromCategory(softwareId,installationId);
+		OssResponse resp = softwareController.deleteSoftwareFromCategory(softwareId,installationId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteDeviceFromInstalation(Session session, long installationId, long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.deleteMember(installationId, "Device", deviceId);
+		OssResponse resp = categoryController.deleteMember(installationId, "Device", deviceId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteRoomFromInstalation(Session session, long installationId, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.deleteMember(installationId, "Room", roomId);
+		OssResponse resp = categoryController.deleteMember(installationId, "Room", roomId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteHWConfFromInstalation(Session session, long installationId, long hwconfId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		CategoryController categoryController = new CategoryController(session,em);
-		return categoryController.deleteMember(installationId, "HWConf", hwconfId);
+		OssResponse resp = categoryController.deleteMember(installationId, "HWConf", hwconfId);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -178,6 +213,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		for( Software object : category.getSoftwares() ) {
 			objects.add(new OssBaseObject(object.getId(),object.getName()));
 		}
+		em.close();
 		return objects;
 	}
 
@@ -189,6 +225,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		for( Device object : category.getDevices() ) {
 			objects.add(new OssBaseObject(object.getId(),object.getName()));
 		}
+		em.close();
 		return objects;
 	}
 
@@ -200,6 +237,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		for( Room object : category.getRooms() ) {
 			objects.add(new OssBaseObject(object.getId(),object.getName()));
 		}
+		em.close();
 		return objects;
 	}
 
@@ -211,6 +249,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		for( HWConf object : category.getHWConfs() ) {
 			objects.add(new OssBaseObject(object.getId(),object.getName()));
 		}
+		em.close();
 		return objects;
 	}
 
@@ -218,14 +257,18 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public List<Map<String, String>> getAvailable(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.getAvailableSoftware();
+		List<Map<String, String>> resp = softwareController.getAvailableSoftware();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse download(Session session, List<String> softwares) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.downloadSoftwares(softwares);
+		OssResponse resp = softwareController.downloadSoftwares(softwares);
+		em.close();
+		return resp;
 	}
 	@Override
 	public OssResponse downloadOne(Session session, String softwareName) {
@@ -233,13 +276,17 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		List<String> softwares = new ArrayList<String>();
 		softwares.add(softwareName);
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.downloadSoftwares(softwares);
+		OssResponse resp = softwareController.downloadSoftwares(softwares);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Map<String, String>> listDownloadedSoftware(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).listDownloadedSoftware();
+		List<Map<String, String>> resp = new SoftwareController(session,em).listDownloadedSoftware();
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -252,31 +299,39 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse setSoftwareInstalledOnDevice(Session session, String deviceName, Map<String, String> software) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).setSoftwareStatusOnDeviceByName(
+		OssResponse resp = new SoftwareController(session,em).setSoftwareStatusOnDeviceByName(
 				deviceName,
 				software.get("name"),
 				software.get("description"),
 				software.get("version"),
 				"I");
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public String getSoftwareLicencesOnDevice(Session session, String deviceName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		return softwareController.getSoftwareLicencesOnDevice(deviceName);
+		String resp = softwareController.getSoftwareLicencesOnDevice(deviceName);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Category> getInstallations(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new CategoryController(session,em).getByType("installation");
+		List<Category> resp = new CategoryController(session,em).getByType("installation");
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Software> getSoftwares(Session session, List<Long> softwareIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).getSoftwareStatusById(softwareIds);
+		List<Software> resp = new SoftwareController(session,em).getSoftwareStatusById(softwareIds);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -294,11 +349,13 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		softwareLicense.setValue(value);
 		softwareLicense.setCount(count);
 		softwareLicense.setLicenseType(licenseType);
-		return new SoftwareController(session,em).addLicenseToSoftware(
+		OssResponse resp = new SoftwareController(session,em).addLicenseToSoftware(
 				softwareLicense,
 				softwareId,
 				fileInputStream,
 				contentDispositionHeader);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -317,29 +374,37 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		softwareLicense.setCount(count);
 		softwareLicense.setValue(value);
 		softwareLicense.setLicenseType(licenseType);
-		return softwareController.modifySoftwareLIcense(
+		OssResponse resp = softwareController.modifySoftwareLIcense(
 				softwareLicense,fileInputStream,contentDispositionHeader);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteLicense(Session session, long licenseId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).deleteLicence(licenseId);
+		OssResponse resp = new SoftwareController(session,em).deleteLicence(licenseId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<SoftwareStatus> getSoftwareStatusOnDevice(Session session, Long deviceId, Long softwareId) {
-		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		if( softwareId == null) {
 			return this.getAllSoftwareStatusOnDevice(session, deviceId);
 		}
-		return new SoftwareController(session,em).getSoftwareStatusOnDeviceById(deviceId, softwareId);
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		List<SoftwareStatus> resp = new SoftwareController(session,em).getSoftwareStatusOnDeviceById(deviceId, softwareId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<SoftwareStatus> getAllSoftwareStatusOnDevice(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).getAllSoftwareStatusOnDeviceById(deviceId);
+		List<SoftwareStatus> resp = new SoftwareController(session,em).getAllSoftwareStatusOnDeviceById(deviceId);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -357,6 +422,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 				softwareStatus.add(st);
 			}
 		}
+		em.close();
 		return softwareStatus;
 	}
 
@@ -368,25 +434,32 @@ public class SoftwareResourceImpl implements SoftwareResource {
 			license.setUsed(license.getDevices().size());
 			licenses.add(license);
 		}
+		em.close();
 		return licenses;
 	}
 
 	@Override
 	public OssResponse addRequirements(Session session, List<String> requirement) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).addRequirements(requirement);
+		OssResponse resp = new SoftwareController(session,em).addRequirements(requirement);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addRequirements(Session session, long softwareId, long requirementId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).addRequirements(softwareId,requirementId);
+		OssResponse resp = new SoftwareController(session,em).addRequirements(softwareId,requirementId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteRequirements(Session session, long softwareId, long requirementId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).deleteRequirements(softwareId,requirementId);
+		OssResponse resp = new SoftwareController(session,em).deleteRequirements(softwareId,requirementId);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -407,6 +480,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		for( Device device : room.getDevices() ) {
 			ss.addAll(sc.getAllSoftwareStatusOnDevice(device));
 		}
+		em.close();
 		return ss;
 	}
 
@@ -419,6 +493,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		for( Device device : hwconf.getDevices() ) {
 			ss.addAll(sc.getAllSoftwareStatusOnDevice(device));
 		}
+		em.close();
 		return ss;
 	}
 
@@ -429,31 +504,40 @@ public class SoftwareResourceImpl implements SoftwareResource {
 		for( Device device : deviceController.getAll() ) {
 			deviceController.manageDevice(device, "applyState", null);
 		}
+		em.close();
 		return new OssResponse(session,"OK","Salt High State was applied on all minions.");
 	}
 
 	@Override
 	public Category getInstallation(Session session, long installationId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new CategoryController(session,em).getById(installationId);
+		Category resp = new CategoryController(session,em).getById(installationId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Map<String, String>> listUpdatesForSoftwarePackages(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).listUpdatesForSoftwarePackages();
+		List<Map<String, String>> resp = new SoftwareController(session,em).listUpdatesForSoftwarePackages();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse updatesSoftwares(Session session, List<String> softwares) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).updateSoftwares(softwares);
+		OssResponse resp = new SoftwareController(session,em).updateSoftwares(softwares);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteDownloadedSoftwares(Session session, List<String> softwares) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).deleteDownloadedSoftwares(softwares);
+		OssResponse resp = new SoftwareController(session,em).deleteDownloadedSoftwares(softwares);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -467,6 +551,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 				objects.add(new OssBaseObject(software.getId(),software.getName()));
 			}
 		}
+		em.close();
 		return objects;
 	}
 
@@ -481,6 +566,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 				objects.add(new OssBaseObject(device.getId(),device.getName()));
 			}
 		}
+		em.close();
 		return objects;
 	}
 
@@ -495,6 +581,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 				objects.add(new OssBaseObject(room.getId(),room.getName()));
 			}
 		}
+		em.close();
 		return objects;
 	}
 
@@ -509,6 +596,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 				objects.add(new OssBaseObject(hwconf.getId(),hwconf.getName()));
 			}
 		}
+		em.close();
 		return objects;
 	}
 

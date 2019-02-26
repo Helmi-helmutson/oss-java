@@ -37,6 +37,7 @@ public class RoomRescourceImpl implements RoomResource {
 	public Room getById(Session session, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Room room = new RoomController(session,em).getById(roomId);
+		em.close();
 		if (room == null) {
 			throw new WebApplicationException(404);
 		}
@@ -48,6 +49,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<Room> rooms = roomController.getAllToUse();
+		em.close();
 		return rooms;
 	}
 	
@@ -59,6 +61,7 @@ public class RoomRescourceImpl implements RoomResource {
 		for( Room room : roomController.getAllToUse() ) {
 			rooms.append(room.getName()).append(roomController.getNl());
 		}
+		em.close();
 		return rooms.toString();
 	}
 	
@@ -67,6 +70,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<Room> rooms = roomController.getAllWithControl();
+		em.close();
 		return rooms;
 	}
 	
@@ -75,6 +79,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<Room> rooms = roomController.getAllWithFirewallControl();
+		em.close();
 		return rooms;
 	}
 	
@@ -82,14 +87,18 @@ public class RoomRescourceImpl implements RoomResource {
 	public OssResponse delete(Session session, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.delete(roomId);
+		OssResponse resp = roomController.delete(roomId);
+		em.close();
+		return resp;
 	}
 	
 	@Override
 	public OssResponse add(Session session, Room room) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.add(room);
+		OssResponse resp = roomController.add(room);
+		em.close();
+		return resp;
 	}
 	
 	@Override
@@ -97,6 +106,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<String> ips = roomController.getAvailableIPAddresses(roomId);
+		em.close();
 		if ( ips == null) {
 			throw new WebApplicationException(404);
 		}
@@ -108,6 +118,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<String> ips = roomController.getAvailableIPAddresses(roomId,count);
+		em.close();
 		if ( ips == null) {
 		    throw new WebApplicationException(404);
 		}
@@ -119,6 +130,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final String nextIP = roomController.getNextRoomIP(network, netMask);
+		em.close();
 		if ( nextIP == null) {
 			throw new WebApplicationException(404);
 		}
@@ -130,6 +142,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<Map<String, String>> users = roomController.getLoggedInUsers(roomId);
+		em.close();
 		if ( users == null) {
 			throw new WebApplicationException(404);
 		}
@@ -141,6 +154,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<AccessInRoom> accesses = roomController.getAccessList(roomId);
+		em.close();
 		if ( accesses == null) {
 			throw new WebApplicationException(404);
 		}
@@ -151,27 +165,35 @@ public class RoomRescourceImpl implements RoomResource {
 	@Override
 	public OssResponse addAccessList(Session session, long roomId, AccessInRoom accessList) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).addAccessList(roomId,accessList);
+		OssResponse resp = new RoomController(session,em).addAccessList(roomId,accessList);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteAccessList(Session session, long accessInRoomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).deleteAccessList(accessInRoomId);
+		OssResponse resp = new RoomController(session,em).deleteAccessList(accessInRoomId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setScheduledAccess(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.setScheduledAccess();
+		OssResponse resp = roomController.setScheduledAccess();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setDefaultAccess(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.setDefaultAccess();
+		OssResponse resp = roomController.setDefaultAccess();
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -179,19 +201,24 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<AccessInRoom> accesses = roomController.getAccessStatus();
+		em.close();
 		return accesses;
 	}
 
 	@Override
 	public AccessInRoom getAccessStatus(Session session, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).getAccessStatus(roomId);
+		AccessInRoom resp = new RoomController(session,em).getAccessStatus(roomId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setAccessStatus(Session session, long roomId, AccessInRoom access) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).setAccessStatus(roomId, access);
+		OssResponse resp = new RoomController(session,em).setAccessStatus(roomId, access);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -199,6 +226,7 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		OssResponse ossResponse = roomController.addDevices(roomId,devices);
+		em.close();
 		return ossResponse;
 	}
 
@@ -206,14 +234,18 @@ public class RoomRescourceImpl implements RoomResource {
 	public OssResponse addDevice(Session session, long roomId, String macAddress, String name) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.addDevice(roomId,macAddress,name);
+		OssResponse resp = roomController.addDevice(roomId,macAddress,name);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteDevices(Session session, long roomId, List<Long> deviceIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.deleteDevices(roomId,deviceIds);
+		OssResponse resp = roomController.deleteDevices(roomId,deviceIds);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -229,121 +261,159 @@ public class RoomRescourceImpl implements RoomResource {
 	public List<Device> getDevices(Session session, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.getDevices(roomId);
+		List<Device> resp = roomController.getDevices(roomId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public HWConf getHwConf(Session session, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.getHWConf(roomId);
+		HWConf resp = roomController.getHWConf(roomId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setHwConf(Session session, long roomId, long hwConfId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.setHWConf(roomId,hwConfId);
+		OssResponse resp = roomController.setHWConf(roomId,hwConfId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Room> search(Session session, String search) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.search(search);
+		List<Room> resp = roomController.search(search);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Room> getRoomsToRegister(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.getAllToRegister();
+		List<Room> resp = roomController.getAllToRegister();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Room> getRooms(Session session, List<Long> roomIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		return roomController.getRooms(roomIds);
+		List<Room> resp = roomController.getRooms(roomIds);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse modify(Session session, Room room) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).modify(room);
+		OssResponse resp = new RoomController(session,em).modify(room);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setDefaultPrinter(Session session, Long roomId, Long printerIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).setDefaultPrinter(roomId, printerIds);
+		OssResponse resp = new RoomController(session,em).setDefaultPrinter(roomId, printerIds);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setDefaultPrinter(Session session, String roomName, String printerName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).setDefaultPrinter(roomName, printerName);
+		OssResponse resp = new RoomController(session,em).setDefaultPrinter(roomName, printerName);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteDefaultPrinter(Session session, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).deleteDefaultPrinter(roomId);
+		OssResponse resp = new RoomController(session,em).deleteDefaultPrinter(roomId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public Printer getDefaultPrinter(Session session, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).getById(roomId).getDefaultPrinter();
+		Printer resp = new RoomController(session,em).getById(roomId).getDefaultPrinter();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setAvailablePrinters(Session session, long roomId, List<Long> printerIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).setAvailablePrinters(roomId, printerIds);
+		OssResponse resp = new RoomController(session,em).setAvailablePrinters(roomId, printerIds);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addAvailablePrinters(Session session, long roomId, long printerId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).addAvailablePrinter(roomId, printerId);
+		OssResponse resp = new RoomController(session,em).addAvailablePrinter(roomId, printerId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse deleteAvailablePrinters(Session session, long roomId, long printerId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).deleteAvailablePrinter(roomId, printerId);
+		OssResponse resp = new RoomController(session,em).deleteAvailablePrinter(roomId, printerId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Printer> getAvailablePrinters(Session session, long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).getById(roomId).getAvailablePrinters();
+		List<Printer> resp = new RoomController(session,em).getById(roomId).getAvailablePrinters();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<String> getAvailableRoomActions(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new EducationController(session,em).getAvailableRoomActions(roomId);
+		List<String> resp = new EducationController(session,em).getAvailableRoomActions(roomId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse manageRoom(Session session, Long roomId, String action) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new EducationController(session,em).manageRoom(roomId,action, null);
+		OssResponse resp = new EducationController(session,em).manageRoom(roomId,action, null);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse manageRoom(Session session, Long roomId, String action, Map<String, String> actionContent) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new EducationController(session,em).manageRoom(roomId,action, actionContent);
+		OssResponse resp = new EducationController(session,em).manageRoom(roomId,action, actionContent);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse importRooms(Session session, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new RoomController(session,em).importRooms(fileInputStream, contentDispositionHeader);
+		OssResponse resp = new RoomController(session,em).importRooms(fileInputStream, contentDispositionHeader);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -358,6 +428,7 @@ public class RoomRescourceImpl implements RoomResource {
 		for(OSSMConfig config : roomController.getMConfigObjects(room, "dhcpOptions") ) {
 			dhcpParameters.add(config);
 		}
+		em.close();
 		return dhcpParameters;
 	}
 
@@ -380,6 +451,7 @@ public class RoomRescourceImpl implements RoomResource {
 			return ossResponse;
 		}
 		new DHCPConfig(session,em).Create();
+		em.close();
 		return new OssResponse(session,"OK","DHCP Parameter was added succesfully");
 	}
 
@@ -388,6 +460,8 @@ public class RoomRescourceImpl implements RoomResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		RoomController roomController = new RoomController(session,em);
 		Room room = roomController.getById(roomId);
-		return roomController.deleteMConfig(room,parameterId);
+		OssResponse resp = roomController.deleteMConfig(room,parameterId);
+		em.close();
+		return resp;
 	}
 }

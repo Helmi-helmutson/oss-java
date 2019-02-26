@@ -62,11 +62,14 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 				userController.startPlugin("modify_user", oldUser);
 			} catch (Exception e) {
 				return null;
+			} finally {
+				em.close();
 			}
 			ossResponse = new OssResponse(session,"OK","User parameters were set successfully.");
 		} else {
 			if( user.getPassword() != null && !user.getPassword().isEmpty() ) {
 				ossResponse = userController.checkPassword(user.getPassword());
+				em.close();
 				if( ossResponse != null  && ossResponse.getCode().equals("ERROR")) {
 					logger.debug("checkPassword:" + ossResponse);
 					return ossResponse;

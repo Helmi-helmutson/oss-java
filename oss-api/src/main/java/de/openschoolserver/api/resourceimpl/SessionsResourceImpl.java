@@ -49,6 +49,7 @@ public class SessionsResourceImpl implements SessionsResource {
 		session.setIP(req.getRemoteAddr());
 		SessionController sessionController = new SessionController(session,em);
 		session = sessionController.createSessionWithUser(username, password, device);
+		em.close();
 		if( session != null ) {
 			logger.debug(session.toString());
 		} else {
@@ -67,16 +68,17 @@ public class SessionsResourceImpl implements SessionsResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final SessionController sessionController = new SessionController(session,em);
 		if( session == null || ! session.getToken().equals(token) ) {
+			em.close();
 			logger.info("deletion of session denied " + token);
 			throw new WebApplicationException(401);
 		}
 		sessionController.deleteSession(session);
+		em.close();
 		logger.debug("deleted session " + token);
 	}
 
 	@Override
 	public String createToken(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
-		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Session session = createSession(ui, username, password, device, req);
 		if( session == null) {
 			return "";
@@ -92,36 +94,43 @@ public class SessionsResourceImpl implements SessionsResource {
 		List<Printer> availablePrinters = null;
 		List<String> data = new ArrayList<String>();
 		final SessionController sessionController = new SessionController(session,em);
-		switch(key) {
-		case "defaultPrinter":
-			if( session.getDevice() != null )
+		String resp = "";
+		switch(key.toLowerCase()) {
+		case "defaultprinter":
+			if( session.getDevice() != null ) {
 				defaultPrinter = session.getDevice().getDefaultPrinter();
-			if( defaultPrinter != null )
-				return defaultPrinter.getName();
-			defaultPrinter = session.getRoom().getDefaultPrinter();
-			if( defaultPrinter != null )
-				return defaultPrinter.getName();
-			break;
-		case "availablePrinters":
-			if( session.getDevice() != null)
-				availablePrinters = session.getDevice().getAvailablePrinters();
-			if( availablePrinters == null )
-				availablePrinters = session.getRoom().getAvailablePrinters();
-			if( availablePrinters != null ) {
-				for( Printer printer : availablePrinters ) {
-					data.add(printer.getName());
+				if( defaultPrinter == null ) {
+					defaultPrinter = session.getRoom().getDefaultPrinter();
 				}
-				return String.join(" ", data);
+				if( defaultPrinter != null ) {
+					resp =  defaultPrinter.getName();
+				}
 			}
 			break;
-		case "dnsName":
-			if( session.getDevice() != null)
-				return session.getDevice().getName();
+		case "availableprinters":
+			if( session.getDevice() != null) {
+				availablePrinters = session.getDevice().getAvailablePrinters();
+				if( availablePrinters == null ) {
+					availablePrinters = session.getRoom().getAvailablePrinters();
+				}
+				if( availablePrinters != null ) {
+					for( Printer printer : availablePrinters ) {
+						data.add(printer.getName());
+					}
+					resp = String.join(" ", data);
+				}
+			}
 			break;
-		case "domainName":
-			return sessionController.getConfigValue("DOMAIN");
+		case "dnsname":
+			if( session.getDevice() != null) {
+				resp = session.getDevice().getName();
+			}
+			break;
+		case "domainname":
+			resp = sessionController.getConfigValue("DOMAIN");
 		}
-		return "";
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -150,6 +159,8 @@ public class SessionsResourceImpl implements SessionsResource {
 	@Override
 	public String logonScript(Session session, String OS) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SessionController(session,em).logonScript(OS);
+		String resp = new SessionController(session,em).logonScript(OS);
+		em.close();
+		return resp;
 	}
 }

@@ -40,67 +40,89 @@ public class GroupResourceImpl implements GroupResource {
 	@Override
 	public List<User> getMembers(Session session, long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).getMembers(groupId);
+		List<User> resp = new GroupController(session,em).getMembers(groupId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Group> getByType(Session session, String type) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).getByType(type);
+		List<Group> resp = new GroupController(session,em).getByType(type);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Group> getAll(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).getAll();
+		List<Group> resp = new GroupController(session,em).getAll();
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Group> search(Session session, String search) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).search(search);
+		List<Group> resp = new GroupController(session,em).search(search);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse add(Session session, Group group) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).add(group);
+		OssResponse resp = new GroupController(session,em).add(group);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse modify(Session session, Group group) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).modify(group);
+		OssResponse resp = new GroupController(session,em).modify(group);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse delete(Session session, long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).delete(groupId);
+		OssResponse resp = new GroupController(session,em).delete(groupId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse setMembers(Session session, long groupId, List<Long> users) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).setMembers(groupId,users);
+		OssResponse resp = new GroupController(session,em).setMembers(groupId,users);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse removeMember(Session session, long groupId, long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).removeMember(groupId,userId);
+		OssResponse resp = new GroupController(session,em).removeMember(groupId,userId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse addMember(Session session, long groupId, long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).addMember(groupId,userId);
+		OssResponse resp = new GroupController(session,em).addMember(groupId,userId);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public List<Group> getGroups(Session session, List<Long> groupIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).getGroups(groupIds);
+		List<Group> resp = new GroupController(session,em).getGroups(groupIds);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -112,7 +134,9 @@ public class GroupResourceImpl implements GroupResource {
 		for(User user : group.getUsers() ) {
 			member.add(user.getUid());
 		}
-		return String.join(gc.getNl(),member);
+		String resp = String.join(gc.getNl(),member);
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -123,13 +147,17 @@ public class GroupResourceImpl implements GroupResource {
 		for( Group group : gc.getByType(type)) {
 			groups.add(group.getName());
 		}
-		return String.join(gc.getNl(),groups);
+		String resp = String.join(gc.getNl(),groups);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public String delete(Session session, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).delete(groupName).getCode();
+		String resp = new GroupController(session,em).delete(groupName).getCode();
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -137,13 +165,17 @@ public class GroupResourceImpl implements GroupResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		GroupController gc = new GroupController(session,em);
 		Group group = gc.getById(groupId);
-		return gc.cleanGrupDirectory(group);
+		OssResponse resp = gc.cleanGrupDirectory(group);
+		em.close();
+		return resp;
 	}
 
 	@Override
 	public OssResponse importGroups(Session session, InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new GroupController(session,em).importGroups(fileInputStream, contentDispositionHeader);
+		OssResponse resp = new GroupController(session,em).importGroups(fileInputStream, contentDispositionHeader);
+		em.close();
+		return resp;
 	}
 }
