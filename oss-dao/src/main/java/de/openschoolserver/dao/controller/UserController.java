@@ -229,8 +229,11 @@ public class UserController extends Controller {
 			return new OssResponse(this.getSession(), "ERROR", errorMessage.toString());
 		}
 		for( String alias : user.getMailAliases() ) {
-			if( isUserAliasUnique(alias) ) {
-				user.addAlias(new Alias(user,alias));
+			String tmp = alias.trim();
+			if( ! tmp.isEmpty() ) {
+				if( isUserAliasUnique(tmp) ) {
+					user.addAlias(new Alias(user,tmp));
+				}
 			}
 		}
 		try {
@@ -275,6 +278,7 @@ public class UserController extends Controller {
 				return ossResponse;
 			}
 		}
+		logger.debug("modifyUser user:" + user);
 		oldUser.setGivenName(user.getGivenName());
 		oldUser.setSurName(user.getSurName());
 		oldUser.setBirthDay(user.getBirthDay());
@@ -287,10 +291,13 @@ public class UserController extends Controller {
 			oldAliases.add(alias.getAlias());
 		}
 		for( String alias : user.getMailAliases() ) {
-			if( !oldAliases.contains(alias) && !this.isUserAliasUnique(alias) ) {
-				return new OssResponse(this.getSession(), "ERROR", "Alias '%s' is not unique",null,alias);
+			String tmp = alias.trim();
+			if( !tmp.isEmpty() ) {
+				if( !oldAliases.contains(tmp) && !this.isUserAliasUnique(tmp) ) {
+					return new OssResponse(this.getSession(), "ERROR", "Alias '%s' is not unique",null,tmp);
+				}
+				newAliases.add(new Alias(oldUser,tmp));
 			}
-			newAliases.add(new Alias(oldUser,alias));
 		}
 		oldUser.setAliases(newAliases);
 		// Check user parameter
