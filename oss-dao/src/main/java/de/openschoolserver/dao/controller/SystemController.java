@@ -139,7 +139,7 @@ public class SystemController extends Controller {
 	public Map<String, List<Map<String, String>>> getStatus() {
 		//Initialize of some variable
 		Map<String, List<Map<String, String>>> systemStatus = new HashMap<>();
-		List<Map<String,String>> statusMapList; 
+		List<Map<String,String>> statusMapList;
 		Map<String,String> statusMap;
 		Query query;
 		Integer count;
@@ -172,7 +172,6 @@ public class SystemController extends Controller {
 			statusMap.put("count",count.toString());
 			statusMap.put("loggedOn",loggedOn.toString());
 			statusMapList.add(statusMap);
-			
 		}
 		systemStatus.put("users", statusMapList);
 
@@ -919,6 +918,11 @@ public class SystemController extends Controller {
 		if( error.toString().isEmpty() ) {
 			return new OssResponse(session,"OK","DNS record was created succesfully.");
 		} else {
+			logger.error(
+					dnsRecord.getDomainName() + "#" +
+					dnsRecord.getRecordName() + "#" +
+					dnsRecord.getRecordType() + "#" +
+					dnsRecord.getRecordData() + "# " + error.toString());
 			return new OssResponse(session,"ERROR",error.toString());
 		}
 	}
