@@ -3,6 +3,7 @@ package de.openschoolserver.dao.controller;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -28,23 +29,30 @@ import de.openschoolserver.dao.tools.OSSShellTools;
 
 public class PrinterController extends Controller {
 	private Path DRIVERS   = Paths.get("/usr/share/oss/templates/drivers.txt");
+	final String[] encodings = { "US-ASCII", "ISO-8859-1", "UTF-8", "UTF-16BE", "UTF-16LE", "UTF-16" };
 	public PrinterController(Session session,EntityManager em) {
 		super(session,em);
 		// TODO Auto-generated constructor stub
 	}
 
 	public String getModel(String name){
-		try {
-			Pattern pattern = Pattern.compile(".NickName: \"(.*)\"");
-			for( String line : Files.readAllLines(Paths.get("/etc/cups/ppd/" + name + ".ppd")) ) {
+
+		List<String> lines;
+		Path path = Paths.get("/etc/cups/ppd/" + name + ".ppd");
+		Pattern pattern = Pattern.compile(".NickName: \"(.*)\"");
+		for (String encoding : encodings) {
+		    try {
+		        lines = Files.readAllLines(path, Charset.forName(encoding));
+		        for (String line : lines) {
 				Matcher matcher = pattern.matcher(line);
 				if( matcher.find() ) {
 					return matcher.group(1);
 				}
-			}
-		} catch (IOException e) {
-			logger.error(e.getMessage());
-			logger.debug("getModel of: " + name + " ppd file not found: /etc/cups/ppd/" + name + ".ppd" );
+		        }
+		        break;
+		    } catch (IOException ioe) {
+		        logger.error(encoding + " failed, trying next.");
+		    }
 		}
 		return "";
 	}
@@ -145,6 +153,9 @@ public class PrinterController extends Controller {
 	 * @return
 	 */
 	public OssResponse deletePrinter(Long printerId) {
+		if( session.getPassword().equals("dummy") ) {
+			return new OssResponse(session,"ERROR","The session password of the administrator is expiered. Please login into the web interface again.");
+		}
 
 		OssResponse ossResponse = new OssResponse(session,"OK","Printer was deleted succesfully.");
 		try {
@@ -178,8 +189,8 @@ public class PrinterController extends Controller {
 
 	public OssResponse activateWindowsDriver(String printerName) {
 		logger.debug("Activating windows driver for: " + printerName);
-		if( session.getPassword() == null || session.getPassword().isEmpty() ) {
-			return new OssResponse(session,"ERROR", "The session password of the administrator is expiered. Please login into the web interface again.");
+		if( session.getPassword().equals("dummy") ) {
+			return new OssResponse(session,"ERROR","The session password of the administrator is expiered. Please login into the web interface again.");
 		}
 		String printserver   = new RoomController(this.session,this.em).getConfigValue("PRINTSERVER");
 		String[] program     = new String[7];
@@ -218,7 +229,11 @@ public class PrinterController extends Controller {
 
 	public OssResponse addPrinter(String name, String mac, Long roomId, String model, boolean windowsDriver,
 			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
-		logger.debug("addPrinter: " + name + "#" + mac + "#" + roomId + "#" + model +"#" + ( windowsDriver ? "yes" : "no" ) );
+		logger.debug("addPrinter: " + name + "#" + mac + "#" + roomId + "#" + model +"#" + ( windowsDriver ? "yes" : "no" ) + "#" + session.getPassword() );
+
+		if( session.getPassword().equals("dummy") ) {
+			return new OssResponse(session,"ERROR","The session password of the administrator is expiered. Please login into the web interface again.");
+		}
 		//First we create a device object
 		RoomController roomController = new RoomController(this.session,this.em);;
 		HWConf hwconf = new CloneToolController(this.session,this.em).getByName("Printer");
@@ -239,7 +254,10 @@ public class PrinterController extends Controller {
 
 	public OssResponse addPrinterQueue(Session session, String name, Long deviceId, String model, boolean windowsDriver,
 				InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
-		
+
+		if( session.getPassword().equals("dummy") ) {
+			return new OssResponse(session,"ERROR","The session password of the administrator is expiered. Please login into the web interface again.");
+		}
 		RoomController roomController = new RoomController(this.session,this.em);;
 		String deviceHostName;
 		Printer printer = new Printer();
@@ -354,6 +372,19 @@ public class PrinterController extends Controller {
 		program[1] = printerName;
 		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(session,"OK","Printer was enabled succesfully.");
+	}
+
+	public OssResponse disablePrinter(String printerName) {
+		String[] program = new String[2];
+		StringBuffer reply  = new StringBuffer();
+		StringBuffer stderr = new StringBuffer();
+		program[0] = "/usr/sbin/cupsdisable";
+		program[1] = printerName;
+		OSSShellTools.exec(program, reply, stderr, null);
+		program[0] = "/usr/sbin/cupsreject";
+		program[1] = printerName;
+		OSSShellTools.exec(program, reply, stderr, null);
+		return new OssResponse(session,"OK","Printer was disabled succesfully.");
 	}
 
 }
