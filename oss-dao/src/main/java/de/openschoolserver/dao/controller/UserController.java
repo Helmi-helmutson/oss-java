@@ -441,7 +441,6 @@ public class UserController extends Controller {
 	public OssResponse syncFsQuotas(List<List<String>> quotas) {
 		User user;
 		try {
-			this.em.getTransaction().begin();
 			for (List<String> quota : quotas) {
 				if (quota.isEmpty())
 					continue;
@@ -449,10 +448,11 @@ public class UserController extends Controller {
 				if (user != null) {
 					user.setFsQuotaUsed(Integer.valueOf(quota.get(1)));
 					user.setFsQuota(Integer.valueOf(quota.get(2)));
+					this.em.getTransaction().begin();
 					this.em.merge(user);
+					this.em.getTransaction().commit();
 				}
 			}
-			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
@@ -463,7 +463,6 @@ public class UserController extends Controller {
 	public OssResponse syncMsQuotas(List<List<String>> quotas) {
 		User user;
 		try {
-			this.em.getTransaction().begin();
 			for (List<String> quota : quotas) {
 				if (quota.isEmpty())
 					continue;
@@ -471,10 +470,11 @@ public class UserController extends Controller {
 				if (user != null) {
 					user.setMsQuotaUsed(Integer.valueOf(quota.get(1)));
 					user.setMsQuota(Integer.valueOf(quota.get(2)));
+					this.em.getTransaction().begin();
 					this.em.merge(user);
+					this.em.getTransaction().commit();
 				}
 			}
-			this.em.getTransaction().commit();
 		} catch (Exception e) {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
@@ -640,7 +640,9 @@ public class UserController extends Controller {
 			if( user != null ) {
 				program[1] = user.getUid();
 				user.setFsQuota(quota);
+				this.em.getTransaction().begin();
 				this.em.merge(user);
+				this.em.getTransaction().commit();
 				OSSShellTools.exec(program, reply, error, null);
 				responses.add(new OssResponse(this.getSession(), "OK", "The file system quota for '%s' was set.",null,user.getUid()));
 			}
@@ -661,7 +663,9 @@ public class UserController extends Controller {
 			if( user != null ) {
 				program[1] = user.getUid();
 				user.setMsQuota(quota);
+				this.em.getTransaction().begin();
 				this.em.merge(user);
+				this.em.getTransaction().commit();
 				OSSShellTools.exec(program, reply, error, null);
 				responses.add(new OssResponse(this.getSession(), "OK", "The mail system quota for '%s' was set.",null,user.getUid()));
 			}
