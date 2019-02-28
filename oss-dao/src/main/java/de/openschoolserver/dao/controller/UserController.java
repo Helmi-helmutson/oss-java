@@ -228,11 +228,13 @@ public class UserController extends Controller {
 		if (errorMessage.length() > 0) {
 			return new OssResponse(this.getSession(), "ERROR", errorMessage.toString());
 		}
-		for( String alias : user.getMailAliases() ) {
-			String tmp = alias.trim();
-			if( ! tmp.isEmpty() ) {
-				if( isUserAliasUnique(tmp) ) {
-					user.addAlias(new Alias(user,tmp));
+		if( user.getMailAliases() != null ) {
+			for( String alias : user.getMailAliases() ) {
+				String tmp = alias.trim();
+				if( ! tmp.isEmpty() ) {
+					if( isUserAliasUnique(tmp) ) {
+						user.addAlias(new Alias(user,tmp));
+					}
 				}
 			}
 		}
@@ -286,17 +288,19 @@ public class UserController extends Controller {
 		oldUser.setFsQuota(user.getFsQuota());
 		oldUser.setMsQuota(user.getMsQuota());
 		List<Alias> newAliases = new ArrayList<Alias>();
-		ArrayList<String> oldAliases = new ArrayList<String>();
-		for( Alias alias : oldUser.getAliases() ) {
-			oldAliases.add(alias.getAlias());
-		}
-		for( String alias : user.getMailAliases() ) {
-			String tmp = alias.trim();
-			if( !tmp.isEmpty() ) {
-				if( !oldAliases.contains(tmp) && !this.isUserAliasUnique(tmp) ) {
-					return new OssResponse(this.getSession(), "ERROR", "Alias '%s' is not unique",null,tmp);
+		if(user.getMailAliases() != null ) {
+			ArrayList<String> oldAliases = new ArrayList<String>();
+			for( Alias alias : oldUser.getAliases() ) {
+				oldAliases.add(alias.getAlias());
+			}
+			for( String alias : user.getMailAliases() ) {
+				String tmp = alias.trim();
+				if( !tmp.isEmpty() ) {
+					if( !oldAliases.contains(tmp) && !this.isUserAliasUnique(tmp) ) {
+						return new OssResponse(this.getSession(), "ERROR", "Alias '%s' is not unique",null,tmp);
+					}
+					newAliases.add(new Alias(oldUser,tmp));
 				}
-				newAliases.add(new Alias(oldUser,tmp));
 			}
 		}
 		oldUser.setAliases(newAliases);
