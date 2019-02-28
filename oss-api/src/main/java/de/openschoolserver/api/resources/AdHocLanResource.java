@@ -304,7 +304,7 @@ public interface AdHocLanResource {
 	@DELETE
 	@Path("rooms/{adHocRoomId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets all devices in an add hoc room.")
+	@ApiOperation(value = "Delets a whole adhoc room inkl devices.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})

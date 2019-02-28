@@ -32,7 +32,7 @@ public class AdHocLanController extends Controller {
 	}
 
 	public Category getAdHocCategoryOfRoom(Long roomId) {
-		Room room = new RoomController(this.session,this.em).getById(roomId);
+		Room room = this.em.find(Room.class, roomId);
 		return (( room == null ) ? null :getAdHocCategoryOfRoom(room) );
 	}
 
@@ -124,12 +124,13 @@ public class AdHocLanController extends Controller {
 
 	public OssResponse delete(Long adHocRoomId) {
 		try {
-			Category category = this.em.find(Category.class, adHocRoomId);
+			Category category = this.getAdHocCategoryOfRoom(adHocRoomId);
 			logger.debug("Delete adHocRoom:" + category);
 			RoomController roomController = new RoomController(this.session,this.em);
 			for( Room room : category.getRooms() ) {
 				roomController.delete(room.getId());
 			}
+			this.em.merge(category);
 			this.em.getTransaction().begin();
 			for( Object o : category.getFaqs())  {
 				this.em.remove(o);

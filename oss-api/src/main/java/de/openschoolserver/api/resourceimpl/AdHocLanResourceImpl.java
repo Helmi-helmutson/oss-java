@@ -67,8 +67,9 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	public List<Group> getGroups(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		AdHocLanController adHocLan = new AdHocLanController(session,em);
+		List<Group> resp = adHocLan.getGroups();
 		em.close();
-		return adHocLan.getGroups();
+		return resp;
 	}
 
 	@Override
@@ -227,27 +228,26 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	public Room getRoomById(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		em.close();
 		Room room = roomController.getById(roomId);
-		if( room == null ) {
-			return null;
+		if( room != null && !room.getRoomType().equals("AdHocAccess")) {
+			room = null;
 		}
-		if( room.getRoomType().equals("AdHocAccess")) {
-			return room;
-		}
-		return null;
+		em.close();
+		return room;
 	}
 
 	@Override
 	public OssResponse modify(Session session, Long roomId, Room room) {
+		OssResponse resp;
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController rc =  new RoomController(session,em);
 		Room oldRoom = rc.getById(roomId);
 		if( !oldRoom.getRoomType().equals("AdHocAccess")) {
-			return new OssResponse(session,"ERROR","This is not an AdHocLan room");
+			resp = new OssResponse(session,"ERROR","This is not an AdHocLan room");
+		} else {
+			room.setId(oldRoom.getId());
+			resp = rc.modify(room);
 		}
-		room.setId(oldRoom.getId());
-		OssResponse resp = rc.modify(room);
 		em.close();
 		return resp;
 	}
@@ -273,14 +273,10 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	@Override
 	public List<Device> getDevicesOfRoom(Session session, Long adHocRoomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		Category category = new AdHocLanController(session,em).getAdHocCategoryOfRoom(adHocRoomId);
+		Room room = em.find(Room.class, adHocRoomId);
 		List<Device> devices = new ArrayList<Device>();
-		for( Room room : category.getRooms() ) {
-			if( room.getRoomType().equals("AdHocAccess")) {
-				for( Device device : room.getDevices() ) {
-					devices.add(device);
-				}
-			}
+		if( room != null ) {
+			devices = room.getDevices();
 		}
 		em.close();
 		return devices;
