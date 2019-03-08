@@ -999,7 +999,7 @@ public class DeviceController extends Controller {
 			program[1] = device.getMac();
 			program[2] = device.getIp();
 			break;
-		case "controlProxy":
+		case "controlproxy":
 			//TODO
 			break;
 		case "savefile":
@@ -1027,14 +1027,18 @@ public class DeviceController extends Controller {
 			program[2] = FQHN.toString();
 			program[3] = "oss_client.logOff";
 		case "cleanuploggedin":
-			this.em.getTransaction().begin();
-			for( User user : device.getLoggedIn() ) {
-				user.getLoggedOn().remove(device);
-				this.em.merge(user);
+			try {
+				this.em.getTransaction().begin();
+				for( User user : device.getLoggedIn() ) {
+					user.getLoggedOn().remove(device);
+					this.em.merge(user);
+				}
+				device.setLoggedIn(new ArrayList<User>());
+				this.em.merge(device);
+				this.em.getTransaction().commit();
+			} catch (Exception e) {
+				logger.error("cleanuploggedin:" + e.getMessage(), e);
 			}
-			device.setLoggedIn(new ArrayList<User>());
-			this.em.merge(device);
-			this.em.getTransaction().commit();
 			break;
 		case "download":
 			UserController uc = new UserController(this.session,this.em);;
