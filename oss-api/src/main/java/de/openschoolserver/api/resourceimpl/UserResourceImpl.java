@@ -518,7 +518,7 @@ public class UserResourceImpl implements UserResource {
 			parameters.add(userImport.getRole());
 			parameters.add("--lang");
 			parameters.add(userImport.getLang());
-			parameters.add("--idetntifier");
+			parameters.add("--identifier");
 			parameters.add(userImport.getIdentifier());
 			if( ! userImport.getPassword().isEmpty() ) {
 				parameters.add("--password");
@@ -539,12 +539,17 @@ public class UserResourceImpl implements UserResource {
 			if( userImport.isResetPassword() ) {
 				parameters.add("--resetPassword");
 			}
+			logger.debug("restartImport userImport:" + userImport);
+			logger.debug("restartImport parameters:" + parameters);
+			
 			String[] program = new String[parameters.size()];
 			program = parameters.toArray(program);
 
 			StringBuffer reply  = new StringBuffer();
 			StringBuffer stderr = new StringBuffer();
 			OSSShellTools.exec(program, reply, stderr, null);
+			logger.debug("restartImport reply: " + reply.toString());
+			logger.debug("restartImport error: " + reply.toString());
 			return new OssResponse(session,"OK", "Import was started.");
 		}
 		return new OssResponse(session,"ERROR", "CAn not find the import.");

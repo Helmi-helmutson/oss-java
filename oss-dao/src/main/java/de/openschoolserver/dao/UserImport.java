@@ -1,5 +1,7 @@
 package de.openschoolserver.dao;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 public class UserImport {
 
 	private String  role;
@@ -88,5 +90,13 @@ public class UserImport {
 	}
 	public void setResult(String result) {
 		this.result = result;
+	}
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch (Exception e) {
+			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
+		}
 	}
 }
