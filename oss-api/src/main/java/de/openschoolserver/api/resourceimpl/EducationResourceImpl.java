@@ -248,28 +248,37 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<OssResponse> uploadFileToRoom(Session session, Long roomId, InputStream fileInputStream,
+	public List<OssResponse> uploadFileToRoom(Session session,
+			Long roomId,
+			Boolean cleanUp,
+			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		List<OssResponse> resp = new EducationController(session,em).uploadFileTo("room",roomId,null,fileInputStream,contentDispositionHeader,false);
+		List<OssResponse> resp = new EducationController(session,em).uploadFileTo("room",roomId,null,fileInputStream,contentDispositionHeader,false, cleanUp);
 		em.close();
 		return resp;
 	}
 
 	@Override
-	public OssResponse uploadFileToUser(Session session, Long userId, InputStream fileInputStream,
+	public OssResponse uploadFileToUser(Session session,
+			Long userId,
+			Boolean cleanUp,
+			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		OssResponse resp = new EducationController(session,em).uploadFileTo("user",userId,null,fileInputStream,contentDispositionHeader,false).get(0);
+		OssResponse resp = new EducationController(session,em).uploadFileTo("user",userId,null,fileInputStream,contentDispositionHeader,false, cleanUp).get(0);
 		em.close();
 		return resp;
 	}
 
 	@Override
-	public OssResponse uploadFileToDevice(Session session, Long deviceId, InputStream fileInputStream,
+	public OssResponse uploadFileToDevice(Session session,
+			Long deviceId,
+			Boolean cleanUp,
+			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		OssResponse resp = new EducationController(session,em).uploadFileTo("device",deviceId,null,fileInputStream,contentDispositionHeader,false).get(0);
+		OssResponse resp = new EducationController(session,em).uploadFileTo("device",deviceId,null,fileInputStream,contentDispositionHeader,false, cleanUp).get(0);
 		em.close();
 		return resp;
 	}
@@ -277,11 +286,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<OssResponse> uploadFileToGroup(Session session,
 			Long groupId,
-			boolean studentsOnly,
+			Boolean cleanUp,
+			Boolean studentsOnly,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		List<OssResponse> resp = new EducationController(session,em).uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly);
+		List<OssResponse> resp = new EducationController(session,em).uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly, cleanUp);
 		em.close();
 		return resp;
 	}
@@ -289,7 +299,8 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<OssResponse> uploadFileToGroups(Session session,
 			String groupIds,
-			boolean studentsOnly,
+			Boolean cleanUp,
+			Boolean studentsOnly,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
@@ -298,7 +309,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		for(String sgroupId : groupIds.split(",")) {
 			Long groupId = Long.valueOf(sgroupId);
 			if( groupId != null ) {
-				responses.addAll(ec.uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly));
+				responses.addAll(ec.uploadFileTo("group",groupId,null,fileInputStream,contentDispositionHeader,studentsOnly, cleanUp));
 			}
 		}
 		em.close();
@@ -306,15 +317,18 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public List<OssResponse> uploadFileToUsers(Session session, InputStream fileInputStream,
-			FormDataContentDisposition contentDispositionHeader, String sUserIds) {
+	public List<OssResponse> uploadFileToUsers(Session session,
+			String sUserIds,
+			Boolean cleanUp,
+			InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader ) {
 		List<Long> userIds = new ArrayList<Long>();
 		for( String id : sUserIds.split(",")) {
 			userIds.add(Long.valueOf(id));
 		}
 		logger.debug("uploadFileToUsers: " + sUserIds + " " + userIds);
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		List<OssResponse> resp = new EducationController(session,em).uploadFileTo("users",0l,userIds,fileInputStream,contentDispositionHeader,false);
+		List<OssResponse> resp = new EducationController(session,em).uploadFileTo("users",0l,userIds,fileInputStream,contentDispositionHeader,false, cleanUp);
 		em.close();
 		return resp;
 	}
@@ -681,8 +695,15 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public List<User> getAvailableMembers(Session session, long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		List<User> resp = new GroupController(session,em).getAvailableMember(groupId);
-		em.close();
+		List<User> resp = new ArrayList<User>();
+		Group group = em.find(Group.class, groupId);
+		if( group != null ) {
+			UserController uc = new UserController(session,em);
+			resp = uc.getByRole(roleStudent);
+			resp.addAll(uc.getByRole(roleTeacher));
+			resp.removeAll(group.getUsers());
+			em.close();
+		}
 		return resp;
 	}
 

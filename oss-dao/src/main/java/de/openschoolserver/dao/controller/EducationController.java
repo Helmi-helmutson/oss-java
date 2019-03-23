@@ -339,7 +339,8 @@ public class EducationController extends UserController {
 			List<Long> objectIds,
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader,
-			boolean studentsOnly ) {
+			Boolean studentsOnly,
+			Boolean cleanUp ) {
 		String fileName = contentDispositionHeader.getFileName();
 		File file = null;
 		List<OssResponse> responses = new ArrayList<OssResponse>();
@@ -356,7 +357,7 @@ public class EducationController extends UserController {
 			for( Long id : objectIds) {
 				User user = this.getById(id);
 				if( user != null ) {
-					responses.add(this.saveFileToUserImport(user, file, fileName));
+					responses.add(this.saveFileToUserImport(user, file, fileName, cleanUp));
 				} else {
 					responses.add(new OssResponse(this.getSession(),"ERROR","User with id %s does not exists.",null,id.toString() ));
 				}
@@ -365,7 +366,7 @@ public class EducationController extends UserController {
 		case "user":
 			User user = this.getById(objectId);
 			if( user != null ) {
-				responses.add(this.saveFileToUserImport(user, file, fileName));
+				responses.add(this.saveFileToUserImport(user, file, fileName, cleanUp));
 			} else {
 				responses.add(new OssResponse(this.getSession(),"ERROR","User with id %s does not exists.",null,objectId.toString() ));
 			}
@@ -376,7 +377,7 @@ public class EducationController extends UserController {
 				for( User myUser : group.getUsers() ) {
 					if( !this.session.getUser().equals(myUser) &&
 						( !studentsOnly  || myUser.getRole().equals(roleStudent) || myUser.getRole().equals(roleGuest) )) {
-						responses.add(this.saveFileToUserImport(myUser, file, fileName));
+						responses.add(this.saveFileToUserImport(myUser, file, fileName, cleanUp));
 					}
 				}
 			} else {
@@ -387,7 +388,7 @@ public class EducationController extends UserController {
 			Device device = new DeviceController(this.session,this.em).getById(objectId);
 			if( device != null ) {
 				for( User myUser : device.getLoggedIn() ) {
-					responses.add(this.saveFileToUserImport(myUser, file, fileName));
+					responses.add(this.saveFileToUserImport(myUser, file, fileName, cleanUp));
 				}
 			} else {
 				responses.add(new OssResponse(this.getSession(),"ERROR","Device with id %s does not exists.",null,objectId.toString() ));
@@ -405,7 +406,7 @@ public class EducationController extends UserController {
 					}
 				}
 				if( myUser != null ) {
-					responses.add(this.saveFileToUserImport(myUser, file, fileName));
+					responses.add(this.saveFileToUserImport(myUser, file, fileName, cleanUp));
 				}
 			}
 		}
@@ -413,7 +414,10 @@ public class EducationController extends UserController {
 		return responses;
 	}
 
-	public OssResponse saveFileToUserImport(User user, File file, String fileName) {
+	public OssResponse saveFileToUserImport(User user, File file, String fileName, Boolean cleanUp) {
+		if( cleanUp == null ) {
+			cleanUp = true;
+		}
 		UserPrincipalLookupService lookupService = FileSystems.getDefault().getUserPrincipalLookupService();
 		List<String> parameters = new ArrayList<String>();
 		if( user == null ) {
@@ -427,7 +431,7 @@ public class EducationController extends UserController {
 			UserPrincipal owner = lookupService.lookupPrincipalByName(user.getUid());
 			String homeDir = this.getHomeDir(user);
 			//TODO make it configurable
-			if( user.getRole().equals(roleWorkstation) ) {
+			if( user.getRole().equals(roleWorkstation) && cleanUp ) {
 				StringBuffer reply = new StringBuffer();
 				StringBuffer error = new StringBuffer();
 				String[] program   = new String[3];
@@ -458,7 +462,7 @@ public class EducationController extends UserController {
 			File exportDir = new File( export );
 			Files.createDirectories(exportDir.toPath(), privatDirAttribute );
 			Files.setOwner(exportDir.toPath(), owner);
-			if( user.getRole().equals(roleStudent) || user.getRole().equals(roleWorkstation) || user.getRole().equals(roleGuest) ) {
+			if( cleanUp && ( user.getRole().equals(roleStudent) || user.getRole().equals(roleWorkstation) || user.getRole().equals(roleGuest) ) ) {
 				//Clean up Export by students workstations and guests
 				for( String mist : exportDir.list() ) {
 					File f = new File(mist);

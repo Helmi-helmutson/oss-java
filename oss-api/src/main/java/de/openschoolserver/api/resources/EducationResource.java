@@ -476,8 +476,9 @@ public interface EducationResource {
 	})
 	List<OssResponse> uploadFileToRoom(@ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("roomId") Long roomId,
-	        @FormDataParam("file") final InputStream fileInputStream,
-	        @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
+	        @FormDataParam("cleanUp") Boolean cleanUp,
+	        @FormDataParam("file")    final InputStream fileInputStream,
+	        @FormDataParam("file")    final FormDataContentDisposition contentDispositionHeader
 	);
 
 	@POST
@@ -728,7 +729,8 @@ public interface EducationResource {
 	})
 	List<OssResponse> uploadFileToGroup(@ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("groupId")  Long  groupId,
-	        @FormDataParam("studentsOnly") boolean studentsOnly,
+	        @FormDataParam("cleanUp") Boolean cleanUp,
+	        @FormDataParam("studentsOnly") Boolean studentsOnly,
 	        @FormDataParam("file") final InputStream fileInputStream,
 	        @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 	        );
@@ -743,7 +745,8 @@ public interface EducationResource {
 	})
 	List<OssResponse> uploadFileToGroups(@ApiParam(hidden = true) @Auth Session session,
 	        @FormDataParam("groupIds")     String groupIds,
-	        @FormDataParam("studentsOnly") boolean studentsOnly,
+	        @FormDataParam("cleanUp") Boolean cleanUp,
+	        @FormDataParam("studentsOnly") Boolean studentsOnly,
 	        @FormDataParam("file") final InputStream fileInputStream,
 	        @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 	        );
@@ -879,6 +882,7 @@ public interface EducationResource {
 	@RolesAllowed("education.users")
 	OssResponse uploadFileToUser(@ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("userId")   Long  userId,
+	        @FormDataParam("cleanUp") Boolean cleanUp,
 	        @FormDataParam("file") final InputStream fileInputStream,
 	        @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 	        );
@@ -893,9 +897,10 @@ public interface EducationResource {
 	})
 	@RolesAllowed("education.users")
 	List<OssResponse> uploadFileToUsers(@ApiParam(hidden = true) @Auth Session session,
+			@FormDataParam("userIds") final String userIds,
+			@FormDataParam("cleanUp") Boolean cleanUp,
 	        @FormDataParam("file") final InputStream fileInputStream,
-	        @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader,
-	        @FormDataParam("userIds") final String userIds
+	        @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 	        );
 
 	@POST
@@ -1071,6 +1076,7 @@ public interface EducationResource {
 	@RolesAllowed("education.rooms")
 	OssResponse uploadFileToDevice(@ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId,
+	        @FormDataParam("cleanUp") Boolean cleanUp,
 	        @FormDataParam("file") final InputStream fileInputStream,
 	        @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 	);
