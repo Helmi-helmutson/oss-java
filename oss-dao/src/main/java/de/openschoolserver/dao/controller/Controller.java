@@ -293,23 +293,21 @@ public class Controller extends Config {
 			case "modify_room":
 				data.append(String.format("name: %s%n", room.getName()));
 				data.append(String.format("description: %s%n", room.getDescription()));
+				data.append(String.format("startIp: %s%n", room.getStartIP()));
 				break;
 			case "delete_room":
 				data.append(String.format("name: %s%n", room.getName()));
+				data.append(String.format("startIp: %s%n", room.getStartIP()));
 				break;
 			}
 			break;
+		case "de.cephalix.api.dao.CephalixCustomer":
 		case "de.cephalix.api.dao.CephalixInstitute":
+		case "de.cephalix.api.dao.CephalixRegcode":
 			try {
-				switch(pluginName){
-				case "add_institute":
-				case "modify_institute":
-				case "delete_institue":
-					data.append(object);
-					break;
-				}
+				data.append(object);
 			} catch (Exception e) {
-				logger.error("pluginHandler : CephalixInstitute:" + e.getMessage());
+				logger.error("pluginHandler : Cephalix****:" + e.getMessage());
 			}
 		}
 		OSSShellTools.exec(program, reply, error, data.toString());
