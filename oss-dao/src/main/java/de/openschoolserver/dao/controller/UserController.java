@@ -134,13 +134,6 @@ public class UserController extends Controller {
 			for (User user : (List<User>) query.getResultList()) {
 				if (userManage || user.getRole().equals(roleStudent)
 					|| ( user.getRole().equals(roleGuest) && user.getCreator().equals(session.getUser()) ) ) {
-					List<String> classes = new ArrayList<String>();
-					for( Group group : user.getGroups()) {
-						if (group.getGroupType().equals("class")) {
-							classes.add(group.getName());
-						}
-					}
-					user.setClasses(String.join(",", classes));
 					users.add(user);
 				}
 			}
@@ -841,6 +834,10 @@ public class UserController extends Controller {
 	public OssResponse addGuestUsers(String name, String description, Long roomId, Long count, Date validUntil) {
 		final CategoryController categoryController = new CategoryController(this.session,this.em);
 		final GroupController groupController = new GroupController(this.session,this.em);
+		//TODO make it confiugrable
+		if( count > 200 ) {
+			return new OssResponse(this.getSession(), "ERROR", "A guest group must not conains more the 200 members.");
+		}
 		Category category = new Category();
 		category.setCategoryType("guestUsers");
 		category.setName(name);
