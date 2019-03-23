@@ -661,6 +661,13 @@ public class User implements Serializable {
 	}
 
 	public String getClasses() {
+		List<String> classesL = new ArrayList<String>();
+		for( Group group : this.getGroups()) {
+			if (group.getGroupType().equals("class")) {
+				classesL.add(group.getName());
+			}
+		}
+		classes = String.join(",", classesL);
 		return classes;
 	}
 
