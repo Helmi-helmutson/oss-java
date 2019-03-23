@@ -340,8 +340,8 @@ public class SessionController extends Controller {
 		batFile.add("net use z: \\\\admin\\"+ this.session.getUser().getUid()
 					+ " /persisten:no /user:"
 					+ this.getConfigValue("WORKGROUP")+"\\"
-					+ this.session.getUser().getUid() + " "
-					+ this.session.getPassword());
+					+ this.session.getUser().getUid() + " \""
+					+ this.session.getPassword() + "\"");
 		program[0] = "/usr/share/oss/plugins/shares/netlogon/open/100-create-logon-script.sh";
 		program[1] = this.session.getUser().getUid();
 		program[2] = this.session.getIP();
