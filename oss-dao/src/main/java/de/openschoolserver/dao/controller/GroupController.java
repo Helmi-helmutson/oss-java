@@ -431,6 +431,9 @@ public class GroupController extends Controller {
 		if( user.getRole().equals(group.getName()) ) {
 			return new OssResponse(this.getSession(),"ERROR","User must not be removed from it's primary group.");
 		}
+		if( group.getOwner().equals(user) ) {
+			return new OssResponse(this.getSession(),"ERROR","You must not remove yourself from your owned groups.");
+		}
 		group.getUsers().remove(user);
 		user.getGroups().remove(group);
 		try {
@@ -450,10 +453,10 @@ public class GroupController extends Controller {
 	}
 
 	public List<Group> getGroups(List<Long> groupIds) {
-	List<Group> groups = new ArrayList<Group>();
-	for( Long id : groupIds){
-		groups.add(this.getById(id));
-	}
+		List<Group> groups = new ArrayList<Group>();
+		for( Long id : groupIds){
+			groups.add(this.getById(id));
+		}
 		return groups;
 	}
 
