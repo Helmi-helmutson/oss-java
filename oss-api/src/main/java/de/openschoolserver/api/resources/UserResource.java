@@ -42,7 +42,7 @@ public interface UserResource {
 	@RolesAllowed("user.search")
 	User getById(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("userId") long userId
+			@PathParam("userId") Long userId
 			);
 
 	/*
@@ -58,7 +58,7 @@ public interface UserResource {
 	@RolesAllowed("user.search")
 	List<Group> groups(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("userId") long userId
+			@PathParam("userId") Long userId
 			);
 
 	/*
@@ -74,7 +74,7 @@ public interface UserResource {
 	@RolesAllowed("user.search")
 	List<Group> getAvailableGroups(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("userId") long userId
+			@PathParam("userId") Long userId
 			);
 
 	/*
@@ -213,7 +213,21 @@ public interface UserResource {
 			User user
 			);
 
-
+	@POST
+	@Path("{userId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "modify an existing user")
+	@ApiResponses(value = {
+			// TODO so oder anders? @ApiResponse(code = 404, message = "At least one user was not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	//@PermitAll
+	@RolesAllowed("user.modify")
+	OssResponse modify(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("userId") Long userId,
+			User user
+			);
 	/*
 	 * DELETE users/<userId>
 	 */
@@ -227,7 +241,7 @@ public interface UserResource {
 	@RolesAllowed("user.delete")
 	OssResponse delete(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("userId") long userId
+			@PathParam("userId") Long userId
 			);
 
 
@@ -244,7 +258,7 @@ public interface UserResource {
 	@RolesAllowed("user.manage")
 	OssResponse addToGroups(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("userId") long userId,
+			@PathParam("userId") Long userId,
 			List<Long> groups
 			);
 
@@ -258,7 +272,7 @@ public interface UserResource {
 	@RolesAllowed("user.manage")
 	OssResponse setMembers(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("userId") long userId,
+			@PathParam("userId") Long userId,
 			List<Long> groups
 			);
 
@@ -276,8 +290,8 @@ public interface UserResource {
 	@RolesAllowed("user.manage")
 	OssResponse removeMember(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("groupId") long groupId,
-			@PathParam("userId") long userId
+			@PathParam("groupId") Long groupId,
+			@PathParam("userId") Long userId
 			);
 
 	/*
@@ -293,8 +307,8 @@ public interface UserResource {
 	@RolesAllowed("user.manage")
 	OssResponse addMember(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("groupId") long groupId,
-			@PathParam("userId") long userId
+			@PathParam("groupId") Long groupId,
+			@PathParam("userId") Long userId
 			);
 
 	/*
@@ -310,7 +324,7 @@ public interface UserResource {
 	@RolesAllowed("user.manage")
 	OssResponse allClasses(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("userId") long userId
+			@PathParam("userId") Long userId
 			);
 
 	/*

@@ -44,7 +44,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public User getById(Session session, long userId) {
+	public User getById(Session session, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final User user = userController.getById(userId);
@@ -108,7 +108,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse delete(Session session, long userId) {
+	public OssResponse delete(Session session, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse ossResponse = new UserController(session,em).delete(userId);
 		em.close();
@@ -118,6 +118,16 @@ public class UserResourceImpl implements UserResource {
 	@Override
 	public OssResponse modify(Session session, User user) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		final UserController userController = new UserController(session,em);
+		OssResponse ossResponse = userController.modify(user);
+		em.close();
+		return ossResponse;
+	}
+
+	@Override
+	public OssResponse modify(Session session, Long userId, User user) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		user.setId(userId);
 		final UserController userController = new UserController(session,em);
 		OssResponse ossResponse = userController.modify(user);
 		em.close();
@@ -137,7 +147,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public List<Group> getAvailableGroups(Session session, long userId) {
+	public List<Group> getAvailableGroups(Session session, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<Group> groups = userController.getAvailableGroups(userId);
@@ -149,7 +159,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public List<Group> groups(Session session, long userId) {
+	public List<Group> groups(Session session, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final UserController userController = new UserController(session,em);
 		final List<Group> groups =  userController.getGroups(userId);
@@ -161,7 +171,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse setMembers(Session session, long userId, List<Long> groupIds) {
+	public OssResponse setMembers(Session session, Long userId, List<Long> groupIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse ossResponse =  new UserController(session,em).setGroups(userId,groupIds);
 		em.close();
@@ -169,7 +179,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse removeMember(Session session, long groupId, long userId) {
+	public OssResponse removeMember(Session session, Long groupId, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final GroupController groupController = new GroupController(session,em);
 		OssResponse ossResponse = groupController.removeMember(groupId,userId);
@@ -178,7 +188,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse addToGroups(Session session, long userId, List<Long> groups) {
+	public OssResponse addToGroups(Session session, Long userId, List<Long> groups) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		StringBuilder error = new StringBuilder();
 		final GroupController groupController = new GroupController(session,em);
@@ -196,7 +206,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse addMember(Session session, long groupId, long userId) {
+	public OssResponse addMember(Session session, Long groupId, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final GroupController groupController = new GroupController(session,em);
 		OssResponse ossResponse = groupController.addMember(groupId,userId);
@@ -622,7 +632,7 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse allClasses(Session session, long userId) {
+	public OssResponse allClasses(Session session, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		User user = new UserController(session,em).getById(userId);
 		final GroupController groupController = new GroupController(session,em);

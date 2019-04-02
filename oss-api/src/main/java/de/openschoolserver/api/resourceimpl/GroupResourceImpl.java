@@ -22,7 +22,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public Group getById(Session session, long groupId) {
+	public Group getById(Session session, Long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Group group =  new GroupController(session,em).getById(groupId);
 		em.close();
@@ -30,7 +30,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public List<User> getAvailableMembers(Session session, long groupId) {
+	public List<User> getAvailableMembers(Session session, Long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<User> users = new GroupController(session,em).getAvailableMember(groupId);
 		em.close();
@@ -38,7 +38,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public List<User> getMembers(Session session, long groupId) {
+	public List<User> getMembers(Session session, Long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<User> resp = new GroupController(session,em).getMembers(groupId);
 		em.close();
@@ -86,7 +86,16 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public OssResponse delete(Session session, long groupId) {
+	public OssResponse modify(Session session,Long groupId, Group group) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		group.setId(groupId);
+		OssResponse resp = new GroupController(session,em).modify(group);
+		em.close();
+		return resp;
+	}
+
+	@Override
+	public OssResponse delete(Session session, Long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new GroupController(session,em).delete(groupId);
 		em.close();
@@ -94,7 +103,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public OssResponse setMembers(Session session, long groupId, List<Long> users) {
+	public OssResponse setMembers(Session session, Long groupId, List<Long> users) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new GroupController(session,em).setMembers(groupId,users);
 		em.close();
@@ -102,7 +111,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public OssResponse removeMember(Session session, long groupId, long userId) {
+	public OssResponse removeMember(Session session, Long groupId, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new GroupController(session,em).removeMember(groupId,userId);
 		em.close();
@@ -110,7 +119,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public OssResponse addMember(Session session, long groupId, long userId) {
+	public OssResponse addMember(Session session, Long groupId, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new GroupController(session,em).addMember(groupId,userId);
 		em.close();
@@ -161,7 +170,7 @@ public class GroupResourceImpl implements GroupResource {
 	}
 
 	@Override
-	public OssResponse cleanUpDirectory(Session session, long groupId) {
+	public OssResponse cleanUpDirectory(Session session, Long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		GroupController gc = new GroupController(session,em);
 		Group group = gc.getById(groupId);

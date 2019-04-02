@@ -40,7 +40,7 @@ public interface GroupResource {
 	@RolesAllowed("group.search")
 	Group getById(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("groupId") long groupId
+	        @PathParam("groupId") Long groupId
 	);
 
 	/*
@@ -56,7 +56,7 @@ public interface GroupResource {
 	@RolesAllowed("group.manage")
 	List<User> getMembers(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("groupId") long groupId
+	        @PathParam("groupId") Long groupId
 	);
 
 	/*
@@ -88,7 +88,7 @@ public interface GroupResource {
 	@RolesAllowed("group.manage")
 	List<User> getAvailableMembers(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("groupId") long groupId
+	        @PathParam("groupId") Long groupId
 	);
 
 	/*
@@ -207,6 +207,21 @@ public interface GroupResource {
 	);
 
 	@POST
+	@Path("{groupId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Modify an existing group")
+	@ApiResponses(value = {
+	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one group was not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("group.modify")
+	OssResponse modify(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("groupId") Long groupId,
+	        Group group
+	);
+
+	@POST
 	@Path("import")
 	@Produces(JSON_UTF8)
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
@@ -256,7 +271,7 @@ public interface GroupResource {
 	@RolesAllowed("group.delete")
 	OssResponse delete(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("groupId") long groupId
+	        @PathParam("groupId") Long groupId
 	);
 
 
@@ -273,7 +288,7 @@ public interface GroupResource {
 	@RolesAllowed("group.delete")
 	OssResponse cleanUpDirectory(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("groupId") long groupId
+	        @PathParam("groupId") Long groupId
 	);
 
 	/*
@@ -289,7 +304,7 @@ public interface GroupResource {
        @RolesAllowed("group.manage")
        OssResponse setMembers(
                @ApiParam(hidden = true) @Auth Session session,
-               @PathParam("groupId") long groupId,
+               @PathParam("groupId") Long groupId,
                List<Long> users
        );
 
@@ -305,8 +320,8 @@ public interface GroupResource {
        @RolesAllowed("group.manage")
        OssResponse removeMember(
                @ApiParam(hidden = true) @Auth Session session,
-               @PathParam("groupId") long groupId,
-               @PathParam("userId") long userId
+               @PathParam("groupId") Long groupId,
+               @PathParam("userId") Long userId
        );
 
        /*
@@ -322,7 +337,7 @@ public interface GroupResource {
        @RolesAllowed("group.manage")
        OssResponse addMember(
                @ApiParam(hidden = true) @Auth Session session,
-               @PathParam("groupId") long groupId,
-               @PathParam("userId") long userId
+               @PathParam("groupId") Long groupId,
+               @PathParam("userId") Long userId
        );
 }

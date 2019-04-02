@@ -45,7 +45,7 @@ public interface RoomResource {
 	@RolesAllowed("room.search")
 	Room getById(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	/**
@@ -200,6 +200,21 @@ public interface RoomResource {
 	        Room room
 	);
 
+	@POST
+	@Path("{roomId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Modify a room")
+	@ApiResponses(value = {
+	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("room.add")
+	OssResponse modify(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("roomId") Long roomId,
+	        Room room
+	);
+
 	/*
 	 * DELETE rooms/{roomId}
 	 */
@@ -213,7 +228,7 @@ public interface RoomResource {
 	@RolesAllowed("room.delete")
 	OssResponse delete(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	/*
@@ -230,7 +245,7 @@ public interface RoomResource {
 	@RolesAllowed("room.search")
 	HWConf getHwConf(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	/*
@@ -247,8 +262,8 @@ public interface RoomResource {
 	@RolesAllowed("room.modify")
 	OssResponse setHwConf(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId")   long roomId,
-	        @PathParam("hwConfId") long hwConfId
+	        @PathParam("roomId")   Long roomId,
+	        @PathParam("hwConfId") Long hwConfId
 	);
 
 	/*
@@ -265,7 +280,7 @@ public interface RoomResource {
 	@RolesAllowed("device.add")
 	List<String> getAvailableIPAddresses(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	/*
@@ -282,8 +297,8 @@ public interface RoomResource {
 	@RolesAllowed("device.add")
 	List<String> getAvailableIPAddresses(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
-	        @PathParam("count") long count
+	        @PathParam("roomId") Long roomId,
+	        @PathParam("count") Long count
 	);
 
 	/*
@@ -318,7 +333,7 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	List<Map<String, String>> getLoggedInUsers(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	/*
@@ -351,7 +366,7 @@ public interface RoomResource {
 	@RolesAllowed("room.add")
 	List<AccessInRoom> getAccessList(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	/*
@@ -373,7 +388,7 @@ public interface RoomResource {
 	@RolesAllowed("room.add")
 	OssResponse addAccessList(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
+	        @PathParam("roomId") Long roomId,
 	        AccessInRoom   accessList
 	);
 
@@ -391,7 +406,7 @@ public interface RoomResource {
 	@RolesAllowed("room.add")
 	OssResponse deleteAccessList(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("accessInRoomId") long accessInRoomId
+	        @PathParam("accessInRoomId") Long accessInRoomId
 	);
 
 	/*
@@ -456,7 +471,7 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	AccessInRoom getAccessStatus(
 		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("roomId") long roomId
+		@PathParam("roomId") Long roomId
 	);
 
 	/*
@@ -473,7 +488,7 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	OssResponse setAccessStatus(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
+	        @PathParam("roomId") Long roomId,
 	        AccessInRoom access
 	);
 
@@ -492,7 +507,7 @@ public interface RoomResource {
 	@RolesAllowed("device.add")
 	OssResponse addDevices(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
+	        @PathParam("roomId") Long roomId,
 	        List<Device> devices
 	);
 
@@ -510,7 +525,7 @@ public interface RoomResource {
 	@PermitAll
 	OssResponse addDevice(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
+	        @PathParam("roomId") Long roomId,
 	        @PathParam("macAddress") String macAddress,
 	        @PathParam("name") String name
 	);
@@ -529,7 +544,7 @@ public interface RoomResource {
 	@RolesAllowed("room.search")
 	List<Device> getDevices(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	/*
@@ -545,7 +560,7 @@ public interface RoomResource {
 	@RolesAllowed("device.delete")
 	OssResponse deleteDevices(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
+	        @PathParam("roomId") Long roomId,
 	        List<Long> deviceId
 	);
 
@@ -562,7 +577,7 @@ public interface RoomResource {
 	@RolesAllowed("device.delete")
 	OssResponse deleteDevice(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
+	        @PathParam("roomId") Long roomId,
 	        @PathParam("deviceId") Long deviceId
 	);
 
@@ -607,7 +622,7 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	OssResponse deleteDefaultPrinter(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	@GET
@@ -620,7 +635,7 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	Printer getDefaultPrinter(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	@POST
@@ -633,7 +648,7 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	OssResponse setAvailablePrinters(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
+	        @PathParam("roomId") Long roomId,
 	        List<Long> printerIds
 	);
 
@@ -647,8 +662,8 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	OssResponse addAvailablePrinters(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId,
-	        @PathParam("prinerId") long prinerId
+	        @PathParam("roomId") Long roomId,
+	        @PathParam("prinerId") Long prinerId
 	);
 
 	@DELETE
@@ -661,8 +676,8 @@ public interface RoomResource {
 	@RolesAllowed("room.manage")
 	OssResponse deleteAvailablePrinters(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId")   long roomId,
-	        @PathParam("prinerId") long prinerId
+	        @PathParam("roomId")   Long roomId,
+	        @PathParam("prinerId") Long prinerId
 	);
 
 	@GET
@@ -675,7 +690,7 @@ public interface RoomResource {
 	@RolesAllowed("room.search")
 	List<Printer> getAvailablePrinters(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("roomId") long roomId
+	        @PathParam("roomId") Long roomId
 	);
 
 	/*

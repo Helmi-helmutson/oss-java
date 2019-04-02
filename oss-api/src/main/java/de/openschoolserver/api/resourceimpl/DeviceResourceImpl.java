@@ -30,7 +30,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public Device getById(Session session, long deviceId) {
+	public Device getById(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		final Device device = deviceController.getById(deviceId);
@@ -102,7 +102,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public Printer getDefaultPrinter(Session session, long deviceId) {
+	public Printer getDefaultPrinter(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		Printer resp = deviceController.getDefaultPrinter(deviceId);
@@ -112,7 +112,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public List<Printer> getAvailablePrinters(Session session, long deviceId) {
+	public List<Printer> getAvailablePrinters(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		List<Printer> resp = deviceController.getAvailablePrinters(deviceId);
@@ -145,7 +145,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public List<String> getLoggedInUsers(Session session, long deviceId) {
+	public List<String> getLoggedInUsers(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		List<String> resp = deviceController.getLoggedInUsers(deviceId);
@@ -154,7 +154,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse setDefaultPrinter(Session session, long deviceId, long defaultPrinterId) {
+	public OssResponse setDefaultPrinter(Session session, Long deviceId, Long defaultPrinterId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		OssResponse resp = deviceController.setDefaultPrinter(deviceId,defaultPrinterId);
@@ -163,7 +163,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse deleteDefaultPrinter(Session session, long deviceId) {
+	public OssResponse deleteDefaultPrinter(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new DeviceController(session,em).deleteDefaultPrinter(deviceId);
 		em.close();
@@ -171,7 +171,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse addAvailablePrinters(Session session, long deviceId, long printerId) {
+	public OssResponse addAvailablePrinters(Session session, Long deviceId, Long printerId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new DeviceController(session,em).addAvailablePrinter(deviceId, printerId);
 		em.close();
@@ -179,7 +179,7 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse deleteAvailablePrinters(Session session, long deviceId, long printerId) {
+	public OssResponse deleteAvailablePrinters(Session session, Long deviceId, Long printerId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new DeviceController(session,em).deleteAvailablePrinter(deviceId, printerId);
 		em.close();
@@ -228,7 +228,16 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
-	public OssResponse delete(Session session, long deviceId) {
+	public OssResponse modify(Session session, Long deviceId, Device device) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		device.setId(deviceId);
+		OssResponse resp =  new DeviceController(session,em).modify(device);
+		em.close();
+		return resp;
+	}
+
+	@Override
+	public OssResponse delete(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		OssResponse resp = deviceController.delete(deviceId,true);

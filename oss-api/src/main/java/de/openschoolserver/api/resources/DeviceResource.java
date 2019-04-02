@@ -46,7 +46,7 @@ public interface DeviceResource {
 	@RolesAllowed("device.manage")
 	Device getById(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("deviceId") long deviceId
+	        @PathParam("deviceId") Long deviceId
 	);
 	
 	/*
@@ -234,7 +234,7 @@ public interface DeviceResource {
 	@PermitAll
 	Printer getDefaultPrinter(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("deviceId") long deviceId
+	        @PathParam("deviceId") Long deviceId
 	);
 	
 	/*
@@ -266,8 +266,8 @@ public interface DeviceResource {
 	@RolesAllowed("device.manage")
 	OssResponse setDefaultPrinter(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("deviceId") long deviceId,
-	        @PathParam("printerId") long printerId
+	        @PathParam("deviceId") Long deviceId,
+	        @PathParam("printerId") Long printerId
 	);
 	
 	/*
@@ -283,7 +283,7 @@ public interface DeviceResource {
 	@RolesAllowed("device.manage")
 	OssResponse deleteDefaultPrinter(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("deviceId") long deviceId
+	        @PathParam("deviceId") Long deviceId
 	);
 	
 	/*
@@ -299,7 +299,7 @@ public interface DeviceResource {
 	@PermitAll
 	List<Printer> getAvailablePrinters(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("deviceId") long deviceId
+	        @PathParam("deviceId") Long deviceId
 	);
 	
 	/*
@@ -331,8 +331,8 @@ public interface DeviceResource {
 	@RolesAllowed("device.manage")
 	OssResponse addAvailablePrinters(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("deviceId") long deviceId,
-	        @PathParam("printerId") long printerId
+	        @PathParam("deviceId") Long deviceId,
+	        @PathParam("printerId") Long printerId
 	);
 	
 	/*
@@ -348,8 +348,8 @@ public interface DeviceResource {
 	@RolesAllowed("device.manage")
 	OssResponse deleteAvailablePrinters(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("deviceId") long deviceId,
-	        @PathParam("printerId") long printerId
+	        @PathParam("deviceId") Long deviceId,
+	        @PathParam("printerId") Long printerId
 	);
 	
 	/*
@@ -428,7 +428,7 @@ public interface DeviceResource {
 	@RolesAllowed("device.manage")
 	List<String> getLoggedInUsers(
 	        @ApiParam(hidden = true) @Auth Session session,
-	        @PathParam("deviceId") long deviceId
+	        @PathParam("deviceId") Long deviceId
 	);
 	
 	/*
@@ -446,9 +446,6 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session
 	);
 	
-	/*
-	 * PUSH devices/modify
-	 */
 	@POST
 	@Path("modify")
 	@Produces(JSON_UTF8)
@@ -462,6 +459,20 @@ public interface DeviceResource {
 	        Device device
 	);
 	
+	@POST
+	@Path("{deviceId}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Modify the configuration of one device.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("device.modify")
+	OssResponse modify(
+	@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("deviceId") Long deviceId,
+	        Device device
+	);
+
 	/*
 	 * DELETE
 	 */
@@ -475,7 +486,7 @@ public interface DeviceResource {
 	@RolesAllowed("device.delete")
 	OssResponse delete(
 		@ApiParam(hidden = true) @Auth Session session,
-		@PathParam("deviceId") long deviceId
+		@PathParam("deviceId") Long deviceId
 	);
 	
 	@POST

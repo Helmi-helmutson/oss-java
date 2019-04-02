@@ -34,7 +34,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public Room getById(Session session, long roomId) {
+	public Room getById(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Room room = new RoomController(session,em).getById(roomId);
 		em.close();
@@ -84,7 +84,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 	
 	@Override
-	public OssResponse delete(Session session, long roomId) {
+	public OssResponse delete(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		OssResponse resp = roomController.delete(roomId);
@@ -102,7 +102,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 	
 	@Override
-	public List<String> getAvailableIPAddresses(Session session, long roomId) {
+	public List<String> getAvailableIPAddresses(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<String> ips = roomController.getAvailableIPAddresses(roomId);
@@ -114,7 +114,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<String> getAvailableIPAddresses(Session session, long roomId, long count) {
+	public List<String> getAvailableIPAddresses(Session session, Long roomId, Long count) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<String> ips = roomController.getAvailableIPAddresses(roomId,count);
@@ -138,7 +138,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<Map<String, String>> getLoggedInUsers(Session session, long roomId) {
+	public List<Map<String, String>> getLoggedInUsers(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<Map<String, String>> users = roomController.getLoggedInUsers(roomId);
@@ -150,7 +150,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<AccessInRoom> getAccessList(Session session, long roomId) {
+	public List<AccessInRoom> getAccessList(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		final List<AccessInRoom> accesses = roomController.getAccessList(roomId);
@@ -163,7 +163,7 @@ public class RoomRescourceImpl implements RoomResource {
 
 
 	@Override
-	public OssResponse addAccessList(Session session, long roomId, AccessInRoom accessList) {
+	public OssResponse addAccessList(Session session, Long roomId, AccessInRoom accessList) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new RoomController(session,em).addAccessList(roomId,accessList);
 		em.close();
@@ -171,7 +171,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse deleteAccessList(Session session, long accessInRoomId) {
+	public OssResponse deleteAccessList(Session session, Long accessInRoomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new RoomController(session,em).deleteAccessList(accessInRoomId);
 		em.close();
@@ -206,7 +206,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public AccessInRoom getAccessStatus(Session session, long roomId) {
+	public AccessInRoom getAccessStatus(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		AccessInRoom resp = new RoomController(session,em).getAccessStatus(roomId);
 		em.close();
@@ -214,7 +214,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse setAccessStatus(Session session, long roomId, AccessInRoom access) {
+	public OssResponse setAccessStatus(Session session, Long roomId, AccessInRoom access) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new RoomController(session,em).setAccessStatus(roomId, access);
 		em.close();
@@ -222,7 +222,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse addDevices(Session session, long roomId, List<Device> devices) {
+	public OssResponse addDevices(Session session, Long roomId, List<Device> devices) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		OssResponse ossResponse = roomController.addDevices(roomId,devices);
@@ -231,7 +231,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse addDevice(Session session, long roomId, String macAddress, String name) {
+	public OssResponse addDevice(Session session, Long roomId, String macAddress, String name) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		OssResponse resp = roomController.addDevice(roomId,macAddress,name);
@@ -240,7 +240,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse deleteDevices(Session session, long roomId, List<Long> deviceIds) {
+	public OssResponse deleteDevices(Session session, Long roomId, List<Long> deviceIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		OssResponse resp = roomController.deleteDevices(roomId,deviceIds);
@@ -249,7 +249,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse deleteDevice(Session session, long roomId, Long deviceId) {
+	public OssResponse deleteDevice(Session session, Long roomId, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		List<Long> deviceIds = new ArrayList<Long>();
@@ -258,7 +258,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<Device> getDevices(Session session, long roomId) {
+	public List<Device> getDevices(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		List<Device> resp = roomController.getDevices(roomId);
@@ -267,7 +267,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public HWConf getHwConf(Session session, long roomId) {
+	public HWConf getHwConf(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		HWConf resp = roomController.getHWConf(roomId);
@@ -276,7 +276,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse setHwConf(Session session, long roomId, long hwConfId) {
+	public OssResponse setHwConf(Session session, Long roomId, Long hwConfId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
 		OssResponse resp = roomController.setHWConf(roomId,hwConfId);
@@ -320,6 +320,15 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
+	public OssResponse modify(Session session, Long roomId, Room room) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		room.setId(roomId);
+		OssResponse resp = new RoomController(session,em).modify(room);
+		em.close();
+		return resp;
+	}
+
+	@Override
 	public OssResponse setDefaultPrinter(Session session, Long roomId, Long printerIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new RoomController(session,em).setDefaultPrinter(roomId, printerIds);
@@ -336,7 +345,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse deleteDefaultPrinter(Session session, long roomId) {
+	public OssResponse deleteDefaultPrinter(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new RoomController(session,em).deleteDefaultPrinter(roomId);
 		em.close();
@@ -344,7 +353,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public Printer getDefaultPrinter(Session session, long roomId) {
+	public Printer getDefaultPrinter(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Printer resp = new RoomController(session,em).getById(roomId).getDefaultPrinter();
 		em.close();
@@ -352,7 +361,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse setAvailablePrinters(Session session, long roomId, List<Long> printerIds) {
+	public OssResponse setAvailablePrinters(Session session, Long roomId, List<Long> printerIds) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new RoomController(session,em).setAvailablePrinters(roomId, printerIds);
 		em.close();
@@ -360,7 +369,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse addAvailablePrinters(Session session, long roomId, long printerId) {
+	public OssResponse addAvailablePrinters(Session session, Long roomId, Long printerId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new RoomController(session,em).addAvailablePrinter(roomId, printerId);
 		em.close();
@@ -368,7 +377,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public OssResponse deleteAvailablePrinters(Session session, long roomId, long printerId) {
+	public OssResponse deleteAvailablePrinters(Session session, Long roomId, Long printerId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new RoomController(session,em).deleteAvailablePrinter(roomId, printerId);
 		em.close();
@@ -376,7 +385,7 @@ public class RoomRescourceImpl implements RoomResource {
 	}
 
 	@Override
-	public List<Printer> getAvailablePrinters(Session session, long roomId) {
+	public List<Printer> getAvailablePrinters(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<Printer> resp = new RoomController(session,em).getById(roomId).getAvailablePrinters();
 		em.close();
