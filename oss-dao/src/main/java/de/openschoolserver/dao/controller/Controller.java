@@ -112,7 +112,7 @@ public class Controller extends Config {
 		if( properties.containsKey(property) ) {
 			return properties.get(property);
 		}
-		return null;
+		return "";
 	}
 
 	public String getNl() {
