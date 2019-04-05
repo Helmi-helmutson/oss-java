@@ -19,7 +19,7 @@ Source3:	start-oss-api
 Source4:	oss-api.service
 Source5:	data.tar.bz2
 Requires: 	systemd 
-Requires:	oss-base
+Requires:	oss-base > 4.0.1
 BuildArch:      noarch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  -post-build-checks

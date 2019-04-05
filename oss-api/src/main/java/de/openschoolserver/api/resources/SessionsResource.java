@@ -26,7 +26,7 @@ public interface SessionsResource {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(JSON_UTF8)
-    @ApiOperation(value = "create a new session")
+    @ApiOperation(value = "Creates a new session and delivers the session.")
     @ApiResponses(value = {
             @ApiResponse(code = 401, message = "Login is incorrect"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -43,7 +43,7 @@ public interface SessionsResource {
     @Path("login")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(TEXT)
-    @ApiOperation(value = "create a new session")
+    @ApiOperation(value = "Creates a new session and delivers the token.")
     @ApiResponses(value = {
             @ApiResponse(code = 401, message = "Login is incorrect"),
             @ApiResponse(code = 500, message = "Server broken, please contact administrator")

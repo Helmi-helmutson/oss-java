@@ -1,11 +1,7 @@
 package de.openschoolserver.dao;
 
-import de.openschoolserver.dao.controller.*;
-import de.openschoolserver.dao.tools.*;
-
 import java.io.Serializable;
 import java.util.List;
-import java.util.regex.*;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;

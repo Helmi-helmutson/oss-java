@@ -14,8 +14,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.json.Json;
+import javax.json.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+
+import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -102,49 +106,36 @@ public class PrinterController extends Controller {
 	 * @return
 	 */
 	public List<Printer> getPrinters() {
-		List<Printer> printers = new ArrayList<Printer>();
-		String[] program = new String[3];
+		List<JsonObject> printers   = new ArrayList<JsonObject>();
+		List<Printer> printers2 = new ArrayList<Printer>();
+		String[] program = new String[1];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
-		program[0] = "/usr/bin/ipptool";
-		program[1] = "ipp://localhost/printers/";
-		program[2] = "get-printers.test";
+		program[0] = "/usr/share/oss/tools/get_printer_list.py";
 		OSSShellTools.exec(program, reply, stderr, null);
 		logger.debug(stderr.toString());
-		String[] lines = reply.toString().split(this.getNl());
-		Pattern pattern = Pattern.compile("\\S+");
-		for( int i=2 ; i < lines.length; i ++) {
-			logger.debug("printer:" + lines[i]);
-			Matcher matcher = pattern.matcher(lines[i]);
-			if( matcher.find()) {
-				String  name    = matcher.group(0);
-				Printer printer = getByName(name);
-				if( printer == null ) {
-					continue;
-				}
-				if( matcher.find() ) {
-					printer.setState(matcher.group(0));
-				}
-				if( matcher.find() ) {
-					printer.setAcceptingJobs(matcher.group(0).equals("true"));
-				}
-				if( matcher.find() ) {
-					logger.debug("Found job:" + matcher.group(0));
-					printer.setActiveJobs(Integer.parseInt(matcher.group(0)));
-				}
-				// Test if the windows driver was activated
-				File file = new File("/var/lib/printserver/drivers/x64/3/"+name+".ppd");
-				if( file.exists() ) {
-					printer.setWindowsDriver(true);
-				}
-				if( printer.getDevice() != null ) {
-					printer.setDeviceName(printer.getDevice().getName());
-				}
-				printer.setModel(getModel(name));
-				printers.add(printer);
+		try {
+			printers = (List<JsonObject> )Json.createReader(
+					 IOUtils.toInputStream(reply.toString(), "UTF-8")).read();
+		} catch (Exception e) {
+			logger.debug("getPrinters :" + e.getMessage());
+			return printers2;
+		}
+		for( JsonObject p : printers ) {
+			logger.debug("printer" + p);
+			logger.debug("printer" + p.getString("name"));
+			Printer printer = getByName(p.getString("name"));
+			if( printer != null ) {
+				printer.setModel(getModel(printer.getName()));
+				printer.setState(p.getString("status","disabled"));
+				printer.setAcceptingJobs(p.getBoolean("acceptingJobs",false));
+				printer.setWindowsDriver(p.getBoolean("windowsDriver",false));
+				printer.setActiveJobs(p.getInt("activeJobs",0));
+				printer.setModel(getModel(p.getString("name")));
+				printers2.add(printer);
 			}
 		}
-		return printers;
+		return printers2;
 	}
 	
 	/**

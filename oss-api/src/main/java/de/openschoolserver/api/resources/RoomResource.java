@@ -200,6 +200,13 @@ public interface RoomResource {
 	        Room room
 	);
 
+	/**
+	 *
+	 * @param session
+	 * @param roomId
+	 * @param room
+	 * @return
+	 */
 	@POST
 	@Path("{roomId}")
 	@Produces(JSON_UTF8)
@@ -215,8 +222,12 @@ public interface RoomResource {
 	        Room room
 	);
 
-	/*
-	 * DELETE rooms/{roomId}
+
+	/**
+	 * Deletes a room by id with all devices with in.
+	 * @param session
+	 * @param roomId
+	 * @return
 	 */
 	@DELETE
 	@Path("{roomId}")
