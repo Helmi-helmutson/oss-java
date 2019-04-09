@@ -281,6 +281,18 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
+	public String getOwnerByIP(Session session, String IP) {
+		Device device = this.getByIP(session, IP);
+		if( device == null ) {
+			return "";
+		}
+		if( device.getOwner() == null ) {
+			return "";
+		}
+		return device.getOwner().getUid();
+	}
+
+	@Override
 	public String getHostnameByMAC(Session session, String MAC) {
 		Device device = this.getByMAC(session, MAC);
 		if( device == null ) {

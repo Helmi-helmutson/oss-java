@@ -84,7 +84,7 @@ public interface DeviceResource {
 	@GET
 	@Path("allNames")
 	@Produces(TEXT)
-	@ApiOperation(value = "Get all devices")
+	@ApiOperation(value = "Get the names of all devices")
 	@ApiResponses(value = {
 	        // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
@@ -147,7 +147,7 @@ public interface DeviceResource {
 	@GET
 	@Path("byIP/{IP}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Get device by MAC address")
+	@ApiOperation(value = "Get device by IP address")
 	    @ApiResponses(value = {
 	    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
@@ -163,7 +163,7 @@ public interface DeviceResource {
 	@GET
 	@Path("hostnameByIP/{IP}")
 	@Produces(TEXT)
-	@ApiOperation(value = "Get device by MAC address")
+	@ApiOperation(value = "Get device name by ip address")
 	    @ApiResponses(value = {
 	    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
@@ -173,6 +173,22 @@ public interface DeviceResource {
 	        @PathParam("IP") String IP
 	);
 	
+	/*
+	 * GET devices/hostnameByIP/<IPAddress>
+	 */
+	@GET
+	@Path("owner/{IP}")
+	@Produces(TEXT)
+	@ApiOperation(value = "Get the uid of the device owners by the ip address of the device.")
+	    @ApiResponses(value = {
+	    @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@PermitAll
+	String getOwnerByIP(
+	        @ApiParam(hidden = true) @Auth Session session,
+	        @PathParam("IP") String IP
+	);
+
 	/*
 	 * GET devices/byMAC/<MACAddress>
 	 */
