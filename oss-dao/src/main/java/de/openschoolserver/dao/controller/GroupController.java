@@ -220,6 +220,7 @@ public class GroupController extends Controller {
 				user.getGroups().remove(group);
 				this.em.merge(user);
 			}
+			this.deletAllConfigs(group);
 			this.em.remove(group);
 			this.em.getTransaction().commit();
 			//em.getEntityManagerFactory().getCache().evictAll();

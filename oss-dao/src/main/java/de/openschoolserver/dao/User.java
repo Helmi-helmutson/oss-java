@@ -146,6 +146,16 @@ public class User implements Serializable {
 	@JsonIgnore
 	private List<AccessInRoom> createdAccessInRoom = new ArrayList<AccessInRoom>();
 
+	//bi-directional many-to-one association to OSSConfig
+	@OneToMany(mappedBy="creator")
+	@JsonIgnore
+	private List<OSSConfig> createdOSSConfig = new ArrayList<OSSConfig>();
+
+	//bi-directional many-to-one association to OSSConfig
+	@OneToMany(mappedBy="creator")
+	@JsonIgnore
+	private List<OSSMConfig> createdOSSMConfig = new ArrayList<OSSMConfig>();
+
 	//bi-directional many-to-one association to Device
 	@OneToMany(mappedBy="owner")
 	@JsonIgnore
@@ -681,5 +691,21 @@ public class User implements Serializable {
 
 	public void setMailAliases(List<String> mailAliases) {
 		this.mailAliases = mailAliases;
+	}
+
+	public List<OSSConfig> getCreatedOSSConfig() {
+		return createdOSSConfig;
+	}
+
+	public void setCreatedOSSConfig(List<OSSConfig> createdOSSConfig) {
+		this.createdOSSConfig = createdOSSConfig;
+	}
+
+	public List<OSSMConfig> getCreatedOSSMConfig() {
+		return createdOSSMConfig;
+	}
+
+	public void setCreatedOSSMConfig(List<OSSMConfig> createdOSSMConfig) {
+		this.createdOSSMConfig = createdOSSMConfig;
 	}
 }

@@ -758,6 +758,31 @@ public class Controller extends Config {
 		return values;
 	}
 
+	public List<OSSMConfig> getAllMConfig(Object object) {
+		Long id = null;
+		Query query = this.em.createNamedQuery("OSSMConfig.getAllById");
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Group":
+			 query.setParameter("type","Group");
+			 id    = ((Group) object ).getId();
+			 break;
+		case "de.openschoolserver.dao.User":
+			 query.setParameter("type","User");
+			 id    = ((User) object ).getId();
+			 break;
+		case "de.openschoolserver.dao.Room":
+			query.setParameter("type","Room");
+			id    = ((Room) object ).getId();
+			break;
+		case "de.openschoolserver.dao.Device":
+			query.setParameter("type","Device");
+			id    = ((Device) object ).getId();
+			break;
+		}
+		query.setParameter("id", id);
+		return (List<OSSMConfig>) query.getResultList();
+	}
+
 	public List<OSSMConfig> getMConfigObjects(Object object, String key) {
 		Long id = null;
 		Query query = this.em.createNamedQuery("OSSMConfig.get");
@@ -820,6 +845,31 @@ public class Controller extends Config {
 		}
 		OSSConfig config = (OSSConfig) query.getResultList().get(0);
 		return config.getValue();
+	}
+
+	public List<OSSConfig> getAllConfig(Object object) {
+		Long id = null;
+		Query query = this.em.createNamedQuery("OSSConfig.getAllById");
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Group":
+			 query.setParameter("type","Group");
+			 id    = ((Group) object ).getId();
+			 break;
+		case "de.openschoolserver.dao.User":
+			 query.setParameter("type","User");
+			 id    = ((User) object ).getId();
+			 break;
+		case "de.openschoolserver.dao.Room":
+			query.setParameter("type","Room");
+			id    = ((Room) object ).getId();
+			break;
+		case "de.openschoolserver.dao.Device":
+			query.setParameter("type","Device");
+			id    = ((Device) object ).getId();
+			break;
+		}
+		query.setParameter("id", id);
+		return (List<OSSConfig>) query.getResultList();
 	}
 
 	public OssResponse addMConfig(Object object, String key, String value) {
@@ -983,5 +1033,16 @@ public class Controller extends Config {
 		} finally {
 		}
 		return new OssResponse(this.getSession(),"OK","Config was deleted");
+	}
+
+	public void deletAllConfigs(Object object) {
+		//Remove corresponding OSSConfig
+		for( OSSConfig o : this.getAllConfig(object)) {
+			this.em.remove(o);
+		}
+		//Remove corresponding OSSMConfig
+		for( OSSMConfig o : this.getAllMConfig(object)) {
+			this.em.remove(o);
+		}
 	}
 }

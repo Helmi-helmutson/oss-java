@@ -191,6 +191,7 @@ public class DeviceController extends Controller {
 					logger.error("Deleting salt file:" + e.getMessage());
 				}
 			}
+			this.deletAllConfigs(device);
 			this.em.remove(device);
 			//Clean up room
 			room.getDevices().remove(device);

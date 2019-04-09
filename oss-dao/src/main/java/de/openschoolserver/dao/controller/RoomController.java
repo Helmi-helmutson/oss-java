@@ -397,6 +397,7 @@ public class RoomController extends Controller {
 				category.getRooms().remove(room);
 				this.em.merge(category);
 			}
+			this.deletAllConfigs(room);
 			this.em.remove(room);
 			this.em.getTransaction().commit();
 		} catch (Exception e) {

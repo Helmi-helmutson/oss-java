@@ -976,10 +976,23 @@ public class UserController extends Controller {
 				this.em.merge(o);
 			}
 			creator.setCreatedUsers(null);
+			//OSSConfig
+			for( OSSConfig o : creator.getCreatedOSSConfig() ) {
+				o.setCreator(newCreator);
+				this.em.merge(o);
+			}
+			//OSSMConfig
+			for( OSSMConfig o : creator.getCreatedOSSMConfig() ) {
+				o.setCreator(newCreator);
+				this.em.merge(o);
+			}
 			//Sessions will be deleted
 			for( Session o : creator.getSessions() ) {
 				this.em.remove(o);
 			}
+			creator.setCreatedUsers(null);
+			//Delete all correspondig configs.
+			this.deletAllConfigs(creator);
 			this.em.merge(newCreator);
 		} catch (Exception e) {
 			logger.error("inheritCreatedObjects:" + e.getMessage());
@@ -1042,6 +1055,8 @@ public class UserController extends Controller {
 			for( Session o : creator.getSessions() ) {
 				this.em.remove(o);
 			}
+			//Delete all correspondig configs.
+			this.deletAllConfigs(creator);
 			creator.setSessions(null);
 			this.em.merge(creator);
 		} catch (Exception e) {
