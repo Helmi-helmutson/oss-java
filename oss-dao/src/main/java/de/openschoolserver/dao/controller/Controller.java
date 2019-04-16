@@ -272,12 +272,12 @@ public class Controller extends Config {
 			data.append(String.format("ip: %s%n", device.getIp()));
 			data.append(String.format("mac: %s%n", device.getMac()));
 			if( ! device.getWlanIp().isEmpty() ) {
-				data.append(String.format("wlanIp: %s%n", device.getWlanIp()));
-				data.append(String.format("wlanMac: %s%n", device.getWlanMac()));
+				data.append(String.format("wlanip: %s%n", device.getWlanIp()));
+				data.append(String.format("wlanmac: %s%n", device.getWlanMac()));
 			}
 			if( device.getHwconf() != null ) {
 				data.append(String.format("hwconf: %s%n", device.getHwconf().getName()));
-				data.append(String.format("hwconfId: %s%n", device.getHwconfId()));
+				data.append(String.format("hwconfid: %s%n", device.getHwconfId()));
 			}
 			break;
 		case "de.openschoolserver.dao.HWconf":
