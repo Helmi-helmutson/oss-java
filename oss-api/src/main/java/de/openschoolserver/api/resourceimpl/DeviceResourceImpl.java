@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
@@ -73,7 +75,7 @@ public class DeviceResourceImpl implements DeviceResource {
 		em.close();
 		if (device == null) {
 	            throw new WebApplicationException(404);
-	    }
+		}
 		return device;
 	}
 
@@ -85,7 +87,7 @@ public class DeviceResourceImpl implements DeviceResource {
 		em.close();
 		if (device == null) {
 	            throw new WebApplicationException(404);
-	    }
+		}
 		return device;
 	}
 
@@ -96,7 +98,7 @@ public class DeviceResourceImpl implements DeviceResource {
 		final Device device = deviceController.getByName(Name);
 		em.close();
 		if (device == null) {
-            throw new WebApplicationException(404);
+			throw new WebApplicationException(404);
 		}
 		return device;
 	}
@@ -108,7 +110,6 @@ public class DeviceResourceImpl implements DeviceResource {
 		Printer resp = deviceController.getDefaultPrinter(deviceId);
 		em.close();
 		return resp;
-		
 	}
 
 	@Override
@@ -195,12 +196,46 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
+	public String setLoggedInUserByMac(
+			UriInfo ui,
+			HttpServletRequest req,
+			String MAC,
+			String userName) {
+		if( !req.getRemoteAddr().equals("127.0.0.1")) {
+			return "ERROR Connection is allowed only from local host.";
+		}
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		Session session  = new SessionController(em).getLocalhostSession();
+		final DeviceController deviceController = new DeviceController(session,em);
+		OssResponse resp = deviceController.setLoggedInUserByMac(MAC, userName);
+		em.close();
+		return resp.getCode() + " " + resp.getValue();
+	}
+
+	@Override
 	public OssResponse deleteLoggedInUser(Session session, String IP, String userName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
 		OssResponse resp =  deviceController.removeLoggedInUser(IP, userName);
 		em.close();
 		return resp;
+	}
+
+	@Override
+	public String deleteLoggedInUserByMac(
+			UriInfo ui,
+			HttpServletRequest req,
+			String MAC,
+			String userName) {
+		if( !req.getRemoteAddr().equals("127.0.0.1")) {
+			return "ERROR Connection is allowed only from local host.";
+		}
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		Session session  = new SessionController(em).getLocalhostSession();
+		final DeviceController deviceController = new DeviceController(session,em);
+		OssResponse resp =  deviceController.removeLoggedInUserByMac(MAC, userName);
+		em.close();
+		return resp.getCode() + " " + resp.getValue();
 	}
 
 	@Override
