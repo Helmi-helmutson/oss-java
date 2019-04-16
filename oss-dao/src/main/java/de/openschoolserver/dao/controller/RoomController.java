@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Calendar;
+import java.util.Comparator;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -121,54 +122,61 @@ public class RoomController extends Controller {
 	}
 
 	public List<Room> getAllToUse() {
+		List<Room> rooms = new ArrayList<Room>();
 		try {
 			Query query = this.em.createNamedQuery("Room.findAllToUse");
-			return (List<Room>) query.getResultList();
+			rooms = query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ArrayList<>();
 		} finally {
 		}
+		rooms.sort(Comparator.comparing(Room::getName));
+		return rooms;
 	}
 
 	public List<Room> getAll() {
+		List<Room> rooms = new ArrayList<Room>();
 		try {
 			Query query = this.em.createNamedQuery("Room.findAll");
-			return (List<Room>) query.getResultList();
+			rooms = query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ArrayList<>();
 		} finally {
 		}
+		rooms.sort(Comparator.comparing(Room::getName));
+		return rooms;
 	}
 
 	public List<Room> getAllWithControl() {
+		List<Room> rooms = new ArrayList<Room>();
 		try {
 			Query query = this.em.createNamedQuery("Room.findAllWithControl");
-			return (List<Room>) query.getResultList();
+			rooms =  query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ArrayList<>();
 		} finally {
 		}
+		rooms.sort(Comparator.comparing(Room::getName));
+		return rooms;
 	}
 
 	public List<Room> getAllWithTeacherControl() {
+		List<Room> rooms = new ArrayList<Room>();
 		try {
 			Query query = this.em.createNamedQuery("Room.findAllWithTeacherControl");
-			return (List<Room>) query.getResultList();
+			rooms =  query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ArrayList<>();
 		} finally {
 		}
+		rooms.sort(Comparator.comparing(Room::getName));
+		return rooms;
 	}
 
 	public List<Room> getAllWithFirewallControl() {
 		List<Room> rooms = new ArrayList<Room>();
 		for( String network : this.getEnumerates("network") ) {
 			String[] net = network.split("/");
-
 			if( net.length != 2 ) {
 				logger.error("Bad network");
 			} else {
@@ -191,18 +199,21 @@ public class RoomController extends Controller {
 			logger.error(e.getMessage());
 		} finally {
 		}
+		rooms.sort(Comparator.comparing(Room::getName));
 		return rooms;
 	}
 
 	public List<Room> getByType(String roomType) {
+		List<Room> rooms = new ArrayList<Room>();
 		try {
 			Query query = this.em.createNamedQuery("Room.getByType").setParameter("type", roomType);
-			return (List<Room>) query.getResultList();
+			rooms = query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ArrayList<>();
 		} finally {
 		}
+		rooms.sort(Comparator.comparing(Room::getName));
+		return rooms;
 	}
 
 
@@ -235,13 +246,13 @@ public class RoomController extends Controller {
 	 * 			For normal user the list his AdHocAccess rooms of those of his groups
 	 */
 	public List<Room> getAllToRegister() {
+		List<Room> rooms = new ArrayList<Room>();
 		try {
 			if( this.isSuperuser() ) {
 				logger.debug("Is superuser" + this.session.getUser().getUid());
 				Query query = this.em.createNamedQuery("Room.findAllToRegister");
-				return query.getResultList();
+				rooms = query.getResultList();
 			} else {
-				List<Room> rooms = new ArrayList<Room>();
 				for( Category category : this.session.getUser().getCategories() ) {
 					if( category.getCategoryType().equals("AdHocAccess") &&
 					  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent) ) &&
@@ -259,13 +270,13 @@ public class RoomController extends Controller {
 						}
 					}
 				}
-				return rooms;
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ArrayList<>();
 		} finally {
 		}
+		rooms.sort(Comparator.comparing(Room::getName));
+		return rooms;
 	}
 
 	/**
@@ -394,8 +405,21 @@ public class RoomController extends Controller {
 			this.em.getTransaction().begin();
 			room = this.em.find(Room.class, roomId);
 			for(Category category : categoriesToModify) {
-				category.getRooms().remove(room);
-				this.em.merge(category);
+				if( category.getCategoryType().equals("AdHocAccess")) {
+					for( Object o : category.getFaqs())  {
+						this.em.remove(o);
+					}
+					for( Object o : category.getAnnouncements())  {
+						this.em.remove(o);
+					}
+					for( Object o : category.getContacts())  {
+						this.em.remove(o);
+					}
+					this.em.remove(category);
+				} else {
+					category.getRooms().remove(room);
+					this.em.merge(category);
+				}
 			}
 			this.deletAllConfigs(room);
 			this.em.remove(room);
@@ -831,6 +855,7 @@ public class RoomController extends Controller {
 				}
 				OssResponse ossResponse = deviceController.check(device, room);
 				if( ossResponse.getCode().equals("ERROR") ) {
+					logger.error("addDevices addDevice:" +ossResponse);
 					return ossResponse;
 				}
 				device.setRoom(room);
@@ -864,6 +889,9 @@ public class RoomController extends Controller {
 			logger.error(e.getMessage());
 			return new OssResponse(this.getSession(),"ERROR", "Error by creating the device: " + e.getMessage());
 		} finally {
+			if( this.em.getTransaction().isActive() ) {
+				this.em.getTransaction().rollback();
+			}
 		}
 		UserController userController = new UserController(this.session,this.em);
 		boolean needWriteSalt = false;
@@ -1420,7 +1448,7 @@ public class RoomController extends Controller {
 					parameters.add(values[header.get("control")]);
 					parameters.add(i.toString());
 					parameters.add(String.join(",",getEnumerates("roomControl")));
-					return new OssResponse(this.getSession(),"ERROR", "Can not find hwconf %s in line %s. Allowed values are: %s.",null,parameters);
+					return new OssResponse(this.getSession(),"ERROR", "Can not find room control %s in line %s. Allowed values are: %s.",null,parameters);
 				}
 				room.setRoomControl(values[header.get("control")]);
 			}
