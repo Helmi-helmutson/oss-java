@@ -11,8 +11,11 @@ import io.swagger.annotations.*;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
@@ -48,7 +51,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId
 	);
-	
+
 	/*
 	* GET devices/byHWConf/{hwconfId}
 	*/
@@ -64,7 +67,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("hwconfId") Long id
 	);
-	
+
 	/*
 	 * GET devices/getAll
 	 */
@@ -80,7 +83,7 @@ public interface DeviceResource {
 	List<Device> getAll(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
-	
+
 	@GET
 	@Path("allNames")
 	@Produces(TEXT)
@@ -93,8 +96,8 @@ public interface DeviceResource {
 	String getAllNames(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
-	
-	
+
+
 	/*
 	 * GET devices/getAll
 	 */
@@ -111,7 +114,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("saltClientOnly") Long saltClientOnly
 	);
-	
+
 	/*
 	 * GET search/{search}
 	 */
@@ -156,7 +159,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("IP") String IP
 	);
-	
+
 	/*
 	 * GET devices/hostnameByIP/<IPAddress>
 	 */
@@ -172,7 +175,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("IP") String IP
 	);
-	
+
 	/*
 	 * GET devices/hostnameByIP/<IPAddress>
 	 */
@@ -204,7 +207,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("MAC") String MAC
 	);
-	
+
 	/*
 	 * GET devices/hostnameByIP/<IPAddress>
 	 */
@@ -220,7 +223,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("MAC") String MAC
 	);
-	
+
 	/*
 	 * GET devices/byName/<Name>
 	 */
@@ -236,7 +239,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("Name") String Name
 	);
-	
+
 	/*
 	 * GET devices/{deviceId}/defaultPrinter
 	 */
@@ -252,7 +255,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId
 	);
-	
+
 	/*
 	 * GET devices/{deviceId}/defaultPrinter
 	 */
@@ -268,7 +271,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("IP") String IP
 	);
-	
+
 	/*
 	 * PUT devices/{deviceId}/defaultPrinter/{printerId}
 	 */
@@ -285,7 +288,7 @@ public interface DeviceResource {
 	        @PathParam("deviceId") Long deviceId,
 	        @PathParam("printerId") Long printerId
 	);
-	
+
 	/*
 	 * DELETE devices/{deviceId}/defaultPrinter
 	 */
@@ -301,7 +304,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId
 	);
-	
+
 	/*
 	 * GET devices/{deviceId}/availablePrinters
 	 */
@@ -317,7 +320,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId
 	);
-	
+
 	/*
 	 * GET devices/{deviceId}/availablePrinters
 	 */
@@ -333,7 +336,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("IP") String IP
 	);
-	
+
 	/*
 	 * PUT devices/{deviceId}/availablePrinters
 	 */
@@ -350,7 +353,7 @@ public interface DeviceResource {
 	        @PathParam("deviceId") Long deviceId,
 	        @PathParam("printerId") Long printerId
 	);
-	
+
 	/*
 	 * DELETE devices/{deviceId}/availablePrinters
 	 */
@@ -367,7 +370,7 @@ public interface DeviceResource {
 	        @PathParam("deviceId") Long deviceId,
 	        @PathParam("printerId") Long printerId
 	);
-	
+
 	/*
 	 * GET devices/loggedInUsers/{IP-Address}
 	 */
@@ -383,7 +386,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("IP") String IP
 	);
-	
+
 	/*
 	 * GET devices/loggedIn/{IP-Address}
 	 */
@@ -413,7 +416,21 @@ public interface DeviceResource {
 	        @PathParam("IP") String IP,
 	        @PathParam("userName") String userName
 	);
-	
+
+	@PUT
+	@Path("loggedInUserByMac/{MAC}/{userName}")
+	@Produces(TEXT)
+	@ApiOperation(value = "Set the logged on user on a device defined by MAC. All other users logged on users will be removed." )
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	String setLoggedInUserByMac(
+			@Context UriInfo ui,
+	        @Context HttpServletRequest req,
+	        @PathParam("MAC") String partitionName,
+	        @PathParam("userName") String key
+	);
+
 	/*
 	 * DELETE devices/loggedInUsers/{IP-Address}/{userName}
 	 */
@@ -430,7 +447,21 @@ public interface DeviceResource {
 	        @PathParam("IP") String IP,
 	        @PathParam("userName") String userName
 	);
-	
+
+	@DELETE
+	@Path("loggedInUserByMac/{MAC}/{userName}")
+	@Produces(TEXT)
+	@ApiOperation(value = "Set the logged on user on a device defined by MAC. All other users logged on users will be removed." )
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Device not found"),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	String deleteLoggedInUserByMac(
+			@Context UriInfo ui,
+	        @Context HttpServletRequest req,
+	        @PathParam("MAC") String partitionName,
+	        @PathParam("userName") String key
+	);
+
 	/*
 	 * GET devices/{deviceId}/loggedInUsers
 	 */
@@ -446,7 +477,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId
 	);
-	
+
 	/*
 	 * GET devices/refreshConfig
 	 */
@@ -461,7 +492,7 @@ public interface DeviceResource {
 	void refreshConfig(
 	        @ApiParam(hidden = true) @Auth Session session
 	);
-	
+
 	@POST
 	@Path("modify")
 	@Produces(JSON_UTF8)
@@ -474,7 +505,7 @@ public interface DeviceResource {
 	@ApiParam(hidden = true) @Auth Session session,
 	        Device device
 	);
-	
+
 	@POST
 	@Path("{deviceId}")
 	@Produces(JSON_UTF8)
@@ -504,7 +535,7 @@ public interface DeviceResource {
 		@ApiParam(hidden = true) @Auth Session session,
 		@PathParam("deviceId") Long deviceId
 	);
-	
+
 	@POST
 	@Path("import")
 	@Produces(JSON_UTF8)
@@ -524,7 +555,7 @@ public interface DeviceResource {
 	        @FormDataParam("file") final InputStream fileInputStream,
 	        @FormDataParam("file") final FormDataContentDisposition contentDispositionHeader
 	);
-	
+
 	/*
 	* GET devices/{deviceId}/actions
 	*/
@@ -541,7 +572,7 @@ public interface DeviceResource {
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("deviceId") Long deviceId
 	);
-	
+
 	/*
 	 * PUT devices/{deviceId}/{action}
 	 */
@@ -559,7 +590,7 @@ public interface DeviceResource {
 	        @PathParam("deviceId") Long deviceId,
 	        @PathParam("action") String action
 	);
-	
+
 	/*
 	 * PUT devices/byName/{deviceName}/{action}
 	 */
@@ -577,7 +608,7 @@ public interface DeviceResource {
 	        @PathParam("deviceName") String deviceName,
 	        @PathParam("action") String action
 	);
-	
+
 	/*
 	 * POST devices/{deviceId}/actionWithMap/{action}
 	 */
@@ -599,7 +630,7 @@ public interface DeviceResource {
 	        @PathParam("action") String action,
 	        Map<String, String> actionContent
 	);
-	
+
 	@DELETE
 	@Path("cleanUpLoggedIn")
 	@Produces(JSON_UTF8)
