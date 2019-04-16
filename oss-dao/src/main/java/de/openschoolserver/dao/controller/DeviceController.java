@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -62,14 +63,16 @@ public class DeviceController extends Controller {
 	 * Delivers a list of all existing devices
 	 */
 	public List<Device> getAll() {
+		List<Device> devices = new ArrayList<Device>();
 		try {
 			Query query = this.em.createNamedQuery("Device.findAll");
-			return query.getResultList();
+			devices = query.getResultList();
 		} catch (Exception e) {
 			logger.error("getAll " + e.getMessage(),e);
-			return null;
 		} finally {
 		}
+		devices.sort(Comparator.comparing(Device::getName));
+		return devices;
 	}
 
 	/*
@@ -423,6 +426,7 @@ public class DeviceController extends Controller {
 				printers.add(printer);
 			}
 		}
+		printers.sort(Comparator.comparing(Printer::getName));
 		return printers;
 	}
 
@@ -683,6 +687,18 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK","The selected printer was removed from device.");
 	}
 
+	public OssResponse addLoggedInUserByMac(String MAC, String userName) {
+		Device device = this.getByMAC(MAC);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with MAC: %s",null,MAC);
+		}
+		User user = new UserController(this.session,this.em).getByUid(userName);
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
+		}
+		return this.addLoggedInUser(device, user);
+	}
+
 	public OssResponse addLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
 		if( device == null ) {
@@ -730,6 +746,14 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}
 
+	public OssResponse removeLoggedInUserByMac(String MAC, String userName) {
+		Device device = this.getByMAC(MAC);
+		User user = new UserController(this.session,this.em).getByUid(userName);
+		if( device == null  || user == null ) {
+			return new OssResponse(this.getSession(),"ERROR","Can not find user or device");
+		}
+		return this.removeLoggedInUser(device, user);
+	}
 
 	public OssResponse removeLoggedInUser(String IP, String userName) {
 		Device device = this.getByIP(IP);
@@ -739,6 +763,7 @@ public class DeviceController extends Controller {
 		}
 		return this.removeLoggedInUser(device, user);
 	}
+
 	public OssResponse removeLoggedInUser(Long deviceId, Long userId) {
 		Device device = this.getById(deviceId);
 		User   user   = new UserController(this.session,this.em).getById(userId);
@@ -747,6 +772,7 @@ public class DeviceController extends Controller {
 		}
 		return this.removeLoggedInUser(device, user);
 	}
+
 	public OssResponse removeLoggedInUser(Device device, User user) {
 		parameters = new ArrayList<String>();
 		if( !user.getLoggedOn().contains(device)) {
@@ -899,7 +925,9 @@ public class DeviceController extends Controller {
 
 	public List<Device> getByHWConf(Long id) {
 		HWConf hwconf = new CloneToolController(this.session,this.em).getById(id);
-		return hwconf.getDevices();
+		List<Device> devices = hwconf.getDevices();
+		devices.sort(Comparator.comparing(Device::getName));
+		return devices;
 	}
 
 	public OssResponse manageDevice(long deviceId, String action, Map<String, String> actionContent) {
@@ -1127,6 +1155,18 @@ public class DeviceController extends Controller {
 			}
 		}
 		return String.join(",", devices);
+	}
+
+	public OssResponse setLoggedInUserByMac(String MAC, String userName) {
+		Device device = this.getByMAC(MAC);
+		if( device == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered device with MAC: %s",null,MAC);
+		}
+		User user = new UserController(this.session,this.em).getByUid(userName);
+		if( user == null ) {
+			return new OssResponse(this.getSession(),"ERROR", "There is no registered user with uid: %s",null,userName);
+		}
+		return this.setLoggedInUsers(device, user);
 	}
 
 	public OssResponse setLoggedInUsers(String IP, String userName) {
