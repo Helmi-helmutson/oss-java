@@ -387,13 +387,16 @@ public class CloneToolController extends Controller {
 	}
 
 	public List<HWConf> getAllHWConf() {
+		List<HWConf> hwconfs = new ArrayList<HWConf>();
 		try {
 			Query query = this.em.createNamedQuery("HWConf.findAll");
-			return (List<HWConf>) query.getResultList();
+			hwconfs = query.getResultList();
 		} catch (Exception e) {
 			logger.error("getAllHWConf: " + e.getMessage());
 			return null;
 		}
+		hwconfs.sort(Comparator.comparing(HWConf::getName));
+		return hwconfs;
 	}
 
 	public OssResponse startCloning(String type, Long id, int multiCast) {

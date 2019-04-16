@@ -2,7 +2,7 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
-
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -298,6 +298,7 @@ public class SoftwareController extends Controller {
 				softwares.add(software);
 			}
 		}
+		softwares.sort(Comparator.comparing(Software::getName));
 		return softwares;
 	}
 
@@ -332,6 +333,7 @@ public class SoftwareController extends Controller {
 				softwares.add(software);
 			}
 		}
+		softwares.sort(Comparator.comparing(Software::getName));
 		return softwares;
 	}
 

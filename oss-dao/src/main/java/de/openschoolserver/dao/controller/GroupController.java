@@ -8,6 +8,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.slf4j.Logger;
@@ -51,15 +52,17 @@ public class GroupController extends Controller {
 	}
 
 	public List<Group> getByType(String groupType) {
+		List<Group> groups = new ArrayList<>();
 		try {
 			Query query = this.em.createNamedQuery("Group.getByType");
 			query.setParameter("groupType", groupType);
-			return query.getResultList();
+			groups = query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
-			return new ArrayList<>();
 		} finally {
 		}
+		groups.sort(Comparator.comparing(Group::getName));
+		return groups;
 	}
 
 	public Group getByName(String name) {
@@ -80,26 +83,30 @@ public class GroupController extends Controller {
 	}
 
 	public List<Group> search(String search) {
+		List<Group> groups = new ArrayList<>();
 		try {
 			Query query = this.em.createNamedQuery("Group.search");
 			query.setParameter("search", search + "%");
-			return query.getResultList();
+			groups = query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			return new ArrayList<>();
 		} finally {
 		}
+		groups.sort(Comparator.comparing(Group::getName));
+		return groups;
 	}
 
 	public List<Group> getAll() {
+		List<Group> groups = new ArrayList<>();
 		try {
 			Query query = this.em.createNamedQuery("Group.findAll");
 			return query.getResultList();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);
-			return new ArrayList<>();
 		} finally {
 		}
+		groups.sort(Comparator.comparing(Group::getName));
+		return groups;
 	}
 
 	public OssResponse add(Group group){
@@ -271,7 +278,7 @@ public class GroupController extends Controller {
 				group = new Group(values[0],values[1],values[2]);
 				ossResponse = this.add(group);
 				if( ossResponse.getCode().equals("ERROR") ) {
-					logger.error("importGroups. Erro in line: " + count + ". ERROR: " + ossResponse.getValue() );
+					logger.error("importGroups. Error in line: " + count + ": " + ossResponse.getValue() );
 					continue;
 				}
 				group = this.getById(ossResponse.getObjectId());

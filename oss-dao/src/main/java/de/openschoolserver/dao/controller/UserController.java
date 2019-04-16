@@ -2,6 +2,7 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -58,15 +59,17 @@ public class UserController extends Controller {
 	}
 
 	public List<User> getByRole(String role) {
+		List<User> users = new ArrayList<User>();
 		try {
 			Query query = this.em.createNamedQuery("User.getByRole");
 			query.setParameter("role", role);
-			return query.getResultList();
+			users = query.getResultList();
 		} catch (Exception e) {
 			logger.error("getByRole: " + e.getMessage());
-			return new ArrayList<>();
 		} finally {
 		}
+		users.sort(Comparator.comparing(User::getUid));
+		return users;
 	}
 
 	public User getByUid(String uid) {
@@ -141,6 +144,7 @@ public class UserController extends Controller {
 			logger.error("getAll: " + e.getMessage());
 		} finally {
 		}
+		users.sort(Comparator.comparing(User::getUid));
 		return users;
 	}
 
