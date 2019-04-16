@@ -106,8 +106,8 @@ public class PrinterController extends Controller {
 	 * @return
 	 */
 	public List<Printer> getPrinters() {
-		List<JsonObject> printers   = new ArrayList<JsonObject>();
-		List<Printer> printers2 = new ArrayList<Printer>();
+		List<JsonObject> printers  = new ArrayList<JsonObject>();
+		List<Printer>    printers2 = new ArrayList<Printer>();
 		String[] program = new String[1];
 		StringBuffer reply  = new StringBuffer();
 		StringBuffer stderr = new StringBuffer();
@@ -133,6 +133,8 @@ public class PrinterController extends Controller {
 				printer.setActiveJobs(p.getInt("activeJobs",0));
 				printer.setModel(getModel(p.getString("name")));
 				printers2.add(printer);
+			} else {
+				logger.error("Can not find printer:" + p.getString("name"));
 			}
 		}
 		return printers2;
@@ -144,14 +146,16 @@ public class PrinterController extends Controller {
 	 * @return
 	 */
 	public OssResponse deletePrinter(Long printerId) {
-		if( session.getPassword().equals("dummy") ) {
+		/*if( session.getPassword().equals("dummy") ) {
+			logger.error("deletePrinter: The session password of the administrator is expiered.");
 			return new OssResponse(session,"ERROR","The session password of the administrator is expiered. Please login into the web interface again.");
-		}
+		}*/
 
 		OssResponse ossResponse = new OssResponse(session,"OK","Printer was deleted succesfully.");
 		try {
 			Printer printer = this.em.find(Printer.class, printerId);
 			if( printer == null ) {
+				logger.error("deletePrinter: Can not find printer.");
 				return new OssResponse(this.getSession(),"ERROR", "Can not find printer with id %s.",null,String.valueOf(printerId));
 			}
 			Device  printerDevice = printer.getDevice();
@@ -162,6 +166,7 @@ public class PrinterController extends Controller {
 			program[1] = "-x";
 			program[2] = printer.getName();
 			OSSShellTools.exec(program, reply, stderr, null);
+			logger.debug("deletePrinter reply:" + reply.toString() + " err:" + stderr.toString());
 			this.em.getTransaction().begin();
 			printerDevice.getPrinterQueue().remove(printer);
 			this.em.remove(printer);
@@ -170,10 +175,14 @@ public class PrinterController extends Controller {
 			if( printerDevice.getPrinterQueue().isEmpty() ) {
 				ossResponse = new DeviceController(this.session,this.em).delete(printerDevice, true);
 			}
+			this.systemctl("reload", "samba-printserver");
 		} catch (Exception e) {
 			logger.debug("deletePrinter :" + e.getMessage());
 			return null;
 		} finally {
+			if( this.em.getTransaction().isActive() ) {
+				this.em.getTransaction().rollback();
+			}
 		}
 		return ossResponse;
 	}
