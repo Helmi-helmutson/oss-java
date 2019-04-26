@@ -271,6 +271,9 @@ public class UserController extends Controller {
 
 	public OssResponse modify(User user) {
 		User oldUser = this.getById(user.getId());
+		if( !this.mayModify(oldUser) ) {
+			return new OssResponse(this.getSession(), "ERROR", "You must not modify this user.");
+		}
 		if (user.getPassword() != null && !user.getPassword().isEmpty()) {
 			OssResponse ossResponse = this.checkPassword(user.getPassword());
 			if (ossResponse != null) {
@@ -405,6 +408,10 @@ public class UserController extends Controller {
 			groups.add(em.find(Group.class, groupId));
 		}
 		User user = this.getById(userId);
+		if( !this.mayModify(user)) {
+			logger.error("resetUserPassword: Session user may not modify: %s",null,userId);
+			return new OssResponse(this.getSession(), "ERROR", "You must not modify this user.");
+		}
 		for (Group group : groups) {
 			if (!user.getGroups().contains(group)) {
 				groupsToAdd.add(group);
@@ -544,6 +551,10 @@ public class UserController extends Controller {
 				logger.error("resetUserPassword: Can not find user with id: %s",null,id);
 				continue;
 			}
+			if( !this.mayModify(user)) {
+				logger.error("resetUserPassword: Session user may not modify: %s",null,id);
+				continue;
+			}
 		/* We allow it
 		 *if( user.getRole().equals(roleWorkstation) ) {
 		 *		logger.error("resetUserPassword: Must not change workstation users password.");
@@ -583,6 +594,10 @@ public class UserController extends Controller {
 		for (Long id : userIds) {
 			User user = this.getById(id);
 			if( user != null ) {
+				if( !this.mayModify(user)) {
+					logger.error("copyTemplate: Session user may not modify: %s",null,id);
+					continue;
+				}
 				program[1] = user.getUid();
 				OSSShellTools.exec(program, reply, error, null);
 				responses.add(new OssResponse(this.getSession(), "OK", "The template for '%s' was copied.",null,user.getUid()));
@@ -600,6 +615,10 @@ public class UserController extends Controller {
 		for (Long id : userIds) {
 			User user = this.getById(id);
 			if( user != null ) {
+				if( !this.mayModify(user)) {
+					logger.error("removeProfile: Session user may not modify: %s",null,id);
+					continue;
+				}
 				program[1] = user.getUid();
 				OSSShellTools.exec(program, reply, error, null);
 				responses.add(new OssResponse(this.getSession(), "OK", "The windows profile of '%s' was removed.",null,user.getUid()));
@@ -623,6 +642,10 @@ public class UserController extends Controller {
 		for (Long id : userIds) {
 			User user = this.getById(id);
 			if( user != null ) {
+				if( !this.mayModify(user)) {
+					logger.error("disableLogin: Session user may not modify: %s",null,id);
+					continue;
+				}
 				program[3] = user.getUid();
 				OSSShellTools.exec(program, reply, error, null);
 				if( disable ) {
@@ -646,6 +669,10 @@ public class UserController extends Controller {
 		for (Long id : userIds) {
 			User user = this.getById(id);
 			if( user != null ) {
+				if( !this.mayModify(user)) {
+					logger.error("setFsQuota: Session user may not modify: %s",null,id);
+					continue;
+				}
 				program[1] = user.getUid();
 				user.setFsQuota(quota);
 				this.em.getTransaction().begin();
@@ -669,6 +696,10 @@ public class UserController extends Controller {
 		for (Long id : userIds) {
 			User user = this.getById(id);
 			if( user != null ) {
+				if( !this.mayModify(user)) {
+					logger.error("setMsQuota: Session user may not modify: %s",null,id);
+					continue;
+				}
 				program[1] = user.getUid();
 				user.setMsQuota(quota);
 				this.em.getTransaction().begin();
@@ -772,6 +803,10 @@ public class UserController extends Controller {
 		for (Long userId : userIds) {
 			User user = this.getById(userId);
 			if( user != null ) {
+				if( !this.mayModify(user)) {
+					logger.error("disableInternet: Session user may not modify: %s",null,userId);
+					continue;
+				}
 				if (disable) {
 					this.setConfig(this.getById(userId), "internetDisabled", "yes");
 					responses.add(new OssResponse(this.getSession(), "OK", "'%s' was disabled.",null,user.getUid()));
