@@ -259,7 +259,7 @@ public class Controller extends Config {
 			case "modify_group":
 				data.append(String.format("name: %s%n", group.getName()));
 				data.append(String.format("description: %s%n", group.getDescription()));
-				data.append(String.format("groupType: %s%n", group.getGroupType()));
+				data.append(String.format("grouptype: %s%n", group.getGroupType()));
 				break;
 			case "delete_group":
 				data.append(String.format("name: %s%n", group.getName()));
@@ -284,7 +284,7 @@ public class Controller extends Config {
 			HWConf hwconf = (HWConf)object;
 			data.append(String.format("name: %s%n", hwconf.getName()));
 			data.append(String.format("id: %d%n", hwconf.getId()));
-			data.append(String.format("deviceType: %s%n", hwconf.getDeviceType()));
+			data.append(String.format("devicetype: %s%n", hwconf.getDeviceType()));
 			break;
 		case "de.openschoolserver.dao.Room":
 			Room room = (Room)object;
@@ -293,11 +293,11 @@ public class Controller extends Config {
 			case "modify_room":
 				data.append(String.format("name: %s%n", room.getName()));
 				data.append(String.format("description: %s%n", room.getDescription()));
-				data.append(String.format("startIp: %s%n", room.getStartIP()));
+				data.append(String.format("startip: %s%n", room.getStartIP()));
 				break;
 			case "delete_room":
 				data.append(String.format("name: %s%n", room.getName()));
-				data.append(String.format("startIp: %s%n", room.getStartIP()));
+				data.append(String.format("startip: %s%n", room.getStartIP()));
 				break;
 			}
 			break;
