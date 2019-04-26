@@ -122,6 +122,9 @@ public class PrinterController extends Controller {
 			return printers2;
 		}
 		for( JsonObject p : printers ) {
+			if( !p.containsKey("name") ){
+				continue;
+			}
 			logger.debug("printer" + p);
 			logger.debug("printer" + p.getString("name"));
 			Printer printer = getByName(p.getString("name"));
