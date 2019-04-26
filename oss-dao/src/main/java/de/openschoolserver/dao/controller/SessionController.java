@@ -76,7 +76,9 @@ public class SessionController extends Controller {
 			Files.write(file.toPath(), credentials);
 			program[4] = file.getAbsolutePath();
 			OSSShellTools.exec(program, reply, error, null);
-			Files.delete(file.toPath());
+			if( ! logger.isDebugEnabled() ) {
+				Files.delete(file.toPath());
+			}
 			logger.debug("Login reply:" + reply.toString());
 			logger.debug("Login error:" + error.toString());
 			if( reply.toString().contains("NT_STATUS_")) {
