@@ -17,6 +17,7 @@ import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.controller.Config;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -474,6 +475,10 @@ public class Controller extends Config {
 			User user = (User)object;
 			ownerId = user.getCreator().getId();
 			neededRights.add("user.modify");
+			if( session.getUser().getRole().equals(roleTeacher) &&
+				user.getRole().equals(roleStudent)) {
+				neededRights.add("education.users");
+			}
 			break;
 		}
 		if( ownerId == null ) {
