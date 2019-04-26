@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -155,7 +156,9 @@ public class ProxyController extends Controller {
 			output.append(role).append(":").append("cephalix:true").append(this.getNl());
 			output.append(role).append(":").append("good:true").append(this.getNl());
 			output.append(role).append(":").append("bad:false").append(this.getNl());
-			for(ProxyRule proxyRule : acls.get(role) ) {
+			List<ProxyRule> rules = acls.get(role);
+			rules.sort(Comparator.comparing(ProxyRule::getDescription));
+			for(ProxyRule proxyRule : rules ) {
 				output.append(role).append(":").append(proxyRule.getName()).append(":");
 				if( proxyRule.isEnabled() ) {
 					output.append("true");
