@@ -94,7 +94,6 @@ public class SessionController extends Controller {
 		if( user == null ) {
 			return null;
 		}
-
 		String IP = this.getSession().getIP();
 		Device device = deviceController.getByIP(IP);
 		if( device != null ) {
@@ -178,16 +177,17 @@ public class SessionController extends Controller {
 				} else {
 					this.em.persist(obj);
 				}
+				User user = obj.getUser();
 				Device device = obj.getDevice();
 				if( device != null ) {
-					User user = obj.getUser();
 					if( ! user.getLoggedOn().contains(device) ) {
 						user.getLoggedOn().add(device);
 						device.getLoggedIn().add(user);
 						this.em.merge(device);
-						this.em.merge(user);
 					}
 				}
+				user.getSessions().add(obj);
+				this.em.merge(user);
 				this.em.flush();
 				this.em.refresh(obj);
 				this.em.getTransaction().commit();
