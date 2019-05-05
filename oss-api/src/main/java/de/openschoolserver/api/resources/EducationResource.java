@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+/* (c) Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.api.resources;
 
 
@@ -83,7 +83,7 @@ public interface EducationResource {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("education.rooms")
-	OssResponse addUser(
+	OssResponse addUserToSmartRoom(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("roomId") Long roomId,
 	        @PathParam("userId") Long userId
@@ -100,7 +100,7 @@ public interface EducationResource {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("education.rooms")
-	OssResponse addDevice(
+	OssResponse addDeviceToSmartRoom(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("roomId")   Long roomId,
 	        @PathParam("deviceId") Long deviceId
@@ -117,7 +117,7 @@ public interface EducationResource {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("education.rooms")
-	OssResponse addGroup(
+	OssResponse addGroupToSmartRoom(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("roomId") Long roomId,
 	        @PathParam("groupId") Long roupId
@@ -135,7 +135,7 @@ public interface EducationResource {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("education.rooms")
-	OssResponse deleteUser(
+	OssResponse deleteUserFromSmartRoom(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("roomId") Long roomId,
 	        @PathParam("userId") Long userId
@@ -152,7 +152,7 @@ public interface EducationResource {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("education.rooms")
-	OssResponse deleteDevice(
+	OssResponse deleteDeviceFromSmartRoom(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("roomId")   Long roomId,
 	        @PathParam("deviceId") Long deviceId
@@ -169,7 +169,7 @@ public interface EducationResource {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("education.rooms")
-	OssResponse deleteGroup(
+	OssResponse deleteGroupFromSmartRoom(
 	        @ApiParam(hidden = true) @Auth Session session,
 	        @PathParam("roomId")  Long roomId,
 	        @PathParam("groupId") Long groupId
@@ -512,7 +512,7 @@ public interface EducationResource {
 	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
 	})
 	@RolesAllowed("education.groups")
-	OssResponse  createGroup(
+	OssResponse  addGroup(
 	        @ApiParam(hidden = true) @Auth Session session,
 	           Group group
 	        );

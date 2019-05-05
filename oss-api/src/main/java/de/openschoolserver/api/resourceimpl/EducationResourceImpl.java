@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+/* (c) Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.InputStream;
@@ -122,7 +122,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse createGroup(Session session, Group group) {
+	public OssResponse addGroup(Session session, Group group) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new EducationController(session,em).createGroup(group);
 		em.close();
@@ -194,7 +194,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse addUser(Session session, Long roomId, Long userId) {
+	public OssResponse addUserToSmartRoom(Session session, Long roomId, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		OssResponse resp = new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
@@ -203,7 +203,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse addDevice(Session session, Long roomId, Long deviceId) {
+	public OssResponse addDeviceToSmartRoom(Session session, Long roomId, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		OssResponse resp = new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
@@ -212,7 +212,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse deleteUser(Session session, Long roomId, Long userId) {
+	public OssResponse deleteUserFromSmartRoom(Session session, Long roomId, Long userId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		OssResponse resp = new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(), "user", userId);
@@ -221,7 +221,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse deleteDevice(Session session, Long roomId, Long deviceId) {
+	public OssResponse deleteDeviceFromSmartRoom(Session session, Long roomId, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		OssResponse resp = new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"device", deviceId);
@@ -230,7 +230,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse addGroup(Session session, Long roomId, Long groupId) {
+	public OssResponse addGroupToSmartRoom(Session session, Long roomId, Long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		OssResponse resp = new CategoryController(session,em).addMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
@@ -239,7 +239,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	}
 
 	@Override
-	public OssResponse deleteGroup(Session session, Long roomId, Long groupId) {
+	public OssResponse deleteGroupFromSmartRoom(Session session, Long roomId, Long groupId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		EducationController educationController = new EducationController(session,em);
 		OssResponse resp = new CategoryController(session,em).deleteMember(educationController.getCategoryToRoom(roomId).getId(),"group",groupId);
