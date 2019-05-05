@@ -1444,13 +1444,10 @@ public class RoomController extends Controller {
 			}
 			if(header.containsKey("control") && !values[header.get("control")].isEmpty() ) {
 				if( ! checkEnumerate("roomControl", values[header.get("control")])){
-					List<String> parameters = new ArrayList<String>();
-					parameters.add(values[header.get("control")]);
-					parameters.add(i.toString());
-					parameters.add(String.join(",",getEnumerates("roomControl")));
-					return new OssResponse(this.getSession(),"ERROR", "Can not find room control %s in line %s. Allowed values are: %s.",null,parameters);
+					room.setRoomControl("teachers");
+				} else {
+					room.setRoomControl(values[header.get("control")]);
 				}
-				room.setRoomControl(values[header.get("control")]);
 			}
 			if(header.containsKey("type") && !values[header.get("type")].isEmpty() ) {
 				room.setRoomType(values[header.get("type")]);
@@ -1464,12 +1461,10 @@ public class RoomController extends Controller {
 			if(header.containsKey("hwconf") && !values[header.get("hwconf")].isEmpty() ) {
 				HWConf hwconf = cloneToolController.getByName(values[header.get("hwconf")]);
 				if( hwconf == null ) {
-					List<String> parameters = new ArrayList<String>();
-					parameters.add(values[header.get("hwconf")]);
-					parameters.add(i.toString());
-					return new OssResponse(this.getSession(),"ERROR", "Can not find hwconf %s in line %s.",null,parameters);
+					room.setHwconfId(4l);
+				} else {
+					room.setHwconfId(hwconf.getId());
 				}
-				room.setHwconfId(hwconf.getId());
 			}
 			ossResponse = this.add(room);
 			if( ossResponse.getCode().equals("ERROR") ) {
