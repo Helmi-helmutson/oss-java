@@ -391,7 +391,7 @@ public class Controller extends Config {
 
 		User owner   = null;
 		Long ownerId = null;
-		List<String> neededRights = new ArrayList<>();
+		List<String> neededRights = new ArrayList<String>();
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Acl":
 			Acl Acl = (Acl)object;
