@@ -54,7 +54,8 @@ public class EducationController extends UserController {
 	public List<Room> getMySmartRooms() {
 		List<Room> smartRooms = new ArrayList<Room>();
 		for( Category category  : new CategoryController(this.session,this.em).getByType("smartRoom") ) {
-			if( category.getOwner().equals(session.getUser())) {
+			if( category.getOwner() != null && category.getOwner().equals(session.getUser())
+					) {
 				logger.debug("getMySamrtRooms" + category);
 				if( category.getRooms() != null && category.getRooms().size() > 0 ) {
 					smartRooms.add(category.getRooms().get(0));
