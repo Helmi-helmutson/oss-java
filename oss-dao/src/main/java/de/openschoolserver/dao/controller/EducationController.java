@@ -81,6 +81,10 @@ public class EducationController extends UserController {
 				switch(room.getRoomControl()) {
 				case "no":
 				case "inRoom":
+					if( this.session.getUser().getRole().equals(roleSysadmin) &&
+						getProperty("de.openschoolserver.dao.Education.Rooms.sysadminsConrtolInRoom").equals("yes")	) {
+						rooms.add(room);
+					}
 					break;
 				case "allTeachers":
 					rooms.add(room);
