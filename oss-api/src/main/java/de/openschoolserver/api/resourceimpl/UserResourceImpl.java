@@ -242,6 +242,9 @@ public class UserResourceImpl implements UserResource {
 			return "";
 		}
 		switch(attribute.toLowerCase()) {
+		case "id":
+			resp = String.valueOf(user.getId());
+			break;
 		case "role":
 			resp = user.getRole();
 			break;
@@ -664,5 +667,18 @@ public class UserResourceImpl implements UserResource {
 		StringBuffer stderr = new StringBuffer();
 		OSSShellTools.exec(program, reply, stderr, null);
 		return new OssResponse(session,"OK", "Import was started.");
+	}
+
+	@Override
+	public OssResponse addUsersToGroups(Session session, List<Long> userIds, List<Long> groupIds) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		final GroupController groupController = new GroupController(session,em);
+		List<User> users = new UserController(session,em).getUsers(userIds);
+		for(Long groupId: groupIds) {
+			Group group = groupController.getById(groupId);
+			groupController.addMembers(group, users);
+		}
+		em.close();
+		return new OssResponse(session,"OK", "Users was inserted in the required groups.");
 	}
 }

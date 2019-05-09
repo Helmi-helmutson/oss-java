@@ -327,6 +327,20 @@ public interface UserResource {
 			@PathParam("userId") Long userId
 			);
 
+	@POST
+	@Path("addUsersToGroups")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Add more user to more groups")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "User not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("user.manage")
+	OssResponse addUsersToGroups(
+			@ApiParam(hidden = true) @Auth Session session,
+			List<Long> userIds,
+			List<Long> groupIds
+			);
+
 	/*
 	 * POST syncFsQuotas
 	 */

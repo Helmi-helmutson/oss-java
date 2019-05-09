@@ -398,6 +398,28 @@ public class GroupController extends Controller {
 		return new OssResponse(this.getSession(),"OK","User %s was added to group %s.",null,parameters );
 	}
 
+	public OssResponse addMembers(Group group, List<User> users) {
+		if( !this.mayModify(group) ) {
+			return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+        }
+		try {
+			for( User user: users ) {
+				if(! user.getGroups().contains(group) ) {
+					group.getUsers().add(user);
+					user.getGroups().add(group);
+					this.em.getTransaction().begin();
+					this.em.merge(user);
+					this.em.merge(group);
+					this.em.getTransaction().commit();
+				}
+			}
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
+		} finally {
+		}
+		this.changeMemberPlugin("addmembers", group, users);
+		return new OssResponse(this.getSession(),"OK","User %s was added to group %s.",null,parameters );
+	}
 	public OssResponse addMember(long groupId, long userId) {
 		Group group = this.em.find(Group.class, groupId);
 		User  user  = this.em.find(User.class, userId);

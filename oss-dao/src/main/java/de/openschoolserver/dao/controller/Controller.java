@@ -325,10 +325,11 @@ public class Controller extends Config {
 		program[1] = "change_member";
 		data.append(String.format("changeType: %s%n",type));
 		data.append(String.format("group: %s%n", group.getName()));
-		data.append("users: ");
+		List<String> uids = new ArrayList<String>();
 		for( User user : users ) {
-			data.append(user.getUid() + " ");
+			uids.add(user.getUid());
 		}
+		data.append(String.format("users: %s%n", String.join(",",uids)));
 		OSSShellTools.exec(program, reply, error, data.toString());
 		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
