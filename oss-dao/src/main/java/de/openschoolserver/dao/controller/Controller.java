@@ -230,15 +230,15 @@ public class Controller extends Config {
 			switch(pluginName) {
 			case "add_user":
 			case "modify_user":
-				data.append(String.format("givenName: %s%n", user.getGivenName()));
-				data.append(String.format("surName: %s%n", user.getSurName()));
-				data.append(String.format("birthDay: %s%n", user.getBirthDay()));
+				data.append(String.format("givenname: %s%n", user.getGivenName()));
+				data.append(String.format("surname: %s%n", user.getSurName()));
+				data.append(String.format("birthnay: %s%n", user.getBirthDay()));
 				data.append(String.format("password: %s%n", user.getPassword()));
 				data.append(String.format("uid: %s%n", user.getUid()));
 				data.append(String.format("uuid: %s%n", user.getUuid()));
 				data.append(String.format("role: %s%n", user.getRole()));
-				data.append(String.format("fsQuota: %d%n", user.getFsQuota()));
-				data.append(String.format("msQuota: %d%n", user.getMsQuota()));
+				data.append(String.format("fsquota: %d%n", user.getFsQuota()));
+				data.append(String.format("msquota: %d%n", user.getMsQuota()));
 				if( user.isMustChange() ) {
 					data.append("mpassword: yes");
 				}
@@ -289,17 +289,12 @@ public class Controller extends Config {
 			break;
 		case "de.openschoolserver.dao.Room":
 			Room room = (Room)object;
-			switch(pluginName){
-			case "add_doom":
-			case "modify_room":
-				data.append(String.format("name: %s%n", room.getName()));
-				data.append(String.format("description: %s%n", room.getDescription()));
-				data.append(String.format("startip: %s%n", room.getStartIP()));
-				break;
-			case "delete_room":
-				data.append(String.format("name: %s%n", room.getName()));
-				data.append(String.format("startip: %s%n", room.getStartIP()));
-				break;
+			data.append(String.format("name: %s%n", room.getName()));
+			data.append(String.format("description: %s%n", room.getDescription()));
+			data.append(String.format("startip: %s%n", room.getStartIP()));
+			data.append(String.format("netmask: %s%n", room.getNetMask()));
+			if(room.getHwconf() != null ) {
+				data.append(String.format("hwconf: %s%n", room.getHwconf().getName()));
 			}
 			break;
 		case "de.cephalix.api.dao.CephalixCustomer":
