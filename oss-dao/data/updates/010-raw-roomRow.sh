@@ -7,8 +7,8 @@ then
 fi
 
 export HOME="/root"
-echo "ALTER TABLE Devices CHANGE COLUMN `row` roomRow  INTEGER DEFAULT 5;" | mysql OSS
-echo "ALTER TABLE Rooms   CHANGE COLUMN `row` roomRows INTEGER DEFAULT 5;" | mysql OSS
+echo 'ALTER TABLE Devices CHANGE COLUMN `row`  roomRow  INTEGER DEFAULT 5;' | mysql OSS
+echo 'ALTER TABLE Rooms   CHANGE COLUMN `rows` roomRows INTEGER DEFAULT 5;' | mysql OSS
 
 touch /var/adm/oss/oss-java-update-010
 
