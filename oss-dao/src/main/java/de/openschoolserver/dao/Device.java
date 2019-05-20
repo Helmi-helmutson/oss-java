@@ -54,7 +54,7 @@ public class Device implements Serializable {
 
 	private int place;
 
-	private int row;
+	private int roomRow;
 
 	@Column(name="IP")
 	@Size(max=16, message="IP must not be longer then 16 characters.")
@@ -247,11 +247,11 @@ public class Device implements Serializable {
 	}
 
 	public int getRow() {
-		return this.row;
+		return this.roomRow;
 	}
 
 	public void setRow(int row) {
-		this.row = row;
+		this.roomRow = row;
 	}
 
 	public String getSerial() {
