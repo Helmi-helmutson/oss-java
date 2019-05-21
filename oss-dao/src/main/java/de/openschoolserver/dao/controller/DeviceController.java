@@ -157,8 +157,10 @@ public class DeviceController extends Controller {
 			}
 			//Clean up softwareStatus
 			for( SoftwareStatus st : device.getSoftwareStatus() ) {
-				logger.debug("Deleteing software status from device:" + device.getName() +" " + st.getId());
-				this.em.remove(st);
+				if( st != null ) {
+					logger.debug("Deleteing software status from device:" + device.getName() + " " + st.getId());
+					this.em.remove(st);
+				}
 			}
 			//Clean up softwareLicences
 			for( SoftwareLicense sl : device.getSoftwareLicenses()  ) {

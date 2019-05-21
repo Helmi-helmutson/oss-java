@@ -53,7 +53,7 @@ public class Room implements Serializable {
 
 	private int places;
 
-	private int rows;
+	private int roomRows;
 
 	@Size(max=64, message="Description must not be longer then 64 characters.")
 	private String description;
@@ -250,11 +250,11 @@ public class Room implements Serializable {
 	}
 
 	public int getRows() {
-		return this.rows;
+		return this.roomRows;
 	}
 
 	public void setRows(int rows) {
-		this.rows = rows;
+		this.roomRows = rows;
 	}
 
 	public List<AccessInRoom> getAccessInRooms() {

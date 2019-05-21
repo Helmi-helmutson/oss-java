@@ -670,11 +670,11 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse addUsersToGroups(Session session, List<Long> userIds, List<Long> groupIds) {
+	public OssResponse addUsersToGroups(Session session, List<List<Long>> ids) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final GroupController groupController = new GroupController(session,em);
-		List<User> users = new UserController(session,em).getUsers(userIds);
-		for(Long groupId: groupIds) {
+		List<User> users = new UserController(session,em).getUsers(ids.get(0));
+		for(Long groupId: ids.get(1)) {
 			Group group = groupController.getById(groupId);
 			groupController.addMembers(group, users);
 		}

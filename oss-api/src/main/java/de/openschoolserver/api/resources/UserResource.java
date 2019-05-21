@@ -330,15 +330,16 @@ public interface UserResource {
 	@POST
 	@Path("addUsersToGroups")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Add more user to more groups")
+	@ApiOperation(value = "Add more user to more groups. The parameter ids is a list of two List<Long>:"
+			+ "The first list is the list of users."
+			+ "The second list is the list of groups into to user need to be added.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "User not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("user.manage")
 	OssResponse addUsersToGroups(
 			@ApiParam(hidden = true) @Auth Session session,
-			List<Long> userIds,
-			List<Long> groupIds
+			List<List<Long>> ids
 			);
 
 	/*

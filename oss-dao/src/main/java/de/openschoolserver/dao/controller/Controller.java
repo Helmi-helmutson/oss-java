@@ -232,7 +232,7 @@ public class Controller extends Config {
 			case "modify_user":
 				data.append(String.format("givenname: %s%n", user.getGivenName()));
 				data.append(String.format("surname: %s%n", user.getSurName()));
-				data.append(String.format("birthnay: %s%n", user.getBirthDay()));
+				data.append(String.format("birthday: %s%n", user.getBirthDay()));
 				data.append(String.format("password: %s%n", user.getPassword()));
 				data.append(String.format("uid: %s%n", user.getUid()));
 				data.append(String.format("uuid: %s%n", user.getUuid()));
