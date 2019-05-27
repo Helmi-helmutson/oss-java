@@ -171,15 +171,13 @@ public class CloneToolController extends Controller {
 	}
 
 	public OssResponse modifyHWConf(Long hwconfId, HWConf hwconf){
-		//TODO make some checks!!
-		//If the name will be modified then some files must be moved too!!! TODO
-		// First we check if the parameter are unique.
-		if( ! this.isNameUnique(hwconf.getName())){
-			return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
-		}
 		try {
 			this.em.getTransaction().begin();
 			HWConf oldHwconf = this.em.find(HWConf.class, hwconfId);
+			if( !oldHwconf.getName().equals(hwconf.getName()) && !this.isNameUnique(hwconf.getName())){
+				// Check only if name is unique if the name was changed.
+				return new OssResponse(this.getSession(),"ERROR", "Configuration name is not unique.");
+			}
 			if( hwconf.getPartitions() != null && hwconf.getPartitions().size() > 0 ) {
 				for( Partition partition : oldHwconf.getPartitions()) {
 					Partition tmp = this.em.find(Partition.class, partition.getId());
