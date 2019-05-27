@@ -3,6 +3,7 @@ HERE=$( pwd )
 #gradle --offline clean build
 gradle clean build
 tar xf build/distributions/de.openschoolserver.api-1.0-SNAPSHOT.tar
+REPO="/data1/OSC/home:varkoly:OSS-4-1:leap15.1/oss-java/"
 
 if [ "$1" ]; then
         PORT=22
@@ -17,7 +18,7 @@ read Y
 if [ "$Y" != "y" ]; then
 	exit
 fi
-cd /data1/OSC/home:varkoly:OSS-4-1:leap15.1/oss-java/
+cd ${REPO}
 osc up
 cd $HERE
 if [ -e oss-java ]; then
@@ -25,7 +26,7 @@ if [ -e oss-java ]; then
 fi
 mv de.openschoolserver.api-1.0-SNAPSHOT  oss-java
 chmod 644 oss-java/lib/*
-tar cjf /data1/OSC/home:varkoly:OSS-4-1:leap15.1/oss-java/oss-java.tar.bz2 oss-java
+tar cjf ${REPO}/oss-java.tar.bz2 oss-java
 cp ${HERE}/../oss-dao/data/school-INSERT.sql.in   ${HERE}/../oss-dao/data/school-INSERT.sql
 cp ${HERE}/../oss-dao/data/business-INSERT.sql.in ${HERE}/../oss-dao/data/business-INSERT.sql
 cd ${HERE}/src/main/java/de/openschoolserver/api/resources/
@@ -33,19 +34,19 @@ cd ${HERE}/src/main/java/de/openschoolserver/api/resources/
 ./find-rolles.pl >> ${HERE}/../oss-dao/data/business-INSERT.sql
 cd ${HERE}
 cd ../oss-dao/
-tar cjf /data1/OSC/home:varkoly:OSS-4-1:leap15.1/oss-java/data.tar.bz2 data
+tar cjf ${REPO}/data.tar.bz2 data
 cd ${HERE}
 CLASSPATH=$( grep "^CLASSPATH=" oss-java/bin/de.openschoolserver.api )
-sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > /data1/OSC/home:varkoly:OSS-4-1:leap15.1/oss-java/start-oss-api
+sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > ${REPO}/start-oss-api
 rm -r oss-java
 xterm -e git log --raw  &
 RELEASE=$(cat RELEASE)
 RELEASE=$((RELEASE+1))
 echo $RELEASE > RELEASE
-sed s/@RELEASE@/${RELEASE}/ oss-java.spec > /data1/OSC/home:varkoly:OSS-4-1:leap15.1/oss-java/oss-java.spec
+sed s/@RELEASE@/${RELEASE}/ oss-java.spec > ${REPO}/oss-java.spec
 git commit -m "New version" RELEASE
 
-cd /data1/OSC/home:varkoly:OSS-4-1:leap15.1/oss-java/
+cd ${REPO}/
 osc vc
 osc ci
 cd $HERE
