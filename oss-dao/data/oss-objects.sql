@@ -558,3 +558,13 @@ CREATE TABLE IF NOT EXISTS Jobs (
        PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
+CREATE TABLE IF NOT EXISTS Tickets (
+        id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id         BIGINT UNSIGNED NOT NULL,
+        uuid            VARCHAR(64) NOT NULL,
+        title           VARCHAR(255) DEFAULT NULL,
+	done            CHAR(1) DEFAULT 'N',
+        FOREIGN KEY(user_id)  REFERENCES Users(id),
+        PRIMARY KEY(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
+

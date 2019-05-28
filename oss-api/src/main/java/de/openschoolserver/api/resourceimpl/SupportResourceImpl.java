@@ -30,7 +30,6 @@ public class SupportResourceImpl implements SupportResource {
 	private String supportEmail;
 	private String supportEmailFrom;
 	private boolean isLinux = true;
-	private EntityManager em;
 	public SupportResourceImpl() {
 		String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 		isLinux = !((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0));
@@ -106,6 +105,7 @@ public class SupportResourceImpl implements SupportResource {
 				parameters.add(suppres.getTicketno());
 				parameters.add(supportRequest.getEmail());
 				parameters.add(suppres.getTicketResponseInfo());
+				logger.debug("Support Respons :" + suppres);
 				return new OssResponse(session,"OK","Support request '%s' was created with ticket number '%s'. Answer will be sent to '%s'.",null,parameters);
 			} catch (Exception e) {
 				logger.error("GETObject :" + e.getMessage());
@@ -156,5 +156,4 @@ public class SupportResourceImpl implements SupportResource {
 			}
 		}
 	}
-
 }
