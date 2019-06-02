@@ -7,7 +7,9 @@ import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
@@ -22,8 +24,8 @@ import io.swagger.annotations.ApiResponses;
 @Path("selfmanagement")
 @Api(value = "selfmanagement")
 public interface SelfManagementResource {
-	
-	
+
+
 	/*
 	 * GET selfmanagement/me
 	 */
@@ -55,5 +57,67 @@ public interface SelfManagementResource {
             @ApiParam(hidden = true) @Auth Session session,
             User user
     );
-    
+
+    /*
+     * VPN Management
+     */
+
+    /**
+     * Checks if a user is allowed to use vpn connection to the school
+     * @param session
+     * @return true/false
+     */
+    @GET
+    @Path("vpn/have")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Checks if a user is allowed to use vpn connection to the school")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("myself.search")
+    Boolean haveVpn(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+
+
+    /**
+     * Delivers the configuration for a given operating system.
+     * @param OS The operating system: Win, Mac or Linux
+     * @return The configuration as an installer or tar archive.
+     */
+    @GET
+    @Path("vpn/config/{OS}")
+    @Produces("*/*")
+    @ApiOperation(value = "Delivers the configuration for a given operating system.",
+	notes = "OS The operating system: Win32, Win, Mac or Linux")
+    @ApiResponses(value = {
+	@ApiResponse(code = 401, message = "You are not allowed to use VPN."),
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator."),
+            @ApiResponse(code = 501, message = "Can not create your configuration. Please contact adminstrator.")})
+    @RolesAllowed("myself.search")
+    Response getConfig(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("OS") String OS
+    );
+
+    /**
+     * Delivers the configuration for a given operating system.
+     * @param OS The operating system: Win, Mac or Linux
+     * @return The configuration as an installer or tar archive.
+     */
+    @GET
+    @Path("vpn/installer/{OS}")
+    @Produces("*/*")
+    @ApiOperation(value = "Delivers the installer for a given operating system.",
+	notes = "OS The operating system: Win32, Win, Mac or Linux")
+    @ApiResponses(value = {
+	@ApiResponse(code = 401, message = "You are not allowed to use VPN."),
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("myself.search")
+    Response getInstaller(
+            @ApiParam(hidden = true) @Auth Session session,
+            @PathParam("OS") String OS
+    );
 }
