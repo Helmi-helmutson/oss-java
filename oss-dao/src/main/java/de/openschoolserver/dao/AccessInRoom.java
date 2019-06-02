@@ -135,6 +135,9 @@ public class AccessInRoom implements Serializable {
 	@JsonIgnore
 	private User creator;
 
+	@Transient
+	private Boolean allowSessionIp;
+
 	public AccessInRoom() {
 		this.pointInTime = "06:00";
 		this.monday   = true;
@@ -386,5 +389,17 @@ public class AccessInRoom implements Serializable {
 
 	public void setRoomName(String roomName) {
 		this.roomName = roomName;
+	}
+
+	public Boolean getAllowSessionIp() {
+		return allowSessionIp;
+	}
+
+	public void setAllowSessionIp(Boolean allowSessionIp) {
+		this.allowSessionIp = allowSessionIp;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 }

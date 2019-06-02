@@ -749,6 +749,7 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	@Override
 	public OssResponse setAccessStatus(Session session, long roomId, AccessInRoom access) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		access.setAllowSessionIp(true);
 		OssResponse resp = new RoomController(session,em).setAccessStatus(roomId, access);
 		em.close();
 		return resp;
