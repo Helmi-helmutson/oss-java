@@ -89,7 +89,7 @@ public interface SelfManagementResource {
     @Path("vpn/config/{OS}")
     @Produces("*/*")
     @ApiOperation(value = "Delivers the configuration for a given operating system.",
-	notes = "OS The operating system: Win32, Win, Mac or Linux")
+	notes = "OS The operating system: Win7, Win10, Mac or Linux")
     @ApiResponses(value = {
 	@ApiResponse(code = 401, message = "You are not allowed to use VPN."),
             @ApiResponse(code = 404, message = "User not found"),
@@ -110,7 +110,7 @@ public interface SelfManagementResource {
     @Path("vpn/installer/{OS}")
     @Produces("*/*")
     @ApiOperation(value = "Delivers the installer for a given operating system.",
-	notes = "OS The operating system: Win32, Win, Mac or Linux")
+	notes = "OS The operating system: Win7, Win10, Mac or Linux")
     @ApiResponses(value = {
 	@ApiResponse(code = 401, message = "You are not allowed to use VPN."),
             @ApiResponse(code = 404, message = "User not found"),
