@@ -643,10 +643,12 @@ public class SystemResourceImpl implements SystemResource {
 	public List<String> getAddOns(Session session) {
 		List<String> res = new ArrayList<String>();
 		File addonsDir = new File( "/usr/share/oss/addons" );
-		for( String addon : addonsDir.list() ) {
-			File tmp = new File("/usr/share/oss/addons/" + addon);
-			if( tmp.isDirectory() ) {
-				res.add(addon);
+		if( addonsDir != null && addonsDir.exists() ) {
+			for( String addon : addonsDir.list() ) {
+				File tmp = new File("/usr/share/oss/addons/" + addon);
+				if( tmp.isDirectory() ) {
+					res.add(addon);
+				}
 			}
 		}
 		return res;
