@@ -1,6 +1,7 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.File;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.WebApplicationException;
@@ -109,15 +110,15 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			throw new WebApplicationException(401);
 		}
 		Config config   = new Config("/etc/sysconfig/oss-vpn","");
-		String vpnId    = config.getConfigValue("VPND_ID");
+		String vpnId    = config.getConfigValue("VPN_ID");
 		File configFile = null;
 		switch(OS) {
 		case "Win7":
 		case "Win10":
-			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + session.getUser().getUid() + ".exe");
+			configFile = new File("/var/adm/oss/vpn/oss-vpn-installer-" + vpnId + "-" + session.getUser().getUid() + ".exe");
 			break;
 		case "Mac":
-			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + session.getUser().getUid() + ".tar.gz");
+			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + session.getUser().getUid() + ".tar.bz2");
 			break;
 		case "Linux":
 			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + session.getUser().getUid() + ".tgz");
@@ -156,6 +157,12 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 		ResponseBuilder response = Response.ok((Object) configFile);
 		response.header("Content-Disposition","attachment; filename=\""+ configFile.getName() + "\"");
 		return response.build();
+	}
+
+	@Override
+	public String[] vpnOS(Session session) {
+		String[] osList = { "Win7","Win10","Mac","Linux" };
+		return osList;
 	}
 
 }

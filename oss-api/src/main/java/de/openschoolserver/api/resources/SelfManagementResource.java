@@ -2,6 +2,8 @@ package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
+import java.util.List;
+
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -81,6 +83,23 @@ public interface SelfManagementResource {
 
 
     /**
+     * Delivers the list of supported clients OS for the VPN.
+     * @param session
+     * @return List of the supported OS
+     */
+    @GET
+    @Path("vpn/OS")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Delivers the list of supported clients OS for the VPN.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "User not found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("myself.search")
+    String[] vpnOS(
+            @ApiParam(hidden = true) @Auth Session session
+    );
+
+    /**
      * Delivers the configuration for a given operating system.
      * @param OS The operating system: Win, Mac or Linux
      * @return The configuration as an installer or tar archive.
@@ -89,7 +108,7 @@ public interface SelfManagementResource {
     @Path("vpn/config/{OS}")
     @Produces("*/*")
     @ApiOperation(value = "Delivers the configuration for a given operating system.",
-	notes = "OS The operating system: Win7, Win10, Mac or Linux")
+	notes = "OS The operating system: the list of the supported os will be delivered by GET selfmanagement/vpn/OS")
     @ApiResponses(value = {
 	@ApiResponse(code = 401, message = "You are not allowed to use VPN."),
             @ApiResponse(code = 404, message = "User not found"),
@@ -110,7 +129,7 @@ public interface SelfManagementResource {
     @Path("vpn/installer/{OS}")
     @Produces("*/*")
     @ApiOperation(value = "Delivers the installer for a given operating system.",
-	notes = "OS The operating system: Win7, Win10, Mac or Linux")
+	notes = "OS The operating system: the list of the supported os will be delivered by GET selfmanagement/vpn/OS")
     @ApiResponses(value = {
 	@ApiResponse(code = 401, message = "You are not allowed to use VPN."),
             @ApiResponse(code = 404, message = "User not found"),
