@@ -112,16 +112,20 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 		Config config   = new Config("/etc/sysconfig/oss-vpn","");
 		String vpnId    = config.getConfigValue("VPN_ID");
 		File configFile = null;
+		String contentType = "application/x-dosexec";
+		String uid  =  session.getUser().getUid();
 		switch(OS) {
 		case "Win7":
 		case "Win10":
-			configFile = new File("/var/adm/oss/vpn/oss-vpn-installer-" + vpnId + "-" + session.getUser().getUid() + ".exe");
+			configFile = new File("/var/adm/oss/vpn/oss-vpn-installer-" + vpnId + "-" + uid + ".exe");
 			break;
 		case "Mac":
-			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + session.getUser().getUid() + ".tar.bz2");
+			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + uid + ".tar.bz2");
+			contentType = "application/x-bzip2";
 			break;
 		case "Linux":
-			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + session.getUser().getUid() + ".tgz");
+			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + uid + ".tgz");
+			contentType = "application/x-compressed-tar";
 			break;
 		}
 		if( ! configFile.exists() ) {
@@ -129,11 +133,11 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			StringBuffer error = new StringBuffer();
 			String[]   program = new String[2];
 			program[0] = "/usr/share/oss/tools/vnp/creat-config.sh";
-			program[1] = session.getUser().getUid();
+			program[1] = uid;
 			OSSShellTools.exec(program, reply, error, null);
 		}
 		ResponseBuilder response = Response.ok((Object) configFile);
-		response.header("Content-Disposition","attachment; filename=\""+ configFile.getName() + "\"");
+		response = response.header("Content-Disposition","attachment; filename="+ configFile.getName());
 		return response.build();
 	}
 
@@ -143,6 +147,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			throw new WebApplicationException(401);
 		}
 		File configFile = null;
+		String contentType = "application/x-dosexec";
 		switch(OS) {
 		case "Win7":
 			configFile = new File("/srv/www/admin/vpn-clients/openvpn-install-Win7.exe");
@@ -152,10 +157,11 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			break;
 		case "Mac":
 			configFile = new File("/srv/www/admin/vpn-clients/Tunnelblick.dmg");
+			contentType = "application/zlib";
 			break;
 		}
 		ResponseBuilder response = Response.ok((Object) configFile);
-		response.header("Content-Disposition","attachment; filename=\""+ configFile.getName() + "\"");
+		response = response.header("Content-Disposition","attachment; filename="+ configFile.getName());
 		return response.build();
 	}
 

@@ -2,8 +2,6 @@ package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
 
-import java.util.List;
-
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
@@ -106,7 +104,7 @@ public interface SelfManagementResource {
      */
     @GET
     @Path("vpn/config/{OS}")
-    @Produces("*/*")
+    @Produces("application/x-dosexec")
     @ApiOperation(value = "Delivers the configuration for a given operating system.",
 	notes = "OS The operating system: the list of the supported os will be delivered by GET selfmanagement/vpn/OS")
     @ApiResponses(value = {
@@ -127,7 +125,7 @@ public interface SelfManagementResource {
      */
     @GET
     @Path("vpn/installer/{OS}")
-    @Produces("*/*")
+    @Produces("application/x-dosexec")
     @ApiOperation(value = "Delivers the installer for a given operating system.",
 	notes = "OS The operating system: the list of the supported os will be delivered by GET selfmanagement/vpn/OS")
     @ApiResponses(value = {
