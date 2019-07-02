@@ -132,7 +132,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			StringBuffer reply = new StringBuffer();
 			StringBuffer error = new StringBuffer();
 			String[]   program = new String[2];
-			program[0] = "/usr/share/oss/tools/vnp/creat-config.sh";
+			program[0] = "/usr/share/oss/tools/vpn/create-config.sh";
 			program[1] = uid;
 			OSSShellTools.exec(program, reply, error, null);
 		}

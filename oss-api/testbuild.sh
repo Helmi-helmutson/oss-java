@@ -1,7 +1,7 @@
 #!/bin/bash
 HERE=$( pwd )
-#gradle --offline clean build
-gradle clean build
+gradle --offline clean build
+#gradle clean build
 tar xf build/distributions/de.openschoolserver.api-1.0-SNAPSHOT.tar
 REPO="/data1/OSC/home:varkoly:OSS-4-0/oss-java"
 if [ "$1" ]; then
