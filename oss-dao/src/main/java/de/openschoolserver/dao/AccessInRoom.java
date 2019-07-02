@@ -136,7 +136,7 @@ public class AccessInRoom implements Serializable {
 	private User creator;
 
 	@Transient
-	private Boolean allowSessionIp;
+	private Boolean allowSessionIp = false;
 
 	public AccessInRoom() {
 		this.pointInTime = "06:00";
