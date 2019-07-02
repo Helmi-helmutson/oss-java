@@ -1,14 +1,22 @@
 package de.openschoolserver.api.resourceimpl;
 
+import java.io.File;
+import java.util.List;
+
 import javax.persistence.EntityManager;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.api.resources.SelfManagementResource;
+import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.controller.Config;
 import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
@@ -17,16 +25,8 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 
 	Logger logger = LoggerFactory.getLogger(SelfManagementResource.class);
 
-	private EntityManager em;
-
 	public SelfManagementResourceImpl() {
 		super();
-		em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-	}
-
-	protected void finalize()
-	{
-	   em.close();
 	}
 
 	@Override
@@ -88,6 +88,87 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			}
 		}
 		return ossResponse;
+	}
+
+	@Override
+	public Boolean haveVpn(Session session) {
+		File vpn = new File("/usr/share/oss/tools/vpn");
+		if( vpn == null || !vpn.exists() ) {
+			return false;
+		}
+		for( Group g : session.getUser().getGroups() ) {
+			if( g.getName().equals("VPNUSERS")) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public Response getConfig(Session session, String OS) {
+		if( ! haveVpn(session)) {
+			throw new WebApplicationException(401);
+		}
+		Config config   = new Config("/etc/sysconfig/oss-vpn","");
+		String vpnId    = config.getConfigValue("VPN_ID");
+		File configFile = null;
+		String contentType = "application/x-dosexec";
+		String uid  =  session.getUser().getUid();
+		switch(OS) {
+		case "Win7":
+		case "Win10":
+			configFile = new File("/var/adm/oss/vpn/oss-vpn-installer-" + vpnId + "-" + uid + ".exe");
+			break;
+		case "Mac":
+			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + uid + ".tar.bz2");
+			contentType = "application/x-bzip2";
+			break;
+		case "Linux":
+			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + uid + ".tgz");
+			contentType = "application/x-compressed-tar";
+			break;
+		}
+		if( ! configFile.exists() ) {
+			StringBuffer reply = new StringBuffer();
+			StringBuffer error = new StringBuffer();
+			String[]   program = new String[2];
+			program[0] = "/usr/share/oss/tools/vpn/create-config.sh";
+			program[1] = uid;
+			OSSShellTools.exec(program, reply, error, null);
+		}
+		ResponseBuilder response = Response.ok((Object) configFile);
+		response = response.header("Content-Disposition","attachment; filename="+ configFile.getName());
+		return response.build();
+	}
+
+	@Override
+	public Response getInstaller(Session session, String OS) {
+		if( ! haveVpn(session)) {
+			throw new WebApplicationException(401);
+		}
+		File configFile = null;
+		String contentType = "application/x-dosexec";
+		switch(OS) {
+		case "Win7":
+			configFile = new File("/srv/www/admin/vpn-clients/openvpn-install-Win7.exe");
+			break;
+		case "Win10":
+			configFile = new File("/srv/www/admin/vpn-clients/openvpn-install-Win10.exe");
+			break;
+		case "Mac":
+			configFile = new File("/srv/www/admin/vpn-clients/Tunnelblick.dmg");
+			contentType = "application/zlib";
+			break;
+		}
+		ResponseBuilder response = Response.ok((Object) configFile);
+		response = response.header("Content-Disposition","attachment; filename="+ configFile.getName());
+		return response.build();
+	}
+
+	@Override
+	public String[] vpnOS(Session session) {
+		String[] osList = { "Win7","Win10","Mac","Linux" };
+		return osList;
 	}
 
 }
