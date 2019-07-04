@@ -387,7 +387,11 @@ public class DeviceController extends Controller {
 	public List<Device> search(String search) {
 		try {
 			Query query = this.em.createNamedQuery("Device.search");
-			query.setParameter("search", "%" + search + "%");
+			if( search.equals("*") ) {
+				query = this.em.createNamedQuery("Device.findAll");
+			} else {
+				query.setParameter("search", "%" + search + "%");
+			}
 			return (List<Device>) query.getResultList();
 		} catch (Exception e) {
 			logger.debug("search " + search + " " + e.getMessage(),e);
