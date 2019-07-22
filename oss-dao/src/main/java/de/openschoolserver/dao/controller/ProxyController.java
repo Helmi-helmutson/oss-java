@@ -273,6 +273,14 @@ public class ProxyController extends Controller {
 			this.em.getTransaction().begin();
 			this.em.remove(positiveList);
 			this.em.getTransaction().commit();
+			String[] program   = new String[2];
+			program[0] = "/usr/share/oss/tools/squidGuard.pl";
+			program[1] = "write";
+			StringBuffer reply = new StringBuffer();
+			StringBuffer error = new StringBuffer();
+			Room room  = new RoomController(this.session,this.em).getById(roomId);
+			String acls = "dummy:" + positiveList.getName() + ":delete\n";
+			OSSShellTools.exec(program, reply, error, acls);
 		}  catch (Exception e) {
 			logger.error("delete " + e.getMessage(),e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());

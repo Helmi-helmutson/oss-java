@@ -381,7 +381,7 @@ public class Controller extends Config {
 	}
 
 	public boolean mayModify(Object object) {
-		if( this.session.getUser().getId() == 0 ) {
+		if( this.session.getUser().getId() == 6 ) {
 			return true;
 		}
 
