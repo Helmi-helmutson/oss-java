@@ -136,12 +136,15 @@ public class DeviceController extends Controller {
 			if( !this.mayModify(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
 			}
+			//Start the transaction
 			this.em.getTransaction().begin();
 			if(hwconf != null )
 			{
+				//Remove device from the hwconf.
 				hwconf.getDevices().remove(device);
 				this.em.merge(hwconf);
 				if( hwconf.getDeviceType().equals("FatClient")) {
+					//If the device was a FatClient salt must be reloaded.
 					needReloadSalt = true;
 				}
 			}
@@ -185,6 +188,11 @@ public class DeviceController extends Controller {
 			//Clean up sessions
 			for( Session session : device.getSessions() ) {
 				this.em.remove(session);
+			}
+			//Clean up loggedIn entries
+			for( User loggedInUser : device.getLoggedIn() ) {
+				loggedInUser.getLoggedOn().remove(device);
+				this.em.merge(loggedInUser);
 			}
 			//Remove salt sls file if exists
 			File saltFile = new File("/srv/salt/oss_device_" + device.getName() + ".sls");
