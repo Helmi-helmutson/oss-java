@@ -207,9 +207,16 @@ public class Controller extends Config {
 	}
 
 	public boolean isUserAliasUnique(String name){
-		Query query = this.em.createNamedQuery("Alias.getByName");
-		query.setParameter("alias", name);
+		Query query = this.em.createNamedQuery("User.getByUid");
+		query.setParameter("uid", name);
 		boolean result = query.getResultList().isEmpty();
+		if( result ) {
+			if( this.getConfigValue("ALLOW_MULTIPLE_ALIASES").toLowerCase().equals("no")) {
+				query = this.em.createNamedQuery("Alias.getByName");
+				query.setParameter("alias", name);
+				result = query.getResultList().isEmpty();
+			}
+		}
 		return result;
 	}
 
