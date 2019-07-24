@@ -278,7 +278,6 @@ public class ProxyController extends Controller {
 			program[1] = "write";
 			StringBuffer reply = new StringBuffer();
 			StringBuffer error = new StringBuffer();
-			Room room  = new RoomController(this.session,this.em).getById(roomId);
 			String acls = "dummy:" + positiveList.getName() + ":delete\n";
 			OSSShellTools.exec(program, reply, error, acls);
 		}  catch (Exception e) {
@@ -298,11 +297,11 @@ public class ProxyController extends Controller {
 		PositiveList positiveList = this.getPositiveListById(id);
 		try {
 			positiveList.setDomains(
-					String.join(
-							this.getNl(),
-							Files.readAllLines(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains"))
-							)
-					);
+				String.join(
+					this.getNl(),
+					Files.readAllLines(Paths.get("/var/lib/squidGuard/db/PL/" + positiveList.getName() + "/domains"))
+					)
+				);
 		}
 		catch( IOException e ) {
 			e.printStackTrace();
