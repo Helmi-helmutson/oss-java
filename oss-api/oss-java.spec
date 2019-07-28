@@ -20,6 +20,7 @@ Source4:	oss-api.service
 Source5:	data.tar.bz2
 Requires: 	systemd 
 Requires:	oss-base >= 4.0.1
+Requires:	java-1_8_0-openjdk
 BuildArch:      noarch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  -post-build-checks
