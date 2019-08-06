@@ -30,9 +30,9 @@ public class CloneToolController extends Controller {
 	Logger logger = LoggerFactory.getLogger(CloneToolController.class);
 	private List<String> parameters = new ArrayList<String>();
 
-	protected Path PXE_BOOT   = Paths.get("/usr/share/oss/templates/pxeboot");
-	protected Path ELILO_BOOT = Paths.get("/usr/share/oss/templates/eliloboot");
-	protected String images   = "/srv/itool/images/";
+	protected Path PXE_BOOT = Paths.get("/usr/share/oss/templates/pxeboot");
+	protected Path EFI_BOOT = Paths.get("/usr/share/oss/templates/efiboot");
+	protected String images = "/srv/itool/images/";
 
 	public CloneToolController(Session session,EntityManager em) {
 		super(session,em);
@@ -399,11 +399,11 @@ public class CloneToolController extends Controller {
 
 	public OssResponse startCloning(String type, Long id, int multiCast) {
 		List<String> pxeBoot;
-		List<String> eliloBoot;
+		List<String> efiBoot;
 		StringBuilder ERROR = new StringBuilder();
 		try {
 			pxeBoot   = Files.readAllLines(PXE_BOOT);
-			eliloBoot = Files.readAllLines(ELILO_BOOT);
+			efiBoot = Files.readAllLines(EFI_BOOT);
 		}
 		catch( IOException e ) {
 			e.printStackTrace();
@@ -417,13 +417,13 @@ public class CloneToolController extends Controller {
 			}
 			pxeBoot.set(i, temp);
 		}
-		for(int i = 0; i < eliloBoot.size(); i++) {
-			String temp = eliloBoot.get(i);
+		for(int i = 0; i < efiBoot.size(); i++) {
+			String temp = efiBoot.get(i);
 			temp = temp.replaceAll("#PARTITIONS#", "all");
 			if( multiCast != 1) {
 				temp = temp.replaceAll("MULTICAST=1", "");
 			}
-			eliloBoot.set(i, temp);
+			efiBoot.set(i, temp);
 		}
 
 		List<Device> devices = new ArrayList<Device>();
@@ -441,10 +441,10 @@ public class CloneToolController extends Controller {
 
 		for( Device device : devices ) {
 			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
-			String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
+			String pathElilo= String.format("/srv/tftp/boot/%s", device.getMac().toLowerCase());
 			try {
 				Files.write(Paths.get(pathPxe), pxeBoot);
-				Files.write(Paths.get(pathElilo), eliloBoot);
+				Files.write(Paths.get(pathElilo), efiBoot);
 			}catch( IOException e ) {
 				e.printStackTrace();
 				ERROR.append(e.getMessage());
@@ -460,12 +460,12 @@ public class CloneToolController extends Controller {
 	public OssResponse startCloning(Long hwconfId, Clone parameters) {
 		List<String> partitions = new ArrayList<String>();
 		List<String> pxeBoot;
-		List<String> eliloBoot;
+		List<String> efiBoot;
 		List<String> responseParameters = new ArrayList<String>();
 		StringBuilder ERROR = new StringBuilder();
 		try {
 			pxeBoot   = Files.readAllLines(PXE_BOOT);
-			eliloBoot = Files.readAllLines(ELILO_BOOT);
+			efiBoot = Files.readAllLines(EFI_BOOT);
 		}
 		catch( IOException e ) {
 			e.printStackTrace();
@@ -489,22 +489,22 @@ public class CloneToolController extends Controller {
 			}
 			pxeBoot.set(i, temp);
 		}
-		for(int i = 0; i < eliloBoot.size(); i++) {
-			String temp = eliloBoot.get(i);
+		for(int i = 0; i < efiBoot.size(); i++) {
+			String temp = efiBoot.get(i);
 			temp = temp.replaceAll("#PARTITIONS#", parts.toString());
 			if(!parameters.isMultiCast()) {
 				temp = temp.replaceAll("MULTICAST=1", "");
 			}
-			eliloBoot.set(i, temp);
+			efiBoot.set(i, temp);
 		}
 		DeviceController dc = new DeviceController(this.session,this.em);
 		for( Long deviceId : parameters.getDeviceIds() ) {
 			Device device   = dc.getById(deviceId);
 			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
-			String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
+			String pathElilo= String.format("/srv/tftp/boot/%s", device.getMac().toLowerCase());
 			try {
 				Files.write(Paths.get(pathPxe), pxeBoot);
-				Files.write(Paths.get(pathElilo), eliloBoot);
+				Files.write(Paths.get(pathElilo), efiBoot);
 			}catch( IOException e ) {
 				e.printStackTrace();
 				ERROR.append(e.getMessage());
@@ -532,7 +532,7 @@ public class CloneToolController extends Controller {
 		}
 		for( Device device : devices ) {
 			String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
-			String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
+			String pathElilo= String.format("/srv/tftp/boot/%s", device.getMac().toLowerCase());
 			try {
 				Files.deleteIfExists(Paths.get(pathPxe));
 				Files.deleteIfExists(Paths.get(pathElilo));
