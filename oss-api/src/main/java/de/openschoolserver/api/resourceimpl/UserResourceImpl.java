@@ -396,6 +396,15 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
+	public String addUserDefaultAlias(Session session, String userName) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		UserController uc = new UserController(session,em);
+		User user = uc.getByUid(userName);
+		String resp = uc.addDefaultAliase(user).getValue();
+		em.close();
+		return resp;
+	}
+	@Override
 	public String removeFromGroup(Session session, String userName, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		String resp = new GroupController(session,em).removeMember(groupName, userName).getCode();

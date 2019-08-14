@@ -21,6 +21,7 @@ import static de.openschoolserver.dao.internal.OSSConstants.*;
 import de.extis.core.util.UserUtil;
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.tools.StringToys.*;
 
 @SuppressWarnings("unchecked")
 public class UserController extends Controller {
@@ -1103,4 +1104,45 @@ public class UserController extends Controller {
 		}
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
+	public OssResponse addAlias(User user, String alias) {
+		if(user.getAliases().contains(alias)) {
+			return new OssResponse(this.getSession(), "OK", "The alias was already add to the user.");
+		}
+		if(!this.isUserAliasUnique(alias)) {
+			return new OssResponse(this.getSession(), "ERROR", "The alias was already add to an other user.");
+		}
+		try {
+			Alias newAlias = new Alias(user,alias);
+			user.getAliases().add(newAlias);
+			this.em.getTransaction().begin();
+			this.em.merge(user);
+			this.em.getTransaction().commit();
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
+		} finally {
+		}
+		return new OssResponse(this.getSession(), "OK", "The alias was add to the user succesfully.");
+	}
+
+	public OssResponse addDefaultAliase(User user) {
+		boolean error = false;
+		OssResponse ossResponse = this.addAlias(user, normalize(user.getGivenName() + "." + user.getSurName()));
+		error = ossResponse.getCode().equals("ERROR");
+		ossResponse = this.addAlias(user,  normalize(user.getSurName() + "." + user.getGivenName()));
+		if( error ) {
+			if( ossResponse.getCode().equals("ERROR") ) {
+				return new OssResponse(this.getSession(), "ERROR", "Can not add default aliases." );
+			} else {
+				return new OssResponse(this.getSession(), "ERROR", "Can not add Givenname.Surname alias.");
+			}
+		} else {
+			if( ossResponse.getCode().equals("ERROR") ) {
+				return new OssResponse(this.getSession(), "ERROR", "Can not ad Surname.Givenname alias" );
+			} else {
+				return new OssResponse(this.getSession(), "OK", "The alias was add to the user succesfully.");
+			}
+		}
+	}
 }

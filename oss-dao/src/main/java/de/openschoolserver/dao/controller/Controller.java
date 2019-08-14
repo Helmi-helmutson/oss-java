@@ -25,8 +25,6 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 
 @SuppressWarnings( "unchecked" )
@@ -77,32 +75,6 @@ public class Controller extends Config {
 		else {
 			return CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		}
-	}
-
-	public String createRandomPassword()
-	{
-		String[] salt = new String[3];
-	    salt[0] = "ABCDEFGHIJKLMNOPQRSTVWXYZ";
-	    salt[1] = "1234567890";
-	    salt[2] = "abcdefghijklmnopqrstvwxyz";
-	    Random rand = new Random();
-	    StringBuilder builder = new StringBuilder();
-	    int saltIndex  = 2;
-	    int beginIndex = Math.abs(rand.nextInt() % salt[saltIndex].length());
-	    builder.append(salt[saltIndex].substring(beginIndex, beginIndex + 1));
-	    saltIndex  = 1;
-	    beginIndex = Math.abs(rand.nextInt() % salt[saltIndex].length());
-	    builder.append(salt[saltIndex].substring(beginIndex, beginIndex + 1));
-	    saltIndex  = 0;
-	    beginIndex = Math.abs(rand.nextInt() % salt[saltIndex].length());
-	    builder.append(salt[saltIndex].substring(beginIndex, beginIndex + 1));
-	    for (int i = 3; i < 8; i++)
-	    {
-	      saltIndex  = Math.abs(rand.nextInt() % 3 );
-	      beginIndex = Math.abs(rand.nextInt() % salt[saltIndex].length());
-	      builder.append(salt[saltIndex].substring(beginIndex, beginIndex + 1));
-	    }
-	    return builder.toString();
 	}
 
 	public Session getSession() {
@@ -597,14 +569,14 @@ public class Controller extends Config {
 	}
 
 	public boolean systemctl(String action, String service) {
-		 String[] program = new String[3];
-		 program[0] = "systemctl";
-		 program[1] = action;
-		 program[2] = service;
-		 StringBuffer reply = new StringBuffer();
-		 StringBuffer error = new StringBuffer();
-		 OSSShellTools.exec(program, reply, error, null);
-		 return  error.length() == 0;
+		String[] program = new String[3];
+		program[0] = "systemctl";
+		program[1] = action;
+		program[2] = service;
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		OSSShellTools.exec(program, reply, error, null);
+		return  error.length() == 0;
 	}
 
 	public OSSMConfig getMConfigObject(Object object, String key, String value) {
@@ -612,21 +584,21 @@ public class Controller extends Config {
 		Query query = this.em.createNamedQuery("OSSMConfig.check");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 query.setParameter("type","Group");
-			 id    = ((Group) object ).getId();
-			 break;
+		query.setParameter("type","Group");
+		id    = ((Group) object ).getId();
+		break;
 		case "de.openschoolserver.dao.User":
-			 query.setParameter("type","User");
-			 id    = ((User) object ).getId();
-			 break;
+		query.setParameter("type","User");
+		id    = ((User) object ).getId();
+		break;
 		case "de.openschoolserver.dao.Room":
-			 query.setParameter("type","Room");
+		query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
 			break;
 		case "de.openschoolserver.dao.Device":
-			 query.setParameter("type","Device");
-			 id    = ((Device) object ).getId();
-			 break;
+		query.setParameter("type","Device");
+		id    = ((Device) object ).getId();
+		break;
 		}
 		query.setParameter("id", id).setParameter("keyword", key).setParameter("value", value);
 		if( query.getResultList().isEmpty() ) {
@@ -647,13 +619,13 @@ public class Controller extends Config {
 		Query query = this.em.createNamedQuery("OSSConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 query.setParameter("type","Group");
-			 id    = ((Group) object ).getId();
-			 break;
+		query.setParameter("type","Group");
+		id    = ((Group) object ).getId();
+		break;
 		case "de.openschoolserver.dao.User":
-			 query.setParameter("type","User");
-			 id    = ((User) object ).getId();
-			 break;
+		query.setParameter("type","User");
+		id    = ((User) object ).getId();
+		break;
 		case "de.openschoolserver.dao.Room":
 			query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
@@ -692,9 +664,9 @@ public class Controller extends Config {
 	/**
 	 * Returns the list of the member of an enumerate.
 	 *
-	 * @param		type	Name of the enumerates: roomType, groupType, deviceType ...
-	 * @return				The list of the member of the enumerate
-	 * @see					addEnumerate
+	 * @param	type	Name of the enumerates: roomType, groupType, deviceType ...
+	 * @return	The list of the member of the enumerate
+	 * @see		addEnumerate
 	 */
 	public List<String> getEnumerates(String type ) {
 		try {
@@ -747,9 +719,9 @@ public class Controller extends Config {
 		Query query = this.em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 query.setParameter("type","Group");
-			 id    = ((Group) object ).getId();
-			 break;
+		query.setParameter("type","Group");
+		id    = ((Group) object ).getId();
+		break;
 		case "de.openschoolserver.dao.User":
 			query.setParameter("type","User");
 			id    = ((User) object ).getId();
@@ -776,13 +748,13 @@ public class Controller extends Config {
 		Query query = this.em.createNamedQuery("OSSMConfig.getAllById");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 query.setParameter("type","Group");
-			 id    = ((Group) object ).getId();
-			 break;
+		query.setParameter("type","Group");
+		id    = ((Group) object ).getId();
+		break;
 		case "de.openschoolserver.dao.User":
-			 query.setParameter("type","User");
-			 id    = ((User) object ).getId();
-			 break;
+		query.setParameter("type","User");
+		id    = ((User) object ).getId();
+		break;
 		case "de.openschoolserver.dao.Room":
 			query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
@@ -801,9 +773,9 @@ public class Controller extends Config {
 		Query query = this.em.createNamedQuery("OSSMConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 query.setParameter("type","Group");
-			 id    = ((Group) object ).getId();
-			 break;
+		query.setParameter("type","Group");
+		id    = ((Group) object ).getId();
+		break;
 		case "de.openschoolserver.dao.User":
 			query.setParameter("type","User");
 			id    = ((User) object ).getId();
@@ -836,13 +808,13 @@ public class Controller extends Config {
 		Query query = this.em.createNamedQuery("OSSConfig.get");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 query.setParameter("type","Group");
-			 id    = ((Group) object ).getId();
-			 break;
+		query.setParameter("type","Group");
+		id    = ((Group) object ).getId();
+		break;
 		case "de.openschoolserver.dao.User":
-			 query.setParameter("type","User");
-			 id    = ((User) object ).getId();
-			 break;
+		query.setParameter("type","User");
+		id    = ((User) object ).getId();
+		break;
 		case "de.openschoolserver.dao.Room":
 			query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
@@ -865,13 +837,13 @@ public class Controller extends Config {
 		Query query = this.em.createNamedQuery("OSSConfig.getAllById");
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 query.setParameter("type","Group");
-			 id    = ((Group) object ).getId();
-			 break;
+		query.setParameter("type","Group");
+		id    = ((Group) object ).getId();
+		break;
 		case "de.openschoolserver.dao.User":
-			 query.setParameter("type","User");
-			 id    = ((User) object ).getId();
-			 break;
+		query.setParameter("type","User");
+		id    = ((User) object ).getId();
+		break;
 		case "de.openschoolserver.dao.Room":
 			query.setParameter("type","Room");
 			id    = ((Room) object ).getId();
@@ -892,13 +864,13 @@ public class Controller extends Config {
 		OSSMConfig mconfig = new OSSMConfig();
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 mconfig.setObjectType("Group");
-			 mconfig.setObjectId(((Group) object ).getId());
-			 break;
+		mconfig.setObjectType("Group");
+		mconfig.setObjectId(((Group) object ).getId());
+		break;
 		case "de.openschoolserver.dao.User":
 			mconfig.setObjectType("User");
 			mconfig.setObjectId(((User) object ).getId());
-			 break;
+		break;
 		case "de.openschoolserver.dao.Room":
 			mconfig.setObjectType("Room");
 			mconfig.setObjectId(((Room) object ).getId());
@@ -930,13 +902,13 @@ public class Controller extends Config {
 		OSSConfig config = new OSSConfig();
 		switch(object.getClass().getName()) {
 		case "de.openschoolserver.dao.Group":
-			 config.setObjectType("Group");
-			 config.setObjectId(((Group) object ).getId());
-			 break;
+		config.setObjectType("Group");
+		config.setObjectId(((Group) object ).getId());
+		break;
 		case "de.openschoolserver.dao.User":
 			config.setObjectType("User");
 			config.setObjectId(((User) object ).getId());
-			 break;
+		break;
 		case "de.openschoolserver.dao.Room":
 			config.setObjectType("Room");
 			config.setObjectId(((Room) object ).getId());

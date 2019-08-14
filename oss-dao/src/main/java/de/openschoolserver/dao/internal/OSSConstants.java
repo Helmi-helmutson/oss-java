@@ -7,13 +7,13 @@ import java.util.Set;
 
 public interface OSSConstants {
 
-	String roleTeacher  = "teachers";
-	String roleStudent  = "students";
-	String roleSysadmin = "sysadmins";
-	String roleGuest    = "guest";
-	String roleAdministratrion = "administration";
-	String roleWorkstation = "workstations";
-	String winLineSeparator = "\r\n";
+	static String roleTeacher  = "teachers";
+	static String roleStudent  = "students";
+	static String roleSysadmin = "sysadmins";
+	static String roleGuest    = "guest";
+	static String roleAdministratrion = "administration";
+	static String roleWorkstation = "workstations";
+	static String winLineSeparator = "\r\n";
 
     static FileAttribute<Set<PosixFilePermission>> privatDirAttribute      = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
     static FileAttribute<Set<PosixFilePermission>> privatFileAttribute     = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));

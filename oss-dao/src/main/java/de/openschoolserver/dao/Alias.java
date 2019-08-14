@@ -5,8 +5,7 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-
+import static de.openschoolserver.dao.tools.StringToys.*;
 /**
  * The persistent class for the Aliases database table.
  * 
@@ -56,6 +55,10 @@ public class Alias implements Serializable {
 			return true;
 		if (obj == null)
 			return false;
+		if (obj.getClass().getName() == "java.lang.String" &&
+				this.alias.equals(obj)) {
+			return true;
+		}
 		if (getClass() != obj.getClass())
 			return false;
 		Alias other = (Alias) obj;
