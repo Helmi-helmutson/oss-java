@@ -584,6 +584,19 @@ public interface UserResource {
 			@PathParam("alias")        String    alias
 			);
 
+	@PUT
+	@Path("text/{userName}/defaultAlias")
+	@Produces(TEXT)
+	@ApiOperation(value = "Add an alias to a user. Helper stuff only.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "User not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("user.manage")
+	String  addUserDefaultAlias(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("userName")	String	userName
+			);
+
 	@DELETE
 	@Path("text/{userName}/groups/{groupName}")
 	@Produces(TEXT)
@@ -712,8 +725,8 @@ public interface UserResource {
 			);
 
 	/*
-	 * Some additional stuff
-	 */
+	* Some additional stuff
+	*/
 	@PUT
 	@Path("allTeachersInAllClasses")
 	@Produces(JSON_UTF8)
