@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
 public class StringToys {
 
 	static CharSequence toReplace = "íéáűőúöüóÍÉÁŰŐÚÖÜÓß";
-    static CharSequence replaceIn = "ieauououoIEAUOUOUOs";
-    
+	static CharSequence replaceIn = "ieauououoIEAUOUOUOs";
+
 	static public String createRandomPassword()
 	{
 		String[] salt = new String[3];
@@ -34,9 +34,9 @@ public class StringToys {
 		}
 		return builder.toString();
 	}
-	
+
 	static public String normalize(String input) {
-		String output = Normalizer.normalize(input, Normalizer.Form.NFD); 
+		String output = Normalizer.normalize(input, Normalizer.Form.NFD);
 		Pattern pattern = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
 		return pattern.matcher(output).replaceAll("");
 	}
