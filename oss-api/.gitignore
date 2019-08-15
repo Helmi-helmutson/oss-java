@@ -128,3 +128,5 @@ local.properties
 .recommenders/
 
 /target/
+
+de.openschoolserver.api-1.0-SNAPSHOT/

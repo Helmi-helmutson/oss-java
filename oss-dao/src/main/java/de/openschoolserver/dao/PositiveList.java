@@ -1,8 +1,6 @@
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
-import java.util.List;
-
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;

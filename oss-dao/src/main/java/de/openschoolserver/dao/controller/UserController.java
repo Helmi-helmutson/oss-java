@@ -21,7 +21,7 @@ import static de.openschoolserver.dao.internal.OSSConstants.*;
 import de.extis.core.util.UserUtil;
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
-import static de.openschoolserver.dao.tools.StringToys.*;
+import static de.openschoolserver.dao.tools.StaticHelpers.*;
 
 @SuppressWarnings("unchecked")
 public class UserController extends Controller {
@@ -247,7 +247,7 @@ public class UserController extends Controller {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
 		}
-		this.startPlugin("add_user", user);
+		startPlugin("add_user", user);
 		GroupController groupController = new GroupController(this.session,this.em);
 		Group group = new GroupController(this.session,this.em).getByName(user.getRole());
 		if (group != null) {
@@ -323,7 +323,7 @@ public class UserController extends Controller {
 			return new OssResponse(this.getSession(), "ERROR", e.getMessage());
 		} finally {
 		}
-		this.startPlugin("modify_user", oldUser);
+		startPlugin("modify_user", oldUser);
 		return new OssResponse(this.getSession(), "OK", "User was modified succesfully");
 	}
 
@@ -356,7 +356,7 @@ public class UserController extends Controller {
 		if( !this.mayModify(user)) {
 			return new OssResponse(this.getSession(),"ERROR", "You must not delete this user.");
 		}
-		this.startPlugin("delete_user", user);
+		startPlugin("delete_user", user);
 		//TODO make it configurable
 		//Remove the devices before doing anything else
 		if( !user.getOwnedDevices().isEmpty() ) {
@@ -446,10 +446,10 @@ public class UserController extends Controller {
 		} finally {
 		}
 		for (Group group : groupsToAdd) {
-			this.changeMemberPlugin("addmembers", group, user);
+			changeMemberPlugin("addmembers", group, user);
 		}
 		for (Group group : groupsToRemove) {
-			this.changeMemberPlugin("removemembers", group, user);
+			changeMemberPlugin("removemembers", group, user);
 		}
 		return new OssResponse(this.getSession(), "OK", "The groups of the user was set.");
 	}

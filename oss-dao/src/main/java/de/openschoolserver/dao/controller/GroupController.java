@@ -30,6 +30,7 @@ import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
+import static de.openschoolserver.dao.tools.StaticHelpers.*;
 
 @SuppressWarnings( "unchecked" )
 public class GroupController extends Controller {
@@ -146,7 +147,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 		}
-		this.startPlugin("add_group", group);
+		startPlugin("add_group", group);
 		if( group.getGroupType().equals("workgroup") ) {
 			logger.debug("Add creator to member");
 			createSmartRoomForGroup(group,true,false);
@@ -182,7 +183,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		}  finally {
 		}
-		this.startPlugin("modify_group", oldGroup);
+		startPlugin("modify_group", oldGroup);
 		return new OssResponse(this.getSession(),"OK","Group was modified.");
 	}
 
@@ -202,7 +203,7 @@ public class GroupController extends Controller {
 			}
 		}
 		//Start the plugin
-		this.startPlugin("delete_group", group);
+		startPlugin("delete_group", group);
 		try {
 			this.em.getTransaction().begin();
 			if( !em.contains(group)) {
@@ -364,8 +365,8 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 		}
-		this.changeMemberPlugin("addmembers", group, usersToAdd);
-		this.changeMemberPlugin("removemembers", group, usersToRemove);
+		changeMemberPlugin("addmembers", group, usersToAdd);
+		changeMemberPlugin("removemembers", group, usersToRemove);
 		return new OssResponse(this.getSession(),"OK","The members of group was set.");
 	}
 
@@ -394,7 +395,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 		}
-		this.changeMemberPlugin("addmembers", group, user);
+		changeMemberPlugin("addmembers", group, user);
 		return new OssResponse(this.getSession(),"OK","User %s was added to group %s.",null,parameters );
 	}
 
@@ -417,7 +418,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 		}
-		this.changeMemberPlugin("addmembers", group, users);
+		changeMemberPlugin("addmembers", group, users);
 		return new OssResponse(this.getSession(),"OK","User %s was added to group %s.",null,parameters );
 	}
 	public OssResponse addMember(long groupId, long userId) {
@@ -475,7 +476,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 		}
-		this.changeMemberPlugin("removemembers", group, user);
+		changeMemberPlugin("removemembers", group, user);
 		parameters = new ArrayList<String>();
 		parameters.add(user.getUid());
 		parameters.add(group.getName());

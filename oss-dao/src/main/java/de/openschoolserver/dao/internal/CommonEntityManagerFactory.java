@@ -4,10 +4,7 @@
 package de.openschoolserver.dao.internal;
 
 import java.util.HashMap;
-
 import java.util.Map;
-
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 
@@ -17,12 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
-
 import org.eclipse.persistence.config.PersistenceUnitProperties;
-
-import de.openschoolserver.dao.Session;
-
-
 
 public class CommonEntityManagerFactory {
 

@@ -1,25 +1,19 @@
 /* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao.controller;
 
+import static de.openschoolserver.dao.internal.OSSConstants.roleStudent;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-
-
-import static de.openschoolserver.dao.internal.OSSConstants.*;
-
-import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.Calendar;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -27,17 +21,23 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import de.openschoolserver.dao.AccessInRoom;
+import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
-import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.AccessInRoom;
-import de.openschoolserver.dao.Category;
-import de.openschoolserver.dao.tools.*;
+import de.openschoolserver.dao.User;
+import de.openschoolserver.dao.tools.IPv4Net;
+import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.tools.StaticHelpers.*;
 
 @SuppressWarnings( "unchecked" )
 public class RoomController extends Controller {
@@ -368,7 +368,7 @@ public class RoomController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
-		this.startPlugin("add_room", room);
+		startPlugin("add_room", room);
 		return new OssResponse(this.getSession(),"OK", "Room was created succesfully.",room.getId());
 	}
 
@@ -432,7 +432,7 @@ public class RoomController extends Controller {
 		DHCPConfig dhcpconfig = new DHCPConfig(session,em);
 		dhcpconfig.Create();
 		new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
-		this.startPlugin("delete_room", room);
+		startPlugin("delete_room", room);
 		return new OssResponse(this.getSession(),"OK", "Room was removed successfully.");
 	}
 
@@ -900,7 +900,7 @@ public class RoomController extends Controller {
 		UserController userController = new UserController(this.session,this.em);
 		boolean needWriteSalt = false;
 		for(Device device : newDevices) {
-			this.startPlugin("add_device", device);
+			startPlugin("add_device", device);
 			logger.debug("Created Device" + device);
 			logger.debug("HWCONF" + device.getHwconf());
 			// We'll create only for fatClients workstation users
@@ -1037,7 +1037,7 @@ public class RoomController extends Controller {
 		} finally {
 		}
 		//Start plugin and create DHCP and salt configuration
-		this.startPlugin("add_device", device);
+		startPlugin("add_device", device);
 		new DHCPConfig(session,em).Create();
 		return new OssResponse(this.getSession(),"OK","Device was created succesfully.",device.getId());
 	}
@@ -1091,7 +1091,7 @@ public class RoomController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
 		} finally {
 		}
-		this.startPlugin("modify_room", oldRoom);
+		startPlugin("modify_room", oldRoom);
 
 		return new OssResponse(this.getSession(),"OK","The room was modified succesfully.");
 	}

@@ -1,8 +1,6 @@
 package de.openschoolserver.api.resourceimpl;
 
 import java.io.File;
-import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
@@ -20,6 +18,8 @@ import de.openschoolserver.dao.controller.Config;
 import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.tools.StaticHelpers.*;
+
 
 public class SelfManagementResourceImpl implements SelfManagementResource {
 
@@ -59,7 +59,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 				em.getTransaction().begin();
 				em.merge(oldUser);
 				em.getTransaction().commit();
-				userController.startPlugin("modify_user", oldUser);
+				startPlugin("modify_user", oldUser);
 			} catch (Exception e) {
 				return null;
 			} finally {
@@ -112,7 +112,6 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 		Config config   = new Config("/etc/sysconfig/oss-vpn","");
 		String vpnId    = config.getConfigValue("VPN_ID");
 		File configFile = null;
-		String contentType = "application/x-dosexec";
 		String uid  =  session.getUser().getUid();
 		switch(OS) {
 		case "Win7":
@@ -121,11 +120,9 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			break;
 		case "Mac":
 			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + uid + ".tar.bz2");
-			contentType = "application/x-bzip2";
 			break;
 		case "Linux":
 			configFile = new File("/var/adm/oss/vpn/" + vpnId + "-" + uid + ".tgz");
-			contentType = "application/x-compressed-tar";
 			break;
 		}
 		if( ! configFile.exists() ) {

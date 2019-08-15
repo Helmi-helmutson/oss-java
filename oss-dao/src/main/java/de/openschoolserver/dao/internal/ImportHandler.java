@@ -239,7 +239,6 @@ public class ImportHandler extends Thread {
 			File dir = new File(filepath);
 			dir.mkdir();
 			File lf = new File(filepath + "/import.log");
-			File uaf = new File(filepath + "/userlist.csv");
 			try {
 				if (logfile == null) {
 					logfile = new FileOutputStream(lf);
@@ -314,7 +313,6 @@ public class ImportHandler extends Thread {
 			if (user.getGroups().size() == 1) {
 				return user.getGroups().get(0).getName();
 			}
-			int i = 0;
 			for (Group group : user.getGroups()) {
 				if ("class".equals(group.getGroupType())) {
 					return group.getName();		

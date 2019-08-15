@@ -23,6 +23,8 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.tools.StaticHelpers.*;
+
 
 @SuppressWarnings( "unchecked" )
 public class CloneToolController extends Controller {
@@ -302,7 +304,7 @@ public class CloneToolController extends Controller {
 	        if( !this.mayModify(hwconf) ) {
 	        	return new OssResponse(this.getSession(),"ERROR","You must not delete this hardware configuration.");
 	        }
-	        this.startPlugin("delete_hwconf", hwconf);
+	        startPlugin("delete_hwconf", hwconf);
 			if( ! this.em.contains(hwconf)) {
 				hwconf = this.em.merge(hwconf);
 			}

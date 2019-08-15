@@ -5,7 +5,6 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import static de.openschoolserver.dao.tools.StringToys.*;
 /**
  * The persistent class for the Aliases database table.
  * 

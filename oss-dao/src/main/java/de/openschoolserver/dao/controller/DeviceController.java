@@ -36,6 +36,8 @@ import de.openschoolserver.dao.SoftwareLicense;
 import de.openschoolserver.dao.SoftwareStatus;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.*;
+import static de.openschoolserver.dao.tools.StaticHelpers.*;
+
 
 @SuppressWarnings( "unchecked" )
 public class DeviceController extends Controller {
@@ -148,7 +150,7 @@ public class DeviceController extends Controller {
 					needReloadSalt = true;
 				}
 			}
-			this.startPlugin("delete_device", device);
+			startPlugin("delete_device", device);
 			if( device.getOwner() != null ) {
 				User owner = device.getOwner();
 				logger.debug("Deleting private device owner:" + owner + " device " + device);
@@ -922,7 +924,7 @@ public class DeviceController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "ERROR-3"+  e.getMessage());
 		} finally {
 		}
-		this.startPlugin("modify_device", oldDevice);
+		startPlugin("modify_device", oldDevice);
 		if( macChange ) {
 			new DHCPConfig(session,em).Create();
 		}

@@ -107,7 +107,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public OssResponse apply(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		SoftwareController softwareController = new SoftwareController(session,em);
-		OssResponse resp = resp = softwareController.applySoftwareStateToHosts();
+		OssResponse resp = softwareController.applySoftwareStateToHosts();
 		em.close();
 		return resp;
 	}

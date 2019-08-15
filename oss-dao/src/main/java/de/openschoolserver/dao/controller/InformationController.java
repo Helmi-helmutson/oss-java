@@ -9,8 +9,6 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.ValidatorFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import de.openschoolserver.dao.Announcement;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Contact;

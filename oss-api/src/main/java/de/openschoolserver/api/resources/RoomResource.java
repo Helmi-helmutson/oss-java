@@ -18,7 +18,6 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
-import de.openschoolserver.dao.OSSConfig;
 import de.openschoolserver.dao.OSSMConfig;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
