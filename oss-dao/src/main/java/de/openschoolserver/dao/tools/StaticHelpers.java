@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.HWConf;
@@ -149,9 +151,7 @@ public class StaticHelpers {
 				data.append(String.format("hwconf: %s%n", room.getHwconf().getName()));
 			}
 			break;
-		case "de.cephalix.api.dao.CephalixCustomer":
-		case "de.cephalix.api.dao.CephalixInstitute":
-		case "de.cephalix.api.dao.CephalixRegcode":
+		default:
 			try {
 				data.append(object);
 			} catch (Exception e) {
@@ -196,4 +196,14 @@ public class StaticHelpers {
 		logger.debug("change_member  : " + data.toString() + " : " + error);
 	}
 
+	static public String  createLiteralJson(Object object) {
+		String jSon = "";
+		ObjectMapper mapper = new ObjectMapper();
+		try {
+			jSon = mapper.writeValueAsString(object);
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+		}
+		return jSon + System.getProperty("line.separator");
+	}
 }

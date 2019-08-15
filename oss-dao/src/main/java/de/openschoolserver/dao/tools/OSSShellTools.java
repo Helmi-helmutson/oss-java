@@ -4,21 +4,23 @@ package de.openschoolserver.dao.tools;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class OSSShellTools {
 
+		static Logger logger = LoggerFactory.getLogger(OSSShellTools.class);
 		public static int exec(String program[], StringBuffer reply, StringBuffer error, String request, boolean log) {
 
 		int procResult = -10000;
 		try {
 			Process proc = Runtime.getRuntime().exec(program);
-			InputStream errorStrm = proc.getErrorStream();
-			InputStream replyStrm = proc.getInputStream();
+			InputStream errorStrm    = proc.getErrorStream();
+			InputStream replyStrm    = proc.getInputStream();
 			OutputStream requestStrm = proc.getOutputStream();
-
 			if (request != null) {
+				logger.debug(request);
 				requestStrm.write(request.getBytes("UTF-8"));
 			}
 			requestStrm.close();
