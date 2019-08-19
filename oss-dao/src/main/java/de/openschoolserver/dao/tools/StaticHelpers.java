@@ -204,6 +204,7 @@ public class StaticHelpers {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		}
-		return jSon + System.getProperty("line.separator");
+		//return jSon + System.getProperty("line.separator");
+		return jSon;
 	}
 }
