@@ -43,8 +43,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<Software> getAll(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		List<Software> resp = softwareController.getAll();
+		List<Software> resp = new SoftwareController(session,em).getAll();
 		em.close();
 		return resp;
 	}
@@ -52,8 +51,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<Software> getAllInstallable(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		List<Software> resp = softwareController.getAllInstallable();
+		List<Software> resp = new SoftwareController(session,em).getAllInstallable();
 		em.close();
 		return resp;
 	}
@@ -61,8 +59,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public Software getById(Session session, long softwareId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		Software resp = softwareController.getById(softwareId);
+		Software resp = new SoftwareController(session,em).getById(softwareId);
 		em.close();
 		return resp;
 	}
@@ -70,8 +67,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public List<Software> search(Session session, String search) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		List<Software> resp = softwareController.search(search);
+		List<Software> resp = new SoftwareController(session,em).search(search);
 		em.close();
 		return resp;
 	}
@@ -79,8 +75,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse add(Session session, Software software) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		OssResponse resp = softwareController.add(software,true);
+		OssResponse resp = new SoftwareController(session,em).add(software,true);
 		em.close();
 		return resp;
 	}
@@ -88,8 +83,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse modify(Session session, Software software) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		OssResponse resp = softwareController.modify(software);
+		OssResponse resp = new SoftwareController(session,em).modify(software);
 		em.close();
 		return resp;
 	}
@@ -97,8 +91,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse delete(Session session, long softwareId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		OssResponse resp = softwareController.delete(softwareId);
+		OssResponse resp = new SoftwareController(session,em).delete(softwareId);
 		em.close();
 		return resp;
 	}
@@ -106,8 +99,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse apply(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		OssResponse resp = softwareController.applySoftwareStateToHosts();
+		OssResponse resp = new SoftwareController(session,em).applySoftwareStateToHosts();
 		em.close();
 		return resp;
 	}
@@ -124,8 +116,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public OssResponse addSoftwareToInstalation(Session session, long installationId, long softwareId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		SoftwareController softwareController = new SoftwareController(session,em);
-		OssResponse resp = softwareController.addSoftwareToCategory(softwareId,installationId);
+		OssResponse resp = new SoftwareController(session,em).addSoftwareToCategory(softwareId,installationId);
 		em.close();
 		return resp;
 	}
