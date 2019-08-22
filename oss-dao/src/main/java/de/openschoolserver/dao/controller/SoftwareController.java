@@ -217,23 +217,33 @@ public class SoftwareController extends Controller {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this software.");
 	        }
 			this.em.getTransaction().begin();
-			if( !em.contains(software)) {
+			if( !this.em.contains(software)) {
+				logger.debug("em does not contains this software.");
 				software = this.em.merge(software);
 			}
 			//Remove all child entries
 			for( SoftwareFullName sf : software.getSoftwareFullNames() ) {
+				logger.debug("delete SoftwareFullName" + sf);
 				this.em.remove(sf);
 			}
 			for( SoftwareVersion sv : software.getSoftwareVersions() ) {
+				logger.debug("delete SoftwareVersion" + sv);
 				for( SoftwareStatus st : sv.getSoftwareStatuses() ) {
-					st.getDevice().getSoftwareStatus().remove(st);
+					logger.debug("delete SoftwareStatus" + sv);
+					if( st.getDevice() != null  && st.getDevice().getSoftwareStatus() != null ) {
+						st.getDevice().getSoftwareStatus().remove(st);
+						this.em.merge(st.getDevice());
+					}
 					this.em.remove(st);
 				}
 				this.em.remove(sv);
 			}
 			for( SoftwareLicense sl : software.getSoftwareLicenses() ) {
 				for( Device device : sl.getDevices() ) {
-					device.getSoftwareLicenses().remove(sl);
+					if( device != null && device.getSoftwareLicenses() != null ) {
+						device.getSoftwareLicenses().remove(sl);
+						this.em.merge(device);
+					}
 				}
 				this.em.remove(sl);
 			}
@@ -254,6 +264,7 @@ public class SoftwareController extends Controller {
 			//TODO Evaluate error message.
 		} catch (Exception e) {
 			logger.error(e.getMessage());
+			e.printStackTrace();
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 		}

@@ -476,8 +476,10 @@ public class Controller extends Config {
 				return true;
 		}
 		for( String right : neededRights ) {
-			if( this.session.getAcls().contains(right) ) {
-				return true;
+			if( this.session.getAcls() != null ) {
+				if( this.session.getAcls().contains(right) ) {
+					return true;
+				}
 			}
 		}
 		//TODO some other acls based on object
