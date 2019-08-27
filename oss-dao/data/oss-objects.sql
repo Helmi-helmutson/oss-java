@@ -377,7 +377,8 @@ CREATE TABLE IF NOT EXISTS SoftwareStatus (
 	status             VARCHAR(2) NOT NULL,
 	FOREIGN KEY(softwareversion_id) REFERENCES SoftwareVersions(id),
 	FOREIGN KEY(device_id)          REFERENCES Devices(id),
-	PRIMARY KEY(id)
+	PRIMARY KEY(id),
+	UNIQUE KEY sv_d (softwareversion_id,device_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
 
 # licenseType C -> command line license
