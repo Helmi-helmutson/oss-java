@@ -1259,6 +1259,7 @@ public class SoftwareController extends Controller {
 		}
 
 		//Evaluate device categories
+		logger.debug("Process devices");
 		for( Device device : deviceController.getAll() ) {
 			if( device.getHwconf() == null || ! device.getHwconf().getDeviceType().equals("FatClient") ) {
 				continue;
@@ -1295,6 +1296,7 @@ public class SoftwareController extends Controller {
 		}
 
 		//Evaluate room categories
+		logger.debug("Process rooms");
 		for( Room room : roomController.getAllToUse() ) {
 			toRemove  = new ArrayList<Software>();
 			toInstall = new ArrayList<String>();
@@ -1328,6 +1330,7 @@ public class SoftwareController extends Controller {
 		}
 
 		//Evaluate hwconf categories
+		logger.debug("Process hwconfs");
 		for( HWConf hwconf : new CloneToolController(this.session,this.em).getAllHWConf() ) {
 			logger.debug("HWConfs: " + hwconf.getName() + " " + hwconf.getDeviceType());
 			if( !hwconf.getDeviceType().equals("FatClient")) {
@@ -1369,10 +1372,12 @@ public class SoftwareController extends Controller {
 		}
 
 		//Write the hosts sls files
+		logger.debug("Process collected datas:");
 		for( Device device : deviceController.getAll() ) {
 			if( device.getHwconf() == null || ! device.getHwconf().getDeviceType().equals("FatClient") ) {
 				continue;
 			}
+			logger.debug("Processing:" + device.getName() );
 			List<String> deviceRemove  = new ArrayList<String>();
 			//List<String> deviceGrains  = new ArrayList<String>();
 			List<String> deviceInstall = new ArrayList<String>();
