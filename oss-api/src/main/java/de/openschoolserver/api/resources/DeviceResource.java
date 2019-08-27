@@ -507,6 +507,19 @@ public interface DeviceResource {
 	);
 
 	@POST
+	@Path("forceModify")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Modify the configuration of one device.")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("device.modify")
+	OssResponse forceModify(
+	@ApiParam(hidden = true) @Auth Session session,
+	        Device device
+	);
+
+	@POST
 	@Path("{deviceId}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Modify the configuration of one device.")

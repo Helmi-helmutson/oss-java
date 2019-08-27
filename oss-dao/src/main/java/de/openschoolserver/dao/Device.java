@@ -148,6 +148,9 @@ public class Device implements Serializable {
 	@JsonIgnore
 	private User owner;
 
+	@Column(name="owner_id", insertable=false, updatable=false)
+	private Long ownerId;
+
 	//bi-directional many-to-one association to TestUser
 	@OneToMany(mappedBy="device")
 	@JsonIgnore
@@ -423,5 +426,25 @@ public class Device implements Serializable {
 
 	public void setSessions(List<Session> sessions) {
 		this.sessions = sessions;
+	}
+
+	public int getRoomRow() {
+		return roomRow;
+	}
+
+	public void setRoomRow(int roomRow) {
+		this.roomRow = roomRow;
+	}
+
+	public Long getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(Long ownerId) {
+		this.ownerId = ownerId;
+	}
+
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 }

@@ -243,7 +243,7 @@ public class RoomController extends Controller {
 	/**
 	 * Return a list the rooms in which the session user can register devices
 	 * @return For super user all rooms will be returned
-	 * 			For normal user the list his AdHocAccess rooms of those of his groups
+	 *         For normal user the list his AdHocAccess rooms of those of his groups
 	 */
 	public List<Room> getAllToRegister() {
 		List<Room> rooms = new ArrayList<Room>();
@@ -527,7 +527,7 @@ public class RoomController extends Controller {
 		if(roomNetMask < subNetwork.getNetmaskNumeric() ) {
 			throw new NumberFormatException("The network netmask must be less then the room netmask:" + roomNetMask + ">" + subNetwork.getNetmaskNumeric() );
 		}
-		Query query = this.em.createNamedQuery("Room.findAll");
+		Query query = this.em.createNamedQuery("Room.findAllToRegister");
 		List<Room> rooms = (List<Room>) query.getResultList();
 		String nextNet = subNetwork.getBase();
 
@@ -538,9 +538,12 @@ public class RoomController extends Controller {
 		boolean used = true;
 		IPv4Net net = new IPv4Net(nextNet + "/" + roomNetMask );
 		String lastIp  = net.getBroadcastAddress();
+
 		while(used) {
 			used = false;
+			logger.debug("getNextRoomIP nextNet:" +nextNet + " lastIp:" +lastIp );
 			for(Room room : rooms ) {
+				logger.debug( "  Room:" +room.getStartIP() + "/" + room.getNetMask() );
 				IPv4Net roomNet = new IPv4Net( room.getStartIP() + "/" + room.getNetMask());
 				if(roomNet.contains(nextNet) || roomNet.contains(lastIp) ) {
 					nextNet = net.getNext();
