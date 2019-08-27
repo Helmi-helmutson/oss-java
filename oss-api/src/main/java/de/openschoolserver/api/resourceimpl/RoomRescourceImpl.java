@@ -129,8 +129,11 @@ public class RoomRescourceImpl implements RoomResource {
 	public String getNextRoomIP(Session session, String network, int netMask) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
+		String[] l = network.split("\\.");
+		network = l[0] + "." + l[1] + "." +l[2] + "."  + l[3] + "/" + l[4];
 		final String nextIP = roomController.getNextRoomIP(network, netMask);
 		em.close();
+		logger.debug("getNextRoomIP: " + network);
 		if ( nextIP == null) {
 			throw new WebApplicationException(404);
 		}

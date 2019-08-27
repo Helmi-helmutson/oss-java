@@ -810,8 +810,24 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Logged in user was removed succesfully:%s;%s",null,parameters);
 	}
 
+	public OssResponse forceModify(Device device) {
+		logger.debug("force modify device: " + device);
+		try {
+			device.setRoom(this.em.find(Room.class, device.getRoomId()));
+			device.setHwconf(this.em.find(HWConf.class, device.getHwconfId()));
+			device.setOwner(this.em.find(User.class, device.getOwnerId()));
+			this.em.getTransaction().begin();
+			this.em.merge(device);
+			this.em.getTransaction().commit();
+		} catch (Exception e) {
+			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
+		} finally {
+		}
+		return new OssResponse(this.getSession(),"OK","Device was modified succesfully");
+	}
+
 	public OssResponse modify(Device device) {
-		logger.debug("modify new device: " + device);
+		logger.debug("modify device: " + device);
 		Device oldDevice;
 		HWConf hwconf;
 		Room   room;
@@ -1229,6 +1245,7 @@ public class DeviceController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}
+
 
 
 }

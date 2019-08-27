@@ -272,6 +272,14 @@ public class DeviceResourceImpl implements DeviceResource {
 	}
 
 	@Override
+	public OssResponse forceModify(Session session, Device device) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		OssResponse resp =  new DeviceController(session,em).forceModify(device);
+		em.close();
+		return resp;
+	}
+
+	@Override
 	public OssResponse delete(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final DeviceController deviceController = new DeviceController(session,em);
