@@ -26,7 +26,7 @@ public class Alias implements Serializable {
 	private String alias;
 
 	//bi-directional many-to-one association to User
-	@ManyToOne
+	@ManyToOne(cascade ={CascadeType.ALL})
 	@JsonIgnore
 	private User user;
 
