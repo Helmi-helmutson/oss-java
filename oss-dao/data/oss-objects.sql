@@ -209,7 +209,7 @@ CREATE TABLE IF NOT EXISTS Acls (
         acl          VARCHAR(32) NOT NULL,
         allowed      CHAR(1) NOT NULL DEFAULT 'Y',
         creator_id   BIGINT UNSIGNED DEFAULT NULL,
-	FOREIGN KEY(creator_id)  REFERENCES Users(id),
+        FOREIGN KEY(creator_id)  REFERENCES Users(id),
         FOREIGN KEY(user_id)  REFERENCES Users(id),
         FOREIGN KEY(group_id) REFERENCES Groups(id),
         PRIMARY KEY(id)
