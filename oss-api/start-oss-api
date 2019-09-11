@@ -42,5 +42,5 @@ APP_HOME="/opt/oss-java"
 @CLASSPATH@
 touch /var/log/oss-api.log
 chmod 600 /var/log/oss-api.log
-exec java -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp $CLASSPATH de.openschoolserver.api.ServerApplication server /opt/oss-java/conf/config.yml >> /var/log/oss-api.log 2>&1
+exec java --add-modules java.xml.bind -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp $CLASSPATH de.openschoolserver.api.ServerApplication server /opt/oss-java/conf/config.yml
 
