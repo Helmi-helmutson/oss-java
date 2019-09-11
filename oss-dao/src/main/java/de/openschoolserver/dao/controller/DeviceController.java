@@ -211,16 +211,16 @@ public class DeviceController extends Controller {
 			this.em.merge(room);
 			this.em.flush();
 			this.em.getTransaction().commit();
+			UserController userController = new UserController(this.session,this.em);
+			user = userController.getByUid(device.getName());
+			if( user != null ) {
+				userController.delete(user);
+			}
 			if( atomic ) {
 				new DHCPConfig(session,em).Create();
 				if( needReloadSalt ) {
 					new SoftwareController(this.session,this.em).applySoftwareStateToHosts();
 				}
-			}
-			UserController userController = new UserController(this.session,this.em);
-			user = userController.getByUid(device.getName());
-			if( user != null ) {
-				userController.delete(user);
 			}
 			return new OssResponse(this.getSession(),"OK", "Device was deleted succesfully.");
 		} catch (Exception e) {
