@@ -167,6 +167,9 @@ public class SoftwareController extends Controller {
 				if( software.getWeight() != null ) {
 					oldSoftware.setWeight(software.getWeight());
 				}
+				if( software.getManually() != null ) {
+					oldSoftware.setManually(software.getManually());
+				}
 				this.em.merge(oldSoftware);
 				this.em.getTransaction().commit();
 			} catch (Exception e) {
