@@ -441,7 +441,7 @@ public class UserResourceImpl implements UserResource {
 			return new OssResponse(session,"ERROR", "Import file can not be saved" + e.getMessage());
 		}
 		List<String> parameters = new ArrayList<String>();
-		parameters.add("/usr/sbin/oss_import_user_list.pl");
+		parameters.add("/usr/sbin/oss_import_user_list.py");
 		parameters.add("--input");
 		parameters.add(file.getAbsolutePath());
 		parameters.add("--role");
@@ -533,7 +533,7 @@ public class UserResourceImpl implements UserResource {
 			StringBuilder importFile = controller.getImportDir(startTime);
 			importFile.append("/userlist.txt");
 			List<String> parameters = new ArrayList<String>();
-			parameters.add("/usr/sbin/oss_import_user_list.pl");
+			parameters.add("/usr/sbin/oss_import_user_list.py");
 			parameters.add("--input");
 			parameters.add(importFile.toString());
 			parameters.add("--role");
