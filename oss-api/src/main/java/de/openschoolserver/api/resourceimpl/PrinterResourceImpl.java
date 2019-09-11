@@ -162,7 +162,7 @@ public class PrinterResourceImpl implements PrinterResource {
 			InputStream fileInputStream,
 			FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		OssResponse resp = new PrinterController(session,em).addPrinter(name,mac,roomId,model,windowsDriver,fileInputStream,contentDispositionHeader);
+		OssResponse resp = new PrinterController(session,em).addPrinter(name.toLowerCase().trim(),mac,roomId,model,windowsDriver,fileInputStream,contentDispositionHeader);
 		em.close();
 		return resp;
 	}
@@ -248,7 +248,7 @@ public class PrinterResourceImpl implements PrinterResource {
 	public OssResponse addPrinterQueue(Session session, String name, Long deviceId, String model, boolean windowsDriver,
 			InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		OssResponse resp = new PrinterController(session,em).addPrinterQueue(session,name,deviceId,model,windowsDriver,fileInputStream,contentDispositionHeader);
+		OssResponse resp = new PrinterController(session,em).addPrinterQueue(session,name.toLowerCase().trim(),deviceId,model,windowsDriver,fileInputStream,contentDispositionHeader);
 		em.close();
 		return resp;
 	}
