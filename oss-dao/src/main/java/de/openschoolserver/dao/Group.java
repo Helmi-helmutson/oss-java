@@ -33,7 +33,7 @@ public class Group implements Serializable {
 
 	@Column(name = "name", updatable = false)
         @Pattern(
-                        regexp = "^[^/\\]+$",
+                        regexp = "^[^/\\\\]+$",
                         flags = Pattern.Flag.CASE_INSENSITIVE,
                         message = "Group name must not contains slash and backslash.")
 	@Size(max=32, message="Name must not be longer then 32 characters.")
