@@ -382,6 +382,10 @@ public class CategoryController extends Controller {
 					category.getSoftwares().add(software);
 					category.getSoftwareIds().add(software.getId());
 					software.getCategories().add(category);
+					if( category.getRemovedSoftwares().contains(software) ) {
+						category.getRemovedSoftwares().remove(software);
+						software.getRemovedFromCategories().remove(category);
+					}
 					this.em.merge(software);
 					changes = true;
 				}
