@@ -5,7 +5,7 @@
 #
 
 Name:           oss-java
-Version:	1.0.1
+Version:	1.1.1
 Release:	@RELEASE@
 License:	GPL-2.0+ and LGPL-2.1+
 Vendor:         Dipl.Ing. Peter Varkoly <peter@varkoly.de>
@@ -19,8 +19,8 @@ Source3:	start-oss-api
 Source4:	oss-api.service
 Source5:	data.tar.bz2
 Requires: 	systemd 
-Requires:	oss-base >= 4.0.1
-Requires:	java-1_8_0-openjdk
+Requires:	oss-base >= 4.1
+Requires:	java-11-openjdk
 BuildArch:      noarch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  -post-build-checks
