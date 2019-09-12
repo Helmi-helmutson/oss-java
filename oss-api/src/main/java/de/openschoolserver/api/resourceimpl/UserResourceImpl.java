@@ -440,6 +440,11 @@ public class UserResourceImpl implements UserResource {
 			logger.error(e.getMessage(), e);
 			return new OssResponse(session,"ERROR", "Import file can not be saved" + e.getMessage());
 		}
+                try {
+			List<String> lines = Files.readAllLines(file.toPath(), Charset.forName("UTF-8"));
+                } catch (IOException ioe) {
+			return new OssResponse(session,"ERROR", "Import file is not UTF-8 coded.");
+                }
 		List<String> parameters = new ArrayList<String>();
 		parameters.add("/usr/sbin/oss_import_user_list.pl");
 		parameters.add("--input");
