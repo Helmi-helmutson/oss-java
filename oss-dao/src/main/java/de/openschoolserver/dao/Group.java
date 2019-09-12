@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.*;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,6 +32,10 @@ public class Group implements Serializable {
 	private Long id;
 
 	@Column(name = "name", updatable = false)
+        @Pattern(
+                        regexp = "^[^/\\]+$",
+                        flags = Pattern.Flag.CASE_INSENSITIVE,
+                        message = "Group name must not contains slash and backslash.")
 	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
