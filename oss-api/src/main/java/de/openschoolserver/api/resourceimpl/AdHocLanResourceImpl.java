@@ -188,10 +188,12 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		category.setPublicAccess(false);
 		category.getRooms().add(room);
 		CategoryController categoryController = new CategoryController(session,em);
-		OssResponse ossResponseCategory = categoryController.add(category);
-		room.setRoomType("AdHocAccess");
-		room.getCategories().add(category);
-		OssResponse resp = roomController.modify(room);
+		OssResponse resp = categoryController.add(category);
+		if( resp.getCode().equals("OK")  ) {
+			room.setRoomType("AdHocAccess");
+			room.getCategories().add(category);
+			resp = roomController.modify(room);
+		}
 		em.close();
 		return resp;
 	}
@@ -276,7 +278,18 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		Room room = em.find(Room.class, adHocRoomId);
 		List<Device> devices = new ArrayList<Device>();
 		if( room != null ) {
-			devices = room.getDevices();
+			for(Device device : room.getDevices() ) {
+				if(device.getOwner() != null ) {
+					device.setOwnerName(
+							String.format("%s (%s, %s)",
+									device.getOwner().getUid(),
+									device.getOwner().getSurName(),
+									device.getOwner().getGivenName()
+									)
+							);
+				}
+				devices.add(device);
+			}
 		}
 		em.close();
 		return devices;
