@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 	@NamedQuery(name="Group.findAll",   query="SELECT g FROM Group g"),
 	@NamedQuery(name="Group.findAllId", query="SELECT g.id FROM Group g"),
 	@NamedQuery(name="Group.getByName", query="SELECT g FROM Group g WHERE g.name = :name OR g.description = :name"),
+	@NamedQuery(name="Group.getByExactName", query="SELECT g FROM Group g WHERE g.name = :name"),
 	@NamedQuery(name="Group.getByType", query="SELECT g FROM Group g WHERE g.groupType = :groupType"),
 	@NamedQuery(name="Group.search",    query="SELECT g FROM Group g WHERE g.name LIKE :search OR g.description LIKE :search OR g.groupType LIKE :search"),
 })
