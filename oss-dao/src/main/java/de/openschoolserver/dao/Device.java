@@ -20,6 +20,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -150,6 +151,9 @@ public class Device implements Serializable {
 
 	@Column(name="owner_id", insertable=false, updatable=false)
 	private Long ownerId;
+
+	@Transient
+	private String ownerName;
 
 	//bi-directional many-to-one association to TestUser
 	@OneToMany(mappedBy="device")
@@ -446,5 +450,13 @@ public class Device implements Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getOwnerName() {
+		return ownerName;
+	}
+
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}
 }
