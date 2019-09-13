@@ -20,8 +20,9 @@ import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.Config;
-+import de.openschoolserver.dao.controller.RoomController;
-+import de.openschoolserver.dao.controller.SessionController;
+import de.openschoolserver.dao.controller.DeviceController;
+import de.openschoolserver.dao.controller.RoomController;
+import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
@@ -188,6 +189,10 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 		}
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		Session session  = new SessionController(em).getLocalhostSession();
+		final DeviceController deviceController = new DeviceController(session,em);
+		if( deviceController.getByMAC(MAC) != null ) {
+			return "ALREADY-REGISTERED";
+		}
 		final RoomController roomController = new RoomController(session,em);
 		final UserController userController = new UserController(session,em);
 		User user = userController.getByUid(userName);
@@ -197,7 +202,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			Integer count = user.getOwnedDevices().size();
 			OssResponse resp = roomController.addDevice(rooms.get(0).getId(), MAC, count.toString());
 			em.close();
-			return resp.getCode() + " " + resp.getValue();
+			return resp.getCode();
 		} else  {
 			return "You can not register devices.";
 		}
