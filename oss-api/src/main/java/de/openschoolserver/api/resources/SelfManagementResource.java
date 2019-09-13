@@ -1,15 +1,20 @@
 package de.openschoolserver.api.resources;
 
 import static de.openschoolserver.api.resources.Resource.JSON_UTF8;
+import static de.openschoolserver.api.resources.Resource.TEXT;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
@@ -137,4 +142,19 @@ public interface SelfManagementResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("OS") String OS
     );
+
+    @PUT
+	@Path("addDeviceToUser/{MAC}/{userName}")
+	@Produces(TEXT)
+	@ApiOperation(value = "Set the logged on user on a device defined by MAC. All other users logged on users will be removed." )
+	@ApiResponses(value = {
+	        @ApiResponse(code = 404, message = "Cant be called only from localhost."),
+	        @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	String addDeviceToUser(
+			@Context UriInfo ui,
+	        @Context HttpServletRequest req,
+	        @PathParam("MAC") String partitionName,
+	        @PathParam("userName") String key
+	);
+
 }

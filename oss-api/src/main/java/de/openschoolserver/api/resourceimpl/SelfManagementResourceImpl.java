@@ -4,8 +4,10 @@ import java.io.File;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.slf4j.Logger;
@@ -14,9 +16,12 @@ import org.slf4j.LoggerFactory;
 import de.openschoolserver.api.resources.SelfManagementResource;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.Config;
++import de.openschoolserver.dao.controller.RoomController;
++import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
@@ -169,6 +174,33 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 	public String[] vpnOS(Session session) {
 		String[] osList = { "Win7","Win10","Mac","Linux" };
 		return osList;
+	}
+
+	@Override
+	public String addDeviceToUser
+	(
+			UriInfo ui,
+			HttpServletRequest req,
+			String MAC,
+			String userName) {
+		if( !req.getRemoteAddr().equals("127.0.0.1")) {
+			return "ERROR Connection is allowed only from local host.";
+		}
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		Session session  = new SessionController(em).getLocalhostSession();
+		final RoomController roomController = new RoomController(session,em);
+		final UserController userController = new UserController(session,em);
+		User user = userController.getByUid(userName);
+		List<Room> rooms = roomController.getRoomToRegisterForUser(user);
+		if( rooms != null && rooms.size() > 0 ) {
+			session.setUser(user);
+			Integer count = user.getOwnedDevices().size();
+			OssResponse resp = roomController.addDevice(rooms.get(0).getId(), MAC, count.toString());
+			em.close();
+			return resp.getCode() + " " + resp.getValue();
+		} else  {
+			return "You can not register devices.";
+		}
 	}
 
 }
