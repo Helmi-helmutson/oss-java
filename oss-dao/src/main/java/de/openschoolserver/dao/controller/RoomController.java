@@ -240,6 +240,27 @@ public class RoomController extends Controller {
 	}
 
 
+	public List<Room> getRoomToRegisterForUser(User user) {
+		List<Room> rooms = new ArrayList<Room>();
+		for( Category category : user.getCategories() ) {
+			if( category.getCategoryType().equals("AdHocAccess") &&
+			  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent) ) &&
+			    !category.getRooms().isEmpty()) {
+					rooms.add(category.getRooms().get(0));
+			}
+		}
+		for(Group group : user.getGroups() ) {
+			for( Category category : group.getCategories() ) {
+				logger.debug("getAllToRegister: " + category);
+				if( category.getCategoryType().equals("AdHocAccess") &&
+				  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent)) &&
+				    !category.getRooms().isEmpty() ) {
+							rooms.add(category.getRooms().get(0));
+				}
+			}
+		}
+		return rooms;
+	}
 	/**
 	 * Return a list the rooms in which the session user can register devices
 	 * @return For super user all rooms will be returned
@@ -253,23 +274,7 @@ public class RoomController extends Controller {
 				Query query = this.em.createNamedQuery("Room.findAllToRegister");
 				rooms = query.getResultList();
 			} else {
-				for( Category category : this.session.getUser().getCategories() ) {
-					if( category.getCategoryType().equals("AdHocAccess") &&
-					  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent) ) &&
-					    !category.getRooms().isEmpty()) {
-							rooms.add(category.getRooms().get(0));
-					}
-				}
-				for(Group group : this.session.getUser().getGroups() ) {
-					for( Category category : group.getCategories() ) {
-						logger.debug("getAllToRegister: " + category);
-						if( category.getCategoryType().equals("AdHocAccess") &&
-						  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent)) &&
-						    !category.getRooms().isEmpty() ) {
-									rooms.add(category.getRooms().get(0));
-						}
-					}
-				}
+				rooms = this.getRoomToRegisterForUser(this.session.getUser());
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
