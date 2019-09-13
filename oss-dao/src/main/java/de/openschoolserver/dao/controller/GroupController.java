@@ -81,6 +81,23 @@ public class GroupController extends Controller {
 		} finally {
 		}
 	}
+	/** getByExactName compares only the name and not the description. used for import of user data */
+	public Group getByExactName(String name) {
+		try {
+			Query query = this.em.createNamedQuery("Group.getByExactName");
+			query.setParameter("name", name);
+			List<Group> result = query.getResultList();
+			if (result!=null && result.size()>0) {
+			return result .get(0);
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage(),e);
+			return null;
+		} finally {
+		}
+	}
 
 	public List<Group> search(String search) {
 		List<Group> groups = new ArrayList<>();

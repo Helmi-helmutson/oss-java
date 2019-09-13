@@ -281,9 +281,9 @@ public class ImportHandler extends Thread {
 			} catch (IOException e) {
 				LOG.error("closeLogfiles useraddLogfile:" + e.getMessage());
 			}
-			useraddLogfiles.clear();
 		} 
-		
+		useraddLogfiles.clear();
+
 	}
 
 	private void appendLog(Importer i, ImportOrder o, String msg) {
@@ -373,6 +373,8 @@ public class ImportHandler extends Thread {
 		}
 	}
 
+	
+	
 	private boolean doCompareAndImportUser(Session session, Person person, ImportOrder o, Importer importer,
 			StringBuilder responseString,GroupController groupController,UserController userController,Set<String> foundRoles, List<Person> oldUserList, List<User>remainingUsers ) {
 		
@@ -470,7 +472,11 @@ public class ImportHandler extends Thread {
 					}
 					for (SchoolClass schoolClass : newClasses) {
 
-						Group group = groupController.getByName(schoolClass.getNormalizedName());
+						Group group = groupController.getByExactName(schoolClass.getOriginalName());
+						if (group==null) {
+							 group = groupController.getByExactName(schoolClass.getNormalizedName());
+						}
+
 						if (group != null) {
 							bclasses.append(group.getName()).append(" ");
 							groupController.addMember(group.getId(), ossUser.getId());
@@ -490,8 +496,8 @@ public class ImportHandler extends Thread {
 			if (person.getPersonNumber()!=null && person.getPersonNumber().length()>0) {
 			  newUser.setUuid(person.getPersonNumber());
 			}
-			newUser.setGivenName(person.getFirstname());
-			newUser.setSurName(person.getName());
+			newUser.setGivenName(person.getFirstname()!=null ? person.getFirstname() : "?");
+			newUser.setSurName(person.getName()!=null ? person.getName() : "?");
 			newUser.setRole((o.getRequestedUserRole() != null && o.getRequestedUserRole().length()>0) ? o.getRequestedUserRole() : getOSSRole(person));
 			foundRoles.add(newUser.getRole());
 			if (person.getBirthday()!=null) {
@@ -547,7 +553,12 @@ public class ImportHandler extends Thread {
 			if (newUser != null && newUser.getId() != null && !o.isTestOnly()) {
 				if (person.getSchoolClasses() != null) {
 					for (SchoolClass schoolClass : person.getSchoolClasses()) {
-						Group group = groupController.getByName(schoolClass.getNormalizedName());
+						Group group = groupController.getByExactName(schoolClass.getOriginalName());
+						if (group==null) {
+							 group = groupController.getByExactName(schoolClass.getNormalizedName());
+						}
+						
+						
 						if (group != null && group.getId() != null) {
 							LOG.debug("Add user to classes" + newUser.getUid() + " " + group.getName());
 							newUserClassesBuilder.append(group.getName()).append(" ");
@@ -598,7 +609,7 @@ public class ImportHandler extends Thread {
 			for (Group group : user.getGroups()) {
 				if ("class".equals(group.getGroupType())) {
 					SchoolClass sc = new SchoolClass(group.getName());
-					sc.setNormalizedName(group.getName());
+					sc.setOriginalName(group.getName());
 					sc.setLongName(group.getDescription());
 					sc.setData(group);
 					p.addSchoolClass(sc);
@@ -627,7 +638,10 @@ public class ImportHandler extends Thread {
 		// LOG.error("importing group: " + schoolClass.getNormalizedName());
 		if (schoolClass != null && schoolClass.getNormalizedName() != null) {
 			
-			final Group existingClass = groupController.getByName(schoolClass.getNormalizedName());
+			 Group existingClass = groupController.getByExactName(schoolClass.getOriginalName());
+			 if (existingClass==null) {
+				 existingClass = groupController.getByExactName(schoolClass.getNormalizedName());
+			 }
 
 			if (existingClass == null) {
 				Group newClass = new Group();
