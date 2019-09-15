@@ -440,13 +440,16 @@ public class UserResourceImpl implements UserResource {
 			logger.error(e.getMessage(), e);
 			return new OssResponse(session,"ERROR", "Import file can not be saved" + e.getMessage());
 		}
-                try {
-			List<String> lines = Files.readAllLines(file.toPath(), Charset.forName("UTF-8"));
-                } catch (IOException ioe) {
-			logger.error(ioe.getMessage(), ioe);
-			return new OssResponse(session,"ERROR", "Import file is not UTF-8 coded.");
-                }
+		try {
+				List<String> lines = Files.readAllLines(file.toPath(), Charset.forName("UTF-8"));
+		} catch (IOException ioe) {
+				logger.error(ioe.getMessage(), ioe);
+				return new OssResponse(session,"ERROR", "Import file is not UTF-8 coded.");
+		}
 		List<String> parameters = new ArrayList<String>();
+		parameters.add("/sbin/startproc");
+		parameters.add("-l");
+		parameters.add("/var/log/import-user.log");
 		parameters.add("/usr/sbin/oss_import_user_list.py");
 		parameters.add("--input");
 		parameters.add(file.getAbsolutePath());
@@ -472,13 +475,16 @@ public class UserResourceImpl implements UserResource {
 			parameters.add("--full");
 		}
 		if( allClasses ) {
-			parameters.add("--allClasses");
+			parameters.add("--all_classes");
 		}
 		if( cleanClassDirs ) {
-			parameters.add("--cleanClassDirs");
+			parameters.add("--clean_class_dirs");
 		}
 		if( resetPassword ) {
-			parameters.add("--resetPassword");
+			parameters.add("--reset_password");
+		}
+		if( logger.isDebugEnabled() ) {
+			parameters.add("--debug");
 		}
 		String[] program = new String[parameters.size()];
 		program = parameters.toArray(program);
