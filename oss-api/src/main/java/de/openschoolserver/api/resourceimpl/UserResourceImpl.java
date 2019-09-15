@@ -475,13 +475,13 @@ public class UserResourceImpl implements UserResource {
 			parameters.add("--full");
 		}
 		if( allClasses ) {
-			parameters.add("--all_classes");
+			parameters.add("--allClasses");
 		}
 		if( cleanClassDirs ) {
-			parameters.add("--clean_class_dirs");
+			parameters.add("--cleanClassDirs");
 		}
 		if( resetPassword ) {
-			parameters.add("--reset_password");
+			parameters.add("--resetPassword");
 		}
 		if( logger.isDebugEnabled() ) {
 			parameters.add("--debug");
@@ -546,6 +546,9 @@ public class UserResourceImpl implements UserResource {
 			StringBuilder importFile = controller.getImportDir(startTime);
 			importFile.append("/userlist.txt");
 			List<String> parameters = new ArrayList<String>();
+			parameters.add("/sbin/startproc");
+			parameters.add("-l");
+			parameters.add("/var/log/import-user.log");
 			parameters.add("/usr/sbin/oss_import_user_list.py");
 			parameters.add("--input");
 			parameters.add(importFile.toString());
@@ -565,7 +568,7 @@ public class UserResourceImpl implements UserResource {
 			if( userImport.isFull() ) {
 				parameters.add("--full");
 			}
-			if( userImport.isFull() ) {
+			if( userImport.isAllClasses() ) {
 				parameters.add("--allClasses");
 			}
 			if( userImport.isCleanClassDirs() ) {
@@ -574,12 +577,16 @@ public class UserResourceImpl implements UserResource {
 			if( userImport.isResetPassword() ) {
 				parameters.add("--resetPassword");
 			}
+			if( logger.isDebugEnabled() ) {
+				parameters.add("--debug");
+			}
 			logger.debug("restartImport userImport:" + userImport);
 			logger.debug("restartImport parameters:" + parameters);
 			
 			String[] program = new String[parameters.size()];
 			program = parameters.toArray(program);
 
+			logger.debug("Start import:" + parameters);
 			StringBuffer reply  = new StringBuffer();
 			StringBuffer stderr = new StringBuffer();
 			OSSShellTools.exec(program, reply, stderr, null);

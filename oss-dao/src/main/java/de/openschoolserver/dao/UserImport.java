@@ -7,7 +7,9 @@ public class UserImport {
 	private String  role;
 	private String  lang;
 	private String  identifier;
+	private String  input;
 	private	boolean test;
+	private	boolean debug;
 	private String  password;
 	private boolean mustchange;
 	private	boolean full;
@@ -98,5 +100,17 @@ public class UserImport {
 		} catch (Exception e) {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
+	}
+	public String getInput() {
+		return input;
+	}
+	public void setInput(String input) {
+		this.input = input;
+	}
+	public boolean isDebug() {
+		return debug;
+	}
+	public void setDebug(boolean debug) {
+		this.debug = debug;
 	}
 }
