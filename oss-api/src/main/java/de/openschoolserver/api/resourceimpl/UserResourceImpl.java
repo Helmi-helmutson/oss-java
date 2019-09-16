@@ -429,9 +429,21 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
-	public OssResponse importUser(Session session, String role, String lang, String identifier, boolean test,
-			String password, boolean mustchange, boolean full, boolean allClasses, boolean cleanClassDirs,
-			boolean resetPassword, InputStream fileInputStream, FormDataContentDisposition contentDispositionHeader) {
+	public OssResponse importUser(
+			Session session,
+			String role,
+			String lang,
+			String identifier,
+			boolean test,
+			String password,
+			boolean mustchange,
+			boolean full,
+			boolean allClasses,
+			boolean cleanClassDirs,
+			boolean resetPassword,
+			boolean appendBirthdayToPassword,
+			InputStream fileInputStream,
+			FormDataContentDisposition contentDispositionHeader) {
 		File file = null;
 		try {
 			file = File.createTempFile("oss", "importUser", new File("/opt/oss-java/tmp/"));
@@ -441,7 +453,7 @@ public class UserResourceImpl implements UserResource {
 			return new OssResponse(session,"ERROR", "Import file can not be saved" + e.getMessage());
 		}
 		try {
-				List<String> lines = Files.readAllLines(file.toPath(), Charset.forName("UTF-8"));
+				Files.readAllLines(file.toPath(), Charset.forName("UTF-8"));
 		} catch (IOException ioe) {
 				logger.error(ioe.getMessage(), ioe);
 				return new OssResponse(session,"ERROR", "Import file is not UTF-8 coded.");
@@ -482,6 +494,9 @@ public class UserResourceImpl implements UserResource {
 		}
 		if( resetPassword ) {
 			parameters.add("--resetPassword");
+		}
+		if( appendBirthdayToPassword ) {
+			parameters.add("--appendBirthdayToPassword");
 		}
 		if( logger.isDebugEnabled() ) {
 			parameters.add("--debug");
