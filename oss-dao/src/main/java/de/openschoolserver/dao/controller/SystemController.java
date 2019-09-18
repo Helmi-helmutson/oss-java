@@ -332,7 +332,7 @@ public class SystemController extends Controller {
 		OSSShellTools.exec(program, reply, error, null);
 		return new OssResponse(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
 	}
-
+	//TODO This function must be adapted to firwalld
 	public List<Map<String, String>> getFirewallOutgoingRules() {
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
 		List<Map<String, String>> firewallList = new ArrayList<>();
@@ -380,7 +380,7 @@ public class SystemController extends Controller {
 		return firewallList;
 	}
 
-	//TODO
+	//TODO This function must be adapted to firwalld
 	public OssResponse setFirewallOutgoingRules(List<Map<String, String>> firewallList) {
 		List<String> fwMasqNets = new ArrayList<String>();
 		try {
@@ -388,6 +388,7 @@ public class SystemController extends Controller {
 		} catch (Exception e) {
 			logger.debug("{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }");
 		}
+		//TODO
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
 		RoomController roomController = new RoomController(this.session,this.em);
 		DeviceController deviceController = new DeviceController(this.session,this.em);
@@ -424,6 +425,7 @@ public class SystemController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Firewall outgoing access rule  was set succesfully.");
 	}
 
+	//TODO This function must be adapted to firwalld
 	public List<Map<String, String>> getFirewallRemoteAccessRules() {
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
 		List<Map<String, String>> firewallList = new ArrayList<>();
@@ -453,6 +455,7 @@ public class SystemController extends Controller {
 		return firewallList;
 	}
 
+	//TODO This function must be adapted to firwalld
 	public OssResponse setFirewallRemoteAccessRules(List<Map<String, String>> firewallList) {
 		List<String> fwForwardMasq = new ArrayList<String>();
 		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
