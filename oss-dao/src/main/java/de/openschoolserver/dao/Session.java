@@ -24,38 +24,41 @@ public class Session implements Principal {
 	@Column(name = "id")
 	@GeneratedValue(strategy = IDENTITY)
 	private int id;
-	 
+
 	@Temporal(TemporalType.TIMESTAMP)
 	@Column(name = "createdate")
-	private Date createDate; 
-	 
+	private Date createDate;
+
 	@Transient
 	private String password = "dummy";
-	
+
+	@Transient
+	private Boolean mustChange = false;
+
 	@Transient
 	private String schoolId = "dummy";
-	
+
 	@Column(name="device_id", insertable = false, updatable = false )
 	private Long deviceId;
-	
+
 	//@OneToOne
 	@ManyToOne
 	@JsonIgnore
 	private Device device;
-	    
+
 	@Column(name = "user_id", insertable = false, updatable = false )
 	private Long userId;
-	
+
 	@ManyToOne
 	@JsonIgnore
 	private User user;
-	
+
 	@Transient
 	private String role = "dummy";
-	
+
 	@Column(name = "room_id", insertable = false, updatable = false)
 	private Long roomId;
-	
+
 	@ManyToOne
 	@JsonIgnore
 	private Room room;
@@ -80,7 +83,7 @@ public class Session implements Principal {
 
 	@Transient
 	private String commonName;
-    
+
 	public Object getTemporaryUploadData() {
 		return temporaryUploadData;
 	}
@@ -88,21 +91,21 @@ public class Session implements Principal {
 	public void setTemporaryUploadData(Object temporaryUploadData) {
 		this.temporaryUploadData = temporaryUploadData;
 	}
-	
+
 	public Session(String token, Long userid, String password, String ip) {
 	    this.userId = userid;
 	    this.password = password;
 	    this.token = token;
 	    this.schoolId="dummy";
 	}
-	
+
 	public Session() {
 		this.deviceId = null;
 		this.roomId   = null;
 		this.dnsName  = null;
 		this.mac      = null;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -110,7 +113,7 @@ public class Session implements Principal {
 		result = prime * result + id;
 		return result;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -124,7 +127,7 @@ public class Session implements Principal {
 			return false;
 		return true;
 	}
-	
+
 	@Override
 	public String toString() {
 		StringBuilder data = new StringBuilder();
@@ -139,124 +142,124 @@ public class Session implements Principal {
 		data.append("role: '" + this.role).append("' ");
 		return data.toString();
 	}
-	
+
 	@Override
-	public String getName() {    
+	public String getName() {
 	    return "dummy";
 	}
-	
+
 	public String getSchoolId() {
 	    return this.schoolId;
 	}
-	
+
 	public void setSchoolId(String schoolId) {
 	    this.schoolId = schoolId;
 	}
-	
+
 	public String getIP() {
 	    return this.ip;
 	}
-	
+
 	public void setIP(String IP) {
 	    this.ip = IP;
 	}
-	
+
 	public Room getRoom() {
 	    return this.room;
 	}
-	
+
 	public void setRoom(Room room) {
 	    this.room = room;
 	}
-	
+
 	public User getUser() {
 	    return this.user;
 	}
-	
+
 	public void setUser(User user) {
 	    this.user = user;
 	}
-	
+
 	public String getPassword() {
 	    return this.password;
 	}
-	
+
 	public void setPassword(String password) {
 	    this.password = password;
 	}
-	
+
 	public String getRole() {
 	    return this.role;
 	}
-	
+
 	public void setRole(String role) {
 	    this.role = role;
 	}
-	
+
 	public Long getUserId() {
 	    return this.userId;
 	}
-	
+
 	public void setUserId(Long userId) {
 	    this.userId = userId;
 	}
-	
+
 	public Long getDeviceId() {
 	    return this.deviceId;
 	}
-	
+
 	public void setDeviceId(Long deviceId) {
 	    this.deviceId = deviceId;
 	}
-	
+
 	public Long getRoomId() {
 	    return this.roomId;
 	}
-	
+
 	public void setRoomId(Long roomId) {
 	    this.roomId = roomId;
 	}
-	
+
 	public Date getCreateDate() {
 	    return this.createDate;
 	}
-	
+
 	public Device getDevice() {
 	    return this.device;
 	}
-	
+
 	public void setDevice(Device device) {
 	    this.device = device;
 	}
-	
+
 	public int getId() {
 	    return this.id;
 	}
-	
+
 	public void setId(int id) {
 	    this.id = id;
 	}
-	
+
 	public String getToken() {
 	    return this.token;
 	}
-	
+
 	public void setToken(String token) {
 	    this.token = token;
 	}
-	
+
 	public String getMac() {
 	    return this.mac;
 	}
-	
+
 	public void setMac(String mac) {
 	    this.mac = mac;
 	}
-	
+
 	public String getDNSName() {
 	    return this.dnsName;
 	}
-	
+
 	public void setDNSName(String dnsName) {
 	    this.dnsName = dnsName;
 	}
@@ -279,5 +282,13 @@ public class Session implements Principal {
 
 	public void setCommonName(String commonName) {
 		this.commonName = commonName;
+	}
+
+	public Boolean getMustChange() {
+		return mustChange;
+	}
+
+	public void setMustChange(Boolean mustChange) {
+		this.mustChange = mustChange;
 	}
 }

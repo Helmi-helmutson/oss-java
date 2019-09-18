@@ -81,7 +81,9 @@ public class SessionController extends Controller {
 			}
 			logger.debug("Login reply:" + reply.toString());
 			logger.debug("Login error:" + error.toString());
-			if( reply.toString().contains("NT_STATUS_")) {
+			if( reply.toString().contains("NT_STATUS_PASSWORD_MUST_CHANGE") ) {
+				this.session.setMustChange(true);
+			}else if( reply.toString().contains("NT_STATUS_")) {
 				return null;
 			}
 		} catch (IOException e) {
