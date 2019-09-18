@@ -270,13 +270,7 @@ public class SystemController extends Controller {
 	///////////////////////////////////////////////////////
 
 	public Map<String, String> getFirewallIncomingRules() {
-		String[] program   = new String[3];
-		StringBuffer reply = new StringBuffer();
-		StringBuffer error = new StringBuffer();
-		program[0] = "/usr/bin/firewall-cmd";
-		program[1] = "--zone=external";
-		program[2] = "--list-services";
-		OSSShellTools.exec(program, reply, error, null);
+		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
 		Map<String,String> statusMap;
 		//External Ports
 		statusMap = new HashMap<>();
@@ -285,18 +279,21 @@ public class SystemController extends Controller {
 		statusMap.put("admin", "false");
 		statusMap.put("rdesktop", "false");
 		statusMap.put("other", "");
-		for( String extPort : reply.toString().split(" ") ) {
+		for( String extPort : fwConfig.getConfigValue("SERVICES_EXT_TCP").split(" ") ) {
 			switch(extPort) {
 			case "ssh":
+			case "22":
 				statusMap.put("ssh","true");
 				break;
+			case "443":
 			case "https":
 				statusMap.put("https", "true");
 				break;
-			case "admin":
+			case "444":
 				statusMap.put("admin", "true");
 				break;
-			case "rdp":
+			case "3389":
+			case "ms-wbt-server":
 				statusMap.put("rdesktop", "true");
 				break;
 			default:
@@ -308,11 +305,8 @@ public class SystemController extends Controller {
 	}
 
 	public OssResponse setFirewallIncomingRules(Map<String, String> firewallExt) {
-		String[] program   = new String[2];
-		StringBuffer reply = new StringBuffer();
-		StringBuffer error = new StringBuffer();
-		program[0] = "/usr/share/oss/tools/set_firewall_external.sh";
 		List<String> fwServicesExtTcp = new ArrayList<String>();
+		Config fwConfig = new Config("/etc/sysconfig/SuSEfirewall2","FW_");
 		if( firewallExt.get("ssh").equals("true") ) {
 			fwServicesExtTcp.add("ssh");
 		}
@@ -320,16 +314,16 @@ public class SystemController extends Controller {
 			fwServicesExtTcp.add("https");
 		}
 		if( firewallExt.get("admin").equals("true")) {
-			fwServicesExtTcp.add("admin");
+			fwServicesExtTcp.add("444");
 		}
 		if( firewallExt.get("rdesktop").equals("true") )  {
-			fwServicesExtTcp.add("rdp");
+			fwServicesExtTcp.add("3389");
 		}
 		if( firewallExt.get("other") != null && !firewallExt.get("other").isEmpty()) {
 			fwServicesExtTcp.add(firewallExt.get("other"));
 		}
-		program[1] = String.join(",", fwServicesExtTcp);
-		OSSShellTools.exec(program, reply, error, null);
+		fwConfig.setConfigValue("SERVICES_EXT_TCP", String.join(" ", fwServicesExtTcp));
+		this.systemctl("try-restart", "SuSEfirewall2");
 		return new OssResponse(this.getSession(),"OK","Firewall incoming access rule  was set succesfully.");
 	}
 
@@ -380,7 +374,6 @@ public class SystemController extends Controller {
 		return firewallList;
 	}
 
-	//TODO
 	public OssResponse setFirewallOutgoingRules(List<Map<String, String>> firewallList) {
 		List<String> fwMasqNets = new ArrayList<String>();
 		try {
