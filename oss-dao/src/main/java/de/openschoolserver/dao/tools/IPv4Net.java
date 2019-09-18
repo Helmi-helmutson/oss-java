@@ -120,12 +120,12 @@ public class IPv4Net {
 
         /* IP */
         baseIPnumeric = IPv4.convertSymbolicIPToNumeric(symbolicIP);
-
         /* netmask from CIDR */
         if (numericCIDR < 8)
             throw new NumberFormatException("Netmask CIDR can not be less than 8");
         setNetmaskNumeric(0xffffffff);
         setNetmaskNumeric(getNetmaskNumeric() << (32 - numericCIDR));
+        baseIPnumeric = baseIPnumeric & getNetmaskNumeric();
 
     }
 

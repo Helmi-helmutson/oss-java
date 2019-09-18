@@ -298,7 +298,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	@Override
 	public OssResponse delete(Session session, Long adHocRoomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		OssResponse resp = new AdHocLanController(session,em).delete(adHocRoomId);
+		OssResponse resp = new RoomController(session,em).delete(adHocRoomId);
 		em.close();
 		return resp;
 	}

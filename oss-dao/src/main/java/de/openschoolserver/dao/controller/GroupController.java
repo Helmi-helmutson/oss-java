@@ -226,6 +226,7 @@ public class GroupController extends Controller {
 			if( !em.contains(group)) {
 				group = this.em.merge(group);
 			}
+
 			for ( Category category : group.getCategories() ) {
 				if( category.getCategoryType().equals("smartRoom") && category.getName().equals(group.getName()) ) {
 					for( Room room : category.getRooms() ) {
@@ -254,6 +255,7 @@ public class GroupController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR",e.getMessage());
 		} finally {
 		}
+		this.getSession().getUser().getOwnedGroups().remove(group);
 		return new OssResponse(this.getSession(),"OK","Group was deleted.");
 	}
 

@@ -481,6 +481,7 @@ public class RoomController extends Controller {
 	 */
 	public List<String> getAvailableIPAddresses(long roomId, long count){
 		Room room   = this.getById(roomId);
+		logger.debug("getAvailableIPAddresses: Room:" + room + " RoomId:" + roomId);
 		List<String> availableIPs = new ArrayList<String>();
 		IPv4Net net = new IPv4Net(room.getStartIP() + "/" + room.getNetMask());
 		IPv4Net subNetwork = null;
@@ -542,6 +543,14 @@ public class RoomController extends Controller {
 
 		boolean used = true;
 		IPv4Net net = new IPv4Net(nextNet + "/" + roomNetMask );
+		logger.debug("getNextRoomIP subnetworkBase:" + subNetwork.getBase() +
+				" networkBase: " + net.getBase() +
+				" roomNetMask: " + roomNetMask
+		);
+		if( net.getBase().equals(subNetwork.getBase())) {
+			nextNet = net.getNext();
+			net = new IPv4Net( nextNet + "/" + roomNetMask );
+		}
 		String lastIp  = net.getBroadcastAddress();
 
 		while(used) {
@@ -974,6 +983,7 @@ public class RoomController extends Controller {
 		if( ipAddress.isEmpty() ){
 			return new OssResponse(this.getSession(),"ERROR","There are no more free ip addresses in this room.");
 		}
+		logger.debug("IPAddr" + ipAddress);
 		Device device = new Device();
 		Room   room   = this.em.find(Room.class, roomId);
 		User   owner  = this.getSession().getUser();
