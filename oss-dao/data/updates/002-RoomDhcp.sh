@@ -7,8 +7,8 @@ if [ "$DHCP" ]; then
 	exit 0
 fi
 
-echo "INSERT INTO Enumerates values(NULL,'apiAcl','room.dhcp',6);"  | mysql OSS 
-echo "INSERT INTO Acls values(NULL,NULL,1,'room.dhcpd','Y',6);"     | mysql OSS 
+echo "INSERT INTO Enumerates values(NULL,'apiAcl','room.dhcp',6);" | mysql OSS
+echo "INSERT INTO Acls values(NULL,NULL,1,'room.dhcp','Y',6);"     | mysql OSS
 
 if [ -e /usr/lib/systemd/system/cephalix-api.service ]; then
 	systemctl restart cephalix-api
