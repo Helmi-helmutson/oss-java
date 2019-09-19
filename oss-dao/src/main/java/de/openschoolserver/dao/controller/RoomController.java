@@ -542,6 +542,10 @@ public class RoomController extends Controller {
 
 		boolean used = true;
 		IPv4Net net = new IPv4Net(nextNet + "/" + roomNetMask );
+		if( net.getBase().equals(subNetwork.getBase())) {
+			nextNet = net.getNext();
+			net = new IPv4Net( nextNet + "/" + roomNetMask );
+		}
 		String lastIp  = net.getBroadcastAddress();
 
 		while(used) {
