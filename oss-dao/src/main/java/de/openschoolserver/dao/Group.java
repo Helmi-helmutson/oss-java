@@ -33,10 +33,16 @@ public class Group implements Serializable {
 	private Long id;
 
 	@Column(name = "name", updatable = false)
-        @Pattern(
-                        regexp = "^[^/\\\\]+$",
+	@Pattern.List({
+		@Pattern(
+                        regexp = "^[^/\\\\#,;=]+$",
                         flags = Pattern.Flag.CASE_INSENSITIVE,
-                        message = "Group name must not contains slash and backslash.")
+                        message = "Group name must not contains: '/' '\\' '#' ',' ';' '='."),
+		@Pattern(
+                regexp = "^[^-\\.].*",
+                flags = Pattern.Flag.CASE_INSENSITIVE,
+                message = "Group name must not start with '-' '.'.")
+	})
 	@Size(max=32, message="Name must not be longer then 32 characters.")
 	private String name;
 
@@ -51,7 +57,7 @@ public class Group implements Serializable {
 	private List<Category> categories;
 
 	//bi-directional many-to-one association to Acls
-	@OneToMany(mappedBy="group")
+	@OneToMany(mappedBy="group",cascade ={CascadeType.ALL})
 	@JsonIgnore
 	private List<Acl> acls;
 
