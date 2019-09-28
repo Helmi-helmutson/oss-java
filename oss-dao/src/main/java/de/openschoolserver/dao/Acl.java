@@ -30,7 +30,7 @@ public class Acl implements Serializable {
 	private Boolean allowed;
 	
 	//bi-directional many-to-one association to User
-	@ManyToOne(cascade ={CascadeType.ALL})
+	@ManyToOne
 	@JsonIgnore
 	private User user;
 	
@@ -38,7 +38,7 @@ public class Acl implements Serializable {
 	private Long userId;
 
 	//bi-directional many-to-one association to Group
-	@ManyToOne(cascade ={CascadeType.ALL})
+	@ManyToOne
 	@JsonIgnore
 	private Group group;
 	
