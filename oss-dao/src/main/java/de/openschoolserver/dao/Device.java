@@ -21,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -50,7 +51,21 @@ public class Device implements Serializable {
 	private Long id;
 
 	@Column(name = "name", updatable = false)
-	@Size(max=32, message="Name must not be longer then 32 characters.")
+	@Pattern.List({
+		@Pattern(
+                 regexp = "^[^,~:@#$%\\^'\\.\\(\\)/\\\\\\{\\}_\\s\\*\\?<>\\|]+$",
+                 flags = Pattern.Flag.CASE_INSENSITIVE,
+                 message = "Group name must not contains following signs: ',~:$%^/\\.(){}#;_' and spaces."),
+		@Pattern(
+                regexp = "^[^-].*",
+                flags = Pattern.Flag.CASE_INSENSITIVE,
+                message = "Group name must not start with '-'."),
+		@Pattern(
+                regexp = ".*[^-]$",
+                flags = Pattern.Flag.CASE_INSENSITIVE,
+                message = "Group name must not ends with '-'.")
+	})
+	@Size(max=15, message="Name must not be longer then 15 characters.")
 	private String name;
 
 	private int place;
@@ -108,10 +123,9 @@ public class Device implements Serializable {
 	private Printer defaultPrinter;
 
 	//bi-directional many-to-one association to SoftwareStatus
-	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="device")
 	@JsonIgnore
 	private List<Printer> printerQueue = new ArrayList<Printer>();
-
 
 	//bi-directional many-to-many association to Device
 	@ManyToMany(mappedBy="devices", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -137,7 +151,7 @@ public class Device implements Serializable {
 	private Room room;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="device", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="device", cascade ={CascadeType.ALL}, orphanRemoval=true)
 	@JsonIgnore
 	private List<Session> sessions = new ArrayList<Session>();
 
@@ -161,7 +175,6 @@ public class Device implements Serializable {
 	private List<TestUser> testUsers;
 
 	//bi-directional many-to-many association to User
-	//@ManyToMany(mappedBy="loggedOn", cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
 	@ManyToMany(mappedBy="loggedOn")
 	@JsonIgnore
 	private List<User> loggedIn = new ArrayList<User>();
