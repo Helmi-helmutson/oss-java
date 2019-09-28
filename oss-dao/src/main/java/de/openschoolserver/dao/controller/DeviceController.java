@@ -138,6 +138,11 @@ public class DeviceController extends Controller {
 			if( !this.mayModify(device) ) {
 				return new OssResponse(this.getSession(),"ERROR","You must not delete this device.");
 			}
+			if(device.getPrinterQueue() != null && !device.getPrinterQueue().isEmpty()) {
+				return new OssResponse(this.getSession(),"ERROR",
+						"This is a printer device with defined printer queues. "
+						+ "You have to delete this devices via printer management.");
+			}
 			//Start the transaction
 			this.em.getTransaction().begin();
 			if(hwconf != null )
