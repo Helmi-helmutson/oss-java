@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import org.eclipse.persistence.annotations.Cache;
@@ -56,6 +57,16 @@ public class User implements Serializable {
 	private String surName;
 
 	@Column(name="uid", updatable=false)
+	@Pattern.List({
+		@Pattern(
+                        regexp = "^[^/\\\\#,;=]+$",
+                        flags = Pattern.Flag.CASE_INSENSITIVE,
+                        message = "Uid must not contains: '/' '\\' '#' ',' ';' '='."),
+		@Pattern(
+                regexp = "^[^-\\.].*",
+                flags = Pattern.Flag.CASE_INSENSITIVE,
+                message = "Uid must not start with '-' '.'.")
+	})
 	@Size(max=32, message="Uid must not be longer then 32 characters.")
 	private String uid;
 
@@ -92,7 +103,7 @@ public class User implements Serializable {
 	private List<User> createdUsers = new ArrayList<User>();
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="user", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="user", cascade ={CascadeType.ALL}, orphanRemoval=true)
 	@JsonIgnore
 	private List<Session> sessions = new ArrayList<Session>();
 
