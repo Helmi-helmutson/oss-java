@@ -21,6 +21,7 @@ Source5:	data.tar.bz2
 Requires: 	systemd 
 Requires:	oss-base >= 4.1
 Requires:	java-11-openjdk
+Requires:	net-tools-deprecated
 BuildArch:      noarch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 BuildRequires:  -post-build-checks
