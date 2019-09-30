@@ -68,37 +68,36 @@ public class ImportHandler extends Thread {
 	private void doHandleObjects() {
 		SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd.HH-mm-ss");
 		importStartDt = fmt.format(new Date());
-		
+
 		String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
 		if ((os.indexOf("mac") >= 0) || (os.indexOf("darwin") >= 0)) {
 			filepath = "/tmp/userimport." + importStartDt;
 		} else {
-			filepath = "/home/groups/SYSADMINS/userimport." + importStartDt;
+			filepath = "/home/groups/SYSADMINS/userimports/" + importStartDt;
+			File dir = new File("/home/groups/SYSADMINS/userimports/");
+			dir.mkdir();
 		}
 
-		
 		ImporterObject object;
 		int ctr = 0;
-		String oldConfigValuePWCheck="yes";
-		final SystemController systemController = new SystemController(session,em);
-		
+		String oldConfigValuePWCheck = "yes";
+		final SystemController systemController = new SystemController(session, em);
+
 		try {
-			final UserController userController = new UserController(session,em);
+			final UserController userController = new UserController(session, em);
 			final GroupController groupController = new GroupController(session, em);
-			
-			
-			
+
 			oldConfigValuePWCheck = systemController.getConfigValue("CHECK_PASSWORD_QUALITY");
-			if (oldConfigValuePWCheck == null || ! "no".equals(oldConfigValuePWCheck)) {
-			systemController.setConfigValue("CHECK_PASSWORD_QUALITY", "no");
+			if (oldConfigValuePWCheck == null || !"no".equals(oldConfigValuePWCheck)) {
+				systemController.setConfigValue("CHECK_PASSWORD_QUALITY", "no");
 			}
-			
-			List<User> allUsers =null;
-			if (order.getRequestedUserRole() != null && order.getRequestedUserRole().length()>0) {
+
+			List<User> allUsers = null;
+			if (order.getRequestedUserRole() != null && order.getRequestedUserRole().length() > 0) {
 				allUsers = userController.getByRole(order.getRequestedUserRole());
 			} else {
 				allUsers = userController.getAll();
-			}		 
+			}
 			List<Group> allClasses = groupController.getByType("class");
 			Set<String> foundRoles = new HashSet<String>();
 			List<Person> oldUserList = buildOldUserlist(userController);
@@ -114,22 +113,22 @@ public class ImportHandler extends Thread {
 					LOG.debug("found object: " + object.getClass());
 					if (object instanceof de.claxss.importlib.SchoolClass) {
 						if (!doCompareAndImportSchoolClass(session, (de.claxss.importlib.SchoolClass) object, order,
-								responseString,groupController,allClasses)) {
-							appendLog(importer, order, "Import " + object.getObjectMessage() + ": FAILED");
+								responseString, groupController, allClasses)) {
+							writeLog(importer, order, "Import " + object.getObjectMessage() + ": FAILED");
 
 						} else {
 
-							appendLog(importer, order, "Import " + object.getObjectMessage() + ": OK");
+							// appendLog(importer, order, "Import " + object.getObjectMessage() + ": OK");
 						}
 					} else if (object instanceof de.claxss.importlib.Person) {
 
 						if (!doCompareAndImportUser(session, (de.claxss.importlib.Person) object, order, importer,
-								responseString,groupController,userController,foundRoles,oldUserList,allUsers)) {
+								responseString, groupController, userController, foundRoles, oldUserList, allUsers)) {
 
-							appendLog(importer, order, "Import " + objectMsg + ": FAILED");
+							writeLog(importer, order, "Import " + objectMsg + ": FAILED");
 						} else {
 
-							appendLog(importer, order, "Import " + objectMsg + ": OK");
+							// appendLog(importer, order, "Import " + objectMsg + ": OK");
 						}
 					}
 					order.setImportResult(responseString.toString());
@@ -144,56 +143,69 @@ public class ImportHandler extends Thread {
 					// }
 				}
 			} while (object != null);
-			
+
 			// cleanup processing
-				
-				if (order.isIncludesAll()) {
-					for (User user : allUsers) {
-						if (foundRoles.contains(user.getRole()) && ! "Default profile".equals(user.getGivenName())) {
-							if (!order.isTestOnly()) {
-								responseString.append("Lösche Benutzer: ").append(user.getUid()).append(" " ).append(user.getGivenName()).append(" ").append(user.getSurName()).append(LINESEP);
-								userController.delete(user);
-							} else {
-								responseString.append("Werde Benutzer löschen: ").append(user.getUid()).append(" " ).append(user.getGivenName()).append(" ").append(user.getSurName()).append(LINESEP);
-							}
-						}
-						order.setImportResult(responseString.toString());
 
-					}
-				}
-				if (order.isContainsAllClasses()) {
-					for (Group group : allClasses) {
+			if (order.isIncludesAll()) {
+				for (User user : allUsers) {
+					if (foundRoles.contains(user.getRole()) && !"Default profile".equals(user.getGivenName())) {
 						if (!order.isTestOnly()) {
-							responseString.append("Lösche Klasse: ").append(group.getName()).append(LINESEP);
-							groupController.delete(group);
+							// responseString.append("Lösche Benutzer: ").append(user.getUid()).append(" "
+							// ).append(user.getGivenName()).append("
+							// ").append(user.getSurName()).append(LINESEP);
+							appendLog(importer, order, user, "Lösche Benutzer: ", "", responseString);
+							userController.delete(user);
 						} else {
-							responseString.append("Werde Klasse löschen: ").append(group.getName()).append(LINESEP);
+							// responseString.append("Werde Benutzer löschen:
+							// ").append(user.getUid()).append(" " ).append(user.getGivenName()).append("
+							// ").append(user.getSurName()).append(LINESEP);
+							appendLog(importer, order, user, "Werde Benutzer löschen: ", "", responseString);
 						}
-						order.setImportResult(responseString.toString());
-
 					}
+					order.setImportResult(responseString.toString());
+
 				}
-				if (order.isCleanupClassesDir()) {
+			}
+			if (order.isContainsAllClasses()) {
+				for (Group group : allClasses) {
 					if (!order.isTestOnly()) {
-						responseString.append("Lösche Inhalte der Klassenverzeichnisse").append(LINESEP);
-						groupController.cleanClassDirectories();
+						// responseString.append("Lösche Klasse:
+						// ").append(group.getName()).append(LINESEP);
+						appendLog(importer, order, group, "Lösche Klasse: ", "", responseString);
+						groupController.delete(group);
 					} else {
-						responseString.append("Werde Inhalte der Klassenverzeichnisse löschen").append(LINESEP);
-					}
-				}
-				order.setImportResult(responseString.toString());
+						// responseString.append("Werde Klasse löschen:
+						// ").append(group.getName()).append(LINESEP);
+						appendLog(importer, order, group, "Werde Klasse löschen: ", "", responseString);
 
-				if (order.isCleanupUserData()) {
-					//TODO cleanup user home dies
-					// maybe we will implement this later, actually not done
+					}
+					order.setImportResult(responseString.toString());
+
 				}
-				
-			
-			
+			}
+			if (order.isCleanupClassesDir()) {
+				if (!order.isTestOnly()) {
+					// responseString.append("Lösche Inhalte der
+					// Klassenverzeichnisse").append(LINESEP);
+					appendLog(importer, order, "Lösche Inhalte der Klassenverzeichnisse", responseString);
+					groupController.cleanClassDirectories();
+				} else {
+					// responseString.append("Werde Inhalte der Klassenverzeichnisse
+					// löschen").append(LINESEP);
+					appendLog(importer, order, "Werde Inhalte der Klassenverzeichnisse löschen", responseString);
+				}
+			}
+			order.setImportResult(responseString.toString());
+
+			if (order.isCleanupUserData()) {
+				// TODO cleanup user home dies
+				// maybe we will implement this later, actually not done
+			}
+
 		} finally {
 			closeLogfiles();
-			if (oldConfigValuePWCheck == null || ! "no".equals(oldConfigValuePWCheck)) {
-				systemController.setConfigValue("CHECK_PASSWORD_QUALITY",oldConfigValuePWCheck);
+			if (oldConfigValuePWCheck == null || !"no".equals(oldConfigValuePWCheck)) {
+				systemController.setConfigValue("CHECK_PASSWORD_QUALITY", oldConfigValuePWCheck);
 			}
 		}
 		order.setPercentCompleted(100);
@@ -201,51 +213,80 @@ public class ImportHandler extends Thread {
 	}
 
 	private OutputStream logfile = null;
-	//private OutputStream useraddLogfile = null;
-	Map<String,OutputStream> useraddLogfiles = new HashMap<String,OutputStream>();
+	// private OutputStream useraddLogfile = null;
+	Map<String, OutputStream> useraddLogfiles = new HashMap<String, OutputStream>();
 	private String CSVSEP = ";";
 	private String LINESEP = "\n";
 	private String CLASSESSEP = ",";
 	private String importStartDt;
 	private String filepath;
-	
+
 	private OutputStream getUserAddLogFile(String schoolclass) throws FileNotFoundException {
 		OutputStream result = useraddLogfiles.get(schoolclass);
-		if (result==null) {
-		File uaf = new File(filepath + "/userlist_" + schoolclass + ".csv");
+		if (result == null) {
+			File uaf = new File(filepath + "/userlist_" + schoolclass + ".csv");
 
-		result = new FileOutputStream(uaf);
-		useraddLogfiles.put(schoolclass, result);
-		StringBuilder b = new StringBuilder();
-		b.append("LOGIN").append(CSVSEP).append("NACHNAME").append(CSVSEP).append("VORNAME").append(CSVSEP)
-				.append("GEBURTSTAG").append(CSVSEP).append("KLASSE").append(CSVSEP).append("PASSWORT")
-				.append(LINESEP);
-		try {
-			result.write(b.toString().getBytes("UTF-8"));
-		} catch (UnsupportedEncodingException e) {
-			LOG.error("createLogfiles: " + e.getMessage());
-		} catch (IOException e) {
-			LOG.error("createLogfiles: " + e.getMessage());
-		}
+			result = new FileOutputStream(uaf);
+			useraddLogfiles.put(schoolclass, result);
+			StringBuilder b = new StringBuilder();
+			b.append("LOGIN").append(CSVSEP).append("NACHNAME").append(CSVSEP).append("VORNAME").append(CSVSEP)
+					.append("GEBURTSTAG").append(CSVSEP).append("KLASSE").append(CSVSEP).append("PASSWORT")
+					.append(LINESEP);
+			try {
+				result.write(b.toString().getBytes("UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				LOG.error("createLogfiles: " + e.getMessage());
+			} catch (IOException e) {
+				LOG.error("createLogfiles: " + e.getMessage());
+			}
 		}
 		return result;
 	}
 
 	private void createLogfiles(Importer i, ImportOrder o) {
 
-		if (logfile == null ) {
-			
-			
+		if (logfile == null) {
+
 			File dir = new File(filepath);
 			dir.mkdir();
+			
+			File params = new File(filepath + "/parameters.json");
+			FileOutputStream paramout;
+			try {
+				paramout = new FileOutputStream(params);
+				StringBuilder paramb = new StringBuilder();
+				paramb.append("{\"role\":\"").append(o.getRequestedUserRole()!=null ? o.getRequestedUserRole() : "")
+				      .append("\",\"lang\":\"DE\",\"identifier\":\"sn-gn-bd\",\"startTime\":\"")
+				      .append(importStartDt).append("\",\"test\":")
+				      .append(o.isTestOnly())
+				      .append(",\"password\":\"")
+				      .append(o.getPwd()!=null ? o.getPwd():"")
+				      .append("\",\"mustchange\":")
+				      .append("false")
+				      .append(",\"full\":")
+				      .append(o.isIncludesAll())
+				      .append(",\"allClasses\":")
+				      .append(o.isContainsAllClasses())
+				      .append(",\"cleanClassDirs\":")
+				      .append(o.isCleanupClassesDir())
+				      .append(",\"resetPassword\":")
+				      .append("false").append("}");
+				paramout.write(paramb.toString().getBytes());
+				paramout.close();
+			} catch (FileNotFoundException e1) {
+				LOG.error(e1.getMessage(),e1);
+			} catch (IOException e) {
+				LOG.error(e.getMessage(),e);
+			}
+	
 			File lf = new File(filepath + "/import.log");
-			File uaf = new File(filepath + "/userlist.csv");
 			try {
 				if (logfile == null) {
 					logfile = new FileOutputStream(lf);
 					StringBuilder b = new StringBuilder();
-					b.append(importStartDt).append(" Import: ").append(i.getImporterDescription().getName()).append(" Modus: ")
-							.append(o.isTestOnly() ? "Test Import" : "Tatsächlicher Import").append(LINESEP);
+					b.append(importStartDt).append(" Import: ").append(i.getImporterDescription().getName())
+							.append(" Modus: ").append(o.isTestOnly() ? "Test Import" : "Tatsächlicher Import").append("<br>")
+							.append(LINESEP);
 					try {
 						logfile.write(b.toString().getBytes("UTF-8"));
 					} catch (UnsupportedEncodingException e) {
@@ -254,7 +295,7 @@ public class ImportHandler extends Thread {
 						LOG.error("createLogfiles: " + e.getMessage());
 					}
 				}
-				
+
 			} catch (FileNotFoundException e) {
 				LOG.error("createLogfiles: " + e.getMessage());
 			}
@@ -281,21 +322,9 @@ public class ImportHandler extends Thread {
 			} catch (IOException e) {
 				LOG.error("closeLogfiles useraddLogfile:" + e.getMessage());
 			}
-		} 
+		}
 		useraddLogfiles.clear();
 
-	}
-
-	private void appendLog(Importer i, ImportOrder o, String msg) {
-		createLogfiles(i, o);
-		try {
-			logfile.write(msg.getBytes("UTF-8"));
-			logfile.write(LINESEP.getBytes());
-		} catch (UnsupportedEncodingException e) {
-			LOG.error("appendLog:" + e.getMessage());
-		} catch (IOException e) {
-			LOG.error("appendLog:" + e.getMessage());
-		}
 	}
 
 	private String normalizeValue(String value) {
@@ -309,20 +338,21 @@ public class ImportHandler extends Thread {
 		}
 		return value;
 	}
-    private String getFirstClass(User user) {
-    	if (user.getGroups() != null) {
+
+	private String getFirstClass(User user) {
+		if (user.getGroups() != null) {
 			if (user.getGroups().size() == 1) {
 				return user.getGroups().get(0).getName();
 			}
-			int i = 0;
 			for (Group group : user.getGroups()) {
 				if ("class".equals(group.getGroupType())) {
-					return group.getName();		
+					return group.getName();
 				}
 			}
 		}
-    	return "";
-    }
+		return "";
+	}
+
 	private String getCSVClasses(User user) {
 		StringBuilder b = new StringBuilder();
 		if (user.getGroups() != null) {
@@ -351,50 +381,102 @@ public class ImportHandler extends Thread {
 		return "";
 	}
 
-	private void appendUserAddLog(Importer i, ImportOrder o, OssResponse res, User newUser, boolean create) {
-		if (!o.isTestOnly()) {
+	private void writeLog(Importer i, ImportOrder o, String msg) {
 		createLogfiles(i, o);
 		try {
-			StringBuilder buf = new StringBuilder();
-			SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
-			String birthday = newUser.getBirthDay() != null ? fmt.format(newUser.getBirthDay()) : "";
-			String classes = getCSVClasses(newUser);
-			String firstclass = getFirstClass(newUser);
-			buf.append(newUser.getUid()).append(CSVSEP).append(normalizeValue(newUser.getSurName())).append(CSVSEP)
-					.append(normalizeValue(newUser.getGivenName())).append(CSVSEP).append(birthday).append(CSVSEP)
-					.append(normalizeValue(classes)).append(CSVSEP).append(res != null ? extractPW(res) : "")
-					.append(LINESEP);
-			getUserAddLogFile(firstclass).write(buf.toString().getBytes("UTF-8"));
+			logfile.write(msg.getBytes("UTF-8"));
+			logfile.write("<br>".getBytes());
+			logfile.write(LINESEP.getBytes());
 		} catch (UnsupportedEncodingException e) {
-			LOG.error("appendUserAddLog:" + e.getMessage());
+			LOG.error("appendLog:" + e.getMessage());
 		} catch (IOException e) {
-			LOG.error("appendUserAddLog:" + e.getMessage());
-		}
+			LOG.error("appendLog:" + e.getMessage());
 		}
 	}
 
-	
-	
+	private String getClassesArray(List<SchoolClass> classes) {
+		if (classes != null && classes.size() > 0) {
+			if (classes.size() == 1) {
+				return classes.get(0).getOriginalName();
+			} else {
+				StringBuilder b = new StringBuilder();
+				for (SchoolClass schoolClass : classes) {
+					b.append(schoolClass.getOriginalName()).append(" ");
+				}
+				return b.toString();
+			}
+		}
+		return null;
+	}
+
+	private void appendLog(Importer i, ImportOrder o, String message, StringBuilder responseString) {
+		writeLog(importer, order, message);
+		responseString.append(message).append(LINESEP);
+	}
+
+	private void appendLog(Importer i, ImportOrder o, User user, String prolog, String epilog,
+			StringBuilder responseString) {
+		StringBuilder b = new StringBuilder();
+		SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
+		String birthday = user.getBirthDay() != null ? fmt.format(user.getBirthDay()) : "";
+		b.append(prolog).append(user.getSurName()).append(", ").append(user.getGivenName()).append(", ")
+				.append(birthday).append(", ").append(user.getUid()).append(", ").append(epilog);
+		String txt = b.toString();
+		responseString.append(txt).append(LINESEP);
+		writeLog(importer, order, txt);
+	}
+
+	private void appendLog(Importer i, ImportOrder o, Group group, String prolog, String epilog,
+			StringBuilder responseString) {
+		StringBuilder b = new StringBuilder();
+		b.append(prolog).append(group.getName()).append(epilog);
+		String txt = b.toString();
+		responseString.append(txt).append(LINESEP);
+		writeLog(importer, order, txt);
+	}
+
+	private void appendUserAddLog(Importer i, ImportOrder o, OssResponse res, User newUser, boolean create) {
+		if (!o.isTestOnly()) {
+			createLogfiles(i, o);
+			try {
+				StringBuilder buf = new StringBuilder();
+				SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
+				String birthday = newUser.getBirthDay() != null ? fmt.format(newUser.getBirthDay()) : "";
+				String classes = getCSVClasses(newUser);
+				String firstclass = getFirstClass(newUser);
+				buf.append(newUser.getUid()).append(CSVSEP).append(normalizeValue(newUser.getSurName())).append(CSVSEP)
+						.append(normalizeValue(newUser.getGivenName())).append(CSVSEP).append(birthday).append(CSVSEP)
+						.append(normalizeValue(classes)).append(CSVSEP).append(res != null ? extractPW(res) : "")
+						.append(LINESEP);
+				getUserAddLogFile(firstclass).write(buf.toString().getBytes("UTF-8"));
+			} catch (UnsupportedEncodingException e) {
+				LOG.error("appendUserAddLog:" + e.getMessage());
+			} catch (IOException e) {
+				LOG.error("appendUserAddLog:" + e.getMessage());
+			}
+		}
+	}
+
 	private boolean doCompareAndImportUser(Session session, Person person, ImportOrder o, Importer importer,
-			StringBuilder responseString,GroupController groupController,UserController userController,Set<String> foundRoles, List<Person> oldUserList, List<User>remainingUsers ) {
-		
+			StringBuilder responseString, GroupController groupController, UserController userController,
+			Set<String> foundRoles, List<Person> oldUserList, List<User> remainingUsers) {
+
 		Person existingUser = null;
 
-	
-	//	List<Person> handledUsers = new ArrayList<Person>();
-		
-		if (person.getPersonNumber()!=null && person.getPersonNumber().length()>0) {
+		// List<Person> handledUsers = new ArrayList<Person>();
+
+		if (person.getPersonNumber() != null && person.getPersonNumber().length() > 0) {
 			// try to find per uuid
 			for (Person person2 : oldUserList) {
 				if (person.getPersonNumber().equals(person2.getPersonNumber())) {
 					existingUser = person2;
-					LOG.info("user  found by uuid: " + person.getPersonNumber() + " " + person.getFirstname() + " " + person.getName() + " "
-							+ person.getLoginId() + " " + person.getBirthday());
+					LOG.info("user  found by uuid: " + person.getPersonNumber() + " " + person.getFirstname() + " "
+							+ person.getName() + " " + person.getLoginId() + " " + person.getBirthday());
 				}
 			}
 		}
-		if (existingUser!=null ) {
-		  existingUser = ImporterUtil.findUserByUid(oldUserList, person);
+		if (existingUser != null) {
+			existingUser = ImporterUtil.findUserByUid(oldUserList, person);
 		}
 		if (existingUser == null) {
 			LOG.info("user not found by uid: " + person.getFirstname() + " " + person.getName() + " "
@@ -428,13 +510,12 @@ public class ImportHandler extends Thread {
 		}
 		/* ========== second step: create or update the user ============ */
 		if (existingUser != null) {
-		//	handledUsers.add(existingUser);
-			
-			
+			// handledUsers.add(existingUser);
+
 			User ossUser = (User) existingUser.getData();
 			remainingUsers.remove(ossUser);
 			foundRoles.add(ossUser.getRole());
-			
+
 			// update the user
 			boolean change = false;
 			if (person.getLoginId() != null && !person.getLoginId().equals(ossUser.getUid())) {
@@ -465,7 +546,7 @@ public class ImportHandler extends Thread {
 				List<SchoolClass> newClasses = new ArrayList<SchoolClass>();
 				List<SchoolClass> keepClasses = new ArrayList<SchoolClass>();
 				ImporterUtil.handleSchoolClassesDiff(existingUser, person, removeClasses, newClasses, keepClasses);
-				StringBuilder bclasses = new StringBuilder();
+				//StringBuilder bclasses = new StringBuilder();
 				if (!o.isTestOnly()) {
 					for (SchoolClass schoolClass : removeClasses) {
 						groupController.removeMember(((Group) schoolClass.getData()).getId(), ossUser.getId());
@@ -473,18 +554,35 @@ public class ImportHandler extends Thread {
 					for (SchoolClass schoolClass : newClasses) {
 
 						Group group = groupController.getByExactName(schoolClass.getOriginalName());
-						if (group==null) {
-							 group = groupController.getByExactName(schoolClass.getNormalizedName());
+						if (group == null) {
+							group = groupController.getByExactName(schoolClass.getOriginalName().toUpperCase());
+						}
+						if (group == null) {
+							group = groupController.getByExactName(schoolClass.getNormalizedName());
 						}
 
 						if (group != null) {
-							bclasses.append(group.getName()).append(" ");
+							//bclasses.append(group.getName()).append(" ");
 							groupController.addMember(group.getId(), ossUser.getId());
 						}
 					}
 				}
-				responseString.append("Benutzer wird aktualisiert: ").append(existingUser.getName()).append(", ")
-						.append(existingUser.getFirstname()).append(" ").append(bclasses.toString()).append(LINESEP);
+//				responseString.append("Benutzer wird aktualisiert: ").append(existingUser.getName()).append(", ")
+//						.append(existingUser.getFirstname()).append(" ").append(bclasses.toString()).append(LINESEP);
+				String oldClassesStr = getClassesArray(keepClasses);
+				String newClassesStr = getClassesArray(newClasses);
+				String delClassesStr = getClassesArray(removeClasses);
+				StringBuilder b = new StringBuilder();
+				if (oldClassesStr!=null) {
+					b.append("Erhalten: ").append(oldClassesStr);
+				}
+				if (newClassesStr!=null) {
+					b.append(" Neu: ").append(newClassesStr);
+				}
+				if (delClassesStr!=null) {
+					b.append(" Gelöscht: ").append(delClassesStr);
+				}
+				appendLog(importer, order, ossUser, "Benutzer wird aktualisiert: ", b.toString(),responseString);
 			}
 			if (change && !o.isTestOnly()) {
 				userController.modify(ossUser);
@@ -493,38 +591,40 @@ public class ImportHandler extends Thread {
 			// create the user
 			User newUser = new User();
 			newUser.setUid(person.getLoginId());
-			if (person.getPersonNumber()!=null && person.getPersonNumber().length()>0) {
-			  newUser.setUuid(person.getPersonNumber());
+			if (person.getPersonNumber() != null && person.getPersonNumber().length() > 0) {
+				newUser.setUuid(person.getPersonNumber());
 			}
-			newUser.setGivenName(person.getFirstname()!=null ? person.getFirstname() : "?");
-			newUser.setSurName(person.getName()!=null ? person.getName() : "?");
-			newUser.setRole((o.getRequestedUserRole() != null && o.getRequestedUserRole().length()>0) ? o.getRequestedUserRole() : getOSSRole(person));
+			newUser.setGivenName(person.getFirstname() != null ? person.getFirstname() : "?");
+			newUser.setSurName(person.getName() != null ? person.getName() : "?");
+			newUser.setRole((o.getRequestedUserRole() != null && o.getRequestedUserRole().length() > 0)
+					? o.getRequestedUserRole()
+					: getOSSRole(person));
 			foundRoles.add(newUser.getRole());
-			if (person.getBirthday()!=null) {
-			newUser.setBirthDay(person.getBirthday());
+			if (person.getBirthday() != null) {
+				newUser.setBirthDay(person.getBirthday());
 			} else {
 				newUser.setBirthDay(new Date());
 			}
-			
+
 			if (person.getPassword() != null && person.getPassword().length() > 0) {
 				newUser.setPassword(person.getPassword());
-			} else if (o.getNewUserPassword()!=null && o.getNewUserPassword().length()>0) {
+			} else if (o.getNewUserPassword() != null && o.getNewUserPassword().length() > 0) {
 				// handling of given new user password
 				if (o.getNewUserPassword().equals("[teachers:random,students:birthday]")) {
-					
+
 					if ("students".equals(newUser.getRole())) {
 						SimpleDateFormat fmt = new SimpleDateFormat("dd.MM.yyyy");
 						newUser.setPassword(fmt.format(newUser.getBirthDay()));
-			
+
 					} else {
 						// no password set -> random
-			
+
 					}
 				} else {
 					newUser.setPassword(o.getNewUserPassword());
 				}
 			}
-			
+
 			OssResponse useraddRes = null;
 			if (!o.isTestOnly()) {
 				useraddRes = userController.add(newUser);
@@ -533,14 +633,19 @@ public class ImportHandler extends Thread {
 				} else {
 					if (useraddRes == null) {
 						LOG.error("userController.add returns no response");
-						responseString.append("Benutzer kann nicht angelegt werden: ").append(newUser.getSurName())
-								.append(", ").append(newUser.getGivenName()).append(LINESEP);
+//						responseString.append("Benutzer kann nicht angelegt werden: ").append(newUser.getSurName())
+//								.append(", ").append(newUser.getGivenName()).append(LINESEP);
+						appendLog(importer, order, newUser, "Benutzer kann nicht angelegt werden: ", "",
+								responseString);
 					} else {
 						LOG.error("userController.add returns null as objectid in response: " + useraddRes.getCode()
 								+ " " + useraddRes.getValue());
-						responseString.append("Benutzer kann nicht angelegt werden: ").append(newUser.getSurName())
-								.append(", ").append(newUser.getGivenName()).append(". Grund: ")
-								.append(useraddRes.getValue()).append(LINESEP);
+//						responseString.append("Benutzer kann nicht angelegt werden: ").append(newUser.getSurName())
+//								.append(", ").append(newUser.getGivenName()).append(". Grund: ")
+//								.append(useraddRes.getValue()).append(LINESEP);
+						appendLog(importer, order, newUser, "Benutzer kann nicht angelegt werden: ",
+								" Grund: " + useraddRes.getValue(), responseString);
+
 					}
 					return false;
 				}
@@ -548,32 +653,37 @@ public class ImportHandler extends Thread {
 			} else {
 				// appendUserAddLog(importer, o, null, newUser, true);
 			}
-			
+
 			StringBuilder newUserClassesBuilder = new StringBuilder();
 			if (newUser != null && newUser.getId() != null && !o.isTestOnly()) {
 				if (person.getSchoolClasses() != null) {
 					for (SchoolClass schoolClass : person.getSchoolClasses()) {
 						Group group = groupController.getByExactName(schoolClass.getOriginalName());
-						if (group==null) {
-							 group = groupController.getByExactName(schoolClass.getNormalizedName());
+						if (group == null) {
+							group = groupController.getByExactName(schoolClass.getOriginalName().toUpperCase());
 						}
-						
-						
+						if (group == null) {
+							group = groupController.getByExactName(schoolClass.getNormalizedName());
+						}
+
 						if (group != null && group.getId() != null) {
 							LOG.debug("Add user to classes" + newUser.getUid() + " " + group.getName());
 							newUserClassesBuilder.append(group.getName()).append(" ");
 							groupController.addMember(group.getId(), newUser.getId());
 						} else {
-							LOG.info("Group not found: " + schoolClass.getNormalizedName() + " " + (group != null
-									? group.getName() : ""));
+							LOG.info("Group not found: " + schoolClass.getNormalizedName() + " "
+									+ (group != null ? group.getName() : ""));
 						}
 					}
 				}
 			}
-			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName()).append(", ")
-			.append(newUser.getGivenName()).append(" ").append(newUserClassesBuilder);
-			
-			responseString.append(LINESEP);
+//			responseString.append("Benutzer wird neu angelegt: ").append(newUser.getSurName()).append(", ")
+//			.append(newUser.getGivenName()).append(" ").append(newUserClassesBuilder);
+//			
+//			responseString.append(LINESEP);
+			appendLog(importer, order, newUser, "Benutzer wird neu angelegt: ", newUserClassesBuilder.toString(),
+					responseString);
+
 			if (!o.isTestOnly()) {
 				// done here to get the classnames of the user
 				newUser = userController.getById(useraddRes.getObjectId());
@@ -582,7 +692,7 @@ public class ImportHandler extends Thread {
 				appendUserAddLog(importer, o, null, newUser, true);
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -634,18 +744,23 @@ public class ImportHandler extends Thread {
 	}
 
 	private boolean doCompareAndImportSchoolClass(Session session, de.claxss.importlib.SchoolClass schoolClass,
-			ImportOrder o, StringBuilder responseString, GroupController groupController, List<Group> remainingClasses) {
+			ImportOrder o, StringBuilder responseString, GroupController groupController,
+			List<Group> remainingClasses) {
 		// LOG.error("importing group: " + schoolClass.getNormalizedName());
 		if (schoolClass != null && schoolClass.getNormalizedName() != null) {
-			
-			 Group existingClass = groupController.getByExactName(schoolClass.getOriginalName());
-			 if (existingClass==null) {
-				 existingClass = groupController.getByExactName(schoolClass.getNormalizedName());
-			 }
+
+			Group existingClass = groupController.getByExactName(schoolClass.getOriginalName());
+			if (existingClass == null) {
+				existingClass = groupController.getByExactName(schoolClass.getOriginalName().toUpperCase());
+			}
+			if (existingClass == null) {
+				existingClass = groupController.getByExactName(schoolClass.getNormalizedName());
+			}
 
 			if (existingClass == null) {
 				Group newClass = new Group();
-				newClass.setName(schoolClass.getNormalizedName());
+				newClass.setName(schoolClass.getOriginalName().toUpperCase()); // getNormalizedName changed to original
+																				// name for dosys
 				newClass.setDescription(schoolClass.getLongName() != null ? schoolClass.getLongName()
 						: schoolClass.getNormalizedName());
 				newClass.setGroupType("class");
@@ -653,7 +768,10 @@ public class ImportHandler extends Thread {
 				if (!o.isTestOnly()) {
 					groupController.add(newClass);
 				}
-				responseString.append("Neue Gruppe wird angelegt: ").append(newClass.getName()).append(LINESEP);
+				// responseString.append("Neue Klasse wird angelegt:
+				// ").append(newClass.getName()).append(LINESEP);
+				appendLog(importer, order, newClass, "Neue Klasse wird angelegt: ", "", responseString);
+
 			} else {
 				remainingClasses.remove(existingClass);
 			}
