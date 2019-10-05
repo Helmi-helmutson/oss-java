@@ -195,7 +195,7 @@ public class PrinterController extends Controller {
 		if( session.getPassword().equals("dummy") ) {
 			return new OssResponse(session,"ERROR","The session password of the administrator is expiered. Please login into the web interface again.");
 		}
-		String printserver   = new RoomController(this.session,this.em).getConfigValue("PRINTSERVER");
+		String printserver   = this.getConfigValue("PRINTSERVER");
 		String[] program     = new String[7];
 		StringBuffer reply   = new StringBuffer();
 		StringBuffer stderr  = new StringBuffer();
@@ -261,7 +261,6 @@ public class PrinterController extends Controller {
 		if( session.getPassword().equals("dummy") ) {
 			return new OssResponse(session,"ERROR","The session password of the administrator is expiered. Please login into the web interface again.");
 		}
-		RoomController roomController = new RoomController(this.session,this.em);;
 		String deviceHostName;
 		Printer printer = new Printer();
 		//Create the printer object
@@ -327,14 +326,14 @@ public class PrinterController extends Controller {
 		OSSShellTools.exec(program, reply, stderr, null);
 		logger.debug(stderr.toString());
 		logger.debug(reply.toString());
-		roomController.systemctl("try-restart", "samba-printserver");
+		this.systemctl("try-restart", "samba-printserver");
 		//Now we have to check if the printer is already visible in samba
 		int tries = 6;
 		program = new String[6];
 		program[0] = "/usr/bin/rpcclient";
 		program[1] = "-U";
 		program[2] = "Administrator%" + session.getPassword();
-		program[3] = roomController.getConfigValue("PRINTSERVER");
+		program[3] = this.getConfigValue("PRINTSERVER");
 		program[4] = "-c";
 		program[5] = "getprinter "+name;
 		do {
