@@ -523,28 +523,28 @@ public class UserController extends Controller {
 	public List<OssResponse> resetUserPassword(List<Long> userIds, String password, boolean mustChange) {
 		logger.debug("resetUserPassword: " + password);
 		List<OssResponse> responses = new ArrayList<OssResponse>();
-		if( password.length() < 7 ) {
-			responses.add(new OssResponse(this.getSession(),"ERROR","Password must contains minimum 7 character."));
+		boolean checkPassword = this.getConfigValue("CHECK_PASSWORD_QUALITY").toLowerCase().equals("yes");
+		this.setConfigValue("CHECK_PASSWORD_QUALITY", "no");
+		OssResponse passwordResponse = this.checkPassword(password);
+		if( passwordResponse != null ) {
+			if (checkPassword) {
+				this.setConfigValue("CHECK_PASSWORD_QUALITY", "yes");
+			}
+			logger.error("Reset Password" + passwordResponse);
+			responses.add(passwordResponse);
 			return responses;
 		}
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
-		String[] program = new String[5];
-		program[0] = "/usr/bin/samba-tool";
-		program[1] = "domain";
-		program[2] = "passwordsettings";
-		program[3] = "set";
-		program[4] = "--complexity=off";
-		OSSShellTools.exec(program, reply, error, null);
-
+		String[] program = new String[4];
 		if (mustChange) {
-			program = new String[6];
-			program[0] = "/usr/bin/samba-tool";
-			program[5] = "--must-change-at-next-login";
+			program    = new String[6];
+			program[4] = "--must-change-at-next-login";
 		}
+		program[0] = "/usr/bin/samba-tool";
 		program[1] = "user";
 		program[2] = "setpassword";
-		program[4] = "--newpassword=" + password;
+		program[3] = "--newpassword=" + password;
 
 		for (Long id : userIds) {
 			User user = this.getById(id);
@@ -570,14 +570,8 @@ public class UserController extends Controller {
 					+ reply.toString() + " E:" + error.toString());
 			responses.add(new OssResponse(this.getSession(), "OK", "The password of '%s' was reseted.",null,user.getUid()));
 		}
-		if (this.getConfigValue("CHECK_PASSWORD_QUALITY").toLowerCase().equals("yes")) {
-			program = new String[5];
-			program[0] = "/usr/bin/samba-tool";
-			program[1] = "domain";
-			program[2] = "passwordsettings";
-			program[3] = "set";
-			program[4] = "--complexity=on";
-			OSSShellTools.exec(program, reply, error, null);
+		if (checkPassword) {
+			this.setConfigValue("CHECK_PASSWORD_QUALITY", "yes");
 		}
 		return responses;
 	}
