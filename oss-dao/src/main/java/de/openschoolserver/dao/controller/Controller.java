@@ -475,6 +475,7 @@ public class Controller extends Config {
 		if( owner != null && this.session.getUser().equals(owner) ) {
 				return true;
 		}
+		logger.debug("mayModify needed Rights:" + neededRights + " user: " + session.getUser() + " object: " + object);
 		for( String right : neededRights ) {
 			if( this.session.getAcls() != null ) {
 				if( this.session.getAcls().contains(right) ) {
