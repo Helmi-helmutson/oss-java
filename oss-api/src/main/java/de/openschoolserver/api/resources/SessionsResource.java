@@ -15,6 +15,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import de.openschoolserver.dao.Session;
 import java.util.List;
+import java.util.Map;
 
 @Path("sessions")
 @Api(value = "sessions")
@@ -37,6 +38,24 @@ public interface SessionsResource {
             @FormParam("password") String password,
             @FormParam("device") String device,
             @Context HttpServletRequest req
+    );
+
+    @POST
+    @Path("create")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "Creates a new session and delivers the token.",
+	notes = "Following parameter are required:<br>"
+	+ "'username' The login name of the user."
+	+ "'password' The password of the user."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 401, message = "Login is incorrect"),
+            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+    })
+    Session createSession(
+            @Context UriInfo ui,
+            @Context HttpServletRequest req,
+            Map<String,String> loginDatas
     );
 
     @POST
@@ -94,7 +113,7 @@ public interface SessionsResource {
             @ApiParam(hidden = true) @Auth Session session,
             @PathParam("key") String key
     );
-    
+
     @GET
     @Path("allowedModules")
     @Produces(JSON_UTF8)

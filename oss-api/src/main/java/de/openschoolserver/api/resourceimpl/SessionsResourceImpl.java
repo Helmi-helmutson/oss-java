@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.UriInfo;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
 
 public class SessionsResourceImpl implements SessionsResource {
@@ -33,6 +34,7 @@ public class SessionsResourceImpl implements SessionsResource {
 	public Session createSession(UriInfo ui, String username, String password, String device, HttpServletRequest req) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 
+		logger.debug("user:" + username + " password:" + password);
 		if(username == null || password == null ) {
 			throw new WebApplicationException(400);
 		}
@@ -56,6 +58,14 @@ public class SessionsResourceImpl implements SessionsResource {
 			throw new WebApplicationException(401);
 		}
 		return session;
+	}
+
+	@Override
+	public Session createSession(UriInfo ui, HttpServletRequest req, Map<String, String> loginDatas) {
+		if( loginDatas.containsKey("username") && loginDatas.containsKey("password") ) {
+			return createSession(ui,loginDatas.get("username"),loginDatas.get("password"),"dummy",req);
+		}
+		throw new WebApplicationException(401);
 	}
 
 	@Override
