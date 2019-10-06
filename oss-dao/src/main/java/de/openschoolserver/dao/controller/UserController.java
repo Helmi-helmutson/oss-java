@@ -538,7 +538,7 @@ public class UserController extends Controller {
 		StringBuffer error = new StringBuffer();
 		String[] program = new String[4];
 		if (mustChange) {
-			program    = new String[6];
+			program    = new String[5];
 			program[4] = "--must-change-at-next-login";
 		}
 		program[0] = "/usr/bin/samba-tool";
@@ -566,7 +566,7 @@ public class UserController extends Controller {
 			reply = new StringBuffer();
 			program[3] = user.getUid();
 			OSSShellTools.exec(program, reply, error, null);
-			logger.debug(program[0] + " " + program[1] + " " + program[2] + " " + program[3] + " " + program[4] + " R:"
+			logger.debug(program[0] + " " + program[1] + " " + program[2] + " " + program[3] + " R:"
 					+ reply.toString() + " E:" + error.toString());
 			responses.add(new OssResponse(this.getSession(), "OK", "The password of '%s' was reseted.",null,user.getUid()));
 		}
