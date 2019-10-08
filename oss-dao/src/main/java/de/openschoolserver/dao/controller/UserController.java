@@ -165,7 +165,18 @@ public class UserController extends Controller {
 		logger.debug("User to create:" + user);
 		// Check role
 		if (user.getRole() == null) {
-			return new OssResponse(this.getSession(), "ERROR", "You have to define the role of the user.");
+			return new OssResponse(
+					this.getSession(),
+					"ERROR",
+					"You have to define the role of the user.");
+		}
+		if( !this.mayAdd(user) ) {
+			return new OssResponse(
+					this.getSession(),
+					"ERROR",
+					"You must not create user whith role %s.",
+					null,
+					user.getRole());
 		}
 		// Check Birthday
 		if (user.getBirthDay() == null) {
@@ -353,7 +364,7 @@ public class UserController extends Controller {
 		if(this.isProtected(user)) {
 			return new OssResponse(this.getSession(), "ERROR", "This user must not be deleted.");
 		}
-		if( !this.mayModify(user)) {
+		if( !this.mayDelete(user)) {
 			return new OssResponse(this.getSession(),"ERROR", "You must not delete this user.");
 		}
 		startPlugin("delete_user", user);

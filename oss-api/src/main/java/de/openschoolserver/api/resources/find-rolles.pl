@@ -1,6 +1,10 @@
 #!/usr/bin/perl
+use strict;
 
-$ROLES=`grep \@RolesAllowed *`;
+my $ROLES=`grep \@RolesAllowed *`;
+
+my @USERROLES  = ( 'students', 'teachers', 'sysadmins', 'workstations' );
+my @GROUPTYPES = ( 'primary', 'class', 'workgroup' );
 
 my $hroles = {};
 my $forTeachers = {};
@@ -34,3 +38,17 @@ foreach( sort keys %$forTeachers )
 	print "INSERT INTO Acls VALUES(NULL,NULL,2,'$_','Y',6);\n";
 }
 print "INSERT INTO Acls VALUES(NULL,1,NULL,'printers.add','Y',6);\n";
+
+foreach( @USERROLES ) {
+	print "INSERT INTO Enumerates VALUES(NULL,'apiAcl','user.add.$_',6);\n";
+	print "INSERT INTO Enumerates VALUES(NULL,'apiAcl','user.delete.$_',6);\n";
+	print "INSERT INTO Enumerates VALUES(NULL,'apiAcl','user.modify.$_',6);\n";
+}
+foreach( @GROUPTYPES ) {
+	print "INSERT INTO Enumerates VALUES(NULL,'apiAcl','group.add.$_',6);\n";
+	print "INSERT INTO Enumerates VALUES(NULL,'apiAcl','group.delete.$_',6);\n";
+	print "INSERT INTO Enumerates VALUES(NULL,'apiAcl','group.modify.$_',6);\n";
+}
+print "INSERT INTO Acls VALUES(NULL,NULL,2,'group.add.workgroup','Y',6);\n";
+print "INSERT INTO Acls VALUES(NULL,NULL,2,'group.delete.workgroup','Y',6);\n";
+print "INSERT INTO Acls VALUES(NULL,NULL,2,'group.modify.workgroup','Y',6);\n";

@@ -143,6 +143,14 @@ public class GroupController extends Controller {
 		if( ! this.isNameUnique(group.getName())){
 			return new OssResponse(this.getSession(),"ERROR","Group name is not unique.");
 		}
+		if( !this.mayAdd(group) ) {
+			return new OssResponse(
+					this.getSession(),
+					"ERROR",
+					"You must not create group with type %",
+					null,
+					group.getGroupType());
+		}
 		group.setOwner(this.session.getUser());
 		try {
 			this.em.getTransaction().begin();
@@ -179,7 +187,7 @@ public class GroupController extends Controller {
 	public OssResponse modify(Group group){
 		Group oldGroup = this.getById(group.getId());
 		if( !this.mayModify(oldGroup) ) {
-       return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
+			return new OssResponse(this.getSession(),"ERROR","You must not modify this group.");
         }
 		oldGroup.setDescription(group.getDescription());
 		//Check group parameter
@@ -210,7 +218,7 @@ public class GroupController extends Controller {
 		if( this.isProtected(group)) {
 			return new OssResponse(this.getSession(),"ERROR","This group must not be deleted.");
 		}
-		if( !this.mayModify(group) ) {
+		if( !this.mayDelete(group) ) {
 			return new OssResponse(this.getSession(),"ERROR","You must not delete this group.");
         }
 		//Primary group must not be deleted if there are member

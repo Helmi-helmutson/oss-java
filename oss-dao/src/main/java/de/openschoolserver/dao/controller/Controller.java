@@ -182,9 +182,6 @@ public class Controller extends Config {
 		return result;
 	}
 
-	
-
-	
 	public boolean isSuperuser() {
 		if(properties.containsKey("de.openschoolserver.dao.Session.superusers")){
 			for( String s : properties.get("de.openschoolserver.dao.Session.superusers").split(",") ){
@@ -221,6 +218,81 @@ public class Controller extends Config {
 		return false;
 	}
 
+	public boolean mayAdd(Object object) {
+		if( this.session.getUser().getId() == 6 ) {
+			return true;
+		}
+
+		List<String> neededRights = new ArrayList<String>();
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Acl":
+			neededRights.add("acl.add");
+			break;
+		case "de.openschoolserver.dao.AccessInRoom":
+			neededRights.add("room.add");
+			break;
+		case "de.openschoolserver.dao.Announcement":
+		case "de.openschoolserver.dao.Contact":
+		case "de.openschoolserver.dao.FAQ":
+			neededRights.add("information.add");
+			break;
+		case "de.openschoolserver.dao.Category":
+			neededRights.add("category.add");
+			break;
+		case "de.openschoolserver.dao.Device":
+			neededRights.add("device.add");
+			break;
+		case "de.openschoolserver.dao.Group":
+			Group group = (Group)object;
+			neededRights.add("group.add");
+			neededRights.add("group.add." + group.getGroupType());
+			break;
+		case "de.openschoolserver.dao.HWConf":
+			neededRights.add("hwconf.add");
+			break;
+		case "de.openschoolserver.dao.OSSConfig":
+			neededRights.add("ossconfig.add");
+			break;
+		case "de.openschoolserver.dao.OSSMConfig":
+			neededRights.add("ossmconfig.add");
+			break;
+		case "de.openschoolserver.dao.Room":
+			neededRights.add("room.add");
+			break;
+		case "de.openschoolserver.dao.RoomSmartControl":
+			break;
+		case "de.openschoolserver.dao.Partition":
+			neededRights.add("hwconf.add");
+			break;
+		case "de.openschoolserver.dao.Software":
+			neededRights.add("software.add");
+			break;
+		case "de.openschoolserver.dao.SoftwareLicence":
+			neededRights.add("softwarelicence.add");
+			break;
+		case "de.openschoolserver.dao.User":
+			User user = (User)object;
+			neededRights.add("user.add");
+			neededRights.add("user.add." + user.getRole());
+			break;
+		}
+		if( this.isSuperuser() ) {
+			//Super User must not add the objects of CEPHALIX
+			//TODO 6 need be evaluated eventually
+			return true;
+		}
+		logger.debug("mayadd needed Rights:" + neededRights + " user: " + session.getUser() + " object: " + object);
+		for( String right : neededRights ) {
+			if( this.session.getAcls() != null ) {
+				if( this.session.getAcls().contains(right) ) {
+					return true;
+				}
+			}
+		}
+		//TODO some other acls based on object
+		return false;
+	}
+
 	public boolean mayModify(Object object) {
 		if( this.session.getUser().getId() == 6 ) {
 			return true;
@@ -243,6 +315,7 @@ public class Controller extends Config {
 		case "de.openschoolserver.dao.Announcement":
 			Announcement an = (Announcement)object;
 			owner = an.getOwner();
+			neededRights.add("information.modify");
 			break;
 		case "de.openschoolserver.dao.Category":
 			Category cat = (Category)object;
@@ -252,12 +325,12 @@ public class Controller extends Config {
 		case "de.openschoolserver.dao.Contact":
 			Contact con = (Contact)object;
 			owner = con.getOwner();
-			neededRights.add("contact.modify");
+			neededRights.add("information.modify");
 			break;
 		case "de.openschoolserver.dao.FAQ":
 			FAQ faq = (FAQ)object;
 			owner = faq.getOwner();
-			neededRights.add("faq.modify");
+			neededRights.add("information.modify");
 			break;
 		case "de.openschoolserver.dao.Device":
 			Device Device = (Device)object;
@@ -268,6 +341,7 @@ public class Controller extends Config {
 			Group group = (Group)object;
 			owner = group.getOwner();
 			neededRights.add("group.modify");
+			neededRights.add("group.modify." + group.getGroupType());
 			break;
 		case "de.openschoolserver.dao.HWConf":
 			HWConf HWConf = (HWConf)object;
@@ -316,6 +390,7 @@ public class Controller extends Config {
 				user.getRole().equals(roleStudent)) {
 				neededRights.add("education.users");
 			}
+			neededRights.add("user.modify." + user.getRole());
 			break;
 		}
 		if( ownerId == null ) {
@@ -325,7 +400,7 @@ public class Controller extends Config {
 			ownerId = owner.getId();
 		}
 		if( this.isSuperuser() && ownerId != 6 ) {
-			//Super User must not delete the objects of CEPHALIX
+			//Super User must not modify the objects of CEPHALIX
 			//TODO 6 need be evaluated eventually
 			return true;
 		}
@@ -344,6 +419,127 @@ public class Controller extends Config {
 		return false;
 	}
 
+	public boolean mayDelete(Object object) {
+		if( this.session.getUser().getId() == 6 ) {
+			return true;
+		}
+
+		User owner   = null;
+		Long ownerId = null;
+		List<String> neededRights = new ArrayList<String>();
+		switch(object.getClass().getName()) {
+		case "de.openschoolserver.dao.Acl":
+			Acl Acl = (Acl)object;
+			owner = Acl.getCreator();
+			neededRights.add("acl.delete");
+			break;
+		case "de.openschoolserver.dao.AccessInRoom":
+			AccessInRoom AccessInRoom = (AccessInRoom)object;
+			owner = AccessInRoom.getCreator();
+			neededRights.add("room.delete");
+			break;
+		case "de.openschoolserver.dao.Announcement":
+			Announcement an = (Announcement)object;
+			owner = an.getOwner();
+			neededRights.add("information.delete");
+			break;
+		case "de.openschoolserver.dao.Category":
+			Category cat = (Category)object;
+			owner = cat.getOwner();
+			neededRights.add("category.delete");
+			break;
+		case "de.openschoolserver.dao.Contact":
+			Contact con = (Contact)object;
+			owner = con.getOwner();
+			neededRights.add("information.delete");
+			break;
+		case "de.openschoolserver.dao.FAQ":
+			FAQ faq = (FAQ)object;
+			owner = faq.getOwner();
+			neededRights.add("information.delete");
+			break;
+		case "de.openschoolserver.dao.Device":
+			Device Device = (Device)object;
+			owner = Device.getOwner();
+			neededRights.add("device.delete");
+			break;
+		case "de.openschoolserver.dao.Group":
+			Group group = (Group)object;
+			owner = group.getOwner();
+			neededRights.add("group.delete");
+			neededRights.add("group.delete." + group.getGroupType());
+			break;
+		case "de.openschoolserver.dao.HWConf":
+			HWConf HWConf = (HWConf)object;
+			owner = HWConf.getCreator();
+			neededRights.add("hwconf.delete");
+			break;
+		case "de.openschoolserver.dao.OSSConfig":
+			OSSConfig ossConfig = (OSSConfig)object;
+			owner = ossConfig.getCreator();
+			neededRights.add("ossconfig.delete");
+			break;
+		case "de.openschoolserver.dao.OSSMConfig":
+			OSSMConfig ossMConfig = (OSSMConfig)object;
+			owner = ossMConfig.getCreator();
+			neededRights.add("ossmconfig.delete");
+			break;
+		case "de.openschoolserver.dao.Room":
+			Room room = (Room)object;
+			owner = room.getCreator();
+			neededRights.add("room.delete");
+			break;
+		case "de.openschoolserver.dao.RoomSmartControl":
+			RoomSmartControl rsc  = (RoomSmartControl)object;
+			owner = rsc.getOwner();
+			break;
+		case "de.openschoolserver.dao.Partition":
+			Partition partition = (Partition)object;
+			owner = partition.getCreator();
+			neededRights.add("hwconf.delete");
+			break;
+		case "de.openschoolserver.dao.Software":
+			Software software = (Software)object;
+			owner = software.getCreator();
+			neededRights.add("software.delete");
+			break;
+		case "de.openschoolserver.dao.SoftwareLicence":
+			SoftwareLicense softwareLicense = (SoftwareLicense)object;
+			owner = softwareLicense.getCreator();
+			neededRights.add("softwarelicence.delete");
+			break;
+		case "de.openschoolserver.dao.User":
+			User user = (User)object;
+			ownerId = user.getCreator().getId();
+			neededRights.add("user.delete");
+			neededRights.add("user.delete." + user.getRole());
+			break;
+		}
+		if( ownerId == null ) {
+			ownerId = 1L;
+		}
+		if( owner != null ) {
+			ownerId = owner.getId();
+		}
+		if( this.isSuperuser() && ownerId != 6 ) {
+			//Super User must not delete the objects of CEPHALIX
+			//TODO 6 need be evaluated eventually
+			return true;
+		}
+		if( owner != null && this.session.getUser().equals(owner) ) {
+				return true;
+		}
+		logger.debug("maydelete needed Rights:" + neededRights + " user: " + session.getUser() + " object: " + object);
+		for( String right : neededRights ) {
+			if( this.session.getAcls() != null ) {
+				if( this.session.getAcls().contains(right) ) {
+					return true;
+				}
+			}
+		}
+		//TODO some other acls based on object
+		return false;
+	}
 	public boolean isProtected(Object object){
 		if (object!=null) {
 			switch(object.getClass().getName()) {

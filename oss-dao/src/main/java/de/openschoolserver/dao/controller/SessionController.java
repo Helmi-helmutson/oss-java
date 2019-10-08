@@ -310,16 +310,17 @@ public class SessionController extends Controller {
 		if( session.getUser().getRole().contains(requiredRole)) {
 			return true;
 		}
+
 		//Is it allowed by the user
 		for( Acl acl : session.getUser().getAcls() ){
-			if( acl.getAcl().equals(requiredRole)) {
+			if( acl.getAcl().startsWith(requiredRole)) {
 				return acl.getAllowed();
 			}
 		}
 		//Is it allowed by one of the groups of the user
 		for( Group group : session.getUser().getGroups() ) {
 			for( Acl acl : group.getAcls() ) {
-				if( acl.getAcl().equals(requiredRole)) {
+				if( acl.getAcl().startsWith(requiredRole)) {
 					return acl.getAllowed();
 				}
 			}
