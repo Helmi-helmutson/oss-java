@@ -358,7 +358,11 @@ public class UserResourceImpl implements UserResource {
 	@Override
 	public String addToGroup(Session session, String userName, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		String resp = new GroupController(session,em).addMember(groupName, userName).getCode();
+		OssResponse ossResponse = new GroupController(session,em).addMember(groupName, userName);
+		String resp = ossResponse.getCode();
+	        if( ossResponse.getCode().equals("ERROR") ) {
+			resp = resp + " " + ossResponse.getValue();
+		}
 		em.close();
 		return resp;
 	}
@@ -367,7 +371,11 @@ public class UserResourceImpl implements UserResource {
 	@Override
 	public String addGroupToUser(Session session, String userName, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		String resp = new GroupController(session,em).setOwner(groupName, userName).getCode();
+		OssResponse ossResponse = new GroupController(session,em).setOwner(groupName, userName);
+		String resp = ossResponse.getCode();
+	        if( ossResponse.getCode().equals("ERROR") ) {
+			resp = resp + " " + ossResponse.getValue();
+		}
 		em.close();
 		return resp;
 	}
@@ -400,14 +408,22 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		UserController uc = new UserController(session,em);
 		User user = uc.getByUid(userName);
-		String resp = uc.addDefaultAliase(user).getValue();
+		OssResponse ossResponse = uc.addDefaultAliase(user);
+		String resp = ossResponse.getCode();
+	        if( ossResponse.getCode().equals("ERROR") ) {
+			resp = resp + " " + ossResponse.getValue();
+		}
 		em.close();
 		return resp;
 	}
 	@Override
 	public String removeFromGroup(Session session, String userName, String groupName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		String resp = new GroupController(session,em).removeMember(groupName, userName).getCode();
+		OssResponse ossResponse = new GroupController(session,em).removeMember(groupName, userName);
+		String resp = ossResponse.getCode();
+	        if( ossResponse.getCode().equals("ERROR") ) {
+			resp = resp + " " + ossResponse.getValue();
+		}
 		em.close();
 		return resp;
 	}
@@ -415,7 +431,11 @@ public class UserResourceImpl implements UserResource {
 	@Override
 	public String delete(Session session, String userName) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		String resp = new UserController(session,em).delete(userName).getCode();
+		OssResponse ossResponse = new UserController(session,em).delete(userName);
+		String resp = ossResponse.getCode();
+	        if( ossResponse.getCode().equals("ERROR") ) {
+			resp = resp + " " + ossResponse.getValue();
+		}
 		em.close();
 		return resp;
 	}
