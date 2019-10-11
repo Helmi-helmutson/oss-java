@@ -536,15 +536,15 @@ public class UserController extends Controller {
 		}
 		StringBuffer reply = new StringBuffer();
 		StringBuffer error = new StringBuffer();
-		String[] program = new String[4];
+		String[] program = new String[5];
 		if (mustChange) {
-			program    = new String[5];
-			program[4] = "--must-change-at-next-login";
+			program    = new String[6];
+			program[5] = "--must-change-at-next-login";
 		}
 		program[0] = "/usr/bin/samba-tool";
 		program[1] = "user";
 		program[2] = "setpassword";
-		program[3] = "--newpassword=" + password;
+		program[4] = "--newpassword=" + password;
 
 		for (Long id : userIds) {
 			User user = this.getById(id);
@@ -556,12 +556,12 @@ public class UserController extends Controller {
 				logger.error("resetUserPassword: Session user may not modify: %s",null,id);
 				continue;
 			}
-		/* We allow it
-		 *if( user.getRole().equals(roleWorkstation) ) {
-		 *		logger.error("resetUserPassword: Must not change workstation users password.");
-		 *		continue;
-		 *	}
-		  */
+			/* We allow it. We will make it confiugrable
+			 *if( user.getRole().equals(roleWorkstation) ) {
+			 *              logger.error("resetUserPassword: Must not change workstation users password.");
+			 *              continue;
+			 *      }
+			 */
 			error = new StringBuffer();
 			reply = new StringBuffer();
 			program[3] = user.getUid();
