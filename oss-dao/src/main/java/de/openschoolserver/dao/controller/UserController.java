@@ -567,6 +567,12 @@ public class UserController extends Controller {
 				logger.error("resetUserPassword: Session user may not modify: %s",null,id);
 				continue;
 			}
+			/* We allow it. We will make it confiugrable
+			 *if( user.getRole().equals(roleWorkstation) ) {
+			 *              logger.error("resetUserPassword: Must not change workstation users password.");
+			 *              continue;
+			 *      }
+			 */
 			error = new StringBuffer();
 			reply = new StringBuffer();
 			program[3] = user.getUid();

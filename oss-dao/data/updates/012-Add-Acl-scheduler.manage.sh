@@ -1,4 +1,5 @@
 #!/bin/bash
+export HOME="/root/"
 
 echo "UPDATE Acls set Acl='room.dhcp' WHERE Acl='room.dhcpd'" | mysql OSS
 SCHEDULER=$( echo "select id from Enumerates where name='apiAcl' AND value='scheduler.manage';" | mysql OSS )
