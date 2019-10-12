@@ -579,7 +579,7 @@ public class UserResourceImpl implements UserResource {
 			if( userImport.isFull() ) {
 				parameters.add("--full");
 			}
-			if( userImport.isFull() ) {
+			if( userImport.isAllClasses() ) {
 				parameters.add("--allClasses");
 			}
 			if( userImport.isCleanClassDirs() ) {
