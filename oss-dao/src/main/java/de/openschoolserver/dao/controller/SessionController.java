@@ -1,4 +1,4 @@
- /* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
+ /* (c)Peter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2017 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.dao.controller;
 
@@ -280,6 +280,13 @@ public class SessionController extends Controller {
 				logger.error(e.getMessage());
 			}
 			timeout = timeout * 60000;
+			if( logger.isDebugEnabled() ) {
+				logger.info(String.format(
+						"timeout: %l now: %l session time: %l",
+						timeout,
+						now().getTime(),
+						session.getCreateDate().getTime() ));
+			}
 			if( (now().getTime() - session.getCreateDate().getTime())  > timeout ) {
 				logger.info("Session was timed out." + session);
 				deleteSession(session);
