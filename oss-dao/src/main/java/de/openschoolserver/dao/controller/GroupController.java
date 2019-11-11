@@ -257,6 +257,7 @@ public class GroupController extends Controller {
 			this.deletAllConfigs(group);
 			this.em.remove(group);
 			this.em.getTransaction().commit();
+			SessionController.removeAllSessionsFromCache();
 			//em.getEntityManagerFactory().getCache().evictAll();
 		} catch (Exception e) {
 			logger.error(e.getMessage(),e);

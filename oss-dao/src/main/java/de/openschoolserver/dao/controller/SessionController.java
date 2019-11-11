@@ -45,7 +45,7 @@ public class SessionController extends Controller {
 
 	public static Map<String, Session> sessions = new ConcurrentHashMap<String, Session>();
 
-	public void removeAllSessionsFromCache() {
+	static public void removeAllSessionsFromCache() {
 		sessions.clear();
 	}
 
@@ -282,7 +282,7 @@ public class SessionController extends Controller {
 			timeout = timeout * 60000;
 			if( logger.isDebugEnabled() ) {
 				logger.info(String.format(
-						"timeout: %l now: %l session time: %l",
+						"timeout: %d now: %d session time: %d",
 						timeout,
 						now().getTime(),
 						session.getCreateDate().getTime() ));
