@@ -46,7 +46,7 @@ public interface AdHocLanResource {
 	@RolesAllowed("adhoclan.manage")
 	List<User> getUsersOfRoom(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("roomId")     Long roomId
+			@PathParam("roomId")	 Long roomId
 			);
 
 	@GET
@@ -59,7 +59,7 @@ public interface AdHocLanResource {
 	@RolesAllowed("adhoclan.manage")
 	List<Group> getGroupsOfRoom(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("roomId")     Long roomId
+			@PathParam("roomId")	 Long roomId
 			);
 
 	/*
@@ -121,27 +121,27 @@ public interface AdHocLanResource {
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
-    /*
-     * POST addhoclan/rooms { hash }
-     */
-    @POST
-    @Path("rooms")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create new AddHocLan room")
-    @ApiResponses(value = {
-            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
-            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @RolesAllowed("adhoclan.manage")
-    OssResponse add(
-            @ApiParam(hidden = true) @Auth Session session,
-            Room room
-    );
+	/*
+	 * POST addhoclan/rooms { hash }
+	 */
+	@POST
+	@Path("rooms")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Create new AddHocLan room")
+	@ApiResponses(value = {
+			// TODO so oder anders? @ApiResponse(code = 404, message = "At least one room was not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("adhoclan.manage")
+	OssResponse add(
+			@ApiParam(hidden = true) @Auth Session session,
+			Room room
+	);
 
-    /*
-     * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
-     */
-    @PUT
+	/*
+	 * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
+	 */
+	@PUT
 	@Path("rooms/{roomId}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Define a room as AdHocLan room")
@@ -154,10 +154,10 @@ public interface AdHocLanResource {
 			@PathParam("roomId")		Long roomId
 			);
 
-    /*
-     * POST addhoclan/rooms/{roomId}
-     */
-    @GET
+	/*
+	 * POST addhoclan/rooms/{roomId}
+	 */
+	@GET
 	@Path("rooms/{roomId}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets an AdHocLan room.")
@@ -170,10 +170,10 @@ public interface AdHocLanResource {
 			@PathParam("roomId")		Long roomId
 			);
 
-    /*
-     * POST addhoclan/rooms/{roomId}
-     */
-    @POST
+	/*
+	 * POST addhoclan/rooms/{roomId}
+	 */
+	@POST
 	@Path("rooms/{roomId}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Modify an AdHocLan room")
@@ -187,10 +187,10 @@ public interface AdHocLanResource {
 			Room room
 			);
 
-    /*
-     * Get addhoclan/rooms/{roomId}/studentsOnly
-     */
-    @GET
+	/*
+	 * Get addhoclan/rooms/{roomId}/studentsOnly
+	 */
+	@GET
 	@Path("rooms/{roomId}/studentsOnly")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets an AdHocLan room.")
@@ -203,10 +203,10 @@ public interface AdHocLanResource {
 			@PathParam("roomId")		Long roomId
 			);
 
-    /*
-     * Get addhoclan/rooms/{roomId}/studentsOnly
-     */
-    @POST
+	/*
+	 * Get addhoclan/rooms/{roomId}/studentsOnly
+	 */
+	@POST
 	@Path("rooms/{roomId}/studentsOnly")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets an AdHocLan room.")
@@ -214,17 +214,17 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.manage")
-    OssResponse setStudentsOnly(
+	OssResponse setStudentsOnly(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId,
 			boolean studentsOnly
 			);
 
 
-    /*
-     * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
-     */
-    @PUT
+	/*
+	 * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
+	 */
+	@PUT
 	@Path("rooms/{roomId}/{objectType}/{objectId}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Add a new group or user to a giwen AdHocLan room")
@@ -239,10 +239,10 @@ public interface AdHocLanResource {
 			@PathParam("objectId")		Long objectId
 			);
 
-    /*
-     * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
-     */
-    @DELETE
+	/*
+	 * PUT addhoclan/rooms/{roomId}/{objectType}/{objectId}
+	 */
+	@DELETE
 	@Path("rooms/{roomId}/{objectType}/{objectId}")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Removes a group or user from an AdHocLan room")
@@ -261,18 +261,19 @@ public interface AdHocLanResource {
 	 * @param session
 	 * @return
 	 */
-    @Path("rooms")
+	@GET
+	@Path("rooms")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets all defined AdHocLan Rooms which a user may use. Superuser get the list of all AdHocLan rooms.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+	@PermitAll
 	List<Room> getRooms(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
-    /**
+	/**
 	 * Delets an adhoc room inkl all devices.
 	 * @param session
 	 * @param adHocRoomId The id of the room to be deleted.
@@ -291,7 +292,7 @@ public interface AdHocLanResource {
 			@PathParam("adHocRoomId")		Long adHocRoomId
 			);
 
-    /**
+	/**
 	 * @param session
 	 * @param adHocRoomId
 	 * @return
@@ -312,28 +313,29 @@ public interface AdHocLanResource {
 	/*
 	 * Functions for all user
 	 */
-    /**
+	/**
 	 * getRooms Delivers a list of all AdHocRooms
 	 * @param session
 	 * @return
 	 */
-    @Path("myRooms")
+	@GET
+	@Path("myRooms")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets all defined AdHocLan Rooms which a user may use. Superuser get the list of all AdHocLan rooms.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-    @PermitAll
+	@PermitAll
 	List<Room> getMyRooms(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
-    /**
-     * getDevices Delivers a list of the owned devices
-     * @param session
-     * @return
-     */
-    @GET
+	/**
+	 * getDevices Delivers a list of the owned devices
+	 * @param session
+	 * @return
+	 */
+	@GET
 	@Path("devices")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets all owned AdHocLan Devices of a user.")
@@ -358,7 +360,7 @@ public interface AdHocLanResource {
 	@PermitAll
 	OssResponse deleteDevice(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("deviceId")         Long    deviceId
+			@PathParam("deviceId")		 Long	deviceId
 			);
 
 	@POST
@@ -371,23 +373,23 @@ public interface AdHocLanResource {
 	@PermitAll
 	OssResponse modifyDevice(
 			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("deviceId")         Long    deviceId,
+			@PathParam("deviceId")		 Long	deviceId,
 			Device device
 			);
 
-    @PUT
-    @Path("rooms/{roomId}/device/{MAC}/{name}")
-    @Produces(JSON_UTF8)
-    @ApiOperation(value = "Create a new device. This api call can be used only for registering own devices.")
-    @ApiResponses(value = {
-            // TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
-            @ApiResponse(code = 500, message = "Server broken, please contact administrator")
-    })
-    @PermitAll
-    OssResponse addDevice(
-            @ApiParam(hidden = true) @Auth Session session,
-            @PathParam("roomId")		long roomId,
-            @PathParam("MAC")			String macAddress,
-            @PathParam("name")			String name
-    );
+	@PUT
+	@Path("rooms/{roomId}/device/{MAC}/{name}")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Create a new device. This api call can be used only for registering own devices.")
+	@ApiResponses(value = {
+			// TODO so oder anders? @ApiResponse(code = 404, message = "At least one device was not found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@PermitAll
+	OssResponse addDevice(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("roomId")		long roomId,
+			@PathParam("MAC")			String macAddress,
+			@PathParam("name")			String name
+	);
 }
