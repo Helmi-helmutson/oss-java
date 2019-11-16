@@ -3,7 +3,7 @@
 package de.openschoolserver.dao;
 
 import java.security.Principal;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -93,17 +93,17 @@ public class Session implements Principal {
 	}
 
 	public Session(String token, Long userid, String password, String ip) {
-	    this.userId = userid;
-	    this.password = password;
-	    this.token = token;
-	    this.schoolId="dummy";
+		this.userId = userid;
+		this.password = password;
+		this.token = token;
+		this.schoolId="dummy";
 	}
 
 	public Session() {
 		this.deviceId = null;
 		this.roomId   = null;
 		this.dnsName  = null;
-		this.mac      = null;
+		this.mac	  = null;
 	}
 
 	@Override
@@ -145,126 +145,129 @@ public class Session implements Principal {
 
 	@Override
 	public String getName() {
-	    return "dummy";
+		return "dummy";
 	}
 
 	public String getSchoolId() {
-	    return this.schoolId;
+		return this.schoolId;
 	}
 
 	public void setSchoolId(String schoolId) {
-	    this.schoolId = schoolId;
+		this.schoolId = schoolId;
 	}
 
 	public String getIP() {
-	    return this.ip;
+		return this.ip;
 	}
 
 	public void setIP(String IP) {
-	    this.ip = IP;
+		this.ip = IP;
 	}
 
 	public Room getRoom() {
-	    return this.room;
+		return this.room;
 	}
 
 	public void setRoom(Room room) {
-	    this.room = room;
+		this.room = room;
 	}
 
 	public User getUser() {
-	    return this.user;
+		return this.user;
 	}
 
 	public void setUser(User user) {
-	    this.user = user;
+		this.user = user;
 	}
 
 	public String getPassword() {
-	    return this.password;
+		return this.password;
 	}
 
 	public void setPassword(String password) {
-	    this.password = password;
+		this.password = password;
 	}
 
 	public String getRole() {
-	    return this.role;
+		return this.role;
 	}
 
 	public void setRole(String role) {
-	    this.role = role;
+		this.role = role;
 	}
 
 	public Long getUserId() {
-	    return this.userId;
+		return this.userId;
 	}
 
 	public void setUserId(Long userId) {
-	    this.userId = userId;
+		this.userId = userId;
 	}
 
 	public Long getDeviceId() {
-	    return this.deviceId;
+		return this.deviceId;
 	}
 
 	public void setDeviceId(Long deviceId) {
-	    this.deviceId = deviceId;
+		this.deviceId = deviceId;
 	}
 
 	public Long getRoomId() {
-	    return this.roomId;
+		return this.roomId;
 	}
 
 	public void setRoomId(Long roomId) {
-	    this.roomId = roomId;
+		this.roomId = roomId;
 	}
 
 	public Date getCreateDate() {
-	    return this.createDate;
+		return this.createDate;
 	}
 
 	public Device getDevice() {
-	    return this.device;
+		return this.device;
 	}
 
 	public void setDevice(Device device) {
-	    this.device = device;
+		this.device = device;
 	}
 
 	public int getId() {
-	    return this.id;
+		return this.id;
 	}
 
 	public void setId(int id) {
-	    this.id = id;
+		this.id = id;
 	}
 
 	public String getToken() {
-	    return this.token;
+		return this.token;
 	}
 
 	public void setToken(String token) {
-	    this.token = token;
+		this.token = token;
 	}
 
 	public String getMac() {
-	    return this.mac;
+		return this.mac;
 	}
 
 	public void setMac(String mac) {
-	    this.mac = mac;
+		this.mac = mac;
 	}
 
 	public String getDNSName() {
-	    return this.dnsName;
+		return this.dnsName;
 	}
 
 	public void setDNSName(String dnsName) {
-	    this.dnsName = dnsName;
+		this.dnsName = dnsName;
 	}
 
 	public List<String> getAcls() {
+		if( acls == null) {
+			return this.getUserAcls();
+		}
 		return acls;
 	}
 
@@ -291,4 +294,29 @@ public class Session implements Principal {
 	public void setMustChange(Boolean mustChange) {
 		this.mustChange = mustChange;
 	}
+
+	public List<String> getUserAcls(){
+		List<String> modules = new ArrayList<String>();
+		//Modules with right permit all is allowed for all authorized users.
+		modules.add("permitall");
+		//Is it allowed by the groups.
+		for( Group group : this.user.getGroups() ) {
+			for( Acl acl : group.getAcls() ) {
+				if( acl.getAllowed() ) {
+					modules.add(acl.getAcl());
+				}
+			}
+		}
+		//Is it allowed by the user
+		for( Acl acl : this.user.getAcls() ){
+			if( acl.getAllowed() && !modules.contains(acl.getAcl())) {
+				modules.add(acl.getAcl());
+			} else if( modules.contains(acl.getAcl()) ) {
+				//It is forbidden by the user
+				modules.remove(acl.getAcl());
+			}
+		}
+		return modules;
+	}
+
 }
