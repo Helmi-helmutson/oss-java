@@ -256,46 +256,23 @@ public interface AdHocLanResource {
 			@PathParam("objectType")	String onjectType,
 			@PathParam("objectId")		Long objectId
 			);
-
-    /*
-     * Functions for normal user which are allowed to register the own devices.
-     */
-	/*
-	 * Get adhoclan/rooms
+	/**
+	 * getRooms Delivers a list of all AdHocRooms
+	 * @param session
+	 * @return
 	 */
-	@GET
-	@Path("rooms")
+    @Path("rooms")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets all defined AdHocLan Rooms which a user may use. Superuser get the list of all AdHocLan rooms.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
+    @PermitAll
 	List<Room> getRooms(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
-	/**
-	 *
-	 * @param session
-	 * @param adHocRoomId
-	 * @return
-	 */
-	@GET
-	@Path("rooms/{adHocRoomId}/devices")
-	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets all devices in an add hoc room.")
-	@ApiResponses(value = {
-			@ApiResponse(code = 404, message = "No room was found"),
-			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
-	List<Device> getDevicesOfRoom(
-			@ApiParam(hidden = true) @Auth Session session,
-			@PathParam("adHocRoomId")		Long adHocRoomId
-			);
-
-
-	/**
+    /**
 	 * Delets an adhoc room inkl all devices.
 	 * @param session
 	 * @param adHocRoomId The id of the room to be deleted.
@@ -308,16 +285,55 @@ public interface AdHocLanResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@PermitAll
+	@RolesAllowed("adhoclan.manage")
 	OssResponse delete(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("adHocRoomId")		Long adHocRoomId
 			);
 
-    /*
-	 * Get adhoclan/devices
+    /**
+	 * @param session
+	 * @param adHocRoomId
+	 * @return
 	 */
 	@GET
+	@Path("rooms/{adHocRoomId}/devices")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets all devices in an add hoc room.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No room was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("adhoclan.manage")
+	List<Device> getDevicesOfRoom(
+			@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("adHocRoomId")		Long adHocRoomId
+			);
+
+	/*
+	 * Functions for all user
+	 */
+    /**
+	 * getRooms Delivers a list of all AdHocRooms
+	 * @param session
+	 * @return
+	 */
+    @Path("myRooms")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Gets all defined AdHocLan Rooms which a user may use. Superuser get the list of all AdHocLan rooms.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 404, message = "No room was found"),
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @PermitAll
+	List<Room> getMyRooms(
+			@ApiParam(hidden = true) @Auth Session session
+			);
+
+    /**
+     * getDevices Delivers a list of the owned devices
+     * @param session
+     * @return
+     */
+    @GET
 	@Path("devices")
 	@Produces(JSON_UTF8)
 	@ApiOperation(value = "Gets all owned AdHocLan Devices of a user.")
@@ -345,9 +361,6 @@ public interface AdHocLanResource {
 			@PathParam("deviceId")         Long    deviceId
 			);
 
-	/*
-	 * Get adhoclan/devices/{deviceId}
-	 */
 	@POST
 	@Path("devices/{deviceId}")
 	@Produces(JSON_UTF8)

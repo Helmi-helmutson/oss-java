@@ -77,7 +77,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<Room> resp;
 		RoomController roomController = new RoomController(session,em);
-		if( roomController.isSuperuser() ) {
+		if( roomController.isSuperuser() || session.getAcls().contains("adhoclan.manage")) {
 			resp = roomController.getByType("AdHocAccess");
 		} else {
 			resp = roomController.getAllToRegister();
@@ -86,6 +86,14 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		return resp;
 	}
 
+	@Override
+	public List<Room> getMyRooms(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		RoomController roomController = new RoomController(session,em);
+		List<Room> resp= roomController.getAllToRegister();
+		em.close();
+		return resp;
+	}
 	@Override
 	public OssResponse add(Session session, Room room) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
