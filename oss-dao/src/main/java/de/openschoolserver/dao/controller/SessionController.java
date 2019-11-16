@@ -134,39 +134,23 @@ public class SessionController extends Controller {
 				}
 			}
 		}
-		List<String> modules = new ArrayList<String>();
-		//Modules with right permit all is allowed for all authorized users.
-		modules.add("permitall");
-		//Is it allowed by the groups.
-		for( Group group : user.getGroups() ) {
-			for( Acl acl : group.getAcls() ) {
-				if( acl.getAllowed() ) {
-					modules.add(acl.getAcl());
-				}
-			}
-		}
-		//Is it allowed by the user
-		for( Acl acl : user.getAcls() ){
-			if( acl.getAllowed() && !modules.contains(acl.getAcl())) {
-				modules.add(acl.getAcl());
-			} else if( modules.contains(acl.getAcl()) ) {
-				//It is forbidden by the user
-				modules.remove(acl.getAcl());
-			}
-		}
+
+		session.setCommonName(user.getGivenName() + " " + user.getSurName());
+		List<String> modules = session.getUserAcls();
 		if( !this.isSuperuser() ) {
 			RoomController  roomController = new RoomController(this.session,this.em);;
 			if( ! roomController.getAllToRegister().isEmpty() ) {
 				modules.add("adhoclan.mydevices");
 			}
 		}
-		session.setCommonName(user.getGivenName() + " " + user.getSurName());
+
 		session.setAcls(modules);
 		session.setPassword(password);
 		sessions.put(token, this.session);
 		save(session);
 		return this.session;
 	}
+
 
 	private void save(Session obj) {
 		if (em != null) {
