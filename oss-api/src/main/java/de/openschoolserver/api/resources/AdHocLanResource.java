@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiResponses;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
-import de.openschoolserver.dao.Room;
+import de.openschoolserver.dao.AdHocRoom;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 
@@ -135,7 +135,7 @@ public interface AdHocLanResource {
 	@RolesAllowed("adhoclan.manage")
 	OssResponse add(
 			@ApiParam(hidden = true) @Auth Session session,
-			Room room
+			AdHocRoom room
 	);
 
 	/*
@@ -165,7 +165,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No category was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@RolesAllowed("adhoclan.manage")
-	Room getRoomById(
+	AdHocRoom getRoomById(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId
 			);
@@ -184,7 +184,7 @@ public interface AdHocLanResource {
 	OssResponse modify(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("roomId")		Long roomId,
-			Room room
+			AdHocRoom room
 			);
 
 	/*
@@ -269,7 +269,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	List<Room> getRooms(
+	List<AdHocRoom> getRooms(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
@@ -326,7 +326,7 @@ public interface AdHocLanResource {
 			@ApiResponse(code = 404, message = "No room was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
 	@PermitAll
-	List<Room> getMyRooms(
+	List<AdHocRoom> getMyRooms(
 			@ApiParam(hidden = true) @Auth Session session
 			);
 
