@@ -1042,6 +1042,16 @@ public class SoftwareController extends Controller {
 
 		List<SoftwareStatus> lss = new ArrayList<SoftwareStatus>();
 		for(SoftwareStatus ss : d.getSoftwareStatus() ) {
+			if( ss == null
+					|| ss.getSoftwareVersion() == null
+					|| ss.getSoftwareVersion().getSoftware() == null ) {
+				logger.error("setSoftwareStatusOnDevice ERROR"
+						+ " Device:" + d
+						+ " Software:"  + s
+						+ " Version:" +  version
+						+ " Status:" + status);
+				continue;
+			}
 			if( ss.getSoftwareVersion().getSoftware().equals(s)) {
 				lss.add(ss);
 			}
