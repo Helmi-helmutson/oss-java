@@ -14,6 +14,7 @@ import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Room;
 import de.openschoolserver.dao.AdHocRoom;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
@@ -75,12 +76,17 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	@Override
 	public List<AdHocRoom> getRooms(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		List<AdHocRoom> resp;
+		List<AdHocRoom> resp = new ArrayList<AdHocRoom>();
 		RoomController roomController = new RoomController(session,em);
+		AdHocLanController adHocLan   = new AdHocLanController(session,em);
 		if( roomController.isSuperuser() || session.getAcls().contains("adhoclan.manage")) {
-			resp = roomController.getByType("AdHocAccess");
+			for( Room  room : roomController.getByType("AdHocAccess") ) {
+				resp.add(adHocLan.roomToAdHoc(room));
+			}
 		} else {
-			resp = roomController.getAllToRegister();
+			for( Room  room : roomController.getAllToRegister() ) {
+				resp.add(adHocLan.roomToAdHoc(room));
+			}
 		}
 		em.close();
 		return resp;
@@ -90,7 +96,11 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	public List<AdHocRoom> getMyRooms(Session session) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		RoomController roomController = new RoomController(session,em);
-		List<AdHocRoom> resp= roomController.getAllToRegister();
+		List<AdHocRoom> resp= new ArrayList<AdHocRoom>();
+		AdHocLanController adHocLan   = new AdHocLanController(session,em);
+		for( Room  room : roomController.getAllToRegister() ) {
+			resp.add(adHocLan.roomToAdHoc(room));
+		}
 		em.close();
 		return resp;
 	}
@@ -238,12 +248,13 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 	public AdHocRoom getRoomById(Session session, Long roomId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		final RoomController roomController = new RoomController(session,em);
-		AdHocRoom room = roomController.getById(roomId);
+		Room room = roomController.getById(roomId);
 		if( room != null && !room.getRoomType().equals("AdHocAccess")) {
-			room = null;
+			return null;
 		}
+		AdHocRoom adhocRoom = new AdHocLanController(session,em).roomToAdHoc(room);
 		em.close();
-		return room;
+		return adhocRoom;
 	}
 
 	@Override
@@ -255,8 +266,15 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		if( !oldRoom.getRoomType().equals("AdHocAccess")) {
 			resp = new OssResponse(session,"ERROR","This is not an AdHocLan room");
 		} else {
-			room.setId(oldRoom.getId());
-			resp = rc.modify(room);
+			oldRoom.setDescription(room.getDescription());
+			oldRoom.setPlaces(room.getPlaces());
+			oldRoom.setRoomControl(room.getRoomControl());
+			resp = rc.modify(oldRoom);
+			final AdHocLanController ac =  new AdHocLanController(session,em);
+			Category cat = ac.getAdHocCategoryOfRoom(oldRoom);
+			cat.setStudentsOnly(room.isStudentsOnly());
+			cat.setDescription(room.getDescription());
+			em.merge(cat);
 		}
 		em.close();
 		return resp;

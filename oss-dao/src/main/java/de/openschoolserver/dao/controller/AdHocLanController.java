@@ -61,14 +61,20 @@ public class AdHocLanController extends Controller {
 	}
 
 
-	public OssResponse add(Room room) {
-		logger.debug("Add AdHocLan: " + room);
+	public OssResponse add(AdHocRoom adHocRoom) {
+		Room room = new Room();
+		room.setName(adHocRoom.getName());
+		room.setDescription(adHocRoom.getDescription());
+		room.setNetMask(adHocRoom.getNetMask());
+		room.setRoomType("AdHocAccess");
+		room.setPlaces(adHocRoom.getPlaces());
+		room.setRoomControl(adHocRoom.getRoomControl());
 		//Search the BYOD HwConf
 		if( room.getHwconf() == null ) {
 			HWConf hwconf = new CloneToolController(this.session,this.em).getByName("BYOD");
 			room.setHwconfId(hwconf.getId());
 		}
-		room.setRoomType("AdHocAccess");
+		logger.debug("Add AdHocLan: " + room);
 		RoomController roomConrtoller = new RoomController(this.session,this.em);;
 		OssResponse ossResponseRoom =  roomConrtoller.add(room);
 		logger.debug("Add AdHocLan after creating: " + room);
@@ -82,6 +88,7 @@ public class AdHocLanController extends Controller {
 		category.setDescription(room.getDescription());
 		category.setOwner(this.session.getUser());
 		category.setPublicAccess(false);
+		category.setStudentsOnly(adHocRoom.isStudentsOnly());
 		logger.debug("Add AdHocLan category: " + category);
 		CategoryController categoryController = new CategoryController(this.session,this.em);;
 		OssResponse ossResponseCategory = categoryController.add(category);
@@ -149,6 +156,17 @@ public class AdHocLanController extends Controller {
 		} finally {
 		}
 		return new OssResponse(this.getSession(),"OK","Category was modified");
+	}
+
+	public AdHocRoom roomToAdHoc(Room room) {
+		//This should work. But casting does not work. 
+		//AdHocRoom adHocRoom = (AdHocRoom) room;
+		AdHocRoom adHocRoom = new AdHocRoom(room);
+		Category cat = this.getAdHocCategoryOfRoom(room);
+		if( cat != null ) {
+			adHocRoom.setStudentsOnly(cat.getStudentsOnly());
+		}
+		return adHocRoom;
 	}
 }
 
