@@ -423,7 +423,6 @@ public class Controller extends Config {
 		if( this.session.getUser().getId() == 6 ) {
 			return true;
 		}
-
 		User owner   = null;
 		Long ownerId = null;
 		List<String> neededRights = new ArrayList<String>();
@@ -540,6 +539,7 @@ public class Controller extends Config {
 		//TODO some other acls based on object
 		return false;
 	}
+
 	public boolean isProtected(Object object){
 		if (object!=null) {
 			switch(object.getClass().getName()) {

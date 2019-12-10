@@ -235,6 +235,7 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		List<Group> groups = new ArrayList<Group>();
 		Category category = new AdHocLanController(session,em).getAdHocCategoryOfRoom(roomId);
+		logger.debug("Category " +category);
 		for( Group group : new GroupController(session,em).getAll() ) {
 			if( !category.getGroups().contains(group) ) {
 				groups.add(group);

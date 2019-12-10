@@ -78,7 +78,7 @@ public class Category implements Serializable {
 			inverseJoinColumns={ @JoinColumn(name="group_id") }
 			)
 	@JsonIgnore
-	private List<Group> groups;
+	private List<Group> groups = new ArrayList<Group>();
 
 	//bi-directional many-to-many association to Group
 	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
@@ -128,7 +128,7 @@ public class Category implements Serializable {
 			inverseJoinColumns={ @JoinColumn(name="user_id") }
 			)
 	@JsonIgnore
-	private List<User> users;
+	private List<User> users = new ArrayList<User>();
 
 	//bi-directional many-to-many association to Announcement
 	@ManyToMany(cascade ={CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
