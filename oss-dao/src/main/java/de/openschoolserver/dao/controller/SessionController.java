@@ -49,8 +49,14 @@ public class SessionController extends Controller {
 		sessions.clear();
 	}
 
+	/**
+	 * Remove a session from the static variable and from database too.
+	 * @param session
+	 */
 	public void deleteSession(Session session) {
-		if (session != null) {
+		if (session != null &&
+			!session.getToken().equals(this.getProperty("de.openschoolserver.api.auth.localhost")) ) {
+			//The local token must not be removed.
 			sessions.remove(session.getToken());
 			remove(session); // delete from database
 		}
@@ -102,7 +108,10 @@ public class SessionController extends Controller {
 			room = device.getRoom();
 		}
 
-		final String token = SessionToken.createSessionToken("dummy");
+		String token = SessionToken.createSessionToken("dummy");
+		while( this.getByToken(token) != null ) {
+			token = SessionToken.createSessionToken("dummy");
+		}
 		this.session.setToken(token);
 		this.session.setUserId(user.getId());
 		this.session.setRole(user.getRole());
@@ -123,7 +132,7 @@ public class SessionController extends Controller {
 				reply = new StringBuffer();
 				error = new StringBuffer();
 				program = new String[3];
-				program[0] = "arp";
+				program[0] = "/sbin/arp";
 				program[1] = "-n";
 				program[2] = IP;
 				OSSShellTools.exec(program, reply, error, null);
@@ -297,18 +306,24 @@ public class SessionController extends Controller {
 
 	public boolean authorize(Session session, String requiredRole){
 
-		//The simply way
+		/**
+		 * If the required role is the role of the user then he is authorized.
+		 */
 		if( session.getUser().getRole().contains(requiredRole)) {
 			return true;
 		}
 
-		//Is it allowed by the user
+		/**
+		 * A required role can be allowed or denied by the user.
+		 */
 		for( Acl acl : session.getUser().getAcls() ){
 			if( acl.getAcl().startsWith(requiredRole)) {
 				return acl.getAllowed();
 			}
 		}
-		//Is it allowed by one of the groups of the user
+		/**
+		 * A required role can be allowed or denied by one of the groups of a user.
+		 */
 		for( Group group : session.getUser().getGroups() ) {
 			for( Acl acl : group.getAcls() ) {
 				if( acl.getAcl().startsWith(requiredRole)) {
