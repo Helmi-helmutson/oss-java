@@ -1,4 +1,4 @@
-/* (c) 2017 Peter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) Peter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.dao;
 
 import java.io.Serializable;
@@ -65,7 +65,6 @@ public class Device implements Serializable {
                 flags = Pattern.Flag.CASE_INSENSITIVE,
                 message = "Group name must not ends with '-'.")
 	})
-	@Size(max=15, message="Name must not be longer then 15 characters.")
 	private String name;
 
 	private int place;

@@ -318,10 +318,14 @@ public class DeviceController extends Controller {
 				return new OssResponse(this.session,"ERROR","The WLAN-IP address is not in the room ip address range.");
 			}
 		}
-		//Check user parameter
+		//Check if the name is DNS and if necessary NETBIOS conform.
 		ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
 		for (ConstraintViolation<Device> violation : factory.getValidator().validate(device) ) {
 			error.add(violation.getMessage());
+		}
+		if(device.getHwconf().getDeviceType().equals("FatClient") &&
+				device.getName().length() > 15 ) {
+			error.add("Name must not be longer then 15 characters.");
 		}
 		if( error.isEmpty() ) {
 			return new OssResponse(this.session,"OK","");
