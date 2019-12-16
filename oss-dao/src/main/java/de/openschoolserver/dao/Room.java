@@ -388,4 +388,18 @@ public class Room implements Serializable {
 	public void setSessions(List<Session> sessions) {
 		this.sessions = sessions;
 	}
+
+	/**
+	 * @return the roomRows
+	 */
+	public int getRoomRows() {
+		return roomRows;
+	}
+
+	/**
+	 * @param roomRows the roomRows to set
+	 */
+	public void setRoomRows(int roomRows) {
+		this.roomRows = roomRows;
+	}
 }
