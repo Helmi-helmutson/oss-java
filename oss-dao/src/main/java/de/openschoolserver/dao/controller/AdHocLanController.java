@@ -158,6 +158,49 @@ public class AdHocLanController extends Controller {
 		return new OssResponse(this.getSession(),"OK","Category was modified");
 	}
 
+	/**
+	 * Modify the setting of an AdHocRoom
+	 * @param room The AdHocRoom to modify. Following attributes can be modified:
+	 *             * Description
+	 *             * The count of the devices an user may register
+	 *             * The control type in a room
+	 *             * If the room is only for students
+	 * @return The result in a OssResponse object.
+	 */
+	public OssResponse modify(AdHocRoom room) {
+		final RoomController rc =  new RoomController(session,em);
+		Room oldRoom = rc.getById(room.getId());
+		if( !oldRoom.getRoomType().equals("AdHocAccess")) {
+			em.close();
+			return new OssResponse(session,"ERROR","This is not an AdHocLan room");
+		} else {
+			oldRoom.setDescription(room.getDescription());
+			oldRoom.setPlaces(room.getPlaces());
+			oldRoom.setRoomControl(room.getRoomControl());
+			oldRoom.setRoomType("AdHocAccess");
+			Category cat = this.getAdHocCategoryOfRoom(oldRoom);
+			cat.setStudentsOnly(room.isStudentsOnly());
+			cat.setDescription(room.getDescription());
+			try {
+				em.getTransaction().begin();
+				em.merge(oldRoom);
+				em.merge(cat);
+				em.getTransaction().commit();
+				return new OssResponse(session,"OK","AdHocLan room was modified successfully");
+			} catch (Exception e) {
+				logger.error("modify:" + e.getMessage());
+				return new OssResponse(session,"ERROR","AdHocLan room could not be modified.");
+			} finally {
+				em.close();
+			}
+		}
+	}
+
+	/**
+	 * Helper script to convert a Room into AdHocRoom
+	 * @param room The Room object
+	 * @return The created AdHocRoom object
+	 */
 	public AdHocRoom roomToAdHoc(Room room) {
 		//This should work. But casting does not work. 
 		//AdHocRoom adHocRoom = (AdHocRoom) room;

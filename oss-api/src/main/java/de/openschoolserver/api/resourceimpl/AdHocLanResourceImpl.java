@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.ws.rs.WebApplicationException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -260,23 +261,12 @@ public class AdHocLanResourceImpl implements AdHocLanResource {
 
 	@Override
 	public OssResponse modify(Session session, Long roomId, AdHocRoom room) {
-		OssResponse resp;
-		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		final RoomController rc =  new RoomController(session,em);
-		Room oldRoom = rc.getById(roomId);
-		if( !oldRoom.getRoomType().equals("AdHocAccess")) {
-			resp = new OssResponse(session,"ERROR","This is not an AdHocLan room");
-		} else {
-			oldRoom.setDescription(room.getDescription());
-			oldRoom.setPlaces(room.getPlaces());
-			oldRoom.setRoomControl(room.getRoomControl());
-			resp = rc.modify(oldRoom);
-			final AdHocLanController ac =  new AdHocLanController(session,em);
-			Category cat = ac.getAdHocCategoryOfRoom(oldRoom);
-			cat.setStudentsOnly(room.isStudentsOnly());
-			cat.setDescription(room.getDescription());
-			em.merge(cat);
+		if( room.getId() != roomId ) {
+			throw new WebApplicationException(403);
 		}
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		final AdHocLanController ac =  new AdHocLanController(session,em);
+		OssResponse resp = ac.modify(room);
 		em.close();
 		return resp;
 	}
