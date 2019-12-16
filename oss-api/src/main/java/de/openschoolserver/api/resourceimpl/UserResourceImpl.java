@@ -26,6 +26,7 @@ import de.openschoolserver.api.resources.UserResource;
 import de.openschoolserver.dao.Alias;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.GuestUsers;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.UserImport;
@@ -334,7 +335,8 @@ public class UserResourceImpl implements UserResource {
 	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		OssResponse resp = new UserController(session,em).addGuestUsers(name, description, roomId, count, validUntil);
+		GuestUsers guestUsers = new GuestUsers(name,description,count,roomId,validUntil);
+		OssResponse resp = new UserController(session,em).addGuestUsers(guestUsers);
 		em.close();
 		return resp;
 	}
@@ -360,7 +362,7 @@ public class UserResourceImpl implements UserResource {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse ossResponse = new GroupController(session,em).addMember(groupName, userName);
 		String resp = ossResponse.getCode();
-	        if( ossResponse.getCode().equals("ERROR") ) {
+	    if( ossResponse.getCode().equals("ERROR") ) {
 			resp = resp + " " + ossResponse.getValue();
 		}
 		em.close();
@@ -477,6 +479,19 @@ public class UserResourceImpl implements UserResource {
 		} catch (IOException ioe) {
 				logger.error(ioe.getMessage(), ioe);
 				return new OssResponse(session,"ERROR", "Import file is not UTF-8 coded.");
+		}
+		if( password != null && !password.isEmpty() ) {
+			UserController uc = new UserController(session,null);
+			boolean checkPassword = uc.getConfigValue("CHECK_PASSWORD_QUALITY").toLowerCase().equals("yes");
+			uc.setConfigValue("CHECK_PASSWORD_QUALITY", "no");
+			OssResponse passwordResponse = uc.checkPassword(password);
+			if( passwordResponse != null ) {
+				if (checkPassword) {
+					uc.setConfigValue("CHECK_PASSWORD_QUALITY", "yes");
+				}
+				logger.error("Reset Password" + passwordResponse);
+				return passwordResponse;
+			}
 		}
 		List<String> parameters = new ArrayList<String>();
 		parameters.add("/sbin/startproc");

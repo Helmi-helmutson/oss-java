@@ -876,29 +876,64 @@ public class UserController extends Controller {
 		return categoryController.delete(category);
 	}
 
-	public OssResponse addGuestUsers(String name, String description, Long roomId, Long count, Date validUntil) {
+	public OssResponse addGuestUsers(GuestUsers guestUsers) {
+		//String name, String description, Long roomId, Long count, Date validUntil)
 		final CategoryController categoryController = new CategoryController(this.session,this.em);
-		final GroupController groupController = new GroupController(this.session,this.em);
+		final GroupController groupController       = new GroupController(this.session,this.em);
+		final RoomController  roomController        = new RoomController(this.session,this.em);
+		Room room = null;
 		//TODO make it confiugrable
-		if( count > 200 ) {
-			return new OssResponse(this.getSession(), "ERROR", "A guest group must not conains more the 200 members.");
+		if( guestUsers.getCount() > 255 ) {
+			return new OssResponse(this.getSession(), "ERROR", "A guest group must not conains more the 255 members.");
 		}
+		// Check the password
+		boolean checkPassword = this.getConfigValue("CHECK_PASSWORD_QUALITY").toLowerCase().equals("yes");
+		this.setConfigValue("CHECK_PASSWORD_QUALITY", "no");
+		String password = guestUsers.getName() + "01";
+		if( !guestUsers.getPassword().isEmpty() ) {
+			password = guestUsers.getPassword();
+		}
+		OssResponse ossResponse = this.checkPassword(password);
+		if( ossResponse != null ) {
+			if (checkPassword) {
+				this.setConfigValue("CHECK_PASSWORD_QUALITY", "yes");
+			}
+			logger.error("Reset Password" + ossResponse);
+			return ossResponse;
+		}
+		// First we check if we can create room with the requested size
+		if( guestUsers.isCreateAdHocRoom() ) {
+			int roomNetMask = 32 - (int) (Math.log(guestUsers.getCount()) / Math.log(2) + 1.0);
+			room = new Room();
+			room.setNetMask(roomNetMask);
+			room.setName(guestUsers.getName());
+			room.setDescription(guestUsers.getDescription());
+			room.setRoomControl("allTeachers");
+			room.setHwconfId(3L);
+			room.setRoomType("adHocRoom");
+			ossResponse = roomController.add(room);
+			if( ossResponse.getCode().equals("ERROR")) {
+				return ossResponse;
+			} else {
+				room = roomController.getById(ossResponse.getObjectId());
+			}
+		}
+
 		Category category = new Category();
 		category.setCategoryType("guestUsers");
-		category.setName(name);
-		category.setDescription(description);
+		category.setName(guestUsers.getName());
+		category.setDescription(guestUsers.getDescription());
 		category.setValidFrom(categoryController.now());
-		category.setValidUntil(validUntil);
-		OssResponse ossResponse = categoryController.add(category);
+		category.setValidUntil(guestUsers.getValidity());
+		ossResponse = categoryController.add(category);
 		if (ossResponse.getCode().equals("ERROR")) {
 			return ossResponse;
 		}
 		category = categoryController.getById(ossResponse.getObjectId());
-
 		Group group = new Group();
 		group.setGroupType("guest");
-		group.setName(name);
-		group.setDescription(description);
+		group.setName(guestUsers.getName());
+		group.setDescription(guestUsers.getDescription());
 		ossResponse = groupController.add(group);
 		if (ossResponse.getCode().equals("ERROR")) {
 			categoryController.delete(category.getId());
@@ -910,6 +945,13 @@ public class UserController extends Controller {
 			this.em.getTransaction().begin();
 			category.setGroups(new ArrayList<Group>());
 			category.getGroups().add(group);
+			if( room != null ) {
+				category.setRooms(new ArrayList<Room>());
+				category.getRooms().add(room);
+				room.setCategories(new ArrayList<Category>());
+				room.getCategories().add(category);
+				this.em.merge(room);
+			}
 			group.setCategories(new ArrayList<Category>());
 			group.getCategories().add(category);
 			this.em.merge(category);
@@ -919,13 +961,16 @@ public class UserController extends Controller {
 			logger.error(e.getMessage());
 			return null;
 		}
-		for (Long i = 1l; i < count + 1; i++) {
-			String userName = String.format("%s%02d", name, i);
+		for (Long i = 1l; i < guestUsers.getCount() + 1; i++) {
+			String userName = String.format("%s%02d", guestUsers.getName(), i);
 			User user = new User();
 			user.setUid(userName);
 			user.setSurName("GuestUser");
 			user.setGivenName(userName);
 			user.setRole("guest");
+			if( !guestUsers.getPassword().isEmpty() ) {
+				user.setPassword(password);
+			}
 			ossResponse = this.add(user);
 			logger.debug("Create user ossResponse:" + ossResponse);
 			user = this.getById(ossResponse.getObjectId());
@@ -1150,4 +1195,5 @@ public class UserController extends Controller {
 			}
 		}
 	}
+
 }

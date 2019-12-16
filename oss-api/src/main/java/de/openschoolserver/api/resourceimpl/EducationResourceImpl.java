@@ -20,6 +20,7 @@ import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.GuestUsers;
 import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.PositiveList;
@@ -639,7 +640,16 @@ public class EducationResourceImpl implements Resource, EducationResource {
 	public OssResponse addGuestUsers(Session session, String name, String description, Long roomId, Long count,
 			Date validUntil) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		OssResponse resp = new UserController(session,em).addGuestUsers(name, description, roomId, count, validUntil);
+		GuestUsers guestUsers = new GuestUsers(name,description,count,roomId,validUntil);
+		OssResponse resp = new UserController(session,em).addGuestUsers(guestUsers);
+		em.close();
+		return resp;
+	}
+
+	@Override
+	public OssResponse createGuestUsers(Session session, GuestUsers guestUser ) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		OssResponse resp = new UserController(session,em).addGuestUsers(guestUser);
 		em.close();
 		return resp;
 	}

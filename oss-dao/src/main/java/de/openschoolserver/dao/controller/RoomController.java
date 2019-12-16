@@ -239,7 +239,14 @@ public class RoomController extends Controller {
 		}
 	}
 
-
+	/**
+	 * Delivers a list of rooms in which a user may register his own devices.
+	 * These can be AdHocAccess room in which the user is member itself or one of
+	 * the group of the user is member in the AdHocAccess room.
+	 * Furthermore Guestusers can have have rooms with AdHocAccess.
+	 * @param user The user
+	 * @return The list of the rooms
+	 */
 	public List<Room> getRoomToRegisterForUser(User user) {
 		List<Room> rooms = new ArrayList<Room>();
 		for( Category category : user.getCategories() ) {
@@ -256,6 +263,14 @@ public class RoomController extends Controller {
 				  ( !category.getStudentsOnly()  || this.session.getUser().getRole().equals(roleStudent)) &&
 				    !category.getRooms().isEmpty() ) {
 							rooms.add(category.getRooms().get(0));
+				}
+				//Guest groups can have adHocRoom too
+				if( user.getRole().equals("guest") && category.getCategoryType().equals("guestUsers") ) {
+					if( !category.getRooms().isEmpty() ) {
+						if( category.getRooms().get(0).getRoomType().equals("AdHocAccess")) {
+							rooms.add(category.getRooms().get(0));
+						}
+					}
 				}
 			}
 		}

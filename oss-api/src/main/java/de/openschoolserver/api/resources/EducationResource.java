@@ -18,6 +18,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.GuestUsers;
 import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Category;
@@ -1291,6 +1292,18 @@ public interface EducationResource {
 	                @FormDataParam("roomId")        Long    roomId,
 	                @FormDataParam("count")         Long    count,
 	                @FormDataParam("validUntil")    Date    validUntil
+	                );
+
+	@POST
+	@Path("guestUsers/create")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Creates a new guest users accounts.")
+	@ApiResponses(value = {
+	                @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("education.guestusers")
+	OssResponse createGuestUsers(
+	                @ApiParam(hidden = true) @Auth Session session,
+	                GuestUsers guestUsers
 	                );
 
 	@GET
