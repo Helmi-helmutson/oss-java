@@ -862,12 +862,15 @@ public class RoomController extends Controller {
 		List<String> ipAddress;
 		List<Device> newDevices = new ArrayList<Device>();
 		List<String> parameters  = new ArrayList<String>();
+		logger.debug("addDevices room" + room);
 		try {
 			for(Device device : devices) {
 				//Remove trailing and ending spaces.
 				this.em.getTransaction().begin();
 				device.setName(device.getName().trim());
+				logger.debug("addDevices device" + device);
 				ipAddress = this.getAvailableIPAddresses(roomId, 2);
+				logger.debug("addDevices ipAddress" + ipAddress);
 				if( device.getIp().isEmpty() ){
 					if( ipAddress.isEmpty() ) {
 						this.em.getTransaction().rollback();
@@ -889,12 +892,6 @@ public class RoomController extends Controller {
 					}
 					device.setWlanIp(ipAddress.get(1).split(" ")[0]);
 				}
-				OssResponse ossResponse = deviceController.check(device, room);
-				if( ossResponse.getCode().equals("ERROR") ) {
-					logger.error("addDevices addDevice:" +ossResponse);
-					return ossResponse;
-				}
-				device.setRoom(room);
 				hwconf = cloneToolController.getById(device.getHwconfId());
 				if( hwconf == null ) {
 					if( room.getHwconf() != null ){
@@ -903,6 +900,13 @@ public class RoomController extends Controller {
 						hwconf = firstFatClient;
 					}
 				}
+				device.setHwconf(hwconf);
+				OssResponse ossResponse = deviceController.check(device, room);
+				if( ossResponse.getCode().equals("ERROR") ) {
+					logger.error("addDevices addDevice:" +ossResponse);
+					return ossResponse;
+				}
+				device.setRoom(room);
 				if( hwconf.getDeviceType().equals("FatClient") && this.getDevicesOnMyPlace(room, device).size() > 0 ) {
 					List<Integer> coordinates = this.getNextFreePlace(room);
 					if( !coordinates.isEmpty() ) {
@@ -910,7 +914,6 @@ public class RoomController extends Controller {
 						device.setRow(coordinates.get(1));
 					}
 				}
-				device.setHwconf(hwconf);
 				device.setRoomId(room.getId());
 				this.em.persist(device);
 				hwconf.getDevices().add(device);

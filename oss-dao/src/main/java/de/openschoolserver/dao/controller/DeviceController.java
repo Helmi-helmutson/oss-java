@@ -323,10 +323,12 @@ public class DeviceController extends Controller {
 		for (ConstraintViolation<Device> violation : factory.getValidator().validate(device) ) {
 			error.add(violation.getMessage());
 		}
+		logger.debug("Befor check name lenght.");
 		if(device.getHwconf().getDeviceType().equals("FatClient") &&
 				device.getName().length() > 15 ) {
 			error.add("Name must not be longer then 15 characters.");
 		}
+		logger.debug("After check name lenght.");
 		if( error.isEmpty() ) {
 			return new OssResponse(this.session,"OK","");
 		}
