@@ -146,8 +146,8 @@ public class SessionController extends Controller {
 			}
 		}
 
-		session.setCommonName(user.getGivenName() + " " + user.getSurName());
-		List<String> modules = session.getUserAcls();
+		this.session.setCommonName(user.getGivenName() + " " + user.getSurName());
+		List<String> modules = this.session.getUserAcls();
 		if( !this.isSuperuser() ) {
 			RoomController  roomController = new RoomController(this.session,this.em);;
 			if( ! roomController.getAllToRegister().isEmpty() ) {
@@ -155,13 +155,40 @@ public class SessionController extends Controller {
 			}
 		}
 
-		session.setAcls(modules);
-		session.setPassword(password);
+		this.session.setAcls(modules);
+		this.session.setPassword(password);
 		sessions.put(token, this.session);
 		save(session);
 		return this.session;
 	}
 
+	public Session createInternalUserSession(String username) {
+		UserController userController = new UserController(this.session,this.em);
+		User user = userController.getByUid(username);
+		if( user == null ) {
+			return null;
+		}
+		String token = SessionToken.createSessionToken("dummy");
+		while( this.getByToken(token) != null ) {
+			token = SessionToken.createSessionToken("dummy");
+		}
+		this.session.setToken(token);
+		this.session.setUserId(user.getId());
+		this.session.setRole(user.getRole());
+		this.session.setUser(user);
+		this.session.setCommonName(user.getGivenName() + " " + user.getSurName());
+		List<String> modules = session.getUserAcls();
+		if( !this.isSuperuser() ) {
+			RoomController  roomController = new RoomController(this.session,this.em);;
+			if( ! roomController.getAllToRegister().isEmpty() ) {
+				modules.add("adhoclan.mydevices");
+			}
+		}
+		this.session.setAcls(modules);
+		sessions.put(token, this.session);
+		save(session);
+		return this.session;
+	}
 
 	private void save(Session obj) {
 		if (em != null) {
