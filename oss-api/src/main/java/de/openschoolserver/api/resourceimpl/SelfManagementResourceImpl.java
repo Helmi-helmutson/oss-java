@@ -195,19 +195,16 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 			final DeviceController deviceController = new DeviceController(session,em);
 			if( deviceController.getByMAC(MAC) != null ) {
 				resp = "ALREADY-REGISTERED";
-			}
-			final RoomController roomController = new RoomController(session,em);
-			final UserController userController = new UserController(session,em);
-			User user = userController.getByUid(userName);
-			List<Room> rooms = roomController.getRoomToRegisterForUser(user);
-			if( rooms != null && rooms.size() > 0 ) {
-				Integer count = user.getOwnedDevices().size();
-				OssResponse ossResponse = roomController.addDevice(rooms.get(0).getId(), MAC, count.toString());
-				em.close();
-				resp =  ossResponse.getCode();
-			} else  {
-				em.close();
-				resp = "You can not register devices.";
+			} else {
+				final RoomController roomController = new RoomController(session,em);
+				List<Room> rooms = roomController.getRoomToRegisterForUser(session.getUser());
+				if( rooms != null && rooms.size() > 0 ) {
+					Integer count = session.getUser().getOwnedDevices().size();
+					OssResponse ossResponse = roomController.addDevice(rooms.get(0).getId(), MAC, count.toString());
+					resp =  ossResponse.getCode() + " " + ossResponse.getValue() + " " + ossResponse.getParameters();
+				} else  {
+					resp = "You can not register devices.";
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
