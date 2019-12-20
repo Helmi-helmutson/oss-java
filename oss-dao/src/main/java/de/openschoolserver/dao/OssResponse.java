@@ -47,7 +47,7 @@ public class OssResponse implements Serializable {
 	private Long   objectId;
 	
 	@ManyToOne
-    Session session;
+	Session session;
 
 	@Column(name="session_id", insertable = false, updatable = false)
 	private java.math.BigInteger sessionId;
@@ -62,7 +62,7 @@ public class OssResponse implements Serializable {
 	}
 	
 
-    @Override
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -87,49 +87,49 @@ public class OssResponse implements Serializable {
 		return true;
 	}
 
-    public OssResponse() {
-    }
+	public OssResponse() {
+	}
 
-    public OssResponse(Session session,String code, String value){
-        this.session  = session;
-        this.code     = code;
-        this.value    = value;
-        this.parameters = new ArrayList<String>();
-        this.objectId = null;
-    }
+	public OssResponse(Session session,String code, String value){
+		this.session  = session;
+		this.code     = code;
+		this.value    = value;
+		this.parameters = new ArrayList<String>();
+		this.objectId = null;
+	}
 
-    public OssResponse(Session session,String code, String value, List<String> parameters){
-            this.session  = session;
-            this.code     = code;
-            this.value    = value;
-            this.parameters = parameters;
-            this.objectId = null;
-    }
+	public OssResponse(Session session,String code, String value, List<String> parameters){
+		this.session  = session;
+		this.code     = code;
+		this.value    = value;
+		this.parameters = parameters;
+		this.objectId = null;
+	}
    
-    public OssResponse(Session session,String code, String value, Long objectId){
-        this.session  = session;
-        this.code     = code;
-        this.value    = value;
-        this.parameters = new ArrayList<String>();
-        this.objectId = objectId;
-    }
+	public OssResponse(Session session,String code, String value, Long objectId){
+	this.session  = session;
+	this.code     = code;
+	this.value    = value;
+	this.parameters = new ArrayList<String>();
+	this.objectId = objectId;
+	}
 
-    public OssResponse(Session session,String code, String value, Long objectId, List<String> parameters){
-        this.session  = session;
-        this.code     = code;
-        this.value    = value;
-        this.parameters = parameters;
-        this.objectId = objectId;
-    }
+	public OssResponse(Session session,String code, String value, Long objectId, List<String> parameters){
+		this.session  = session;
+		this.code     = code;
+		this.value    = value;
+		this.parameters = parameters;
+		this.objectId = objectId;
+	}
 
-    public OssResponse(Session session,String code, String value, Long objectId, String parameter){
-        this.session  = session;
-        this.code     = code;
-        this.value    = value;
-        this.parameters = new ArrayList<String>();
-        this.parameters.add(parameter);
-        this.objectId = objectId;
-    }
+	public OssResponse(Session session,String code, String value, Long objectId, String parameter){
+		this.session  = session;
+		this.code     = code;
+		this.value    = value;
+		this.parameters = new ArrayList<String>();
+		this.parameters.add(parameter);
+		this.objectId = objectId;
+	}
 
 	public Long getId() {
 		return this.id;
@@ -174,7 +174,6 @@ public class OssResponse implements Serializable {
 	public void setParameters(List<String> parameters) {
 		this.parameters = parameters;
 	}
-
 
 	public void setCode(String code) {
 		this.code = code;
