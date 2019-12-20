@@ -4,6 +4,7 @@ import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.regex.Pattern;
 
@@ -207,4 +208,10 @@ public class StaticHelpers {
 		//return jSon + System.getProperty("line.separator");
 		return jSon;
 	}
+
+	@SuppressWarnings("unchecked")
+	static public Map<String, Object> convertObjectToMap(Object object) {
+		return new ObjectMapper().convertValue(object, Map.class);
+	}
+
 }
