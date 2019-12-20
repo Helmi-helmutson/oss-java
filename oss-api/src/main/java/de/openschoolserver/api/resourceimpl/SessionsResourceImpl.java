@@ -1,10 +1,7 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) Péter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
-
 import de.openschoolserver.api.resources.SessionsResource;
-
-
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.SessionController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
