@@ -185,25 +185,38 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 		if( !req.getRemoteAddr().equals("127.0.0.1")) {
 			return "ERROR Connection is allowed only from local host.";
 		}
-		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		Session session  = new SessionController(em).getLocalhostSession();
-		final DeviceController deviceController = new DeviceController(session,em);
-		if( deviceController.getByMAC(MAC) != null ) {
-			return "ALREADY-REGISTERED";
-		}
-		final RoomController roomController = new RoomController(session,em);
-		final UserController userController = new UserController(session,em);
-		User user = userController.getByUid(userName);
-		List<Room> rooms = roomController.getRoomToRegisterForUser(user);
-		if( rooms != null && rooms.size() > 0 ) {
-			session.setUser(user);
-			Integer count = user.getOwnedDevices().size();
-			OssResponse resp = roomController.addDevice(rooms.get(0).getId(), MAC, count.toString());
+		EntityManager em     = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		Session session      = new Session();
+		SessionController sc = new SessionController(session,em);
+		String  resp         = "";
+		try {
+			session.setIP(req.getRemoteAddr());
+			session = sc.createInternalUserSession(userName);
+			final DeviceController deviceController = new DeviceController(session,em);
+			if( deviceController.getByMAC(MAC) != null ) {
+				resp = "ALREADY-REGISTERED";
+			}
+			final RoomController roomController = new RoomController(session,em);
+			final UserController userController = new UserController(session,em);
+			User user = userController.getByUid(userName);
+			List<Room> rooms = roomController.getRoomToRegisterForUser(user);
+			if( rooms != null && rooms.size() > 0 ) {
+				Integer count = user.getOwnedDevices().size();
+				OssResponse ossResponse = roomController.addDevice(rooms.get(0).getId(), MAC, count.toString());
+				em.close();
+				resp =  ossResponse.getCode();
+			} else  {
+				em.close();
+				resp = "You can not register devices.";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			if( session != null ) {
+				sc.deleteSession(session);
+			}
 			em.close();
-			return resp.getCode();
-		} else  {
-			return "You can not register devices.";
 		}
+		return resp;
 	}
-
 }
