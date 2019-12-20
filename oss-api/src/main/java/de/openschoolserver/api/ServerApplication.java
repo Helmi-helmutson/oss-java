@@ -19,6 +19,8 @@ import io.dropwizard.setup.Environment;
 import io.federecio.dropwizard.swagger.SwaggerBundle;
 import io.federecio.dropwizard.swagger.SwaggerBundleConfiguration;
 
+import java.io.File;
+
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 
 import de.extis.xpluginlib.PluginHandler;
@@ -113,9 +115,11 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final InformationResource infoResource = new InformationResourceImpl();
         environment.jersey().register(infoResource);
 
-        final ImporterResource importerResource = new ImporterResourceImpl();
-        environment.jersey().register(importerResource);
-        PluginHandler.registerPlugins(environment);
+        if( new File("/srv/www/ossweb/index.html").exists() ) {
+		final ImporterResource importerResource = new ImporterResourceImpl();
+		environment.jersey().register(importerResource);
+		PluginHandler.registerPlugins(environment);
+        }
 
         final SupportResource supportResource = new SupportResourceImpl();
 		environment.jersey().register(supportResource);
