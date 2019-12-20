@@ -545,11 +545,8 @@ public class InformationController extends Controller {
 		CategoryController categoryController = new CategoryController(this.session,this.em);
 		boolean isSuperuser = this.isSuperuser();
 		List<Category> categories = new ArrayList<Category>();
-		for(Category category : this.session.getUser().getOwnedCategories() ) {
-			categories.add(category);
-		}
 		for(Category category : categoryController.getByType("informations") ) {
-			if(isSuperuser ||  category.isPublicAccess() ) {
+			if(isSuperuser ||  category.isPublicAccess() || this.session.getUser().equals(category.getOwner())) {
 				if( !categories.contains(category) ) {
 					categories.add(category);
 				}
@@ -557,7 +554,7 @@ public class InformationController extends Controller {
 		}
 		for(Category category : categoryController.getByType("smartRoom") ) {
 			logger.debug("getInfoCategories smartRoom:" + category );
-			if( isSuperuser ||  category.isPublicAccess() ) {
+			if( isSuperuser ||  category.isPublicAccess() || this.session.getUser().equals(category.getOwner())) {
 				if( !categories.contains(category) ) {
 					categories.add(category);
 				}
