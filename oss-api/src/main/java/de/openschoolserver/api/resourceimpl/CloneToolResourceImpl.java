@@ -342,27 +342,20 @@ public class CloneToolResourceImpl implements CloneToolResource {
 	}
 
 	@Override
-	public String resetMinion(Session session, Long deviceId) {
+	public OssResponse stopCloningOnDevice(Session session, String deviceIP) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		String resp = new CloneToolController(session,em).resetMinion(deviceId);
+		Device device = new DeviceController(session,em).getByIP(deviceIP);
+		OssResponse resp = new CloneToolController(session,em).stopCloning("device",device.getId());
 		em.close();
 		return resp;
 	}
 
 	@Override
-	public OssResponse stopCloningOnDevice(Session session, String deviceIP) {
+	public String resetMinion(Session session, Long deviceId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		Device device = new DeviceController(session,em).getByIP(deviceIP);
-		String pathPxe  = String.format("/srv/tftp/pxelinux.cfg/01-%s", device.getMac().toLowerCase().replace(":", "-"));
-		String pathElilo= String.format("/srv/tftp/%s.conf", device.getMac().toUpperCase().replace(":", "-"));
-		try {
-			Files.deleteIfExists(Paths.get(pathPxe));
-			Files.deleteIfExists(Paths.get(pathElilo));
-		}catch( IOException e ) {
-			e.printStackTrace();
-		}
+		String resp = new CloneToolController(session,em).resetMinion(deviceId);
 		em.close();
-		return null;
+		return resp;
 	}
 
 	@Override
