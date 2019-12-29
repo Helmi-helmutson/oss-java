@@ -633,6 +633,31 @@ public class UserController extends Controller {
 		return responses;
 	}
 
+	public List<OssResponse> mandatoryProfile(List<Long> userIds, boolean booleanValue) {
+		List<OssResponse> responses = new ArrayList<OssResponse>();
+		StringBuffer reply = new StringBuffer();
+		StringBuffer error = new StringBuffer();
+		String[] program = new String[2];
+		if( booleanValue ) {
+			program[0] = "/usr/share/oss/tools/set_profil_ro.sh";
+		} else {
+			program[0] = "/usr/share/oss/tools/set_profil_rw.sh";
+		}
+		for (Long id : userIds) {
+			User user = this.getById(id);
+			if( user != null ) {
+				if( !this.mayModify(user)) {
+					logger.error("removeProfile: Session user may not modify: %s",null,id);
+					continue;
+				}
+				program[1] = user.getUid();
+				OSSShellTools.exec(program, reply, error, null);
+				responses.add(new OssResponse(this.getSession(), "OK", "The windows profile of '%s' was removed.",null,user.getUid()));
+			}
+		}
+		return responses;
+	}
+
 	public List<OssResponse> disableLogin(List<Long> userIds, boolean disable) {
 		List<OssResponse> responses = new ArrayList<OssResponse>();
 		StringBuffer reply = new StringBuffer();
@@ -1195,5 +1220,6 @@ public class UserController extends Controller {
 			}
 		}
 	}
+
 
 }

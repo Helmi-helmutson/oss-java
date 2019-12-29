@@ -592,6 +592,10 @@ public class EducationResourceImpl implements Resource, EducationResource {
 			return  userController.disableInternet(
 					ossActionMap.getUserIds(),
 					ossActionMap.isBooleanValue());
+		case "mandatoryProfile":
+			return  userController.mandatoryProfile(
+					ossActionMap.getUserIds(),
+					ossActionMap.isBooleanValue());
 		case "copyTemplate":
 			return  userController.copyTemplate(
 					ossActionMap.getUserIds(),
