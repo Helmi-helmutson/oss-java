@@ -4,7 +4,7 @@ sudo /usr/sbin/update-alternatives --set java /usr/lib64/jvm/jre-1.8.0-openjdk/b
 gradle --offline clean build
 #gradle clean build
 tar xf build/distributions/de.openschoolserver.api-1.0-SNAPSHOT.tar
-REPO="/data1/OSC/home:varkoly:OSS-4-0/oss-java"
+REPO="/data1/OSC/home:varkoly:OSS-4-0:stable-samba-4.8.9/oss-java"
 if [ "$1" ]; then
         PORT=22
         if [ "$2" ]; then
