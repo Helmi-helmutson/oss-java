@@ -22,6 +22,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
@@ -35,6 +37,7 @@ public class Controller extends Config {
 	protected Session session ;
 	protected EntityManager em;
 	private Map<String, String> properties;
+	private static List<String> systemNames;
 	private static String basePath;
 	static {
 		String os = System.getProperty("os.name", "generic").toLowerCase(Locale.ENGLISH);
@@ -50,6 +53,7 @@ public class Controller extends Config {
 		this.session=session;
 		this.em     = em;
 		properties = new HashMap<String, String>();
+		String[] tmp;
 		try {
 			File file = new File("/opt/oss-java/conf/oss-api.properties");
 			FileInputStream fileInput = new FileInputStream(file);
@@ -61,6 +65,21 @@ public class Controller extends Config {
 				String key = (String) enuKeys.nextElement();
 				String value = props.getProperty(key);
 				properties.put(key, value);
+			}
+			if(systemNames == null ) {
+				systemNames = new ArrayList<String>();
+				for( String line : Files.readAllLines(Paths.get("/etc/passwd"))) {
+					tmp = line.split(":");
+					if( tmp.length > 1 ) {
+						systemNames.add(tmp[0].toLowerCase());
+					}
+				}
+				for( String line : Files.readAllLines(Paths.get("/etc/group"))) {
+					tmp = line.split(":");
+					if( tmp.length > 1 ) {
+						systemNames.add(tmp[0].toLowerCase());
+					}
+				}
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -94,6 +113,9 @@ public class Controller extends Config {
 
 	public boolean isNameUnique(String name){
 		if( this.getConfigValue("WORKGROUP").equals(name)) {
+			return false;
+		}
+		if( systemNames.contains(name.toLowerCase())) {
 			return false;
 		}
 		Query query = this.em.createNamedQuery("User.getByUid");
