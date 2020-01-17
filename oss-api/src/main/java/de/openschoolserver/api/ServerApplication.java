@@ -124,7 +124,6 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final SupportResource supportResource = new SupportResourceImpl();
 		environment.jersey().register(supportResource);
 
-
         final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
         environment.healthChecks().register("template", healthCheck);
 

@@ -244,7 +244,6 @@ public class User implements Serializable {
 		joinColumns={@JoinColumn(name="user_id")},
 		inverseJoinColumns={@JoinColumn(name="group_id")}
 	)
-	//@JsonManagedReference
 	@JsonIgnore
 	private List<Group> groups = new ArrayList<Group>();
 

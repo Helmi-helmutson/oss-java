@@ -1,3 +1,4 @@
+/* (c) 2020 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api;
 
 import java.io.BufferedReader;
