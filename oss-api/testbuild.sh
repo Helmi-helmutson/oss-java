@@ -41,11 +41,6 @@ CLASSPATH=$( grep "^CLASSPATH=" oss-java/bin/de.openschoolserver.api )
 sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > ${REPO}/start-oss-api
 rm -r oss-java
 xterm -e git log --raw  &
-RELEASE=$(cat RELEASE)
-RELEASE=$((RELEASE+1))
-echo $RELEASE > RELEASE
-sed s/@RELEASE@/${RELEASE}/ oss-java.spec > ${REPO}/oss-java.spec
-git commit -m "New version" RELEASE
 
 cd ${REPO}/
 osc vc
