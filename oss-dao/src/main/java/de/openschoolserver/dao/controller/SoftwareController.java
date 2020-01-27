@@ -1548,8 +1548,6 @@ public class SoftwareController extends Controller {
 			software.setManually(true);
 			software.setDescription(description);
 			try {
-				if( st == null ) {
-					logger.error("setSoftwareStatusOnDevice SoftwareStatus is NULL on device:" + device);
 				this.em.getTransaction().begin();
 				this.em.persist(software);
 				this.em.getTransaction().commit();
