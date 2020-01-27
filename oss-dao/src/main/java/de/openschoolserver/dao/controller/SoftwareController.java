@@ -1041,22 +1041,22 @@ public class SoftwareController extends Controller {
 		List<SoftwareVersion> lsv;
 
 		List<SoftwareStatus> lss = new ArrayList<SoftwareStatus>();
-		for(SoftwareStatus ss : d.getSoftwareStatus() ) {
-			if( ss == null
-					|| ss.getSoftwareVersion() == null
-					|| ss.getSoftwareVersion().getSoftware() == null ) {
-				logger.error("setSoftwareStatusOnDevice ERROR"
-						+ " Device:" + d
-						+ " Software:"  + s
-						+ " Version:" +  version
-						+ " Status:" + status);
-				continue;
-			}
-			if( ss.getSoftwareVersion().getSoftware().equals(s)) {
-				lss.add(ss);
-			}
-		}
 		try {
+			for(SoftwareStatus ss : d.getSoftwareStatus() ) {
+				if( ss == null
+						|| ss.getSoftwareVersion() == null
+						|| ss.getSoftwareVersion().getSoftware() == null ) {
+					logger.error("setSoftwareStatusOnDevice ERROR"
+							+ " Device:" + d
+							+ " Software:"  + s
+							+ " Version:" +  version
+							+ " Status:" + status);
+					continue;
+				}
+				if( ss.getSoftwareVersion().getSoftware().equals(s)) {
+					lss.add(ss);
+				}
+			}
 			this.em.getTransaction().begin();
 			if( !lss.isEmpty()) {
 				for( SoftwareStatus ss : lss ) {
@@ -1548,6 +1548,8 @@ public class SoftwareController extends Controller {
 			software.setManually(true);
 			software.setDescription(description);
 			try {
+				if( st == null ) {
+					logger.error("setSoftwareStatusOnDevice SoftwareStatus is NULL on device:" + device);
 				this.em.getTransaction().begin();
 				this.em.persist(software);
 				this.em.getTransaction().commit();
@@ -1588,7 +1590,10 @@ public class SoftwareController extends Controller {
 		}
 */
 		for( SoftwareStatus st : device.getSoftwareStatus() ) {
-			//logger.debug("Software Status of " + st.getSoftwareVersion().getSoftware().getName());
+			if( st == null ) {
+				logger.error("setSoftwareStatusOnDevice SoftwareStatus of " + softwareName + " is NULL on device:" + device);
+				continue;
+			}
 			if( st.getSoftwareVersion().equals(softwareVersion) ) {
 				logger.debug("equal:" +st.getSoftwareVersion().getVersion());
 				softwareStatus = st;
