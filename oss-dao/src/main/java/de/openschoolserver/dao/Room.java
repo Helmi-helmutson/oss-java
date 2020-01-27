@@ -44,10 +44,6 @@ public class Room implements Serializable {
 	private Long id;
 
 	@Column(name = "name", updatable = false)
-	@Pattern(
-			regexp = "^[a-z0-9\\-]+$",
-			flags = Pattern.Flag.CASE_INSENSITIVE,
-			message = "Room name can only contains characters numeric characters and '-'.")
 	@Size(max=10, message="Name must not be longer then 10 characters.")
 	private String name;
 
