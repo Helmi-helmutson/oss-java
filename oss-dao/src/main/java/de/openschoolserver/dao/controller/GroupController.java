@@ -31,6 +31,7 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Room;
 import static de.openschoolserver.dao.tools.StaticHelpers.*;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 @SuppressWarnings( "unchecked" )
 public class GroupController extends Controller {
@@ -159,7 +160,7 @@ public class GroupController extends Controller {
 				this.em.persist(enumerate);
 			}
 			this.em.persist(group);
-			if( group.getGroupType().equals("workgroup") || group.getGroupType().equals("guest")) {
+			if( group.getGroupType().equals("workgroup") || group.getGroupType().equals(roleGuest)) {
 				this.session.getUser().getOwnedGroups().add(group);
 				User user = this.em.find(User.class, this.session.getUser().getId());
 				group.setOwnerId(user.getId());

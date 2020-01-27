@@ -16,12 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import static de.openschoolserver.dao.internal.OSSConstants.*;
 import de.extis.core.util.UserUtil;
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import static de.openschoolserver.dao.tools.StaticHelpers.*;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 @SuppressWarnings("unchecked")
 public class UserController extends Controller {
@@ -209,7 +208,7 @@ public class UserController extends Controller {
 			}
 		}
 		// Check the user password
-		if (user.getRole().equals("workstations") || user.getRole().equals("guest")) {
+		if (user.getRole().equals("workstations") || user.getRole().equals(roleGuest)) {
 			user.setPassword(user.getUid());
 		} else if (user.getPassword() == null || user.getPassword().isEmpty()) {
 			user.setPassword(createRandomPassword());
@@ -887,13 +886,13 @@ public class UserController extends Controller {
 		final GroupController groupController = new GroupController(this.session,this.em);
 		Category category = categoryController.getById(guestUsersId);
 		for (User user : category.getUsers()) {
-			if (user.getRole().equals("guest")) {
+			if (user.getRole().equals(roleGuest)) {
 				this.delete(user);
 			}
 		}
 		category.setUsers(new ArrayList<User>());
 		for (Group group : category.getGroups()) {
-			if (group.getGroupType().equals("guest")) {
+			if (group.getGroupType().equals(roleGuest)) {
 				groupController.delete(group);
 			}
 		}
@@ -956,7 +955,7 @@ public class UserController extends Controller {
 		}
 		category = categoryController.getById(ossResponse.getObjectId());
 		Group group = new Group();
-		group.setGroupType("guest");
+		group.setGroupType(roleGuest);
 		group.setName(guestUsers.getName());
 		group.setDescription(guestUsers.getDescription());
 		ossResponse = groupController.add(group);
@@ -992,7 +991,7 @@ public class UserController extends Controller {
 			user.setUid(userName);
 			user.setSurName("GuestUser");
 			user.setGivenName(userName);
-			user.setRole("guest");
+			user.setRole(roleGuest);
 			if( !guestUsers.getPassword().isEmpty() ) {
 				user.setPassword(password);
 			}
