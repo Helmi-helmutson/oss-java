@@ -250,7 +250,6 @@ public class CloneToolController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Partition: %s was created in %s (%s)",null,parameters);
 	}
 
-
 	public OssResponse setConfigurationValue(Long hwconfId, String partitionName, String key, String value) {
 		Partition partition = this.getPartition(hwconfId, partitionName);
 		if(partition == null ) {
@@ -466,7 +465,7 @@ public class CloneToolController extends Controller {
 		List<String> responseParameters = new ArrayList<String>();
 		StringBuilder ERROR = new StringBuilder();
 		try {
-			pxeBoot   = Files.readAllLines(PXE_BOOT);
+			pxeBoot = Files.readAllLines(PXE_BOOT);
 			efiBoot = Files.readAllLines(EFI_BOOT);
 		}
 		catch( IOException e ) {
@@ -556,13 +555,6 @@ public class CloneToolController extends Controller {
 			if( device == null ) {
 				return "ERROR Can not find the device.";
 			}
-			this.em.getTransaction().begin();
-			for ( SoftwareStatus st : device.getSoftwareStatus() ) {
-				this.em.remove(st);
-			}
-			device.setSoftwareStatus(null);
-			this.em.merge(device);
-			this.em.getTransaction().commit();
 			String deviceName  = device.getName();
 			String[] program   = new String[4];
 			StringBuffer reply = new StringBuffer();
@@ -583,6 +575,17 @@ public class CloneToolController extends Controller {
 			Files.deleteIfExists(Paths.get(path.toString()));
 			this.systemctl("try-restart", "salt-master");
 			this.systemctl("try-restart", "oss_salt_event_watcher");
+			this.em.getTransaction().begin();
+			for ( SoftwareStatus st : device.getSoftwareStatus() ) {
+				if( st != null ) {
+					this.em.remove(st);
+				} else {
+					logger.error("resetMinion: st is NULL" + device);
+				}
+			}
+			device.setSoftwareStatus(null);
+			this.em.merge(device);
+			this.em.getTransaction().commit();
 		} catch ( IOException e ) {
 			logger.error("resetMinion: " + e.getMessage());
 			return "ERROR "+e.getMessage();
@@ -634,5 +637,4 @@ public class CloneToolController extends Controller {
 		}
 		return new OssResponse(this.getSession(),"OK","Multicast imaging was started succesfully.");
 	}
-
 }
