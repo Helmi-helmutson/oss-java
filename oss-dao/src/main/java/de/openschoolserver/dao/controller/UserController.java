@@ -208,7 +208,7 @@ public class UserController extends Controller {
 			}
 		}
 		// Check the user password
-		if (user.getRole().equals("workstations") || user.getRole().equals(roleGuest)) {
+		if (user.getRole().equals("workstations") || ( user.getRole().equals(roleGuest) && user.getPassword().isEmpty()) ) {
 			user.setPassword(user.getUid());
 		} else if (user.getPassword() == null || user.getPassword().isEmpty()) {
 			user.setPassword(createRandomPassword());
@@ -948,7 +948,7 @@ public class UserController extends Controller {
 		category.setName(guestUsers.getName());
 		category.setDescription(guestUsers.getDescription());
 		category.setValidFrom(categoryController.now());
-		category.setValidUntil(guestUsers.getValidity());
+		category.setValidUntil(guestUsers.getValidUntil());
 		ossResponse = categoryController.add(category);
 		if (ossResponse.getCode().equals("ERROR")) {
 			return ossResponse;
@@ -994,6 +994,8 @@ public class UserController extends Controller {
 			user.setRole(roleGuest);
 			if( !guestUsers.getPassword().isEmpty() ) {
 				user.setPassword(password);
+			} else {
+				user.setPassword("");
 			}
 			ossResponse = this.add(user);
 			logger.debug("Create user ossResponse:" + ossResponse);

@@ -5,7 +5,6 @@ import java.io.Serializable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.persistence.*;
-import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import java.util.ArrayList;
@@ -49,7 +48,8 @@ public class Room implements Serializable {
 
 	private int places;
 
-	private int roomRows;
+	@Column(name = "roomRows")
+	private int rows;
 
 	@Size(max=64, message="Description must not be longer then 64 characters.")
 	private String description;
@@ -245,14 +245,6 @@ public class Room implements Serializable {
 		this.roomControl = roomcontrol;
 	}
 
-	public int getRows() {
-		return this.roomRows;
-	}
-
-	public void setRows(int rows) {
-		this.roomRows = rows;
-	}
-
 	public List<AccessInRoom> getAccessInRooms() {
 		return this.accessInRooms;
 	}
@@ -388,14 +380,14 @@ public class Room implements Serializable {
 	/**
 	 * @return the roomRows
 	 */
-	public int getRoomRows() {
-		return roomRows;
+	public int getRows() {
+		return rows;
 	}
 
 	/**
 	 * @param roomRows the roomRows to set
 	 */
-	public void setRoomRows(int roomRows) {
-		this.roomRows = roomRows;
+	public void setRows(int roomRows) {
+		this.rows = roomRows;
 	}
 }

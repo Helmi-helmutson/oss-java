@@ -690,6 +690,12 @@ public class EducationResourceImpl implements Resource, EducationResource {
 				groups.add(group);
 			}
 		}
+		for( Group group : session.getUser().getOwnedGroups() ) {
+			if( !group.getGroupType().equals("primary") &&
+			    !groups.contains(group)) {
+				groups.add(group);
+			}
+		}
 		return groups;
 	}
 

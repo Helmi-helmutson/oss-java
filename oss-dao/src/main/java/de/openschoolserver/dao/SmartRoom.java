@@ -78,7 +78,7 @@ public class SmartRoom {
 		/*If this is a smart room, we have to organize the devices.
 		if( isSmartRoom ) {
 			int workstationCount = (this.devices.size() > this.users.size()) ?  this.devices.size() : this.users.size();
-			int availablePlaces  = room.getPlaces() * room.getRows();
+			int availablePlaces  = room.getPlaces() * room.getRoomRows();
 			while( workstationCount > availablePlaces ) {
 				this.places++;
 				this.rows++;

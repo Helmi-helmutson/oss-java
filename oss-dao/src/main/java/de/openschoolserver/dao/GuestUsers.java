@@ -13,18 +13,18 @@ import java.util.List;
  */
 public class GuestUsers {
 
-	public GuestUsers(String name, String description, Long count, List<Long> rooms, String password,
+	public GuestUsers(String name, String description, Long count, List<Long> roomIds, String password,
 			boolean createAdHocRoom, String roomControl, boolean privateGroup, Date validity) {
 		super();
 		this.name = name;
 		this.description = description;
 		this.count = count;
-		this.rooms = rooms;
+		this.roomIds = roomIds;
 		this.password = password;
 		this.createAdHocRoom = createAdHocRoom;
 		this.roomControl = roomControl;
 		this.privateGroup = privateGroup;
-		this.validity = validity;
+		this.validUntil = validity;
 	}
 
 	public GuestUsers(String name, String description, Long count, Long room, Date validity) {
@@ -32,11 +32,11 @@ public class GuestUsers {
 			this.name = name;
 			this.description = description;
 			this.count = count;
-			this.rooms = new ArrayList<Long>();
-			this.rooms.add(room);
+			this.roomIds = new ArrayList<Long>();
+			this.roomIds.add(room);
 			this.password = "";
 			this.createAdHocRoom = false;
-			this.validity = validity;
+			this.validUntil = validity;
 			this.privateGroup = true;
 			this.roomControl  = "allTeachers";
 		}
@@ -66,7 +66,7 @@ public class GuestUsers {
 	/**
 	 * The list of the room ids where the member of the group may use the workstations
 	 */
-	private List<Long> rooms = new ArrayList<Long>();
+	private List<Long> roomIds = new ArrayList<Long>();
 	
 	/**
 	 * The standard password of the guest user 
@@ -91,7 +91,7 @@ public class GuestUsers {
 	/**
 	 * Validity of the guest group
 	 */
-	private Date validity;
+	private Date validUntil;
 	
 	/**
 	 * @return the name
@@ -136,17 +136,17 @@ public class GuestUsers {
 	}
 
 	/**
-	 * @return the rooms
+	 * @return the roomIds
 	 */
-	public List<Long> getRooms() {
-		return rooms;
+	public List<Long> getRoomIds() {
+		return roomIds;
 	}
 
 	/**
-	 * @param rooms the rooms to set
+	 * @param roomIds the roomIds to set
 	 */
-	public void setRooms(List<Long> rooms) {
-		this.rooms = rooms;
+	public void setRoomIds(List<Long> roomIds) {
+		this.roomIds = roomIds;
 	}
 
 	/**
@@ -180,15 +180,15 @@ public class GuestUsers {
 	/**
 	 * @return the validity
 	 */
-	public Date getValidity() {
-		return validity;
+	public Date getValidUntil() {
+		return validUntil;
 	}
 
 	/**
 	 * @param validity the validity to set
 	 */
-	public void setValidity(Date validity) {
-		this.validity = validity;
+	public void setValidUntil(Date validity) {
+		this.validUntil = validity;
 	}
 
 	/**

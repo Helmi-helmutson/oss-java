@@ -69,7 +69,8 @@ public class Device implements Serializable {
 
 	private int place;
 
-	private int roomRow;
+	@Column(name = "roomRow")
+	private int row;
 
 	@Column(name="IP")
 	@Size(max=16, message="IP must not be longer then 16 characters.")
@@ -266,11 +267,11 @@ public class Device implements Serializable {
 	}
 
 	public int getRow() {
-		return this.roomRow;
+		return this.row;
 	}
 
 	public void setRow(int row) {
-		this.roomRow = row;
+		this.row = row;
 	}
 
 	public String getSerial() {
@@ -442,14 +443,6 @@ public class Device implements Serializable {
 
 	public void setSessions(List<Session> sessions) {
 		this.sessions = sessions;
-	}
-
-	public int getRoomRow() {
-		return roomRow;
-	}
-
-	public void setRoomRow(int roomRow) {
-		this.roomRow = roomRow;
 	}
 
 	public Long getOwnerId() {
