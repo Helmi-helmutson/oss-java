@@ -355,8 +355,8 @@ CREATE TABLE IF NOT EXISTS SoftwareFullNames (
 CREATE TABLE IF NOT EXISTS SoftwareVersions (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         software_id    BIGINT UNSIGNED,
-	version        VARCHAR(32) NOT NULL,
-	status         VARCHAR(1)  NOT NULL,
+	version        VARCHAR(128) NOT NULL,
+	status         VARCHAR(1)   NOT NULL,
         FOREIGN KEY(software_id)    REFERENCES Softwares(id),
         PRIMARY KEY(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci ;
