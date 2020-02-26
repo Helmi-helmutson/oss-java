@@ -33,99 +33,102 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 
 public class ServerApplication extends Application<ServerConfiguration> {
 
-    public static void main(String[] args) throws Exception {
-        new ServerApplication().run(args);
-    }
+	public static void main(String[] args) throws Exception {
+		new ServerApplication().run(args);
+	}
 
-    @Override
-    public String getName() {
-        return "OSS API";
-    }
+	@Override
+	public String getName() {
+		return "OSS API";
+	}
 
-    @Override
-    public void initialize(Bootstrap<ServerConfiguration> bootstrap) {
-        bootstrap.addBundle(new SwaggerBundle<ServerConfiguration>() {
-            @Override
-            protected SwaggerBundleConfiguration getSwaggerBundleConfiguration(ServerConfiguration configuration) {
-                return configuration.swaggerBundleConfiguration;
-            }
-        });
-    }
+	@Override
+	public void initialize(Bootstrap<ServerConfiguration> bootstrap) {
+		bootstrap.addBundle(new SwaggerBundle<ServerConfiguration>() {
+			@Override
+			protected SwaggerBundleConfiguration getSwaggerBundleConfiguration(ServerConfiguration configuration) {
+				return configuration.swaggerBundleConfiguration;
+			}
+		});
+	}
 
-    @Override
-    public void run(ServerConfiguration configuration, Environment environment) {
+	@Override
+	public void run(ServerConfiguration configuration, Environment environment) {
 
 
-        @SuppressWarnings("rawtypes")
+		@SuppressWarnings("rawtypes")
 		AuthFilter tokenAuthorizer = new OAuthCredentialAuthFilter.Builder<Session>()
-                .setAuthenticator(new OSSTokenAuthenticator())
-                .setAuthorizer(new OSSAuthorizer())
-                .setPrefix("Bearer")
-                .buildAuthFilter();
+		.setAuthenticator(new OSSTokenAuthenticator())
+		.setAuthorizer(new OSSAuthorizer())
+		.setPrefix("Bearer")
+		.buildAuthFilter();
 
-        environment.jersey().register(new AuthDynamicFeature(tokenAuthorizer));
-        environment.jersey().register(new AuthValueFactoryProvider.Binder<>(Session.class));
-        environment.jersey().register(RolesAllowedDynamicFeature.class);
+		environment.jersey().register(new AuthDynamicFeature(tokenAuthorizer));
+		environment.jersey().register(new AuthValueFactoryProvider.Binder<>(Session.class));
+		environment.jersey().register(RolesAllowedDynamicFeature.class);
 
-        environment.jersey().register(MultiPartFeature.class);
+		environment.jersey().register(MultiPartFeature.class);
 
-        final SchedulerResource schedulerResource = new SchedulerResourceImpl();
-        environment.jersey().register(schedulerResource);
+		final SchedulerResource schedulerResource = new SchedulerResourceImpl();
+		environment.jersey().register(schedulerResource);
 
-        final SystemResource systemResource = new SystemResourceImpl();
-        environment.jersey().register(systemResource);
+		final SystemResource systemResource = new SystemResourceImpl();
+		environment.jersey().register(systemResource);
 
-	//TODO check if allowed
-        final AdHocLanResource adHocLanResource = new AdHocLanResourceImpl();
-        environment.jersey().register(adHocLanResource);
+		//TODO check if allowed
+		final AdHocLanResource adHocLanResource = new AdHocLanResourceImpl();
+		environment.jersey().register(adHocLanResource);
 
-        final SessionsResource sessionsResource = new SessionsResourceImpl();
-        environment.jersey().register(sessionsResource);
+		final SessionsResource sessionsResource = new SessionsResourceImpl();
+		environment.jersey().register(sessionsResource);
 
-        final SelfManagementResource selfManagementResource = new SelfManagementResourceImpl();
-        environment.jersey().register(selfManagementResource);
+		final SelfManagementResource selfManagementResource = new SelfManagementResourceImpl();
+		environment.jersey().register(selfManagementResource);
 
-        final RoomResource roomsResource = new RoomRescourceImpl();
-        environment.jersey().register(roomsResource);
+		final RoomResource roomsResource = new RoomRescourceImpl();
+		environment.jersey().register(roomsResource);
 
-        final UserResource usersResource = new UserResourceImpl();
-        environment.jersey().register(usersResource);
+		final UserResource usersResource = new UserResourceImpl();
+		environment.jersey().register(usersResource);
 
-        final GroupResource groupsResource = new GroupResourceImpl();
-        environment.jersey().register(groupsResource);
+		final GroupResource groupsResource = new GroupResourceImpl();
+		environment.jersey().register(groupsResource);
 
-        final DeviceResource devicesResource = new DeviceResourceImpl();
-        environment.jersey().register(devicesResource);
+		final DeviceResource devicesResource = new DeviceResourceImpl();
+		environment.jersey().register(devicesResource);
 
-        final PrinterResource printerResource = new PrinterResourceImpl();
-        environment.jersey().register(printerResource);
+		final PrinterResource printerResource = new PrinterResourceImpl();
+		environment.jersey().register(printerResource);
 
-        final CloneToolResource cloneToolResource = new CloneToolResourceImpl();
-        environment.jersey().register(cloneToolResource);
+		final CloneToolResource cloneToolResource = new CloneToolResourceImpl();
+		environment.jersey().register(cloneToolResource);
 
-        final CategoryResource categoryResource = new CategoryResourceImpl();
-        environment.jersey().register(categoryResource);
+		final HwconfResource hwconfResource = new HwconfResourceImpl();
+		environment.jersey().register(hwconfResource);
+		
+		final CategoryResource categoryResource = new CategoryResourceImpl();
+		environment.jersey().register(categoryResource);
 
-        final SoftwareResource softwareResource = new SoftwareResourceImpl();
-        environment.jersey().register(softwareResource);
+		final SoftwareResource softwareResource = new SoftwareResourceImpl();
+		environment.jersey().register(softwareResource);
 
-        final EducationResource educationResource = new EducationResourceImpl();
-        environment.jersey().register(educationResource);
+		final EducationResource educationResource = new EducationResourceImpl();
+		environment.jersey().register(educationResource);
 
-        final InformationResource infoResource = new InformationResourceImpl();
-        environment.jersey().register(infoResource);
+		final InformationResource infoResource = new InformationResourceImpl();
+		environment.jersey().register(infoResource);
 
-        if( new File("/srv/www/ossweb/index.html").exists() ) {
-		final ImporterResource importerResource = new ImporterResourceImpl();
-		environment.jersey().register(importerResource);
-		PluginHandler.registerPlugins(environment);
-        }
+		if( new File("/srv/www/ossweb/index.html").exists() ) {
+			final ImporterResource importerResource = new ImporterResourceImpl();
+			environment.jersey().register(importerResource);
+			PluginHandler.registerPlugins(environment);
+		}
 
-        final SupportResource supportResource = new SupportResourceImpl();
+		final SupportResource supportResource = new SupportResourceImpl();
 		environment.jersey().register(supportResource);
 
-        final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
-        environment.healthChecks().register("template", healthCheck);
+		final TemplateHealthCheck healthCheck = new TemplateHealthCheck(configuration.getTemplate());
+		environment.healthChecks().register("template", healthCheck);
 
-    }
+	}
 }
