@@ -163,14 +163,6 @@ public class Session implements Principal {
 		this.schoolId = schoolId;
 	}
 
-	public String getIP() {
-		return this.ip;
-	}
-
-	public void setIP(String IP) {
-		this.ip = IP;
-	}
-
 	public Room getRoom() {
 		return this.room;
 	}

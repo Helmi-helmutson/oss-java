@@ -24,7 +24,7 @@ public class OSSDaoTestCase extends TestCase {
        
     
         Session session =  new Session();
-        session.setIP("10.0.0.1");
+        session.setIp("10.0.0.1");
          c = new SessionController(session,null);
      
     }

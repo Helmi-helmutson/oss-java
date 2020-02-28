@@ -190,7 +190,7 @@ public class SelfManagementResourceImpl implements SelfManagementResource {
 		SessionController sc = new SessionController(session,em);
 		String  resp         = "";
 		try {
-			session.setIP(req.getRemoteAddr());
+			session.setIp(req.getRemoteAddr());
 			session = sc.createInternalUserSession(userName);
 			final DeviceController deviceController = new DeviceController(session,em);
 			if( deviceController.getByMAC(MAC) != null ) {

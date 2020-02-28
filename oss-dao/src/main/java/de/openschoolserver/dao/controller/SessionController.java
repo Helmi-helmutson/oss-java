@@ -102,7 +102,7 @@ public class SessionController extends Controller {
 		if( user == null ) {
 			return null;
 		}
-		String IP = this.getSession().getIP();
+		String IP = this.getSession().getIp();
 		Device device = deviceController.getByIP(IP);
 		if( device != null ) {
 			room = device.getRoom();
@@ -124,7 +124,7 @@ public class SessionController extends Controller {
 		if( device != null ) {
 			this.session.setDeviceId(device.getId());
 			this.session.setMac(device.getMac());
-			this.session.setIP(device.getIp());
+			this.session.setIp(device.getIp());
 			this.session.setDNSName(device.getName());
 			this.session.setDevice(device);
 		} else {
@@ -383,7 +383,7 @@ public class SessionController extends Controller {
 					+ this.session.getPassword() + "\"");
 		program[0] = "/usr/share/oss/plugins/shares/netlogon/open/100-create-logon-script.sh";
 		program[1] = this.session.getUser().getUid();
-		program[2] = this.session.getIP();
+		program[2] = this.session.getIp();
 		program[3] = OS;
 		if( this.session.getDevice() != null ) {
 			program[4] = this.session.getDevice().getName();

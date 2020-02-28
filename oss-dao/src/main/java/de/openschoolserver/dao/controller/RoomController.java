@@ -631,7 +631,7 @@ public class RoomController extends Controller {
 		String[] program = new String[4];
 		if( access.getAllowSessionIp() ) {
 			program = new String[5];
-			program[4] = this.session.getIP();
+			program[4] = this.session.getIp();
 		}
 		program[0] = "/usr/sbin/oss_set_access_state.sh";
 		program[2] = room.getStartIP() + "/" + room.getNetMask();

@@ -2,9 +2,12 @@
 package de.openschoolserver.dao.controller;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -16,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.extis.core.util.UserUtil;
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import static de.openschoolserver.dao.tools.StaticHelpers.*;
@@ -148,16 +150,38 @@ public class UserController extends Controller {
 		return users;
 	}
 
+	public void createUid(User user) {
+		user.setUid(this.createUid(user.getGivenName(), user.getSurName(), user.getBirthDay()));
+	}
 	public String createUid(String givenName, String surName, Date birthDay) {
-		String userId = UserUtil.createUserId(givenName, surName, birthDay, true,
-				"telex".equals(this.getConfigValue("STRING_CONVERT_TYPE")) , this.getConfigValue("LOGIN_SCHEME"));
+		String userId = "";
+		Pattern pattern = Pattern.compile( "([GNY])(\\d+)" );
+		for ( Matcher m = pattern.matcher( this.getConfigValue("LOGIN_SCHEME") ); m.find(); ) {
+			int endIndex = Integer.valueOf(m.group(2));
+			switch(m.group(1)) {
+			case "G":
+				userId.concat(givenName.substring(0, endIndex));
+				break;
+			case "N":
+			case "S":
+				userId.concat(surName.substring(0, endIndex));
+				break;
+			case "Y":
+				String  bds = String.valueOf(birthDay.getYear());
+				switch(endIndex) {
+					case 2: userId.concat(bds.substring(2, 4)); break;
+					case 4: userId.concat(bds);
+				}
+				break;
+			}
+		}
 		String newUserId = this.getConfigValue("LOGIN_PREFIX") + userId;
 		Integer i = 1;
 		while (!this.isNameUnique(newUserId)) {
 			newUserId = this.getConfigValue("LOGIN_PREFIX") + userId + i;
 			i++;
 		}
-		return newUserId;
+		return newUserId.toLowerCase();
 	}
 
 	public OssResponse add(User user) {
@@ -187,14 +211,7 @@ public class UserController extends Controller {
 		}
 		// Create uid if not given
 		if (user.getUid() == null || user.getUid().isEmpty()) {
-			String userId = UserUtil.createUserId(user.getGivenName(), user.getSurName(), user.getBirthDay(), true,
-					"telex".equals(this.getConfigValue("STRING_CONVERT_TYPE")), this.getConfigValue("LOGIN_SCHEME"));
-			user.setUid(this.getConfigValue("LOGIN_PREFIX") + userId);
-			Integer i = 1;
-			while (!this.isNameUnique(user.getUid())) {
-				user.setUid(this.getConfigValue("LOGIN_PREFIX") + userId + i);
-				i++;
-			}
+			this.createUid(user);
 		} else {
 			user.setUid(user.getUid().toLowerCase());
 			// First we check if the parameter are unique.
