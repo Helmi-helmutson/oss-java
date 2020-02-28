@@ -119,6 +119,7 @@ public class SessionController extends Controller {
 		if( room != null ) {
 			this.session.setRoomId(room.getId());
 			this.session.setRoom(room);
+			this.session.setRoomName(room.getName());
 		}
 		if( device != null ) {
 			this.session.setDeviceId(device.getId());

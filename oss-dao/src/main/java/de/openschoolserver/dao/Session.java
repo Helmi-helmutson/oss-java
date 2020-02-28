@@ -29,14 +29,6 @@ public class Session implements Principal {
 	@Column(name = "createdate")
 	private Date createDate;
 
-	@Transient
-	private String password = "dummy";
-
-	@Transient
-	private Boolean mustChange = false;
-
-	@Transient
-	private String schoolId = "dummy";
 
 	@Column(name="device_id", insertable = false, updatable = false )
 	private Long deviceId;
@@ -53,9 +45,6 @@ public class Session implements Principal {
 	@JsonIgnore
 	private User user;
 
-	@Transient
-	private String role = "dummy";
-
 	@Column(name = "room_id", insertable = false, updatable = false)
 	private Long roomId;
 
@@ -63,17 +52,35 @@ public class Session implements Principal {
 	@JsonIgnore
 	private Room room;
 
-	@Transient
-	private String mac;
-
-	@Transient
-	private String dnsName;
-
 	@Column(name = "ip")
 	private String ip;
 
 	@Column(name = "token")
 	private String token;
+
+	/**
+	 * Transient variables to make the life in front end more simply.
+	 */
+	@Transient
+	private String role = "dummy";
+
+	@Transient
+	private String password = "dummy";
+
+	@Transient
+	private Boolean mustChange = false;
+
+	@Transient
+	private String schoolId = "dummy";
+
+	@Transient
+	private String mac;
+
+	@Transient
+	private String roomName;
+
+	@Transient
+	private String dnsName;
 
 	@JsonIgnore
 	private transient Object temporaryUploadData;
@@ -317,6 +324,48 @@ public class Session implements Principal {
 			}
 		}
 		return modules;
+	}
+
+	/**
+	 * @return the roomName
+	 */
+	public String getRoomName() {
+		return roomName;
+	}
+
+	/**
+	 * @param roomName the roomName to set
+	 */
+	public void setRoomName(String roomName) {
+		this.roomName = roomName;
+	}
+
+	/**
+	 * @return the dnsName
+	 */
+	public String getDnsName() {
+		return dnsName;
+	}
+
+	/**
+	 * @param dnsName the dnsName to set
+	 */
+	public void setDnsName(String dnsName) {
+		this.dnsName = dnsName;
+	}
+
+	/**
+	 * @return the ip
+	 */
+	public String getIp() {
+		return ip;
+	}
+
+	/**
+	 * @param ip the ip to set
+	 */
+	public void setIp(String ip) {
+		this.ip = ip;
 	}
 
 }
