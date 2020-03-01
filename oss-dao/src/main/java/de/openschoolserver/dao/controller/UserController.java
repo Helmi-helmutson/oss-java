@@ -153,24 +153,28 @@ public class UserController extends Controller {
 	public void createUid(User user) {
 		user.setUid(this.createUid(user.getGivenName(), user.getSurName(), user.getBirthDay()));
 	}
+	@SuppressWarnings("deprecation")
 	public String createUid(String givenName, String surName, Date birthDay) {
 		String userId = "";
 		Pattern pattern = Pattern.compile( "([GNY])(\\d+)" );
 		for ( Matcher m = pattern.matcher( this.getConfigValue("LOGIN_SCHEME") ); m.find(); ) {
 			int endIndex = Integer.valueOf(m.group(2));
+			//logger.debug("have found" + m.group(1) + " " + m.group(2) + " " + endIndex + " " + givenName );
 			switch(m.group(1)) {
 			case "G":
-				userId.concat(givenName.substring(0, endIndex));
+				endIndex = endIndex > givenName.length() ?  givenName.length() : endIndex;
+				userId = userId.concat(givenName.substring(0, endIndex));
 				break;
 			case "N":
 			case "S":
-				userId.concat(surName.substring(0, endIndex));
+				endIndex = endIndex > surName.length() ?  givenName.length() : endIndex;
+				userId = userId.concat(surName.substring(0, endIndex));
 				break;
 			case "Y":
 				String  bds = String.valueOf(birthDay.getYear());
 				switch(endIndex) {
-					case 2: userId.concat(bds.substring(2, 4)); break;
-					case 4: userId.concat(bds);
+					case 2: userId = userId.concat(bds.substring(2, 4)); break;
+					case 4: userId = userId.concat(bds);
 				}
 				break;
 			}
@@ -181,7 +185,7 @@ public class UserController extends Controller {
 			newUserId = this.getConfigValue("LOGIN_PREFIX") + userId + i;
 			i++;
 		}
-		return newUserId.toLowerCase();
+		return normalize(newUserId.toLowerCase());
 	}
 
 	public OssResponse add(User user) {
