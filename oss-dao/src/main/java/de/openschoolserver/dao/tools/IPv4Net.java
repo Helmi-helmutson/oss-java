@@ -233,13 +233,13 @@ public void setNetmaskNumeric(int netmaskNumeric) {
             numberOfIPs = numberOfIPs | 0x01;
 
         }
-
+        numberOfIPs = numberOfIPs +1;
         Integer baseIP = baseIPnumeric & getNetmaskNumeric();
 	    if( numberofIPs == 0 ) {
-	      numberofIPs = numberOfIPs;
+		numberofIPs = numberOfIPs;
 	    }
-        //We need the first and the last address too.
-        for (int i = 0; i < (numberOfIPs) && i < numberofIPs +2; i++) {
+
+        for (int i = 0; i < (numberOfIPs) && i < numberofIPs; i++) {
 
             Integer ourIP = baseIP + i;
 
