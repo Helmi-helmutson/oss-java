@@ -548,7 +548,7 @@ public class RoomController extends Controller {
 		if(roomNetMask < subNetwork.getNetmaskNumeric() ) {
 			throw new NumberFormatException("The network netmask must be less then the room netmask:" + roomNetMask + ">" + subNetwork.getNetmaskNumeric() );
 		}
-		Query query = this.em.createNamedQuery("Room.findAllToRegister");
+		Query query = this.em.createNamedQuery("Room.findAllWithFirewallControl");
 		List<Room> rooms = (List<Room>) query.getResultList();
 		String nextNet = subNetwork.getBase();
 
