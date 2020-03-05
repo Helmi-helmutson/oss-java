@@ -192,10 +192,10 @@ public class DeviceController extends Controller {
 				cat.getDevices().remove(device);
 				this.em.merge(cat);
 			}
-			//Clean up sessions
+			/*Clean up sessions
 			for( Session session : device.getSessions() ) {
 				this.em.remove(session);
-			}
+			}*/
 			//Clean up loggedIn entries
 			for( User loggedInUser : device.getLoggedIn() ) {
 				loggedInUser.getLoggedOn().remove(device);

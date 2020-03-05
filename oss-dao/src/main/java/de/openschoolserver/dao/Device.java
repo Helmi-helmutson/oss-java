@@ -151,7 +151,7 @@ public class Device implements Serializable {
 	private Room room;
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="device", cascade ={CascadeType.ALL}, orphanRemoval=true)
+	@OneToMany(mappedBy="device", cascade ={CascadeType.ALL} )
 	@JsonIgnore
 	private List<Session> sessions = new ArrayList<Session>();
 
