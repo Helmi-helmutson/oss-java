@@ -70,7 +70,7 @@ public class Room implements Serializable {
 	private List<Category> categories = new ArrayList<Category>();
 
 	//bi-directional many-to-one association to AccessInRoom
-	@OneToMany(mappedBy="room", cascade=CascadeType.ALL, orphanRemoval=true)
+	@OneToMany(mappedBy="room", cascade=CascadeType.ALL )
 	@JsonIgnore
 	private List<AccessInRoom> accessInRooms = new ArrayList<AccessInRoom>();
 
@@ -80,7 +80,7 @@ public class Room implements Serializable {
 	private List<Device> devices = new ArrayList<Device>();
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="room",cascade=CascadeType.ALL, orphanRemoval=true )
+	@OneToMany(mappedBy="room",cascade=CascadeType.ALL )
 	@JsonIgnore
 	private List<Session> sessions = new ArrayList<Session>();
 

@@ -1167,13 +1167,13 @@ public class UserController extends Controller {
 				this.em.remove(o);
 			}
 			creator.setCreatedUsers(null);
-			//Sessions will be deleted
+			/*Sessions will be deleted
 			for( Session o : creator.getSessions() ) {
 				this.em.remove(o);
-			}
+			}*/
 			//Delete all correspondig configs.
 			this.deletAllConfigs(creator);
-			creator.setSessions(null);
+			//creator.setSessions(null);
 			this.em.merge(creator);
 		} catch (Exception e) {
 			logger.error("delete owned objects:" + e.getMessage());

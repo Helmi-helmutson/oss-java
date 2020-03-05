@@ -78,12 +78,12 @@ public class User implements Serializable {
 	private Date birthDay;
 
 	//bi-directional many-to-one association to Alias
-	@OneToMany(mappedBy="user", cascade ={CascadeType.ALL}, orphanRemoval=true)
+	@OneToMany(mappedBy="user", cascade ={CascadeType.ALL})
 	@JsonIgnore
 	private List<Alias> aliases = new ArrayList<Alias>();
 
 	//bi-directional many-to-one association to Acls
-	@OneToMany(mappedBy="user", cascade ={CascadeType.ALL}, orphanRemoval=true)
+	@OneToMany(mappedBy="user", cascade ={CascadeType.ALL})
 	@JsonIgnore
 	private List<Acl> acls = new ArrayList<Acl>();
 
@@ -103,7 +103,7 @@ public class User implements Serializable {
 	private List<User> createdUsers = new ArrayList<User>();
 
 	//bi-directional many-to-one association to Device
-	@OneToMany(mappedBy="user", cascade ={CascadeType.ALL}, orphanRemoval=true)
+	@OneToMany(mappedBy="user", cascade ={CascadeType.ALL})
 	@JsonIgnore
 	private List<Session> sessions = new ArrayList<Session>();
 
