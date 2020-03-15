@@ -68,6 +68,11 @@ public class StaticHelpers {
 		return pattern.matcher(output).replaceAll("");
 	}
 
+	/**
+	 * Start a plugin for an object by creating modifying or deleting
+	 * @param pluginName The name of the plugin to be called: add_user, modify_user ...
+	 * @param object The corresponding object.
+	 */
 	static public void startPlugin(String pluginName, Object object){
 		StringBuilder data = new StringBuilder();
 		String[] program   = new String[2];
