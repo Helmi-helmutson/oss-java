@@ -406,7 +406,7 @@ public class Controller extends Config {
 			break;
 		case "de.openschoolserver.dao.User":
 			User user = (User)object;
-			ownerId = user.getCreator().getId();
+			owner = user.getCreator();
 			neededRights.add("user.modify");
 			if( session.getUser().getRole().equals(roleTeacher) &&
 				user.getRole().equals(roleStudent)) {
