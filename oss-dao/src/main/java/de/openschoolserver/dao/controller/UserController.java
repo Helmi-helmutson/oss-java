@@ -450,7 +450,7 @@ public class UserController extends Controller {
 			}
 		}
 		for (Group group : user.getGroups()) {
-			if (!user.getRole().equals(group.getName())) {
+			if(user.getRole().equals(group.getName())) {
 				// User must not be removed from it's primary group.
 				continue;
 			}
