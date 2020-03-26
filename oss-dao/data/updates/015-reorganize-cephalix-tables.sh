@@ -68,3 +68,6 @@ then
 	echo "alter table CephalixOssCareMessages change COLUMN type careMessageType VARCHAR(16);" | mysql OSS
 fi
 
+echo "ALTER TABLE CephalixSystemStatus ADD COLUMN IF NOT EXISTS recDate DATETIME DEFAULT NOW() AFTER lastUpdate;" | mysql OSS
+echo "ALTER TABLE CephalixSystemStatus MODIFY lastUpdate DATETIME DEFAULT NOW() on update current_timestamp();" | mysql OSS
+
