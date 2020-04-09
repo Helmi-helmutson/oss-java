@@ -164,7 +164,6 @@ public class RoomRescourceImpl implements RoomResource {
 		return accesses;
 	}
 
-
 	@Override
 	public OssResponse addAccessList(Session session, Long roomId, AccessInRoom accessList) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
@@ -473,6 +472,15 @@ public class RoomRescourceImpl implements RoomResource {
 		RoomController roomController = new RoomController(session,em);
 		Room room = roomController.getById(roomId);
 		OssResponse resp = roomController.deleteMConfig(room,parameterId);
+		em.close();
+		return resp;
+	}
+
+	@Override
+	public OssResponse setPrinters(Session session, Long roomId, Map<String, List<Long>> printers) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		RoomController roomController = new RoomController(session,em);
+		OssResponse resp = roomController.setPrinters(roomId, printers);
 		em.close();
 		return resp;
 	}
