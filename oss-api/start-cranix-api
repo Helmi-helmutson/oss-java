@@ -1,0 +1,44 @@
+#!/bin/bash
+
+. /etc/sysconfig/schoolserver
+. /etc/profile.d/profile.sh
+
+#Create a session for local services
+TOKEN=$( grep de.openschoolserver.api.auth.localhost= /opt/cranix-java/conf/cranix-api.properties | sed 's/de.openschoolserver.api.auth.localhost=//' )
+SQLUSER=$( grep javax.persistence.jdbc.user= /opt/cranix-java/conf/cranix-api.properties | sed 's/javax.persistence.jdbc.user=//' )
+SQLPW=$( grep javax.persistence.jdbc.password= /opt/cranix-java/conf/cranix-api.properties | sed 's/javax.persistence.jdbc.password=//' )
+LOCAL_TOKEN=$( echo "SELECT COUNT(*) FROM Sessions WHERE token='$TOKEN'" | mysql OSS -u $SQLUSER -p${SQLPW} | tail -n 1 )
+if [  "${LOCAL_TOKEN}" = 0 -o "${SCHOOL_RESET_REGISTER_PASSWORD}" = "yes" ]; then
+	grep -q de.openschoolserver.api.auth.localhost= /opt/cranix-java/conf/cranix-api.properties || echo de.openschoolserver.api.auth.localhost=TOKEN >> /opt/cranix-java/conf/cranix-api.properties
+	TOKEN="localhost_"$(uuidgen)
+	sed -i s/de.openschoolserver.api.auth.localhost=.*/de.openschoolserver.api.auth.localhost=$TOKEN/ /opt/cranix-java/conf/cranix-api.properties
+	chmod 600            /opt/cranix-java/conf/cranix-api.properties
+	echo "DELETE FROM Sessions WHERE IP='127.0.0.1'" | mysql -u $SQLUSER -p${SQLPW} OSS
+	echo "INSERT INTO Sessions VALUES(NULL,1,NULL,NULL,NOW(),'127.0.0.1','$TOKEN')" | mysql -u $SQLUSER -p${SQLPW} OSS
+fi
+#Create recreate the printer driver files if neccesarry
+if [ -e /usr/share/oss/templates/printers.txt -a -e /usr/share/oss/templates/drivers.txt ]; then
+        NEWER=$( find /usr/share/cups -name '*ppd.gz' -newer /usr/share/oss/templates/printers.txt )
+        if [ "$NEWER" ]; then
+                /usr/share/oss/tools/CreatePrinterPpd.pl
+        fi
+else
+        /usr/share/oss/tools/CreatePrinterPpd.pl
+fi
+
+#Register the server if not already done
+if [ ! -e /etc/zypp/repos.d/OSS.repo -o ! -e /srv/salt/repos.d/salt-packages.repo ]; then
+        /usr/share/oss/tools/register.sh
+fi
+
+#Create lock dir if not exists
+if [ -d /run/lock/cranix-api ]; then
+        mkdir -p /run/lock/cranix-api
+fi
+
+#Java path
+APP_HOME="/opt/cranix-java"
+
+@CLASSPATH@
+exec java --add-modules java.xml.bind -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant -cp $CLASSPATH de.openschoolserver.api.ServerApplication server /opt/cranix-java/conf/config.yml
+

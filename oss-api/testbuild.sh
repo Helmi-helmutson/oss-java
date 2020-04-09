@@ -4,7 +4,7 @@ sudo /usr/sbin/update-alternatives --set java /usr/lib64/jvm/jre-11-openjdk/bin/
 #gradle --offline clean build
 gradle clean build
 tar xf build/distributions/de.openschoolserver.api-1.0-SNAPSHOT.tar
-REPO="/data1/OSC/home:varkoly:OSS-4-1:leap15.1/oss-java/"
+REPO="/data1/OSC/home:varkoly:CRANIX-4-2/cranix-java/"
 
 if [ "$1" ]; then
         PORT=22
@@ -25,9 +25,9 @@ cd $HERE
 if [ -e oss-java ]; then
     rm -r oss-java
 fi
-mv de.openschoolserver.api-1.0-SNAPSHOT  oss-java
-chmod 644 oss-java/lib/*
-tar cjf ${REPO}/oss-java.tar.bz2 oss-java
+mv de.openschoolserver.api-1.0-SNAPSHOT  cranix-java
+chmod 644 cranix-java/lib/*
+tar cjf ${REPO}/cranix-java.tar.bz2 cranix-java
 cp ${HERE}/../oss-dao/data/school-INSERT.sql.in   ${HERE}/../oss-dao/data/school-INSERT.sql
 cp ${HERE}/../oss-dao/data/business-INSERT.sql.in ${HERE}/../oss-dao/data/business-INSERT.sql
 cd ${HERE}/src/main/java/de/openschoolserver/api/resources/
@@ -37,9 +37,9 @@ cd ${HERE}
 cd ../oss-dao/
 tar cjf ${REPO}/data.tar.bz2 data
 cd ${HERE}
-CLASSPATH=$( grep "^CLASSPATH=" oss-java/bin/de.openschoolserver.api )
-sed "s#@CLASSPATH@#$CLASSPATH#" start-oss-api > ${REPO}/start-oss-api
-rm -r oss-java
+CLASSPATH=$( grep "^CLASSPATH=" cranix-java/bin/de.openschoolserver.api )
+sed "s#@CLASSPATH@#$CLASSPATH#" start-cranix-api > ${REPO}/start-cranix-api
+rm -r cranix-java
 xterm -e git log --raw  &
 
 cd ${REPO}/
