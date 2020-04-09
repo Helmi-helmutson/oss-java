@@ -272,6 +272,25 @@ public interface DeviceResource {
 	        @PathParam("IP") String IP
 	);
 
+	@POST
+	@Path("{deviceId}/printers")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Modify the printers of one device.",
+			notes = "The printers object has following format<br>"
+					+ "{"
+					+ "  defaultPrinter:  [id],"
+					+ "  availablePrinters: [ id1, id2 ]"
+					+ "}")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("device.modify")
+	OssResponse setPrinters(
+	@ApiParam(hidden = true) @Auth Session session,
+			@PathParam("deviceId") Long deviceId,
+			Map<String, List<Long>> printers
+	);
+
 	/*
 	 * PUT devices/{deviceId}/defaultPrinter/{printerId}
 	 */

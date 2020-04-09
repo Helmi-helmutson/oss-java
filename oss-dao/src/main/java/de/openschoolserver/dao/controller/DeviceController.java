@@ -1259,6 +1259,42 @@ public class DeviceController extends Controller {
 		return new OssResponse(this.getSession(),"OK", "Logged in user was added succesfully:%s;%s;%s",null,parameters);
 	}
 
+	public OssResponse setPrinters(Long deviceId, Map<String, List<Long>>  printers) {
+		Device device = this.getById(deviceId);
+		List<Long> toAdd    = new ArrayList<Long>();
+		List<Long> toRemove = new ArrayList<Long>();
+		this.deleteDefaultPrinter(deviceId);
+		if( !printers.get("defaultPrinter").isEmpty() ) {
+			this.setDefaultPrinter(deviceId, printers.get("defaultPrinter").get(0));
+		}
 
+		try {
+			for( Printer printer: device.getAvailablePrinters() ) {
+				if( !printers.get("availablePrinters").contains(printer.getId())) {
+					toRemove.add(printer.getId());
+				}
+			}
+			for( Long printerId: printers.get("availablePrinters")) {
+				boolean found = false;
+				for( Printer printer: device.getAvailablePrinters() ) {
+					if(printer.getId().equals(printerId)) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					toAdd.add(printerId);
+				}
+			}
+			for(Long printerId: toRemove) {
+				this.deleteAvailablePrinter(deviceId, printerId);
+			}
+			for(Long printerId: toAdd) {
+				this.addAvailablePrinter(deviceId, printerId);
+			}
+		} catch (Exception e) {
 
+		}
+		return new OssResponse(this.session,"OK","Printers of the device was set.");
+	}
 }

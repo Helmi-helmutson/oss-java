@@ -476,4 +476,13 @@ public class DeviceResourceImpl implements DeviceResource {
 		em.close();
 		return resp;
 	}
+
+	@Override
+	public OssResponse setPrinters(Session session, Long deviceId, Map<String, List<Long>> printers) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		DeviceController deviceController = new DeviceController(session,em);
+		OssResponse resp = deviceController.setPrinters(deviceId,printers);
+		em.close();
+		return resp;
+	}
 }
