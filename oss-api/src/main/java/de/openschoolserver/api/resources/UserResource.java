@@ -9,6 +9,7 @@ import io.swagger.annotations.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.*;
 
 import java.io.InputStream;
@@ -669,7 +670,7 @@ public interface UserResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "User not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("user.search")
+	@RolesAllowed("user.manage")
 	List<UserImport> getImports(
 			@ApiParam(hidden = true) @Auth Session session
 			);
@@ -681,7 +682,7 @@ public interface UserResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "User not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("user.search")
+	@RolesAllowed("user.manage")
 	UserImport getImport(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("startTime")  String    startTime
@@ -694,7 +695,7 @@ public interface UserResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "User not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("user.search")
+	@RolesAllowed("user.manage")
 	OssResponse restartImport(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("startTime")  String    startTime
@@ -707,7 +708,7 @@ public interface UserResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "User not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("user.search")
+	@RolesAllowed("user.manage")
 	OssResponse deleteImport(
 			@ApiParam(hidden = true) @Auth Session session,
 			@PathParam("startTime")  String    startTime
@@ -720,10 +721,36 @@ public interface UserResource {
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "User not found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
-	@RolesAllowed("user.search")
+	@RolesAllowed("user.manage")
 	UserImport getRunningImport(
 			@ApiParam(hidden = true) @Auth Session session
 			);
+
+	@GET
+	@Path("imports/{startTime}/pdf")
+	@Produces("*/*")
+	@ApiOperation(value = "Delivers result of the import as PDF file.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("user.manage")
+	Response getImportAsPdf(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("startTime")  String    startTime
+	);
+
+	@GET
+	@Path("imports/{startTime}/txt")
+	@Produces("*/*")
+	@ApiOperation(value = "Delivers result of the import as txt file.")
+	@ApiResponses(value = {
+		@ApiResponse(code = 500, message = "Server broken, please contact administrator")
+	})
+	@RolesAllowed("user.manage")
+	Response getImportAsTxt(
+		@ApiParam(hidden = true) @Auth Session session,
+		@PathParam("startTime")  String    startTime
+	);
 
 	/*
 	* Some additional stuff

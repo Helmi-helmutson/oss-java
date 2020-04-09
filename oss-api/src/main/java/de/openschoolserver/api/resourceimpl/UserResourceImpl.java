@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
@@ -679,6 +680,18 @@ public class UserResourceImpl implements UserResource {
 	}
 
 	@Override
+	public Response getImportAsPdf(Session session, String startTime) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Response getImportAsTxt(Session session, String startTime) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
 	public OssResponse syncMsQuotas(Session session, List<List<String>> Quotas) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new UserController(session,em).syncMsQuotas(Quotas);
@@ -760,4 +773,5 @@ public class UserResourceImpl implements UserResource {
 		em.close();
 		return new OssResponse(session,"OK", "Users was inserted in the required groups.");
 	}
+
 }
