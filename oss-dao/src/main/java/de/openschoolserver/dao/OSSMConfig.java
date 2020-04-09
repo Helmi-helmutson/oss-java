@@ -24,7 +24,7 @@ public class OSSMConfig implements Serializable {
         private static final long serialVersionUID = 1L;
 
         @Id
-	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
+        @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
         private Long id;
 
         private String objectType;
@@ -48,7 +48,6 @@ public class OSSMConfig implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
 
         @Override
 		public int hashCode() {
@@ -125,5 +124,4 @@ public class OSSMConfig implements Serializable {
 		public void setCreator(User creator) {
 			this.creator = creator;
 		}
-
 }

@@ -164,8 +164,8 @@ public class StaticHelpers {
 				logger.error("pluginHandler : Cephalix****:" + e.getMessage());
 			}
 		}
-		OSSShellTools.exec(program, reply, error, data.toString());
-		logger.debug(pluginName + " : " + data.toString() + " : " + error);
+		int ret = OSSShellTools.exec(program, reply, error, data.toString());
+		logger.debug(pluginName + " : " + data.toString() + " : " + error + " : " + ret);
 	}
 
 	static public void changeMemberPlugin(String type, Group group, List<User> users){

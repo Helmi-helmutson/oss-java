@@ -92,7 +92,7 @@ public interface PrinterResource {
 	@GET
 	@Path("all")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets thes lis of printers.")
+	@ApiOperation(value = "Gets the lis of printers.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
@@ -104,7 +104,7 @@ public interface PrinterResource {
 	@GET
 	@Path("{printerId}")
 	@Produces(JSON_UTF8)
-	@ApiOperation(value = "Gets thes lis of printers.")
+	@ApiOperation(value = "Gets the a printer by id.")
 	@ApiResponses(value = {
 			@ApiResponse(code = 404, message = "No device was found"),
 			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
