@@ -8,7 +8,9 @@ import javax.persistence.*;
 import javax.validation.constraints.Size;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -38,6 +40,42 @@ import java.util.List;
 public class Room implements Serializable {
 	private static final long serialVersionUID = 1L;
 
+	@SuppressWarnings("serial")
+	public static Map<Integer, Integer> nmToCount = new HashMap<Integer, Integer>() {{
+		put(0,0);
+		put(31,2);
+		put(30,4);
+		put(29,8);
+		put(28,16);
+		put(27,32);
+		put(26,64);
+		put(25,128);
+		put(24,256);
+		put(23,512);
+		put(22,1024);
+		put(21,2048);
+		put(20,4096);
+		put(19,8192);
+	}};
+
+	@SuppressWarnings("serial")
+	public static Map<Integer, Integer> countToNm = new HashMap<Integer, Integer>() {{
+		put(0,0);
+		put(2,31);
+		put(4,30);
+		put(8,29);
+		put(16,28);
+		put(32,27);
+		put(64,26);
+		put(128,25);
+		put(256,24);
+		put(512,23);
+		put(1024,22);
+		put(2048,21);
+		put(4096,20);
+		put(8192,19);
+	}};
+
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")
 	private Long id;
@@ -46,23 +84,23 @@ public class Room implements Serializable {
 	@Size(max=10, message="Name must not be longer then 10 characters.")
 	private String name;
 
-	private int places;
+	private Integer places;
 
 	@Column(name = "roomRows")
-	private int rows;
+	private Integer rows;
 
 	@Size(max=64, message="Description must not be longer then 64 characters.")
 	private String description;
 
 	@Column(name = "netMask", updatable = false)
-	private int netMask;
+	private Integer netMask;
 
 	@Column(name = "startIP", updatable = false)
-	private String startIP;
+	private String startIP = "";
 
-	private String roomType;
+	private String roomType = "ComputerRoom";
 
-	private String roomControl;
+	private String roomControl = "inRoom";
 
 	//bi-directional many-to-many association to Category
 	@ManyToMany(mappedBy="rooms")
@@ -115,7 +153,7 @@ public class Room implements Serializable {
 	private List<RoomSmartControl> smartControls = new ArrayList<RoomSmartControl>();
 
 	@Transient
-	private String network;
+	private String network = "";
 
 	//bi-directional many-to-one association to HWConf
 	@ManyToOne
@@ -130,16 +168,11 @@ public class Room implements Serializable {
 	@JsonIgnore
 	private User creator;
 
+	@Transient
+	private Integer devCount;
+
 	public Room() {
-		this.network           = "";
-		this.roomControl       = "inRoom";
-		this.roomType	       = "ComputerRoom";
-		this.startIP           = "";
-		this.categories        = new ArrayList<Category>();
-		this.accessInRooms     = new ArrayList<AccessInRoom>();
-		this.availablePrinters = new ArrayList<Printer>();
-		this.devices           = new ArrayList<Device>();
-		this.smartControls     = new ArrayList<RoomSmartControl>();
+		this.convertNmToCount();
 	}
 
 	public Long getId() {
@@ -185,6 +218,14 @@ public class Room implements Serializable {
 		return true;
 	}
 
+	public void convertNmToCount() {
+		this.devCount = nmToCount.get(this.netMask);
+	}
+
+	public void convertCountToNm() {
+		this.netMask = countToNm.get(this.devCount);
+	}
+
 	public Long getHwconfId() {
 		return this.hwconfId;
 	}
@@ -197,11 +238,11 @@ public class Room implements Serializable {
 		this.name = name;
 	}
 
-	public int getPlaces() {
+	public Integer getPlaces() {
 		return this.places;
 	}
 
-	public void setPlaces(int places) {
+	public void setPlaces(Integer places) {
 		this.places = places;
 	}
 
@@ -213,11 +254,11 @@ public class Room implements Serializable {
 		this.description = description;
 	}
 
-	public int getNetMask() {
+	public Integer getNetMask() {
 		return this.netMask;
 	}
 
-	public void setNetMask(int netMask) {
+	public void setNetMask(Integer netMask) {
 		this.netMask = netMask;
 	}
 
@@ -380,14 +421,35 @@ public class Room implements Serializable {
 	/**
 	 * @return the roomRows
 	 */
-	public int getRows() {
+	public Integer getRows() {
 		return rows;
 	}
 
 	/**
 	 * @param roomRows the roomRows to set
 	 */
-	public void setRows(int roomRows) {
+	public void setRows(Integer roomRows) {
 		this.rows = roomRows;
+	}
+
+	/**
+	 * @return the devCount
+	 */
+	public Integer getDevCount() {
+		return devCount;
+	}
+
+	/**
+	 * @param devCount the devCount to set
+	 */
+	public void setDevCount(Integer devCount) {
+		this.devCount = devCount;
+	}
+
+	/**
+	 * @return the serialversionuid
+	 */
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 }

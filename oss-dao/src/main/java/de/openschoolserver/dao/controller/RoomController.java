@@ -45,23 +45,6 @@ public class RoomController extends Controller {
 	Logger logger = LoggerFactory.getLogger(RoomController.class);
 
 	@SuppressWarnings("serial")
-	static Map<String, Integer> countToNm = new HashMap<String, Integer>() {{
-		put("2",  31);
-		put("4",  30);
-		put("8",  29);
-		put("16",  28);
-		put("32",  27);
-		put("64",  26);
-		put("128",  25);
-		put("256",  24);
-		put("512",  23);
-		put("1024",  22);
-		put("2048",  21);
-		put("4096",  20);
-		put("8192",  19);
-	}};
-
-	@SuppressWarnings("serial")
 	static Map<Integer, Integer> nmToRowsPlaces = new HashMap<Integer, Integer>() {{
 		put(31,2);
 		put(30,2);
@@ -113,7 +96,11 @@ public class RoomController extends Controller {
 	public Room getById(long roomId) {
 
 		try {
-			return this.em.find(Room.class, roomId);
+			Room room = this.em.find(Room.class, roomId);
+			if( room != null ) {
+				room.convertNmToCount();
+			}
+			return room;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -130,6 +117,9 @@ public class RoomController extends Controller {
 			logger.error(e.getMessage());
 		} finally {
 		}
+		for( Room room: rooms ) {
+			room.convertNmToCount();
+		}
 		rooms.sort(Comparator.comparing(Room::getName));
 		return rooms;
 	}
@@ -142,6 +132,9 @@ public class RoomController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
+		}
+		for( Room room: rooms ) {
+			room.convertNmToCount();
 		}
 		rooms.sort(Comparator.comparing(Room::getName));
 		return rooms;
@@ -156,6 +149,9 @@ public class RoomController extends Controller {
 			logger.error(e.getMessage());
 		} finally {
 		}
+		for( Room room: rooms ) {
+			room.convertNmToCount();
+		}
 		rooms.sort(Comparator.comparing(Room::getName));
 		return rooms;
 	}
@@ -168,6 +164,9 @@ public class RoomController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
+		}
+		for( Room room: rooms ) {
+			room.convertNmToCount();
 		}
 		rooms.sort(Comparator.comparing(Room::getName));
 		return rooms;
@@ -199,6 +198,9 @@ public class RoomController extends Controller {
 			logger.error(e.getMessage());
 		} finally {
 		}
+		for( Room room: rooms ) {
+			room.convertNmToCount();
+		}
 		rooms.sort(Comparator.comparing(Room::getName));
 		return rooms;
 	}
@@ -212,6 +214,9 @@ public class RoomController extends Controller {
 			logger.error(e.getMessage());
 		} finally {
 		}
+		for( Room room: rooms ) {
+			room.convertNmToCount();
+		}
 		rooms.sort(Comparator.comparing(Room::getName));
 		return rooms;
 	}
@@ -220,7 +225,11 @@ public class RoomController extends Controller {
 	public Room getByIP(String ip) {
 		try {
 			Query query = this.em.createNamedQuery("Room.getByIp").setParameter("ip", ip);
-			return (Room) query.getResultList().get(0);
+			Room room = (Room)query.getResultList().get(0);
+			if( room != null ) {
+				room.convertNmToCount();
+			}
+			return room;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -231,7 +240,11 @@ public class RoomController extends Controller {
 	public Room getByName(String name) {
 		try {
 			Query query = this.em.createNamedQuery("Room.getByName").setParameter("name", name);
-			return (Room) query.getResultList().get(0);
+			Room room = (Room)query.getResultList().get(0);
+			if( room != null ) {
+				room.convertNmToCount();
+			}
+			return room;
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 			return null;
@@ -274,6 +287,9 @@ public class RoomController extends Controller {
 				}
 			}
 		}
+		for( Room room: rooms ) {
+			room.convertNmToCount();
+		}
 		return rooms;
 	}
 	/**
@@ -294,6 +310,9 @@ public class RoomController extends Controller {
 		} catch (Exception e) {
 			logger.error(e.getMessage());
 		} finally {
+		}
+		for( Room room: rooms ) {
+			room.convertNmToCount();
 		}
 		rooms.sort(Comparator.comparing(Room::getName));
 		return rooms;
@@ -343,6 +362,10 @@ public class RoomController extends Controller {
 			return new OssResponse(this.getSession(),"ERROR", "Room description is not unique.");
 		}
 
+		//If no devCount was set we calculate the net mask
+		if( room.getDevCount() != null ) {
+			room.convertCountToNm();
+		}
 		// If no network was configured we will use net school network.
 		if( room.getNetwork() == null || room.getNetwork().isEmpty() ) {
 			room.setNetwork(this.getConfigValue("NETWORK") + "/" + this.getConfigValue("NETMASK"));
@@ -1257,6 +1280,43 @@ public class RoomController extends Controller {
 		return new OssResponse(this.getSession(),"OK","The selected printer was removed from room.");
 	}
 
+	public OssResponse setPrinters(Long roomId, Map<String, List<Long>>  printers) {
+		Room room = this.getById(roomId);
+		List<Long> toAdd    = new ArrayList<Long>();
+		List<Long> toRemove = new ArrayList<Long>();
+		this.deleteDefaultPrinter(roomId);
+		if( !printers.get("defaultPrinter").isEmpty() ) {
+			this.setDefaultPrinter(roomId, printers.get("defaultPrinter").get(0));
+		}
+		try {
+			for( Printer printer: room.getAvailablePrinters() ) {
+				if( !printers.get("availablePrinters").contains(printer.getId())) {
+					toRemove.add(printer.getId());
+				}
+			}
+			for( Long printerId: printers.get("availablePrinters")) {
+				boolean found = false;
+				for( Printer printer: room.getAvailablePrinters() ) {
+					if(printer.getId().equals(printerId)) {
+						found = true;
+						break;
+					}
+				}
+				if(!found) {
+					toAdd.add(printerId);
+				}
+			}
+			for(Long printerId: toRemove) {
+				this.deleteAvailablePrinter(roomId, printerId);
+			}
+			for(Long printerId: toAdd) {
+				this.addAvailablePrinter(roomId, printerId);
+			}
+		} catch (Exception e) {
+
+		}
+		return new OssResponse(this.session,"OK","Printers of the room was set.");
+	}
 	public OssResponse manageRoom(long roomId, String action, Map<String, String> actionContent) {
 		OssResponse ossResponse = null;
 		List<String> errors = new ArrayList<String>();
@@ -1467,10 +1527,11 @@ public class RoomController extends Controller {
 				room.setDescription(values[header.get("name")]);
 			}
 			if(header.containsKey("count") && !values[header.get("count")].isEmpty()) {
-				if( ! countToNm.containsKey(values[header.get("count")]) ) {
+				int count = Integer.valueOf(values[header.get("count")]);
+				if( ! Room.countToNm.containsKey(count) ) {
 					return new OssResponse(this.getSession(),"ERROR", "Bad computer count. Allowed values are 4,8,16,32,64,128.256,512,1024,2048,4096");
 				}
-				room.setNetMask(countToNm.get(values[header.get("count")]));
+				room.setNetMask(Room.countToNm.get(count));
 			}
 			if(header.containsKey("rows") && !values[header.get("rows")].isEmpty() ) {
 				room.setRows(Integer.parseInt(values[header.get("rows")]));
