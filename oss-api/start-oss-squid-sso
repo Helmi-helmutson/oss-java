@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #Java path
-APP_HOME="/opt/oss-java/lib"
+APP_HOME="/opt/cranix-java/lib"
 exec java -Xrs -Dfile.encoding=UTF-8 -Duser.country=US -Duser.language=en -Duser.variant \
      -cp ${APP_HOME}/de.openschoolserver.api-1.0-SNAPSHOT.jar:${APP_HOME}/httpclient-4.5.2.jar:${APP_HOME}/fluent-hc-4.5.2.jar:${APP_HOME}/httpcore-4.4.4.jar:${APP_HOME}/commons-logging-1.2.jar \
      de.openschoolserver.api.OssSquidSSO

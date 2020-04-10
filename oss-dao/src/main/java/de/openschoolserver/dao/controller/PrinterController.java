@@ -21,7 +21,6 @@ import javax.persistence.Query;
 
 import org.apache.commons.io.IOUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.openschoolserver.dao.Device;
@@ -30,6 +29,7 @@ import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 public class PrinterController extends Controller {
 	private Path DRIVERS   = Paths.get("/usr/share/oss/templates/drivers.txt");
@@ -286,7 +286,7 @@ public class PrinterController extends Controller {
 		if( fileInputStream != null ) {
 			File file = null;
 			try {
-				file = File.createTempFile("oss_driverFile", name, new File("/opt/oss-java/tmp/"));
+				file = File.createTempFile("oss_driverFile", name, new File(cranixTmpDir));
 				Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			} catch (IOException e) {
 				logger.error(e.getMessage(), e);

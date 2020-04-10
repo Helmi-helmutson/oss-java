@@ -74,7 +74,7 @@ public class SessionController extends Controller {
 		program[2] = "admin";
 		program[3] = "-A";
 		try {
-			File file = File.createTempFile("login", ".cred", new File("/opt/oss-java/tmp/"));
+			File file = File.createTempFile("login", ".cred", new File(cranixTmpDir));
 			List<String> credentials = new ArrayList<String>();
 			credentials.add("username=" + username);
 			credentials.add("password=" + password);

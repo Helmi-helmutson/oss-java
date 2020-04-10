@@ -37,6 +37,7 @@ import de.openschoolserver.dao.controller.UserController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import de.openschoolserver.dao.OssResponse;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 public class UserResourceImpl implements UserResource {
 
@@ -469,7 +470,7 @@ public class UserResourceImpl implements UserResource {
 			FormDataContentDisposition contentDispositionHeader) {
 		File file = null;
 		try {
-			file = File.createTempFile("oss", "importUser", new File("/opt/oss-java/tmp/"));
+			file = File.createTempFile("oss", "importUser", new File(cranixTmpDir));
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);

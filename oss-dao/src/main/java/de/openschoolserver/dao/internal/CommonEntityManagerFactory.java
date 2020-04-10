@@ -1,4 +1,4 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 202 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 /* (c) 2016 EXTIS GmbH - all rights reserved */
 
 package de.openschoolserver.dao.internal;
@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Properties;
 import org.eclipse.persistence.config.PersistenceUnitProperties;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 public class CommonEntityManagerFactory {
 
@@ -57,7 +58,7 @@ public class CommonEntityManagerFactory {
              * value="DefaultLogger"/>
              */
 	    try {
-			File file = new File("/opt/oss-java/conf/oss-api.properties");
+			File file = new File(cranixPropFile);
 			FileInputStream fileInput = new FileInputStream(file);
 			Properties props = new Properties();
 			props.load(fileInput);

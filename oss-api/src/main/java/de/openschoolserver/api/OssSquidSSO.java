@@ -8,8 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Properties;
-
 import org.apache.http.client.fluent.* ;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 public class OssSquidSSO implements Runnable {
 
@@ -51,7 +51,7 @@ public class OssSquidSSO implements Runnable {
 	public static void main(String[] args) {
 		String tmp = "";
 		try {
-			File file = new File("/opt/oss-java/conf/oss-api.properties");
+			File file = new File(cranixPropFile);
 			FileInputStream fileInput = new FileInputStream(file);
 			Properties props = new Properties();
 			props.load(fileInput);

@@ -11,8 +11,8 @@ if [ "$1" ]; then
         if [ "$2" ]; then
            PORT=$2
         fi
-	scp -P $PORT de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@$1:/opt/oss-java/lib/
-	ssh -p $PORT root@$1 systemctl restart oss-api
+	scp -P $PORT de.openschoolserver.api-1.0-SNAPSHOT/lib/de.openschoolserver.* root@$1:/opt/cranix-java/lib/
+	ssh -p $PORT root@$1 systemctl restart cranix-api
 fi
 echo  -n "Do you want to check in (y/n)?"
 read Y
@@ -22,8 +22,8 @@ fi
 cd ${REPO}
 osc up
 cd $HERE
-if [ -e oss-java ]; then
-    rm -r oss-java
+if [ -e cranix-java ]; then
+    rm -r cranix-java
 fi
 mv de.openschoolserver.api-1.0-SNAPSHOT  cranix-java
 chmod 644 cranix-java/lib/*

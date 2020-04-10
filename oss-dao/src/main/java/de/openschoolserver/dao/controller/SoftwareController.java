@@ -1,5 +1,6 @@
- /* (c) Péter Varkoly <peter@varkoly.de> - all rights reserved  */
+ /* (c) 2020 Péter Varkoly <peter@varkoly.de> - all rights reserved  */
 package de.openschoolserver.dao.controller;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -37,7 +38,6 @@ import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import static de.openschoolserver.dao.internal.OSSConstants.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SuppressWarnings( "unchecked" )
 public class SoftwareController extends Controller {
@@ -533,7 +533,7 @@ public class SoftwareController extends Controller {
 	public OssResponse downloadSoftwares(List<String> softwares) {
 		File file = null;
 		try {
-			file = File.createTempFile("oss_download_job", ".ossb", new File("/opt/oss-java/tmp/"));
+			file = File.createTempFile("oss_download_job", ".ossb", new File(cranixTmpDir));
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -619,7 +619,7 @@ public class SoftwareController extends Controller {
 	public OssResponse updateSoftwares(List<String> softwares) {
 		File file = null;
 		try {
-			file = File.createTempFile("oss_update_softwares_job", ".ossb", new File("/opt/oss-java/tmp/"));
+			file = File.createTempFile("oss_update_softwares_job", ".ossb", new File(cranixTmpDir));
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
 			return new OssResponse(this.getSession(),"ERROR", e.getMessage());
@@ -864,7 +864,7 @@ public class SoftwareController extends Controller {
 		} else {
 			File file = null;
 			try {
-				file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+				file = File.createTempFile("oss_uploadFile", ".ossb", new File(cranixTmpDir));
 				Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				this.em.getTransaction().begin();
 				for( String line : Files.readAllLines(file.toPath())) {

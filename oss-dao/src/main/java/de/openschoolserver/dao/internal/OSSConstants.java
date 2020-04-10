@@ -14,6 +14,10 @@ public interface OSSConstants {
 	static String roleAdministratrion = "administration";
 	static String roleWorkstation = "workstations";
 	static String winLineSeparator = "\r\n";
+	static String cranixConfDir    = "/opt/cranix-java/conf/";
+	static String cranixPropFile   = "/opt/cranix-java/conf/cranix-api.properties";
+	static String cranixTmpDir     = "/opt/cranix-java/tmp/";
+	static String cranixPrinters   = "/usr/share/oss/templates/printers.txt";
 
 	static FileAttribute<Set<PosixFilePermission>> privatDirAttribute      = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rwx------"));
 	static FileAttribute<Set<PosixFilePermission>> privatFileAttribute     = PosixFilePermissions.asFileAttribute( PosixFilePermissions.fromString("rw-------"));

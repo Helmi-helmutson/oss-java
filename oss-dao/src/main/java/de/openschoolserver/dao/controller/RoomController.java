@@ -38,6 +38,7 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.tools.IPv4Net;
 import de.openschoolserver.dao.tools.OSSShellTools;
 import static de.openschoolserver.dao.tools.StaticHelpers.*;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 @SuppressWarnings( "unchecked" )
 public class RoomController extends Controller {
@@ -1490,7 +1491,7 @@ public class RoomController extends Controller {
 		File file = null;
 		List<String> importFile;
 		try {
-			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+			file = File.createTempFile("oss_uploadFile", ".ossb", new File(cranixTmpDir));
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			importFile = Files.readAllLines(file.toPath());
 		} catch (IOException e) {

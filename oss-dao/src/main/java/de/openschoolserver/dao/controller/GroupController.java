@@ -288,7 +288,7 @@ public class GroupController extends Controller {
 		List<String> importFile;
 		OssResponse ossResponse;
 		try {
-			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+			file = File.createTempFile("oss_uploadFile", ".ossb", new File(cranixTmpDir));
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 			importFile = Files.readAllLines(file.toPath());
 		} catch (IOException e) {

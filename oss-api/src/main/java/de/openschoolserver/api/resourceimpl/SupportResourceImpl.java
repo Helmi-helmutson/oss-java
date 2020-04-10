@@ -22,6 +22,7 @@ import de.openschoolserver.dao.SupportRequest;
 import de.openschoolserver.dao.controller.SystemController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 public class SupportResourceImpl implements SupportResource {
 	Logger logger = LoggerFactory.getLogger(SupportResourceImpl.class);
@@ -71,7 +72,7 @@ public class SupportResourceImpl implements SupportResource {
 		logger.debug(supportRequest.toString());
 		File file = null;
 		try {
-			file = File.createTempFile("support", ".json", new File("/opt/oss-java/tmp/"));
+			file = File.createTempFile("support", ".json", new File(cranixTmpDir));
 			PrintWriter writer = new PrintWriter(file.getPath(), "UTF-8");
 			writer.print(supportRequest.toString());
 			writer.close();

@@ -45,7 +45,7 @@ public class Controller extends Config {
 		properties = new HashMap<String, String>();
 		String[] tmp;
 		try {
-			File file = new File("/opt/oss-java/conf/oss-api.properties");
+			File file = new File(cranixPropFile);
 			FileInputStream fileInput = new FileInputStream(file);
 			Properties props = new Properties();
 			props.load(fileInput);

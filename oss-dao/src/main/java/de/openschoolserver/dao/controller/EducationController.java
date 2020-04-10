@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory;
 
 import de.openschoolserver.dao.*;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 public class EducationController extends UserController {
 
@@ -350,7 +351,7 @@ public class EducationController extends UserController {
 		File file = null;
 		List<OssResponse> responses = new ArrayList<OssResponse>();
 		try {
-			file = File.createTempFile("oss_uploadFile", ".ossb", new File("/opt/oss-java/tmp/"));
+			file = File.createTempFile("oss_uploadFile", ".ossb", new File(cranixTmpDir));
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);

@@ -24,6 +24,7 @@ import de.openschoolserver.api.resources.ImporterResource;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.internal.ImportHandler;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 public class ImporterResourceImpl implements ImporterResource {
 	private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ImporterResourceImpl.class);
@@ -82,7 +83,7 @@ public class ImporterResourceImpl implements ImporterResource {
 				+ (o == null ? "no order" : o.getImportJobId()));
 		if (o != null) {
 			try {
-				File file = File.createTempFile("oss_", ".ossb", new File("/opt/oss-java/tmp/"));
+				File file = File.createTempFile("oss_", ".ossb", new File(cranixTmpDir));
 				Files.copy(inputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 				o.setImportData(file);
 			} catch (IOException e) {

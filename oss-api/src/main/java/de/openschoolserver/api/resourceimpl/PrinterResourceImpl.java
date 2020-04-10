@@ -28,12 +28,13 @@ import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.controller.*;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 import de.openschoolserver.dao.tools.OSSShellTools;
+import static de.openschoolserver.dao.internal.OSSConstants.*;
 
 public class PrinterResourceImpl implements PrinterResource {
 
 	Logger logger = LoggerFactory.getLogger(PrinterResourceImpl.class);
 
-	private Path PRINTERS  = Paths.get("/usr/share/oss/templates/printers.txt");
+	private Path PRINTERS  = Paths.get(cranixPrinters);
 
 	public PrinterResourceImpl() {
 	}
@@ -215,7 +216,7 @@ public class PrinterResourceImpl implements PrinterResource {
 		}
 		File file = null;
 		try {
-			file = File.createTempFile("oss_driverFile", printer.getName(), new File("/opt/oss-java/tmp/"));
+			file = File.createTempFile("oss_driverFile", printer.getName(), new File(cranixTmpDir));
 			Files.copy(fileInputStream, file.toPath(), StandardCopyOption.REPLACE_EXISTING);
 		} catch (IOException e) {
 			logger.error(e.getMessage(), e);
