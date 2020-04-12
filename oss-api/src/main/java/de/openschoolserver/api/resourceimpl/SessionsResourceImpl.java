@@ -67,6 +67,7 @@ public class SessionsResourceImpl implements SessionsResource {
 
 	@Override
 	public Session getStatus(Session session) {
+		session.setAcls(this.allowedModules(session));
 		return session;
 	}
 
