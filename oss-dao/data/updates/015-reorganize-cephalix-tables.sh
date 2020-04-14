@@ -74,7 +74,7 @@ echo "INSERT INTO Enumerates VALUES(NULL,'noticeType','access',1);" | mysql OSS
 echo "INSERT INTO Enumerates VALUES(NULL,'noticeType','todo',1);" | mysql OSS
 echo "INSERT INTO Enumerates VALUES(NULL,'noticeType','work',1);" | mysql OSS
 echo "INSERT INTO Enumerates VALUES(NULL,'noticeType','other',1);" | mysql OSS
-echo "alter table change recDate created datetime not null default now();" | mysql OSS
+echo "alter table CephalixSystemStatus change recDate created datetime not null default now();" | mysql OSS
 echo "alter table CephalixSystemStatus change lastUpdate lastUpdate datetime not null default now();" | mysql OSS
 
 #Adapt the tepmaltes too
