@@ -867,8 +867,38 @@ public interface SoftwareResource {
      * Functions to get the installation status
      * ##########################################
      *
-     * GET softwares/devices/{deviceId}
+     * GET softwares/status
      */
+    @GET
+    @Path("status")
+    @Produces(JSON_UTF8)
+    @ApiOperation(value = "The state of the installation of software(s) on all devices.",
+              notes = "A call with ID < 1 as softwareId a list of all softwares in all version on a device. "
+                + "The delivered list has following format:<br>"
+                + "[ {<br>"
+                + "&nbsp;&nbsp;&nbsp;softwareName : Name of the software<br>"
+                + "&nbsp;&nbsp;&nbsp;deviceName   : Name of the device<br>"
+                + "&nbsp;&nbsp;&nbsp;softwareversionId : Id of the SoftwareVersion<br>"
+                + "&nbsp;&nbsp;&nbsp;version    : Version of the software<br>"
+                + "&nbsp;&nbsp;&nbsp;status     : Installation status of this version<br>"
+                + "&nbsp;&nbsp;&nbsp;manually   : Was the softwar installed manually<br>"
+                + "} ]<br>"
+                + "There are following installation states:<br>"
+                + "I  -> installed<br>"
+                + "IS -> installation scheduled<br>"
+                + "MD -> manuell deinstalled<br>"
+                + "DS -> deinstallation scheduled<br>"
+                + "DF -> deinstallation failed<br>"
+                + "IF -> installation failed"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "No category was found"),
+            @ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+    @RolesAllowed("software.install")
+    List<SoftwareStatus> softwareStatus(
+            @ApiParam(hidden = true) @Auth Session session
+            );
+
     @GET
     @Path("devices/{deviceId}")
     @Produces(JSON_UTF8)

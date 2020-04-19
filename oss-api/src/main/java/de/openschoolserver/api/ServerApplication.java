@@ -103,6 +103,9 @@ public class ServerApplication extends Application<ServerConfiguration> {
         final CloneToolResource cloneToolResource = new CloneToolResourceImpl();
         environment.jersey().register(cloneToolResource);
 
+        final HwconfResource hwconfResource = new HwconfResourceImpl();
+        environment.jersey().register(hwconfResource);
+
         final CategoryResource categoryResource = new CategoryResourceImpl();
         environment.jersey().register(categoryResource);
 
