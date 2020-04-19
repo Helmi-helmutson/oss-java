@@ -105,7 +105,7 @@ public class ServerApplication extends Application<ServerConfiguration> {
 
 		final HwconfResource hwconfResource = new HwconfResourceImpl();
 		environment.jersey().register(hwconfResource);
-		
+
 		final CategoryResource categoryResource = new CategoryResourceImpl();
 		environment.jersey().register(categoryResource);
 

@@ -29,7 +29,7 @@ import java.util.List;
 @Api(value = "hwconfs")
 public interface HwconfResource {
 
-	
+
 	/**
 	 * Delivers the list of all hwconfs
 	 * @param session
@@ -201,7 +201,7 @@ public interface HwconfResource {
 	        @PathParam("partitionName") String partitionName
 	);
 
-	
+
 	/**
 	 * Start recovering of selected devices in a hwconf
 	 * @param session

@@ -739,9 +739,15 @@ public class SoftwareController extends Controller {
 	 * @return The list of searched SofwareStatus.
 	 * @see SoftwareStatus
 	 */
-	public List<SoftwareStatus> getAllStatus(String installationStatus) {
-        Query query = this.em.createNamedQuery("SoftwareStatus.findByStatus").setParameter("STATUS",installationStatus);
-        return (List<SoftwareStatus>) query.getResultList();
+	public List<SoftwareStatus> getAllStatus() {
+		Query query = this.em.createNamedQuery("SoftwareStatus.findAll");
+		List<SoftwareStatus> sts = new ArrayList<SoftwareStatus>();
+		for( SoftwareStatus st: (List<SoftwareStatus>) query.getResultList() ) {
+			st.setSoftwareName(st.getSoftwareVersion().getSoftware().getName());
+			st.setDeviceName(st.getDevice().getName());
+			st.setRoomName(st.getDevice().getRoom().getName());
+		}
+		return sts;
 	}
 
 	/**

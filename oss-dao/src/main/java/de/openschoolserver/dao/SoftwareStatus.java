@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * The persistent class for the SoftwareStatus database table.
- * 
+ *
  */
 @Entity
 @Table(name="SoftwareStatus")
@@ -28,7 +28,7 @@ public class SoftwareStatus implements Serializable {
 	@SequenceGenerator(name="SOFTWARESTATUS_ID_GENERATOR" )
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SOFTWARESTATUS_ID_GENERATOR")
 	private Long id;
-	
+
 	/**
 	 * The state of the installation can have following values:<br>
 	 * I  -> installed<br>
@@ -36,9 +36,9 @@ public class SoftwareStatus implements Serializable {
  	 * US -> update scheduled<br>
 	 * MD -> manuell deinstalled<br>
 	 * DS -> deinstallation scheduled<br>
-     * DF -> deinstallation failed<br>
-     * IF -> installation failed<br>
-     * FR -> installed version is frozen: This must not be updated.<br>
+	 * DF -> deinstallation failed<br>
+	 * IF -> installation failed<br>
+	 * FR -> installed version is frozen: This must not be updated.<br>
 	 */
 	private String status;
 
@@ -61,22 +61,25 @@ public class SoftwareStatus implements Serializable {
 
 	@Column(name = "device_id", insertable = false, updatable = false)
 	private Long deviceId;
-	
+
+	@Transient
+	private String roomName;
+
 	@Transient
 	private String deviceName;
-	 
+
 	@Transient
 	private String softwareName;
-	
+
 	@Transient
 	private boolean manually;
-	
+
 	@Transient
 	private Long softwareId;
-	
+
 	@Transient
 	private String version;
-	
+
 	@Override
 	public String toString() {
 		try {
@@ -85,7 +88,7 @@ public class SoftwareStatus implements Serializable {
 			return "{ \"ERROR\" : \"CAN NOT MAP THE OBJECT\" }";
 		}
 	}
-	
+
 
 	@Override
 	public int hashCode() {
@@ -111,16 +114,16 @@ public class SoftwareStatus implements Serializable {
 			return false;
 		return true;
 	}
-	
+
 	public SoftwareStatus() {
 	}
-	
+
 	public SoftwareStatus(Device d, SoftwareVersion sv, String status) {
 		this.device = d;
 		this.softwareVersion = sv;
 		this.status = status;
 	}
-	
+
 	public Long getId() {
 		return this.id;
 	}
@@ -211,5 +214,29 @@ public class SoftwareStatus implements Serializable {
 
 	public void setSoftwareId(Long softwareId) {
 		this.softwareId = softwareId;
+	}
+
+
+	/**
+	 * @return the roomName
+	 */
+	public String getRoomName() {
+		return roomName;
+	}
+
+
+	/**
+	 * @param roomName the roomName to set
+	 */
+	public void setRoomName(String roomName) {
+		this.roomName = roomName;
+	}
+
+
+	/**
+	 * @return the serialversionuid
+	 */
+	public static long getSerialversionuid() {
+		return serialVersionUID;
 	}
 }

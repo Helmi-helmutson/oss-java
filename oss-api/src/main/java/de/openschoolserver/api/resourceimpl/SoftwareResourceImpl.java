@@ -284,7 +284,9 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public OssResponse setSoftwareInstalledOnDevice(Session session, String deviceName, String softwareName,
 			String version) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
-		return new SoftwareController(session,em).setSoftwareStatusOnDeviceByName(deviceName, softwareName, softwareName, version, "I");
+		OssResponse resp = new SoftwareController(session,em).setSoftwareStatusOnDeviceByName(deviceName, softwareName, softwareName, version, "I");
+		em.close();
+		return resp;
 	}
 
 	@Override
@@ -375,6 +377,15 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	public OssResponse deleteLicense(Session session, long licenseId) {
 		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
 		OssResponse resp = new SoftwareController(session,em).deleteLicence(licenseId);
+		em.close();
+		return resp;
+	}
+
+
+	@Override
+	public List<SoftwareStatus> softwareStatus(Session session) {
+		EntityManager em = CommonEntityManagerFactory.instance("dummy").getEntityManagerFactory().createEntityManager();
+		List<SoftwareStatus> resp = new SoftwareController(session,em).getAllStatus();
 		em.close();
 		return resp;
 	}
