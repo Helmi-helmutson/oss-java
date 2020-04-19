@@ -744,8 +744,11 @@ public class SoftwareController extends Controller {
 		List<SoftwareStatus> sts = new ArrayList<SoftwareStatus>();
 		for( SoftwareStatus st: (List<SoftwareStatus>) query.getResultList() ) {
 			st.setSoftwareName(st.getSoftwareVersion().getSoftware().getName());
+			st.setVersion(st.getSoftwareVersion().getVersion());
 			st.setDeviceName(st.getDevice().getName());
 			st.setRoomName(st.getDevice().getRoom().getName());
+			st.setSoftwareId(st.getSoftwareVersion().getSoftware().getId());
+			sts.add(st);
 		}
 		return sts;
 	}
