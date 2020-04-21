@@ -573,39 +573,39 @@ public class EducationResourceImpl implements Resource, EducationResource {
 		switch(ossActionMap.getName()) {
 		case "setPassword":
 			return  userController.resetUserPassword(
-					ossActionMap.getUserIds(),
+					ossActionMap.getObjectIds(),
 					ossActionMap.getStringValue(),
 					ossActionMap.isBooleanValue());
 		case "setFilesystemQuota":
 			return  userController.setFsQuota(
-					ossActionMap.getUserIds(),
+					ossActionMap.getObjectIds(),
 					ossActionMap.getLongValue());
 		case "setMailsystemQuota":
 			return  userController.setMsQuota(
-					ossActionMap.getUserIds(),
+					ossActionMap.getObjectIds(),
 					ossActionMap.getLongValue());
 		case "disableLogin":
 			return  userController.disableLogin(
-					ossActionMap.getUserIds(),
+					ossActionMap.getObjectIds(),
 					ossActionMap.isBooleanValue());
 		case "disableInternet":
 			return  userController.disableInternet(
-					ossActionMap.getUserIds(),
+					ossActionMap.getObjectIds(),
 					ossActionMap.isBooleanValue());
 		case "mandatoryProfile":
 			return  userController.mandatoryProfile(
-					ossActionMap.getUserIds(),
+					ossActionMap.getObjectIds(),
 					ossActionMap.isBooleanValue());
 		case "copyTemplate":
 			return  userController.copyTemplate(
-					ossActionMap.getUserIds(),
+					ossActionMap.getObjectIds(),
 					ossActionMap.getStringValue());
 		case "removeProfiles":
-			return  userController.removeProfile(ossActionMap.getUserIds());
+			return  userController.removeProfile(ossActionMap.getObjectIds());
 		case "deleteUser":
 			SessionController sessionController = new SessionController(session,em);
 			if( sessionController.authorize(session,"user.delete") || sessionController.authorize(session,"student.delete") ) {
-				return  userController.deleteStudents(ossActionMap.getUserIds());
+				return  userController.deleteStudents(ossActionMap.getObjectIds());
 			} else {
 				responses.add(new OssResponse(session,"ERROR","You have no right to execute this action."));
 				return responses;

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class OssActionMap {
 
-	private List<Long> userIds;
+	private List<Long> objectIds;
 	private String     name;
 	private String     stringValue;
 	private Long       longValue;
@@ -25,12 +25,12 @@ public class OssActionMap {
 		// TODO Auto-generated constructor stub
 	}
 
-	public List<Long> getUserIds() {
-		return userIds;
+	public List<Long> getObjectIds() {
+		return objectIds;
 	}
 
-	public void setUserIds(List<Long> userIds) {
-		this.userIds = userIds;
+	public void setObjectIds(List<Long> userIds) {
+		this.objectIds = userIds;
 	}
 
 	public String getName() {
