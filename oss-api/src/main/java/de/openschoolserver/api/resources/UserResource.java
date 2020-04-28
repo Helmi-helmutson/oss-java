@@ -653,7 +653,7 @@ public interface UserResource {
 			@FormDataParam("identifier")  String  identifier,
 			@FormDataParam("test")  boolean test,
 			@FormDataParam("password")       String  password,
-			@FormDataParam("mustchange")     boolean mustchange,
+			@FormDataParam("mustChange")     boolean mustChange,
 			@FormDataParam("full")  boolean full,
 			@FormDataParam("allClasses")     boolean allClasses,
 			@FormDataParam("cleanClassDirs") boolean cleanClassDirs,

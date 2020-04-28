@@ -460,7 +460,7 @@ public class UserResourceImpl implements UserResource {
 			String identifier,
 			boolean test,
 			String password,
-			boolean mustchange,
+			boolean mustChange,
 			boolean full,
 			boolean allClasses,
 			boolean cleanClassDirs,
@@ -517,7 +517,7 @@ public class UserResourceImpl implements UserResource {
 			parameters.add("--password");
 			parameters.add(password);
 		}
-		if( mustchange ) {
+		if( mustChange ) {
 			parameters.add("--mustchange");
 		}
 		if( full ) {

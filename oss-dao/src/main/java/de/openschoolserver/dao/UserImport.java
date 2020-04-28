@@ -11,7 +11,7 @@ public class UserImport {
 	private	boolean test;
 	private	boolean debug;
 	private String  password;
-	private boolean mustchange;
+	private boolean mustChange;
 	private	boolean full;
 	private boolean allClasses;
 	private boolean cleanClassDirs;
@@ -47,10 +47,10 @@ public class UserImport {
 		this.password = password;
 	}
 	public boolean isMustchange() {
-		return mustchange;
+		return mustChange;
 	}
-	public void setMustchange(boolean mustchange) {
-		this.mustchange = mustchange;
+	public void setMustchange(boolean mustChange) {
+		this.mustChange = mustChange;
 	}
 	public boolean isFull() {
 		return full;
