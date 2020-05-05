@@ -17,6 +17,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import de.openschoolserver.api.resources.DeviceResource;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OSSMConfig;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Session;
@@ -484,5 +485,11 @@ public class DeviceResourceImpl implements DeviceResource {
 		OssResponse resp = deviceController.setPrinters(deviceId,printers);
 		em.close();
 		return resp;
+	}
+
+	@Override
+	public OssResponse applyAction(Session session, OssActionMap actionMap) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

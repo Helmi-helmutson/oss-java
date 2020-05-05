@@ -19,6 +19,7 @@ import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OSSMConfig;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Session;
@@ -842,4 +843,21 @@ public interface RoomResource {
 	        @PathParam("roomId") Long roomId,
 	        @PathParam("parameterId") Long parameterId
 	        );
+	/**
+	 * Apply actions on a list of rooms.
+	 * @param session
+	 * @return The result in an OssResponse object
+	 * @see OssResponse
+	 */
+	@POST
+	@Path("applyAction")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Apply actions on selected institutes.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("room.manage")
+	OssResponse applyAction(
+			@ApiParam(hidden = true) @Auth Session session,
+			OssActionMap actionMap
+			);
 }

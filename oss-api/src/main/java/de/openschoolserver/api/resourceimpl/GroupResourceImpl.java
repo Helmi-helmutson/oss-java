@@ -10,6 +10,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 
 import de.openschoolserver.api.resources.GroupResource;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.controller.GroupController;
 import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
@@ -186,5 +187,11 @@ public class GroupResourceImpl implements GroupResource {
 		OssResponse resp = new GroupController(session,em).importGroups(fileInputStream, contentDispositionHeader);
 		em.close();
 		return resp;
+	}
+
+	@Override
+	public OssResponse applyAction(Session session, OssActionMap actionMap) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

@@ -15,6 +15,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
 
@@ -340,4 +341,22 @@ public interface GroupResource {
                @PathParam("groupId") Long groupId,
                @PathParam("userId") Long userId
        );
+
+	/**
+	 * Apply actions on a list of groups.
+	 * @param session
+	 * @return The result in an OssResponse object
+	 * @see OssResponse
+	 */
+	@POST
+	@Path("applyAction")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Apply actions on selected institutes.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("group.manage")
+	OssResponse applyAction(
+			@ApiParam(hidden = true) @Auth Session session,
+			OssActionMap actionMap
+			);
 }

@@ -22,6 +22,7 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.OSSMConfig;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
@@ -739,4 +740,22 @@ public interface DeviceResource {
 	        @PathParam("deviceId") Long deviceId,
 	        @PathParam("parameterId") Long parameterId
 	        );
+
+	/**
+	 * Apply actions on a list of devices.
+	 * @param session
+	 * @return The result in an OssResponse object
+	 * @see OssResponse
+	 */
+	@POST
+	@Path("applyAction")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Apply actions on selected institutes.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("device.manage")
+	OssResponse applyAction(
+			@ApiParam(hidden = true) @Auth Session session,
+			OssActionMap actionMap
+			);
 }

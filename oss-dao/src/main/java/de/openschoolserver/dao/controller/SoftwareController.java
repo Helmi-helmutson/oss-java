@@ -1396,12 +1396,12 @@ public class SoftwareController extends Controller {
 		//Write the hosts sls files
 		logger.debug("Process collected datas:");
 		for( Device device : deviceController.getAll() ) {
+			//We only create salt files for FatClients
 			if( device.getHwconf() == null || ! device.getHwconf().getDeviceType().equals("FatClient") ) {
 				continue;
 			}
 			logger.debug("Processing:" + device.getName() );
 			List<String> deviceRemove  = new ArrayList<String>();
-			//List<String> deviceGrains  = new ArrayList<String>();
 			List<String> deviceInstall = new ArrayList<String>();
 			List<String> deviceOssInst = new ArrayList<String>();
 			deviceRemove.add("packages.toremove:");

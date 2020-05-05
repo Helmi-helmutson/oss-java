@@ -28,6 +28,7 @@ import de.openschoolserver.dao.Alias;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
 import de.openschoolserver.dao.GuestUsers;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.Session;
 import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.UserImport;
@@ -773,6 +774,12 @@ public class UserResourceImpl implements UserResource {
 		}
 		em.close();
 		return new OssResponse(session,"OK", "Users was inserted in the required groups.");
+	}
+
+	@Override
+	public OssResponse applyAction(Session session, OssActionMap actionMap) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

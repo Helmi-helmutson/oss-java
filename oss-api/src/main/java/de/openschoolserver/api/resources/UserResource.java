@@ -23,6 +23,7 @@ import de.openschoolserver.dao.User;
 import de.openschoolserver.dao.UserImport;
 import de.openschoolserver.dao.Category;
 import de.openschoolserver.dao.Group;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Session;
 
@@ -765,6 +766,23 @@ public interface UserResource {
 	@RolesAllowed("user.search")
 	OssResponse allTeachersInAllClasses(
 			@ApiParam(hidden = true) @Auth Session session
+			);
+	/**
+	 * Apply actions on a list of users.
+	 * @param session
+	 * @return The result in an OssResponse object
+	 * @see OssResponse
+	 */
+	@POST
+	@Path("applyAction")
+	@Produces(JSON_UTF8)
+	@ApiOperation(value = "Apply actions on selected institutes.")
+	@ApiResponses(value = {
+			@ApiResponse(code = 500, message = "Server broken, please contact adminstrator")})
+	@RolesAllowed("user.manage")
+	OssResponse applyAction(
+			@ApiParam(hidden = true) @Auth Session session,
+			OssActionMap actionMap
 			);
 
 }

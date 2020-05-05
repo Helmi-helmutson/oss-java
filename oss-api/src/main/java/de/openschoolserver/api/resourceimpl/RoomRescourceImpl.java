@@ -5,6 +5,7 @@ import de.openschoolserver.dao.AccessInRoom;
 import de.openschoolserver.dao.Device;
 import de.openschoolserver.dao.HWConf;
 import de.openschoolserver.dao.OSSMConfig;
+import de.openschoolserver.dao.OssActionMap;
 import de.openschoolserver.dao.OssResponse;
 import de.openschoolserver.dao.Printer;
 import de.openschoolserver.dao.Room;
@@ -483,5 +484,11 @@ public class RoomRescourceImpl implements RoomResource {
 		OssResponse resp = roomController.setPrinters(roomId, printers);
 		em.close();
 		return resp;
+	}
+
+	@Override
+	public OssResponse applyAction(Session session, OssActionMap actionMap) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

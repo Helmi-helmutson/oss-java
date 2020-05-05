@@ -1,33 +1,21 @@
-/* (c) 2017 Péter Varkoly <peter@varkoly.de> - all rights reserved */
+/* (c) 2020 Péter Varkoly <peter@varkoly.de> - all rights reserved */
 package de.openschoolserver.api.resourceimpl;
 
-import de.openschoolserver.dao.HWConf;
-
-
-import de.openschoolserver.dao.Clone;
-import de.openschoolserver.dao.Device;
-import de.openschoolserver.dao.Partition;
-import de.openschoolserver.dao.OssResponse;
-import de.openschoolserver.dao.Session;
-import de.openschoolserver.dao.Room;
-import de.openschoolserver.dao.controller.CloneToolController;
-import de.openschoolserver.dao.controller.Config;
-import de.openschoolserver.dao.controller.RoomController;
-import de.openschoolserver.dao.controller.SessionController;
-import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
-import de.openschoolserver.dao.controller.DeviceController;
-import de.openschoolserver.api.resources.HwconfResource;
+import java.util.List;
 
 import javax.persistence.EntityManager;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.UriInfo;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import de.openschoolserver.api.resources.HwconfResource;
+import de.openschoolserver.dao.Clone;
+import de.openschoolserver.dao.Device;
+import de.openschoolserver.dao.HWConf;
+import de.openschoolserver.dao.OssActionMap;
+import de.openschoolserver.dao.OssResponse;
+import de.openschoolserver.dao.Partition;
+import de.openschoolserver.dao.Session;
+import de.openschoolserver.dao.controller.CloneToolController;
+import de.openschoolserver.dao.internal.CommonEntityManagerFactory;
 
 public class HwconfResourceImpl implements HwconfResource {
 
@@ -162,5 +150,11 @@ public class HwconfResourceImpl implements HwconfResource {
 		}
 		em.close();
 		return ossResponse;
+	}
+
+	@Override
+	public OssResponse applyAction(Session session, OssActionMap actionMap) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

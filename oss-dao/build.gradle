@@ -6,9 +6,9 @@ version = '1.0-SNAPSHOT'
 description = "OSS Java Data Access"
 
 repositories {
-//    maven { url "http://repo.maven.apache.org/maven2" } 
-maven { url "http://nexus.extis.de:18081/repository/maven-public/" }
-
+//    mavenLocal()
+//   mavenCentral()
+    maven { url "http://nexus.extis.de:18081/repository/maven-public/" }
 }
 
 dependencies {
