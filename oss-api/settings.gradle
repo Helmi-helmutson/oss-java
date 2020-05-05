@@ -1,4 +1,0 @@
-rootProject.name = 'de.openschoolserver.api'
-
-include ':de.openschoolserver.dao'
-project(':de.openschoolserver.dao').projectDir = new File(settingsDir, '../oss-dao')
