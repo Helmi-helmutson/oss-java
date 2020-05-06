@@ -2,7 +2,6 @@
 export HOME="/root"
 
 
-
 TYPE=$( echo "describe CephalixInstitutes" | mysql OSS | grep type | gawk '{ print $2 }'  )
 if [ "$TYPE" ]
 then
@@ -70,12 +69,31 @@ fi
 
 echo "ALTER TABLE CephalixSystemStatus ADD COLUMN IF NOT EXISTS recDate DATETIME DEFAULT NOW() AFTER lastUpdate;" | mysql OSS
 echo "ALTER TABLE CephalixSystemStatus MODIFY lastUpdate DATETIME DEFAULT NOW() on update current_timestamp();" | mysql OSS
+echo "DELETE FROM Enumerates WHERE name = 'noticeType'; " | mysql OSS
 echo "INSERT INTO Enumerates VALUES(NULL,'noticeType','access',1);" | mysql OSS
 echo "INSERT INTO Enumerates VALUES(NULL,'noticeType','todo',1);" | mysql OSS
 echo "INSERT INTO Enumerates VALUES(NULL,'noticeType','work',1);" | mysql OSS
 echo "INSERT INTO Enumerates VALUES(NULL,'noticeType','other',1);" | mysql OSS
-echo "alter table CephalixSystemStatus change recDate created datetime not null default now();" | mysql OSS
-echo "alter table CephalixSystemStatus change lastUpdate lastUpdate datetime not null default now();" | mysql OSS
+echo "ALTER TABLE CephalixSystemStatus CHANGE recDate created datetime not null default now();" | mysql OSS
+echo "ALTER TABLE CephalixSystemStatus CHANGE lastUpdate lastUpdate datetime not null default now();" | mysql OSS
+echo "UPDATE CephalixInstitutes set instituteType='globalSchool'    where instituteType='global';" | mysql OSS
+echo "UPDATE CephalixInstitutes set instituteType='primarySchool'   where instituteType='primary';" | mysql OSS
+echo "UPDATE CephalixInstitutes set instituteType='realSchool'      where instituteType='real';" | mysql OSS
+echo "UPDATE CephalixInstitutes set instituteType='secondarySchool' where instituteType='secondary_school';" | mysql OSS
+echo "UPDATE CephalixInstitutes set instituteType='workSchool'      where instituteType='work';" | mysql OSS
+echo "DELETE FROM Enumerates WHERE name = 'instituteType'; " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','workSchool',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','globalSchool',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','primarySchool',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','gymnasium',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','secondary',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','secondarySchool',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','administration',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','realSchool',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','special',1); " | mysql OSS
+echo "INSERT INTO Enumerates VALUES(NULL,'instituteType','other',1); " | mysql OSS
+echo "ALTER TABLE CephalixMappings change COLUMN ossId cranixId BIGINT UNSIGNED DEFAULT NULL;" | mysql OSS
+echo "ALTER TABLE CephalixTickets  change COLUMN ossuserId cranixuserId BIGINT UNSIGNED DEFAULT NULL;" | mysql OSS
 
 #Adapt the tepmaltes too
 for i in /usr/share/cephalix/templates/autoyast-*xml
@@ -83,4 +101,5 @@ do
 	sed -i 's/###network###/###internalNetwork###/' $i
 	sed -i 's/###type###/###instituteType###/' $i
 done
+
 

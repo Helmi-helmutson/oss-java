@@ -24,6 +24,7 @@ import de.cranix.dao.Session;
 import de.cranix.dao.SoftwareStatus;
 import de.cranix.dao.tools.OSSShellTools;
 import static de.cranix.dao.tools.StaticHelpers.*;
+import static de.cranix.dao.internal.CranixConstants.*;
 
 
 @SuppressWarnings( "unchecked" )
@@ -602,7 +603,7 @@ public class CloneToolController extends Controller {
 			StringBuffer reply = new StringBuffer();
 			StringBuffer error = new StringBuffer();
 			program[0] = "/sbin/startproc";
-			program[1] =  cranixBaseDir + "tools/start_multicast_imaging.sh";
+			program[1] = cranixBaseDir + "tools/start_multicast_imaging.sh";
 			program[2] = networkDevice;
 			program[3] = images + hwconfId + "/" + partition.getName() + ".img";
 			OSSShellTools.exec(program, reply, error, null);

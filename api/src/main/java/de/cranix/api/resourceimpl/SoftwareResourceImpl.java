@@ -467,7 +467,7 @@ public class SoftwareResourceImpl implements SoftwareResource {
 	@Override
 	public String downloadStatus(Session session) {
 		try {
-			return	String.join(" ", Files.readAllLines(Paths.get("/run/lock/oss-api/oss_download_packages")));
+			return	String.join(" ", Files.readAllLines(Paths.get("/run/lock/cranix-api/crx_download_packages")));
 		} catch( IOException e ) {
 			return "";
 		}
