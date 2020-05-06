@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. /etc/sysconfig/schoolserver
+. /etc/sysconfig/cranix
 . /etc/profile.d/profile.sh
 
 #Create a session for local services
@@ -8,7 +8,7 @@ TOKEN=$( grep de.cranix.api.auth.localhost= /opt/cranix-java/conf/cranix-api.pro
 SQLUSER=$( grep javax.persistence.jdbc.user= /opt/cranix-java/conf/cranix-api.properties | sed 's/javax.persistence.jdbc.user=//' )
 SQLPW=$( grep javax.persistence.jdbc.password= /opt/cranix-java/conf/cranix-api.properties | sed 's/javax.persistence.jdbc.password=//' )
 LOCAL_TOKEN=$( echo "SELECT COUNT(*) FROM Sessions WHERE token='$TOKEN'" | mysql CRANIX -u $SQLUSER -p${SQLPW} | tail -n 1 )
-if [  "${LOCAL_TOKEN}" = 0 -o "${SCHOOL_RESET_REGISTER_PASSWORD}" = "yes" ]; then
+if [  "${LOCAL_TOKEN}" = 0 -o "${CRANIX_RESET_REGISTER_PASSWORD}" = "yes" ]; then
 	grep -q de.cranix.api.auth.localhost= /opt/cranix-java/conf/cranix-api.properties || echo de.cranix.api.auth.localhost=TOKEN >> /opt/cranix-java/conf/cranix-api.properties
 	TOKEN="localhost_"$(uuidgen)
 	sed -i s/de.cranix.api.auth.localhost=.*/de.cranix.api.auth.localhost=$TOKEN/ /opt/cranix-java/conf/cranix-api.properties

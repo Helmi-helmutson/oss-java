@@ -16,5 +16,5 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'de.openschoolserver.dao'
+rootProject.name = 'de.cranix.dao'
 

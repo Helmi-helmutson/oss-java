@@ -6,4 +6,4 @@ connection.project.dir=
 derived.resources=.gradle,build
 eclipse.preferences.version=1
 natures=org.eclipse.jdt.core.javanature
-project.path=\:de.openschoolserver.dao
+project.path=\:de.cranix.dao

@@ -11,14 +11,14 @@ server:
     port: 9090
 
 swagger:
-  resourcePackage: de.openschoolserver.api.resources
+  resourcePackage: de.cranix.api.resources
   title: Open School Server API
   version: 0.0.1
 
 logging:
   level: INFO
   loggers:
-    de.openschoolserver: DEBUG
+    de.cranix: DEBUG
     io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper: DEBUG
 #    org.glassfish.jersey.logging.ServerLoggingFilter: DEBUG
 #    org.glassfish.jersey.logging.LoggingFeature: DEBUG
