@@ -83,7 +83,7 @@ public class CommonEntityManagerFactory {
         if (emf == null) {
             Map<String, Object> props = getProperties();
 
-            emf = Persistence.createEntityManagerFactory("OSS", props);
+            emf = Persistence.createEntityManagerFactory("CRX", props);
 
             if (emf == null) {
             	System.err.println("getEntityManagerFactory : EntityManagerFactory still null."); //TODO
