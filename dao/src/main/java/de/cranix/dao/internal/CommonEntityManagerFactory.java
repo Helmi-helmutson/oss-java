@@ -44,11 +44,12 @@ public class CommonEntityManagerFactory {
 
             properties.put(PersistenceUnitProperties.CLASSLOADER, CommonEntityManagerFactory.class.getClassLoader());
 
-            properties.put("eclipselink.logging.level", "WARNING");
+            properties.put("eclipselink.logging.level", "ALL");
             properties.put("eclipselink.logging.timestamp", "true");
             properties.put("eclipselink.logging.session", "true");
             properties.put("eclipselink.logging.thread", "true");
             properties.put("eclipselink.logging.exceptions", "true");
+	    //properties.put("eclipselink.persistencexml", "/opt/cranix-java/conf/persistence.xml");
             /*
              * <property name="eclipselink.logging.level.sql" value="FINE"/>
              * <property name="eclipselink.logging.parameters" value="true"/>
@@ -83,7 +84,7 @@ public class CommonEntityManagerFactory {
         if (emf == null) {
             Map<String, Object> props = getProperties();
 
-            emf = Persistence.createEntityManagerFactory("CRX", props);
+            emf = Persistence.createEntityManagerFactory("OSS", props);
 
             if (emf == null) {
             	System.err.println("getEntityManagerFactory : EntityManagerFactory still null."); //TODO
